@@ -61,12 +61,12 @@
     "type-check": "tsc",
     "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx src/",
     "lint:fix": "eslint . --fix --ext .ts,.tsx,.js,.jsx src/",
-    "format": "prettier --check .",
+    "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{ts,tsx,js, jsx}": [
+    "*.{ts,tsx,js,jsx}": [
       "yarn format:fix",
       "yarn lint:fix",
       "git add"

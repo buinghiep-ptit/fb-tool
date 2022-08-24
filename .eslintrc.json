@@ -1,0 +1,59 @@
+{
+  "plugins": ["react", "prettier", "react-hooks", "@typescript-eslint"],
+  "extends": [
+    "airbnb-typescript",
+    "plugin:import/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "arrowParens": "avoid",
+        "semi": false,
+        "trailingComma": "all",
+        "endOfLine": "lf",
+        "tabWidth": 2,
+        "useTabs": false,
+        "singleQuote": true,
+        "printWidth": 80,
+        "jsxSingleQuote": false
+      }
+    ],
+    "react/jsx-filename-extension": [
+      1,
+      { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "import/no-anonymous-default-export": [2, { "allowArrowFunction": true }],
+    "import/no-unresolved": [0],
+    "import/extensions": [0],
+    "import/named": [0],
+    "import/no-named-as-default-member": [0],
+    "import/namespace": [0],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "@typescript-eslint/default-param-last": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-implied-eval": "off"
+  },
+  "ignorePatterns": ["src/assets/*", "**/*.config.js"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": {}
+    }
+  }
+}

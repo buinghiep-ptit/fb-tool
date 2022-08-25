@@ -1,5 +1,6 @@
 import { CssBaseline, StyledEngineProvider } from '@mui/material'
-import * as history from 'history'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import 'perfect-scrollbar/css/perfect-scrollbar.css'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
@@ -7,13 +8,24 @@ import App from './app/App'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,
+    },
+  },
+})
+
 ReactDOM.render(
-  <StyledEngineProvider injectFirst>
-    <BrowserRouter history={history}>
-      <CssBaseline />
-      <App />
-    </BrowserRouter>
-  </StyledEngineProvider>,
+  <QueryClientProvider client={queryClient}>
+    <StyledEngineProvider injectFirst>
+      <BrowserRouter>
+        <CssBaseline />
+        <App />
+      </BrowserRouter>
+    </StyledEngineProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>,
   document.getElementById('root'),
 )
 

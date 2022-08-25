@@ -20,12 +20,7 @@ const AppSwitch = () => {
   return (
     <Container>
       <Box className="mb-sm-30">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Switch' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Switch' }]} />
       </Box>
 
       <Stack spacing={3}>

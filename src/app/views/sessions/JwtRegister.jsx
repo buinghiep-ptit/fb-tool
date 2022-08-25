@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react'
 import { LoadingButton } from '@mui/lab'
 import { Card, Checkbox, Grid, TextField } from '@mui/material'
 import { Box, styled } from '@mui/system'
-import { Paragraph } from 'app/components/Typography'
+import { Paragraph, Span } from 'app/components/Typography'
 import useAuth from 'app/hooks/useAuth'
 import { Formik } from 'formik'
 import { useState } from 'react'
@@ -11,12 +11,21 @@ import * as Yup from 'yup'
 
 const FlexBox = styled(Box)(() => ({ display: 'flex', alignItems: 'center' }))
 
-const JustifyBox = styled(FlexBox)(() => ({ justifyContent: 'center' }))
+const JustifyBox = styled(FlexBox)(() => ({
+  justifyContent: 'center',
+  flexDirection: 'column',
+}))
 
 const ContentBox = styled(JustifyBox)(() => ({
   height: '100%',
   padding: '32px',
   background: 'rgba(0, 0, 0, 0.01)',
+}))
+const StyledSpan = styled(Span)(({ mode }) => ({
+  fontSize: 36,
+  fontFamily: 'Caveat',
+  fontWeight: 900,
+  display: mode === 'compact' ? 'none' : 'block',
 }))
 
 const JWTRegister = styled(JustifyBox)(() => ({
@@ -75,10 +84,11 @@ const JwtRegister = () => {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <ContentBox>
+              <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
               <img
+                src="/assets/images/login/bg-register.png"
                 width="100%"
                 alt="Register"
-                src="/assets/images/illustrations/posting_photo.svg"
               />
             </ContentBox>
           </Grid>

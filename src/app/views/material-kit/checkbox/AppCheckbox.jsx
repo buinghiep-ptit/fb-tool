@@ -18,12 +18,7 @@ const AppCheckbox = () => {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Chckbox' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Chckbox' }]} />
       </Box>
 
       <SimpleCard title="simple checkbox">

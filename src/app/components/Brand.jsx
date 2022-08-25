@@ -11,8 +11,10 @@ const BrandRoot = styled(Box)(() => ({
 }))
 
 const StyledSpan = styled(Span)(({ mode }) => ({
-  fontSize: 18,
+  fontSize: 24,
   marginLeft: '.5rem',
+  fontFamily: 'Caveat',
+  fontWeight: 700,
   display: mode === 'compact' ? 'none' : 'block',
 }))
 
@@ -24,9 +26,10 @@ const Brand = ({ children }) => {
   return (
     <BrandRoot>
       <Box display="flex" alignItems="center">
-        <MatxLogo />
+        <img src="/assets/images/logo-campdi.svg" alt="" />
+        {/* <MatxLogo /> */}
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          Matx
+          CampDi
         </StyledSpan>
       </Box>
 

@@ -1,6 +1,41 @@
 export const navigations = [
-  { name: 'Dashboard', path: '/dashboard/default', icon: 'dashboard' },
-  { label: 'PAGES', type: 'label' },
+  { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
+  // {
+  //   name: 'Quản lý tài khoản KH',
+  //   path: '/quan-ly-tai-khoan-khach-hang',
+  //   icon: 'account_box',
+  // },
+  {
+    name: 'Quản lý Feed',
+    path: '/quan-ly-bang-tin',
+    icon: 'feed',
+  },
+  {
+    name: 'Bài Feed Campdi',
+    path: '/tool-post-bai-feed',
+    icon: 'event_note',
+  },
+  {
+    name: 'Quản lý địa danh',
+    path: '/quan-ly-thong-tin-dia-danh',
+    icon: 'edit_location_alt',
+  },
+  {
+    name: 'Quản lý điểm camp',
+    path: '/quan-ly-thong-tin-diem-camp',
+    icon: 'edit_location',
+  },
+  {
+    name: 'Quản lý dịch vụ',
+    path: '/quan-ly-dich-vu',
+    icon: 'event',
+  },
+  {
+    name: 'Quản lý từ cấm',
+    path: '/quan-ly-tu-cam',
+    icon: 'comments_disabled',
+  },
+  // { label: 'PAGES', type: 'label' },
   {
     name: 'Session/Auth',
     icon: 'security',
@@ -15,11 +50,16 @@ export const navigations = [
       { name: 'Error', iconText: '404', path: '/session/404' },
     ],
   },
-  { label: 'Components', type: 'label' },
+  // { label: 'Components', type: 'label' },
   {
-    name: 'Components',
+    name: 'Biểu đồ / Thống kê',
+    icon: 'trending_up',
+    children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
+  },
+  {
+    name: 'MUI-Components',
     icon: 'favorite',
-    badge: { value: '30+', color: 'secondary' },
+    badge: { value: '10+', color: 'secondary' },
     children: [
       { name: 'Auto Complete', path: '/material/autocomplete', iconText: 'A' },
       { name: 'Buttons', path: '/material/buttons', iconText: 'B' },
@@ -41,15 +81,10 @@ export const navigations = [
       { name: 'Table', path: '/material/table', iconText: 'T' },
     ],
   },
-  {
-    name: 'Charts',
-    icon: 'trending_up',
-    children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
-  },
-  {
-    name: 'Documentation',
-    icon: 'launch',
-    type: 'extLink',
-    path: 'http://demos.ui-lib.com/matx-react-doc/',
-  },
+  // {
+  //   name: 'Documentation',
+  //   icon: 'launch',
+  //   type: 'extLink',
+  //   path: 'http://demos.ui-lib.com/matx-react-doc/',
+  // },
 ]

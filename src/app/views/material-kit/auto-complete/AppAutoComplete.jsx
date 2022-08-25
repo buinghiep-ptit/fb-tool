@@ -17,12 +17,7 @@ const AppAutoComplete = () => {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Autocomplete' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Autocomplete' }]} />
       </Box>
 
       <SimpleCard title="autocomplete combo">

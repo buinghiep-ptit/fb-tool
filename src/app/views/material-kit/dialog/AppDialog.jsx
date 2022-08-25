@@ -24,12 +24,7 @@ const AppDialog = () => {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Dialog' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Dialog' }]} />
       </Box>
 
       <Stack spacing={3}>

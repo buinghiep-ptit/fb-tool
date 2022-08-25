@@ -22,12 +22,7 @@ const AppSnackbar = () => {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Snackbar' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Snackbar' }]} />
       </Box>
 
       <Stack spacing={3}>

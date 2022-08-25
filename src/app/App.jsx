@@ -6,15 +6,17 @@ import { AuthProvider } from './contexts/JWTAuthContext'
 import { SettingsProvider } from './contexts/SettingsContext'
 import { Store } from './redux/Store'
 import routes from './routes'
+import NavigationScroll from './components/NavigationScroll'
 
 const App = () => {
   const content = useRoutes(routes)
-
   return (
     <Provider store={Store}>
       <SettingsProvider>
         <MatxTheme>
-          <AuthProvider>{content}</AuthProvider>
+          <AuthProvider>
+            <NavigationScroll>{content}</NavigationScroll>
+          </AuthProvider>
         </MatxTheme>
       </SettingsProvider>
     </Provider>

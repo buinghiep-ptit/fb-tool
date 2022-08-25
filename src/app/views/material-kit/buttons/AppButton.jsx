@@ -20,12 +20,7 @@ export default function AppButton() {
   return (
     <AppButtonRoot>
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Material', path: '/material' },
-            { name: 'Buttons' },
-          ]}
-        />
+        <Breadcrumb routeSegments={[{ name: 'Buttons' }]} />
       </Box>
 
       <SimpleCard title="contained buttons">

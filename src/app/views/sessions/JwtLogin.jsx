@@ -1,22 +1,32 @@
 import { LoadingButton } from '@mui/lab'
 import { Card, Checkbox, Grid, TextField } from '@mui/material'
 import { Box, styled, useTheme } from '@mui/system'
-import { Paragraph } from 'app/components/Typography'
+import { Paragraph, Span } from 'app/components/Typography'
 import useAuth from 'app/hooks/useAuth'
 import { Formik } from 'formik'
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const FlexBox = styled(Box)(() => ({ display: 'flex', alignItems: 'center' }))
 
-const JustifyBox = styled(FlexBox)(() => ({ justifyContent: 'center' }))
+const JustifyBox = styled(FlexBox)(() => ({
+  justifyContent: 'center',
+  flexDirection: 'column',
+}))
 
 const ContentBox = styled(Box)(() => ({
   height: '100%',
   padding: '32px',
   position: 'relative',
   background: 'rgba(0, 0, 0, 0.01)',
+}))
+
+const StyledSpan = styled(Span)(({ mode }) => ({
+  fontSize: 36,
+  fontFamily: 'Caveat',
+  fontWeight: 900,
+  display: mode === 'compact' ? 'none' : 'block',
 }))
 
 const JWTRoot = styled(JustifyBox)(() => ({
@@ -34,8 +44,8 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const initialValues = {
-  email: 'jason@ui-lib.com',
-  password: 'dummyPass',
+  email: 'dscra@gmail.com',
+  password: '00000000',
   remember: true,
 }
 
@@ -56,11 +66,14 @@ const JwtLogin = () => {
 
   const { login } = useAuth()
 
+  const location = useLocation()
+  const from = location.state?.from || '/'
+
   const handleFormSubmit = async values => {
     setLoading(true)
     try {
       await login(values.email, values.password)
-      navigate('/')
+      navigate(from, { replace: true })
     } catch (e) {
       setLoading(false)
     }
@@ -72,8 +85,9 @@ const JwtLogin = () => {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
+              <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
               <img
-                src="/assets/images/illustrations/dreamer.svg"
+                src="/assets/images/login/bg-login.png"
                 width="100%"
                 alt=""
               />

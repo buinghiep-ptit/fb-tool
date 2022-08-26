@@ -3,7 +3,7 @@ import { lazy } from 'react'
 
 const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
 const ManagerFeed = Loadable(lazy(() => import('./ManagerFeed')))
-const ManagerPlace = Loadable(lazy(() => import('./ManagerPlace')))
+const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )

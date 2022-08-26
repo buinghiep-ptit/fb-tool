@@ -44,7 +44,7 @@ class Http {
     const http = axios.create({
       baseURL: isServer ? `${process.env.NEXT_PUBLIC_API_URL}` : '',
       headers: headers as any,
-      paramsSerializer: params => queryString.stringify(params),
+      paramsSerializer: (params: any) => queryString.stringify(params),
       timeout: 15000,
       withCredentials: true,
     })
@@ -81,11 +81,11 @@ class Http {
 
         return originalRequest
       },
-      error => Promise.reject(error),
+      (error: any) => Promise.reject(error),
     )
 
     http.interceptors.response.use(
-      response => {
+      (response: any) => {
         if (currentExecutingRequests[response.request.responseURL]) {
           // here you clean the request
           delete currentExecutingRequests[response.request.responseURL]
@@ -93,10 +93,10 @@ class Http {
 
         return response
       },
-      async err => {
-        const originalRequest = err.config
+      async (error: any) => {
+        const originalRequest = error.config
 
-        if (axios.isCancel(err)) {
+        if (axios.isCancel(error)) {
           // here you check if this is a cancelled request to drop it silently (without error)
           return new Promise(() => {})
         }
@@ -107,8 +107,8 @@ class Http {
         }
 
         if (
-          err.response?.status &&
-          err.response.status === 401 &&
+          error.response?.status &&
+          error.response.status === 401 &&
           !originalRequest._retry
         ) {
           if (isRefreshing) {
@@ -157,7 +157,7 @@ class Http {
           })
         }
 
-        throw err
+        throw error
       },
     )
 

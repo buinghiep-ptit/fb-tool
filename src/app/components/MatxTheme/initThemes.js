@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material'
+import { createTheme, responsiveFontSizes } from '@mui/material'
 import { forEach, merge } from 'lodash'
 import { themeColors } from './themeColors'
 import themeOptions from './themeOptions'
@@ -8,6 +8,7 @@ function createMatxThemes() {
 
   forEach(themeColors, (value, key) => {
     themes[key] = createTheme(merge({}, themeOptions, value))
+    themes[key] = responsiveFontSizes(themes[key])
   })
 
   return themes

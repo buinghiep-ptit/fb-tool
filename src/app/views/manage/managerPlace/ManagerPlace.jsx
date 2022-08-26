@@ -11,13 +11,17 @@ import {
   TableRow,
   TableHead,
   IconButton,
+  TablePagination,
+  Switch,
 } from '@mui/material'
-import { Breadcrumb } from 'app/components'
+import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { values } from 'lodash'
 import { Paragraph } from 'app/components/Typography'
+import { useState } from 'react'
+import TableCustom from 'app/components/TableCustom/TableCustom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -45,7 +49,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }))
 
-const subscribarList = [
+const dataList = [
   {
     imagePlace: 'image',
     namePlace: 'name',
@@ -53,7 +57,38 @@ const subscribarList = [
     event: '1231',
     address: 'address',
     type: 'adasd',
-    status: 'on',
+    status: true,
+    action: ['edit', 'delete'],
+  },
+  {
+    imagePlace: 'image',
+    namePlace: 'name',
+    quantity: 10,
+    event: '1231',
+    address: 'address',
+    type: 'adasd',
+    status: false,
+    action: ['edit'],
+  },
+  {
+    imagePlace: 'image',
+    namePlace: 'name',
+    quantity: 10,
+    event: '1231',
+    address: 'address',
+    type: 'adasd',
+    status: true,
+    action: ['delete'],
+  },
+  {
+    imagePlace: 'image',
+    namePlace: 'name',
+    quantity: 10,
+    event: '1231',
+    address: 'address',
+    type: 'adasd',
+    status: true,
+    action: ['edit', 'delete'],
   },
 ]
 
@@ -66,21 +101,49 @@ const tableModel = {
     'Sự kiện',
     'Địa chỉ',
     'Loại hình',
-    'Trang thái',
+    'Trạng thái',
     'Hành động',
   ],
   bodyCell: [
-    'imagePlace',
-    'namePlace',
-    'quantity',
-    'event',
-    'address',
-    'type',
-    'status',
+    {
+      name: 'imagePlace',
+    },
+    {
+      name: 'namePlace',
+    },
+    {
+      name: 'quantity',
+    },
+    {
+      name: 'event',
+    },
+    {
+      name: 'address',
+    },
+    {
+      name: 'type',
+    },
+    {
+      name: 'status',
+    },
+    {
+      name: 'action',
+    },
   ],
 }
 
 export default function ManagerPlace(props) {
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
+
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = event => {
+    setRowsPerPage(+event.target.value)
+    setPage(0)
+  }
   const handleFormSubmit = values => {
     console.log('submit')
   }
@@ -154,40 +217,12 @@ export default function ManagerPlace(props) {
           </Paragraph>
         </Grid>
       </Grid>
-      <Box width="100%" overflow="auto">
-        <StyledTable>
-          <TableHead>
-            <TableRow>
-              {tableModel.headCell.map((cell, index) => (
-                <TableCell align="center" key={index}>
-                  {cell}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {subscribarList.map((subscriber, index) => (
-              <TableRow key={index}>
-                <TableCell align="center">{index + 1}</TableCell>
-                {tableModel.bodyCell.map((element, id) => (
-                  <TableCell align="center" key={id}>
-                    {subscriber[element]}
-                  </TableCell>
-                ))}
-                <TableCell align="center">
-                  <IconButton>
-                    <Icon color="error">edit</Icon>
-                  </IconButton>
-                  <IconButton>
-                    <Icon color="error">delete</Icon>
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </StyledTable>
-      </Box>
+      <TableCustom
+        title="Danh sách địa điểm Camp"
+        dataTable={dataList}
+        tableModel={tableModel}
+        pagination={true}
+      />
     </Container>
   )
 }

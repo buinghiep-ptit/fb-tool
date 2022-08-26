@@ -35,7 +35,7 @@ const themeRoot = {
       default: '#F9FAFC',
       paper: '#FFFFFF',
     },
-    divider: '#E6E8F0',
+    // divider: '#E6E8F0',
     primary: {
       main: '#5048E5',
       light: '#828DF8',

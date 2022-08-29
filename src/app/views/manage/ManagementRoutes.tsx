@@ -7,7 +7,9 @@ const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )
-const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
+const ManagerServices = Loadable(
+  lazy(() => import('./managerServices/ServiceSetiing')),
+)
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
 )

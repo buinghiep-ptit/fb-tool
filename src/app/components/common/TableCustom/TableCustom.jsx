@@ -77,9 +77,10 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
           <TableBody>
             {dataTable.map((data, index) => (
               <TableRow key={index}>
-                <TableCell align="center">{index + 1}</TableCell>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
+                    case 'index':
+                      return <TableCell align="center">{index + 1}</TableCell>
                     case 'status':
                       return (
                         <TableCell align="center" key={id}>

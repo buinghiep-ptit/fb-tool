@@ -108,6 +108,7 @@ const tableModel = {
     },
   ],
   bodyCell: [
+    'index',
     'imagePlace',
     'namePlace',
     'quantity',

@@ -1,27 +1,12 @@
-import {
-  Box,
-  Button,
-  Grid,
-  Icon,
-  styled,
-  TextField,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  TableHead,
-  IconButton,
-  TablePagination,
-  Switch,
-} from '@mui/material'
-import { Breadcrumb, SimpleCard } from 'app/components'
+import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import { Breadcrumb } from 'app/components'
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { values } from 'lodash'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
-import TableCustom from 'app/components/TableCustom/TableCustom'
+import TableCustom from 'app/components/common/TableCustom/TableCustom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -38,16 +23,6 @@ const Container = styled('div')(({ theme }) => ({
 //     .min(6, 'Password must be 6 character length')
 //     .required('Password is required!'),
 // })
-
-const StyledTable = styled(Table)(({ theme }) => ({
-  whiteSpace: 'pre',
-  '& thead': {
-    '& tr': { '& th': { paddingLeft: 0, paddingRight: 0 } },
-  },
-  '& tbody': {
-    '& tr': { '& td': { paddingLeft: 0, textTransform: 'capitalize' } },
-  },
-}))
 
 const dataList = [
   {
@@ -94,41 +69,54 @@ const dataList = [
 
 const tableModel = {
   headCell: [
-    'STT',
-    'Ảnh',
-    'Tên địa danh',
-    'Số điểm camp',
-    'Sự kiện',
-    'Địa chỉ',
-    'Loại hình',
-    'Trạng thái',
-    'Hành động',
+    {
+      name: 'STT',
+      width: 50,
+    },
+    {
+      name: 'Ảnh',
+      width: null,
+    },
+    {
+      name: 'Tên địa danh',
+      width: null,
+    },
+    {
+      name: 'Số điểm camp',
+      width: null,
+    },
+    {
+      name: 'Sự kiện',
+      width: null,
+    },
+    {
+      name: 'Địa chỉ',
+      width: null,
+    },
+    {
+      name: 'Loại hình',
+      width: null,
+    },
+    {
+      name: 'Trạng thái',
+      width: null,
+    },
+
+    {
+      name: 'Hành động',
+      width: null,
+    },
   ],
   bodyCell: [
-    {
-      name: 'imagePlace',
-    },
-    {
-      name: 'namePlace',
-    },
-    {
-      name: 'quantity',
-    },
-    {
-      name: 'event',
-    },
-    {
-      name: 'address',
-    },
-    {
-      name: 'type',
-    },
-    {
-      name: 'status',
-    },
-    {
-      name: 'action',
-    },
+    'index',
+    'imagePlace',
+    'namePlace',
+    'quantity',
+    'event',
+    'address',
+    'type',
+    'status',
+    'action',
   ],
 }
 

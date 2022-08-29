@@ -17,10 +17,20 @@ import { SimpleCard } from 'app/components'
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: 'pre',
   '& thead': {
-    '& tr': { '& th': { paddingLeft: 0, paddingRight: 0 } },
+    '& tr': {
+      '& th': {
+        paddingLeft: 0,
+        paddingRight: 0,
+      },
+    },
   },
   '& tbody': {
-    '& tr': { '& td': { paddingLeft: 0, textTransform: 'capitalize' } },
+    '& tr': {
+      '& td': {
+        paddingLeft: 0,
+        textTransform: 'capitalize',
+      },
+    },
   },
 }))
 
@@ -43,32 +53,43 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
         <StyledTable>
           <TableHead>
             <TableRow>
-              {tableModel.headCell.map((cell, index) => (
-                <TableCell align="center" key={index}>
-                  {cell}
-                </TableCell>
-              ))}
+              {tableModel.headCell.map((cell, index) => {
+                if (cell.width) {
+                  return (
+                    <TableCell
+                      align="center"
+                      key={index}
+                      style={{ width: cell.width }}
+                    >
+                      {cell.name}
+                    </TableCell>
+                  )
+                }
+                return (
+                  <TableCell align="center" key={index}>
+                    {cell.name}
+                  </TableCell>
+                )
+              })}
             </TableRow>
           </TableHead>
 
           <TableBody>
             {dataTable.map((data, index) => (
               <TableRow key={index}>
-                <TableCell align="center" style={{ maxWidth: '10px' }}>
-                  {index + 1}
-                </TableCell>
+                <TableCell align="center">{index + 1}</TableCell>
                 {tableModel.bodyCell.map((element, id) => {
-                  switch (element.name) {
+                  switch (element) {
                     case 'status':
                       return (
                         <TableCell align="center" key={id}>
-                          <Switch checked={data[element.name]} />
+                          <Switch checked={data[element]} />
                         </TableCell>
                       )
                     case 'action':
                       return (
                         <TableCell align="right" key={id}>
-                          {data[element.name].map((type, indexType) => (
+                          {data[element].map((type, indexType) => (
                             <IconButton key={indexType}>
                               <Icon color="error">{type}</Icon>
                             </IconButton>
@@ -78,7 +99,7 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
                     default:
                       return (
                         <TableCell align="center" key={id}>
-                          {data[element.name]}
+                          {data[element]}
                         </TableCell>
                       )
                   }

@@ -7,18 +7,16 @@ import {
   styled,
   TextField,
   Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  TableHead,
-  IconButton,
+  MenuItem,
 } from '@mui/material'
 import { Breadcrumb } from 'app/components'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { values } from 'lodash'
 import { H4, Paragraph } from 'app/components/Typography'
-import TableCustom from 'app/components/TableCustom/TableCustom'
+import TableCustom from 'app/components/common/TableCustom/TableCustom'
+import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import BasicSelect from 'app/components/common/BasicSelect'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -54,7 +52,7 @@ const serviceList = [
     typeService: 'Trọn gói',
     address: 'address',
     quantity: 10,
-    status: true,
+    status: 'all',
     action: ['edit', 'delete'],
   },
   {
@@ -64,48 +62,61 @@ const serviceList = [
     typeService: 'Thuê theo giờ',
     address: 'address',
     quantity: 20,
-    status: false,
+    status: 'all',
     action: ['edit'],
   },
 ]
 
 const tableModel = {
   headCell: [
-    'STT',
-    'Ảnh',
-    'Tên dịch vụ',
-    'Loại',
-    'Loại dịch vụ',
-    'Địa chỉ',
-    'Số lượng',
-    'Trạng thái',
-    'Hành động',
+    {
+      name: 'STT',
+      width: 50,
+    },
+    {
+      name: 'Ảnh',
+      width: null,
+    },
+    {
+      name: 'Tên dịch vụ',
+      width: null,
+    },
+    {
+      name: 'Loại',
+      width: null,
+    },
+    {
+      name: 'Loại dịch vụ',
+      width: null,
+    },
+    {
+      name: 'Địa chỉ',
+      width: null,
+    },
+    {
+      name: 'Số lượng',
+      width: 60,
+    },
+    {
+      name: 'Trạng thái',
+      width: null,
+    },
+
+    {
+      name: 'Hành động',
+      width: null,
+    },
   ],
   bodyCell: [
-    {
-      name: 'image',
-    },
-    {
-      name: 'nameService',
-    },
-    {
-      name: 'type',
-    },
-    {
-      name: 'typeService',
-    },
-    {
-      name: 'address',
-    },
-    {
-      name: 'quantity',
-    },
-    {
-      name: 'status',
-    },
-    {
-      name: 'action',
-    },
+    'index',
+    'image',
+    'nameService',
+    'type',
+    'typeService',
+    'address',
+    'quantity',
+    'status',
+    'action',
   ],
 }
 
@@ -124,7 +135,6 @@ export default function ServiceSetting(props) {
             display: 'flex',
             alignItems: 'center',
             margin: '20px 0',
-            justifyContent: 'space-between',
           }}
         >
           <H4
@@ -136,7 +146,19 @@ export default function ServiceSetting(props) {
           >
             Nhập thông tin tìm kiếm:
           </H4>
+        </Grid>
 
+        <Grid
+          item
+          sm={6}
+          xs={6}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '20px 0',
+            justifyContent: 'space-between',
+          }}
+        >
           <H4
             variant="h1"
             component="h2"
@@ -144,7 +166,7 @@ export default function ServiceSetting(props) {
             children={undefined}
             ellipsis={undefined}
           >
-            Nhập thông tin tìm kiếm:
+            Trạng thái:
           </H4>
         </Grid>
       </Grid>
@@ -170,7 +192,6 @@ export default function ServiceSetting(props) {
               <form onSubmit={handleSubmit}>
                 <TextField
                   id="nameService"
-                  fullWidth
                   size="medium"
                   type="text"
                   name="nameService"
@@ -181,11 +202,15 @@ export default function ServiceSetting(props) {
                   onChange={handleChange}
                   helperText={touched.nameService && errors.nameService}
                   error={Boolean(errors.nameService && touched.nameService)}
-                  sx={{ mb: 3 }}
+                  sx={{ mb: 3, width: '75%' }}
                 />
               </form>
             )}
           </Formik>
+        </Grid>
+
+        <Grid item sm={6} xs={6}>
+          <BasicSelect></BasicSelect>
         </Grid>
       </Grid>
       <Grid container>

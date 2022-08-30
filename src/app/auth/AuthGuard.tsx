@@ -17,6 +17,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 // };
 
 type Props = {
+  // eslint-disable-next-line prettier/prettier
   children: ReactElement
 }
 

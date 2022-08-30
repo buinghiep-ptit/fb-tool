@@ -53,7 +53,7 @@ export const columnsAdminAccounts: readonly TableColumn<TitleAccounts>[] = [
   {
     id: 'action',
     label: '',
-    minWidth: 170,
+    minWidth: 85,
     align: 'right',
     action: (value: any) => (
       <MuiSwitch

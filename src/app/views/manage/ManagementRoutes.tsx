@@ -8,7 +8,7 @@ const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
-const ManagerPlace = Loadable(lazy(() => import('./ManagerPlace')))
+const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )
@@ -33,7 +33,10 @@ const ManagementRoutes = [
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
   { path: '/quan-ly-feeds/xet-duyet', element: <ReportInfringe /> },
   { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
-  { path: '/quan-ly-thong-tin-dia-danh', element: <ManagerPlace /> },
+  {
+    path: '/quan-ly-thong-tin-dia-danh',
+    element: <ManagerPlace />,
+  },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },

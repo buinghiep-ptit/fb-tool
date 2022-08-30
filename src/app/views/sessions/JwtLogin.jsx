@@ -44,8 +44,9 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const initialValues = {
-  email: 'dscra@gmail.com',
-  password: '00000000',
+  // email: 'dscra@gmail.com',
+  email: '0975452750',
+  password: 'nghiepbv2',
   remember: true,
 }
 
@@ -55,7 +56,7 @@ const validationSchema = Yup.object().shape({
     .min(6, 'Password must be 6 character length')
     .required('Password is required!'),
   email: Yup.string()
-    .email('Invalid Email address')
+    // .email('Invalid Email address')
     .required('Email is required!'),
 })
 
@@ -113,7 +114,7 @@ const JwtLogin = () => {
                     <TextField
                       fullWidth
                       size="small"
-                      type="email"
+                      type="text"
                       name="email"
                       label="Email"
                       variant="outlined"

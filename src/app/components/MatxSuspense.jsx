@@ -1,8 +1,8 @@
-import { MatxLoading } from 'app/components'
 import { Suspense } from 'react'
+import MuiLoading from './common/MuiLoadingApp'
 
 const MatxSuspense = ({ children }) => {
-  return <Suspense fallback={<MatxLoading />}>{children}</Suspense>
+  return <Suspense fallback={<MuiLoading />}>{children}</Suspense>
 }
 
 export default MatxSuspense

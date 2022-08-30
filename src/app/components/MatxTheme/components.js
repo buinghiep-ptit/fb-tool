@@ -4,7 +4,7 @@ export const components = {
   MuiTable: {
     styleOverrides: {
       root: {
-        tableLayout: 'fixed',
+        // tableLayout: 'fixed',
       },
     },
   },

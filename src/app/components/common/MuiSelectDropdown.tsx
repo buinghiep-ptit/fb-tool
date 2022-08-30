@@ -23,7 +23,7 @@ export function SelectDropDown({
       sx={{
         width: '100%',
         '& .MuiInputBase-root': {
-          height: 48,
+          height: 40,
         },
       }}
     >

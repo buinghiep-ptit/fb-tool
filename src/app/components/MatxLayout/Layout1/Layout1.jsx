@@ -20,7 +20,7 @@ const Layout1Root = styled(Box)(({ theme }) => ({
 const ContentBox = styled(Box)(() => ({
   height: '100%',
   display: 'flex',
-  overflowY: 'auto',
+  // overflowY: 'auto',
   overflowX: 'hidden',
   flexDirection: 'column',
   justifyContent: 'space-between',

@@ -1,9 +1,9 @@
 import { Suspense } from 'react'
-import Loading from './MatxLoading'
+import MuiLoading from './common/MuiLoadingApp'
 
 const Loadable = Component => props => {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<MuiLoading />}>
       <Component {...props} />
     </Suspense>
   )

@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './app/App'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
+import './app/assets/scss/material-kit-react.scss?v=1.9.0'
 
 const queryClient = new QueryClient({
   defaultOptions: {

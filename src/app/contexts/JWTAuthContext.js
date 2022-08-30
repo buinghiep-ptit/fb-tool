@@ -1,7 +1,8 @@
-import React, { createContext, useEffect, useReducer } from 'react'
-import jwtDecode from 'jwt-decode'
-import { MatxLoading } from 'app/components'
+import { getProfile, loginUser } from 'app/apis/auth/auth.service'
+import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { http } from 'app/helpers/http-config'
+import { isValidToken } from 'app/utils/validToken'
+import { createContext, useEffect, useReducer } from 'react'
 
 const initialState = {
   isAuthenticated: false,
@@ -9,24 +10,11 @@ const initialState = {
   user: null,
 }
 
-const isValidToken = accessToken => {
-  if (!accessToken) {
-    return false
-  }
-
-  const decodedToken = jwtDecode(accessToken)
-  const currentTime = Date.now() / 1000
-
-  return decodedToken.exp > currentTime + 7 * 24 * 3600 - 60 * 50
-}
-
 const setSession = accessToken => {
   if (accessToken) {
     localStorage.setItem('accessToken', accessToken)
-    // http.defaults.headers.common.Authorization = `Bearer ${accessToken}`
   } else {
     localStorage.removeItem('accessToken')
-    // delete http.defaults.headers.common.Authorization
   }
 }
 
@@ -84,19 +72,38 @@ const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const login = async (email, password) => {
-    const response = await http.post('/api/auth/login', {
-      email,
+  const login = async (phoneNumber, password) => {
+    const response = await loginUser({
+      phoneNumber,
       password,
     })
-    const { accessToken, user } = response.data
+    const { accessToken } = response
 
     setSession(accessToken)
 
     dispatch({
       type: 'LOGIN',
       payload: {
-        user,
+        user: {
+          address: null,
+          birthday: '20/12/1991',
+          districtId: null,
+          districtName: null,
+          email: 'nghiepbvptit@gmail.com',
+          firstName: null,
+          fullName: 'Bùi Văn Nghiệp',
+          gender: 'MALE',
+          id: 3,
+          imageUrl:
+            'https://api-dev.fcare.club/auth/api/customer/image?fileName=foxcare%2Ffoxcare_1661709140872_avatardownload.jpeg',
+          lastName: null,
+          mobilePhone: '0975452750',
+          provinceId: null,
+          provinceName: null,
+          wardId: null,
+          wardLevel: null,
+          wardName: null,
+        },
       },
     })
   }
@@ -132,9 +139,9 @@ export const AuthProvider = ({ children }) => {
 
         if (accessToken && isValidToken(accessToken)) {
           setSession(accessToken)
-          const response = await http.get('/api/auth/profile')
-          const { user } = response.data
-
+          const response = await getProfile()
+          const user = response
+          console.log('user:', user)
           dispatch({
             type: 'INIT',
             payload: {
@@ -165,7 +172,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   if (!state.isInitialised) {
-    return <MatxLoading />
+    return <MuiLoading />
   }
 
   return (

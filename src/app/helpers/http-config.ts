@@ -2,8 +2,6 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import queryString from 'query-string'
 // const camelize = require('camelize')
 
-const isServer = typeof window === 'undefined'
-
 enum StatusCode {
   Unauthorized = 401,
   Forbidden = 403,
@@ -42,7 +40,7 @@ class Http {
 
   initHttp() {
     const http = axios.create({
-      baseURL: isServer ? `${process.env.NEXT_PUBLIC_API_URL}` : '',
+      baseURL: process.env.REACT_APP_API_URL,
       headers: headers as any,
       paramsSerializer: (params: any) => queryString.stringify(params),
       timeout: 15000,

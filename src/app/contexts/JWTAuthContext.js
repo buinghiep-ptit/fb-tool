@@ -72,11 +72,8 @@ const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  const login = async (phoneNumber, password) => {
-    const response = await loginUser({
-      phoneNumber,
-      password,
-    })
+  const login = async payload => {
+    const response = await loginUser(payload)
     const { accessToken } = response
 
     setSession(accessToken)

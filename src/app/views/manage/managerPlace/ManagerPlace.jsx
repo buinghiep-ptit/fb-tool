@@ -1,5 +1,5 @@
 import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
-import { Breadcrumb } from 'app/components'
+import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
@@ -54,6 +54,16 @@ const dataList = [
     type: 'adasd',
     status: true,
     action: ['delete'],
+  },
+  {
+    imagePlace: 'image',
+    namePlace: 'name',
+    quantity: 10,
+    event: '1231',
+    address: 'address',
+    type: 'adasd',
+    status: true,
+    action: ['edit', 'delete'],
   },
   {
     imagePlace: 'image',
@@ -139,78 +149,80 @@ export default function ManagerPlace(props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'ManagerPlace' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý địa danh' }]} />
       </Box>
-      <Grid container>
-        <Grid item sm={6} xs={6}>
-          <Formik
-            onSubmit={values => {
-              console.log(values)
-            }}
-            initialValues={{
-              namePlace: '',
-            }}
-            // validationSchema={validationSchema}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-            }) => (
-              <form onSubmit={handleSubmit}>
-                <TextField
-                  id="namePlace"
-                  fullWidth
-                  size="medium"
-                  type="text"
-                  name="namePlace"
-                  label="Tên địa danh/địa chỉ"
-                  variant="outlined"
-                  onBlur={handleBlur}
-                  value={values.namePlace}
-                  onChange={handleChange}
-                  helperText={touched.namePlace && errors.namePlace}
-                  error={Boolean(errors.namePlace && touched.namePlace)}
-                  sx={{ mb: 3 }}
-                />
-                <Button color="primary" variant="contained" type="submit">
-                  <Icon>search</Icon>
-                </Button>
-              </form>
-            )}
-          </Formik>
+      <SimpleCard>
+        <Grid container>
+          <Grid item sm={6} xs={6}>
+            <Formik
+              onSubmit={values => {
+                console.log(values)
+              }}
+              initialValues={{
+                namePlace: '',
+              }}
+              // validationSchema={validationSchema}
+            >
+              {({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+              }) => (
+                <form onSubmit={handleSubmit}>
+                  <TextField
+                    id="namePlace"
+                    fullWidth
+                    size="medium"
+                    type="text"
+                    name="namePlace"
+                    label="Tên địa danh/địa chỉ"
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    value={values.namePlace}
+                    onChange={handleChange}
+                    helperText={touched.namePlace && errors.namePlace}
+                    error={Boolean(errors.namePlace && touched.namePlace)}
+                    sx={{ mb: 3 }}
+                  />
+                  <Button color="primary" variant="contained" type="submit">
+                    <Icon>search</Icon>
+                  </Button>
+                </form>
+              )}
+            </Formik>
+          </Grid>
         </Grid>
-      </Grid>
-      <Grid container>
-        <Grid
-          item
-          sm={6}
-          xs={6}
-          sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
-        >
-          <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
-            add_circle
-          </Icon>
-          <Paragraph
-            variant="h1"
-            component="h2"
-            children={undefined}
-            className={undefined}
-            ellipsis={undefined}
+        <Grid container>
+          <Grid
+            item
+            sm={6}
+            xs={6}
+            sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
           >
-            Thêm địa danh
-          </Paragraph>
+            <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
+              add_circle
+            </Icon>
+            <Paragraph
+              variant="h1"
+              component="h2"
+              children={undefined}
+              className={undefined}
+              ellipsis={undefined}
+            >
+              Thêm địa danh
+            </Paragraph>
+          </Grid>
         </Grid>
-      </Grid>
-      <TableCustom
-        title="Danh sách địa điểm Camp"
-        dataTable={dataList}
-        tableModel={tableModel}
-        pagination={true}
-      />
+        <TableCustom
+          title="Danh sách địa điểm Camp"
+          dataTable={dataList}
+          tableModel={tableModel}
+          pagination={true}
+        />
+      </SimpleCard>
     </Container>
   )
 }

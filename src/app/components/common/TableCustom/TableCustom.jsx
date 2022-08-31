@@ -53,12 +53,12 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
         <StyledTable>
           <TableHead>
             <TableRow>
-              {tableModel.headCell.map((cell, index) => {
+              {tableModel.headCell.map(cell => {
                 if (cell.width) {
                   return (
                     <TableCell
                       align="center"
-                      key={index}
+                      key={cell.name}
                       style={{ width: cell.width }}
                     >
                       {cell.name}
@@ -66,7 +66,7 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
                   )
                 }
                 return (
-                  <TableCell align="center" key={index}>
+                  <TableCell align="center" key={cell.name}>
                     {cell.name}
                   </TableCell>
                 )
@@ -80,7 +80,11 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
                     case 'index':
-                      return <TableCell align="center">{index + 1}</TableCell>
+                      return (
+                        <TableCell align="center" key={id}>
+                          {index + 1}
+                        </TableCell>
+                      )
                     case 'status':
                       return (
                         <TableCell align="center" key={id}>

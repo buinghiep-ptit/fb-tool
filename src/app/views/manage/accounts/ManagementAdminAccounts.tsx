@@ -259,7 +259,7 @@ export default function AdminAccounts(props: Props) {
             </Grid>
           </FormProvider>
         </form>
-        <Box pt={3}>
+        <Box mt={3}>
           <Grid container spacing={2}>
             <Grid item sm={3} xs={12}>
               <MuiButton
@@ -288,7 +288,7 @@ export default function AdminAccounts(props: Props) {
           </Grid>
         </Box>
 
-        <Box mt={2}>
+        <Box mt={3}>
           <MuiStyledTable
             rows={DATA as IAccount[]}
             columns={columnsAdminAccounts}

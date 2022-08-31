@@ -3,6 +3,11 @@ export const navigations = [
   {
     name: 'Quản lý tài khoản Admin',
     path: '/quan-ly-tai-khoan-admin',
+    icon: 'admin_panel_settings',
+  },
+  {
+    name: 'Quản lý tài khoản KH',
+    path: '/quan-ly-tai-khoan-khach-hang',
     icon: 'account_box',
   },
   {

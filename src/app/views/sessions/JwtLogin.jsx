@@ -44,10 +44,9 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const initialValues = {
-  // email: 'dscra@gmail.com',
-  email: '0975452750',
-  password: 'nghiepbv2',
-  remember: true,
+  email: 'giangcm@fpt.com.vn',
+  password: 'abc123456',
+  rememberMe: false,
 }
 
 // form field validation schema
@@ -71,9 +70,10 @@ const JwtLogin = () => {
   const from = location.state?.from || '/'
 
   const handleFormSubmit = async values => {
+    console.log('values:', values)
     setLoading(true)
     try {
-      await login(values.email, values.password)
+      await login(values)
       navigate(from, { replace: true })
     } catch (e) {
       setLoading(false)
@@ -145,7 +145,7 @@ const JwtLogin = () => {
                       <FlexBox gap={1}>
                         <Checkbox
                           size="small"
-                          name="remember"
+                          name="rememberMe"
                           onChange={handleChange}
                           checked={values.remember}
                           sx={{ padding: 0 }}

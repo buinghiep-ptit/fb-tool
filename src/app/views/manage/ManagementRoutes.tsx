@@ -1,6 +1,5 @@
 import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
-import DetailPlace from './managerPlace/detailPlace/detailPlace'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -17,6 +16,10 @@ const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
 )
+const DetailPlace = Loadable(
+  lazy(() => import('./managerPlace/detailPlace/detailPlace')),
+)
+const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 
 const ManagementRoutes = [
   { path: '/quan-ly-tai-khoan-admin', element: <AdminAccounts /> },
@@ -45,5 +48,6 @@ const ManagementRoutes = [
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
+  { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },
 ]
 export default ManagementRoutes

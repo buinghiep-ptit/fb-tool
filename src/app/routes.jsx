@@ -5,7 +5,7 @@ import managementRoutes from 'app/views/manage/ManagementRoutes'
 import materialRoutes from 'app/views/material-kit/MaterialRoutes'
 import NotFound from 'app/views/sessions/NotFound'
 import sessionRoutes from 'app/views/sessions/SessionRoutes'
-import { Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import MatxLayout from './components/MatxLayout/MatxLayout'
 
 const routes = [

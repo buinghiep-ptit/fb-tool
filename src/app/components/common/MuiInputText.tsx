@@ -9,7 +9,7 @@ export type IFormInputTextProps = {
 
 const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
-    height: 48,
+    height: 40,
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {

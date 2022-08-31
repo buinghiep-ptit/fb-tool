@@ -8,5 +8,5 @@ export const isValidToken = (accessToken: string) => {
   const decodedToken = jwtDecode(accessToken)
   const currentTime = Date.now() / 1000
 
-  return (decodedToken as any)?.exp > currentTime + 7 * 24 * 3600 - 60 * 50
+  return (decodedToken as any)?.exp > currentTime + 5 * 60
 }

@@ -17,6 +17,9 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": "src"
+    // "paths": {
+    //   "*": ["src/app/*"]
+    // }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]

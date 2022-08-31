@@ -68,7 +68,7 @@ const AuthGuard = ({ children }: Props) => {
 
   return (
     <>
-      {isAuth && user ? (
+      {isAuth && isAuthenticated ? (
         children
       ) : (
         <Navigate replace to="/session/signin" state={{ from: pathname }} />

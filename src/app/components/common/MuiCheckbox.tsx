@@ -30,10 +30,11 @@ export function MuiCheckBox({
               color="primary"
               onChange={field.onChange}
               checked={field.value}
+              sx={{ py: 0 }}
               {...props}
             />
           }
-          label="Feed Camp"
+          label={label || 'Label'}
         />
       )}
     />

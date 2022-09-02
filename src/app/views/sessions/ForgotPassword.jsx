@@ -1,6 +1,21 @@
-import { Box, Button, Card, Grid, styled, TextField } from '@mui/material'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
+import {
+  Box,
+  Card,
+  Grid,
+  IconButton,
+  Stack,
+  styled,
+  TextField,
+} from '@mui/material'
+import { MuiButton } from 'app/components/common/MuiButton'
+import FormInputText from 'app/components/common/MuiInputText'
+import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
+import * as Yup from 'yup'
 
 const FlexBox = styled(Box)(() => ({
   display: 'flex',
@@ -15,7 +30,16 @@ const ContentBox = styled(Box)(({ theme }) => ({
   padding: 32,
   background: theme.palette.background.default,
 }))
-
+const CssTextField = styled(TextField)({
+  '& .MuiInputBase-root': {
+    height: 40,
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      //   border: 'none',
+    },
+  },
+})
 const ForgotPasswordRoot = styled(JustifyBox)(() => ({
   background: '#1A2038',
   minHeight: '100vh !important',
@@ -26,12 +50,53 @@ const ForgotPasswordRoot = styled(JustifyBox)(() => ({
   },
 }))
 
+const defaultValues = {
+  email: 'giangcm@fpt.com.vn',
+}
+
 const ForgotPassword = () => {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('admin@example.com')
+  const [step, setStep] = useState(1)
+  const [showPassword, setShowPassword] = useState({
+    visibility: false,
+  })
+  const validationSchema1 = Yup.object().shape({
+    email: Yup.string()
+      .email('Email không hợp lệ')
+      .required('Email là bắt buộc'),
+  })
 
-  const handleFormSubmit = () => {
-    console.log(email)
+  const validationSchema2 = Yup.object().shape({
+    password: Yup.string()
+      .required('Mật khẩu là bắt buộc')
+      .matches('^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$', 'Mật khẩu không hợp lệ'),
+    passwordConfirmation: Yup.string()
+      .oneOf([Yup.ref('password'), null], 'Mật khẩu xác nhận không khớp')
+      .required('Mật khẩu xác nhận là bắt buộc'),
+  })
+
+  const methods = useForm({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(step === 1 ? validationSchema1 : validationSchema2),
+  })
+
+  const onSubmitHandler = values => {
+    console.log('values:', values)
+    setStep(step + 1)
+  }
+  const handleClickShowPassword = () => {
+    setShowPassword(prev => ({
+      ...prev,
+      visibility: !prev.visibility,
+    }))
+  }
+  const handleGoBack = () => {
+    if (step === 1) {
+      navigate(-1)
+    } else {
+      setStep(step - 1)
+    }
   }
 
   return (
@@ -48,36 +113,93 @@ const ForgotPassword = () => {
             </JustifyBox>
 
             <ContentBox>
-              <form onSubmit={handleFormSubmit}>
-                <TextField
-                  type="email"
-                  name="email"
-                  size="small"
-                  label="Email"
-                  value={email}
-                  variant="outlined"
-                  onChange={e => setEmail(e.target.value)}
-                  sx={{ mb: 3, width: '100%' }}
-                />
+              <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+                <FormProvider {...methods}>
+                  <Stack mb={3}>
+                    {step === 1 && (
+                      <>
+                        <MuiTypography variant="subtitle2" pb={1}>
+                          Email
+                        </MuiTypography>
+                        <FormInputText
+                          type="text"
+                          name="email"
+                          size="small"
+                          placeholder="Nhập email"
+                          fullWidth
+                        />
+                      </>
+                    )}
+                    {step === 2 && (
+                      <>
+                        <Stack mb={2}>
+                          <MuiTypography variant="subtitle2" pb={1}>
+                            Mật khẩu
+                          </MuiTypography>
+                          <FormInputText
+                            type={showPassword.visibility ? 'text' : 'password'}
+                            name="password"
+                            placeholder="Nhập mật khẩu"
+                            size="small"
+                            fullWidth
+                            iconEnd={
+                              <IconButton
+                                onClick={handleClickShowPassword}
+                                edge="end"
+                              >
+                                {!showPassword.visibility ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            }
+                          />
+                        </Stack>
+                        <Stack>
+                          <MuiTypography variant="subtitle2" pb={1}>
+                            Xác nhận mật khẩu
+                          </MuiTypography>
+                          <FormInputText
+                            type={showPassword.visibility ? 'text' : 'password'}
+                            name="passwordConfirmation"
+                            placeholder="Nhập mật khẩu xác nhận"
+                            size="small"
+                            fullWidth
+                            iconEnd={
+                              <IconButton
+                                onClick={handleClickShowPassword}
+                                edge="end"
+                              >
+                                {!showPassword.visibility ? (
+                                  <VisibilityOff />
+                                ) : (
+                                  <Visibility />
+                                )}
+                              </IconButton>
+                            }
+                          />
+                        </Stack>
+                      </>
+                    )}
+                  </Stack>
+                  <MuiButton
+                    fullWidth
+                    title="Tiếp tục"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                  />
 
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                >
-                  Reset Password
-                </Button>
-
-                <Button
-                  fullWidth
-                  color="primary"
-                  variant="outlined"
-                  onClick={() => navigate(-1)}
-                  sx={{ mt: 2 }}
-                >
-                  Go Back
-                </Button>
+                  <MuiButton
+                    fullWidth
+                    title="Quay lại"
+                    color="primary"
+                    variant="outlined"
+                    onClick={handleGoBack}
+                    sx={{ mt: 2 }}
+                  />
+                </FormProvider>
               </form>
             </ContentBox>
           </Grid>

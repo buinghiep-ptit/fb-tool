@@ -1,4 +1,12 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Grid,
+  Icon,
+  styled,
+  TextField,
+  Autocomplete,
+} from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { Formik, Form } from 'formik'
@@ -145,11 +153,12 @@ export default function ManagerLocation(props) {
   const handleFormSubmit = values => {
     console.log('submit')
   }
+  const options = ['Option 1', 'Option 2']
 
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý địa danh' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý địa điểm Camp' }]} />
       </Box>
       <SimpleCard>
         <Grid container>
@@ -187,6 +196,13 @@ export default function ManagerLocation(props) {
                     error={Boolean(errors.namePlace && touched.namePlace)}
                     sx={{ mb: 3 }}
                   />
+                  {/* <Autocomplete
+                    sx={{ width: 300 }}
+                    options={options}
+                    renderInput={params => (
+                      <TextField {...params} label="Controllable" />
+                    )}
+                  /> */}
                   <Button color="primary" variant="contained" type="submit">
                     <Icon>search</Icon>
                   </Button>
@@ -212,7 +228,7 @@ export default function ManagerLocation(props) {
               className={undefined}
               ellipsis={undefined}
             >
-              Thêm địa danh
+              Thêm địa điểm
             </Paragraph>
           </Grid>
         </Grid>

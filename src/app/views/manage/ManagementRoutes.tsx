@@ -13,7 +13,7 @@ const CustomerDetail = Loadable(
 const CustomerHistory = Loadable(
   lazy(() => import('./accounts/CustomerOrderHistoryDetail')),
 )
-const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
+
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
@@ -63,7 +63,7 @@ const ManagementRoutes = [
     path: '/chi-tiet-dia-danh',
     element: <DetailPlace />,
   },
-  { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
+  { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
   { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },

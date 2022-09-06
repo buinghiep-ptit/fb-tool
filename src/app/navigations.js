@@ -1,13 +1,18 @@
 export const navigations = [
   { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
-  // {
-  //   name: 'Quản lý tài khoản KH',
-  //   path: '/quan-ly-tai-khoan-khach-hang',
-  //   icon: 'account_box',
-  // },
+  {
+    name: 'Quản lý tài khoản Admin',
+    path: '/quan-ly-tai-khoan-admin',
+    icon: 'admin_panel_settings',
+  },
+  {
+    name: 'Quản lý tài khoản KH',
+    path: '/quan-ly-tai-khoan-khach-hang',
+    icon: 'account_box',
+  },
   {
     name: 'Quản lý Feed',
-    path: '/quan-ly-bang-tin',
+    path: '/quan-ly-feeds',
     icon: 'feed',
   },
   {

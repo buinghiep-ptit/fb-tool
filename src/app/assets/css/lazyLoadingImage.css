@@ -1,0 +1,64 @@
+.wrapper {
+  position: relative;
+  overflow: hidden;
+}
+.wrapper > img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  object-fit: cover;
+  object-position: center;
+}
+.source {
+  opacity: 0;
+  transition: opacity 1200ms;
+}
+.loaded {
+  opacity: 1;
+}
+
+/* For demo layout */
+html {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  color: #222222;
+  background-color: #f0f4f8;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+h3 {
+  margin-bottom: 0.25rem;
+}
+a {
+  color: #4299e1;
+  text-decoration: none;
+}
+figcaption {
+  margin-top: 0.3rem;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  min-height: calc(100vh - 100px);
+}
+.demo {
+  width: 600px;
+  max-width: calc(100vw - 36px);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}

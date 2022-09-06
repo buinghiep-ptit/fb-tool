@@ -1,5 +1,5 @@
 import { Button, ButtonProps, styled } from '@mui/material'
-import { CSSProperties, MouseEventHandler } from 'react'
+import { MouseEventHandler } from 'react'
 
 export interface IButtonProps extends ButtonProps {
   title: string
@@ -8,7 +8,7 @@ export interface IButtonProps extends ButtonProps {
 
 const StyledButton = styled(Button)({
   boxShadow: 'none',
-  height: 48,
+  height: 40,
 })
 
 export function MuiButton({ title, onClick, ...props }: IButtonProps) {

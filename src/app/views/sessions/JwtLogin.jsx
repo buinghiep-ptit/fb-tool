@@ -1,10 +1,15 @@
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
-import { Card, Checkbox, Grid, TextField } from '@mui/material'
-import { Box, styled, useTheme } from '@mui/system'
-import { Paragraph, Span } from 'app/components/Typography'
+import { Card, Grid, IconButton } from '@mui/material'
+import { Box, Stack, styled, useTheme } from '@mui/system'
+import { MuiCheckBox } from 'app/components/common/MuiCheckbox'
+import FormInputText from 'app/components/common/MuiInputText'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import { Span } from 'app/components/Typography'
 import useAuth from 'app/hooks/useAuth'
-import { Formik } from 'formik'
 import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 
@@ -43,40 +48,53 @@ const JWTRoot = styled(JustifyBox)(() => ({
 }))
 
 // inital login credentials
-const initialValues = {
-  email: 'dscra@gmail.com',
-  password: '00000000',
-  remember: true,
+const defaultValues = {
+  email: 'giangcm@fpt.com.vn',
+  password: 'abc123456',
+  rememberMe: true,
 }
 
 // form field validation schema
 const validationSchema = Yup.object().shape({
+  email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
   password: Yup.string()
-    .min(6, 'Password must be 6 character length')
-    .required('Password is required!'),
-  email: Yup.string()
-    .email('Invalid Email address')
-    .required('Email is required!'),
+    .matches('^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$', 'Mật khẩu không hợp lệ')
+    .required('Mật khẩu là bắt buộc'),
 })
 
 const JwtLogin = () => {
   const theme = useTheme()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-
+  const [showPassword, setShowPassword] = useState({
+    visibility: false,
+  })
   const { login } = useAuth()
 
   const location = useLocation()
   const from = location.state?.from || '/'
 
-  const handleFormSubmit = async values => {
+  const methods = useForm({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+  })
+
+  const onSubmitHandler = async values => {
     setLoading(true)
     try {
-      await login(values.email, values.password)
+      await login(values)
       navigate(from, { replace: true })
     } catch (e) {
       setLoading(false)
     }
+  }
+
+  const handleClickShowPassword = () => {
+    setShowPassword(prev => ({
+      ...prev,
+      visibility: !prev.visibility,
+    }))
   }
 
   return (
@@ -96,96 +114,71 @@ const JwtLogin = () => {
 
           <Grid item sm={6} xs={12}>
             <ContentBox>
-              <Formik
-                onSubmit={handleFormSubmit}
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-              >
-                {({
-                  values,
-                  errors,
-                  touched,
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                }) => (
-                  <form onSubmit={handleSubmit}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="email"
+              <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+                <FormProvider {...methods}>
+                  <Stack>
+                    <MuiTypography variant="subtitle2" pb={1}>
+                      Email
+                    </MuiTypography>
+                    <FormInputText
+                      type="text"
                       name="email"
-                      label="Email"
-                      variant="outlined"
-                      onBlur={handleBlur}
-                      value={values.email}
-                      onChange={handleChange}
-                      helperText={touched.email && errors.email}
-                      error={Boolean(errors.email && touched.email)}
-                      sx={{ mb: 3 }}
-                    />
-
-                    <TextField
-                      fullWidth
                       size="small"
-                      name="password"
-                      type="password"
-                      label="Password"
-                      variant="outlined"
-                      onBlur={handleBlur}
-                      value={values.password}
-                      onChange={handleChange}
-                      helperText={touched.password && errors.password}
-                      error={Boolean(errors.password && touched.password)}
-                      sx={{ mb: 1.5 }}
+                      placeholder="Nhập email"
+                      fullWidth
                     />
+                  </Stack>
+                  <Stack pt={2}>
+                    <MuiTypography variant="subtitle2" pb={1}>
+                      Mật khẩu
+                    </MuiTypography>
+                    <FormInputText
+                      type={showPassword.visibility ? 'text' : 'password'}
+                      name="password"
+                      placeholder="Nhập mật khẩu"
+                      size="small"
+                      fullWidth
+                      iconEnd={
+                        <IconButton
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {!showPassword.visibility ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      }
+                    />
+                  </Stack>
 
-                    <FlexBox justifyContent="space-between">
-                      <FlexBox gap={1}>
-                        <Checkbox
-                          size="small"
-                          name="remember"
-                          onChange={handleChange}
-                          checked={values.remember}
-                          sx={{ padding: 0 }}
-                        />
-
-                        <Paragraph>Remember Me</Paragraph>
-                      </FlexBox>
-
-                      <NavLink
-                        to="/session/forgot-password"
-                        style={{ color: theme.palette.primary.main }}
-                      >
-                        Forgot password?
-                      </NavLink>
-                    </FlexBox>
-
-                    <LoadingButton
-                      type="submit"
-                      color="primary"
-                      loading={loading}
-                      variant="contained"
-                      sx={{ my: 2 }}
+                  <Stack
+                    direction={'row'}
+                    justifyContent="space-between"
+                    alignItems={'center'}
+                    py={2}
+                  >
+                    <MuiCheckBox name="rememberMe" label="Ghi nhớ tôi" />
+                    <NavLink
+                      to="/session/forgot-password"
+                      style={{ color: theme.palette.primary.main }}
                     >
-                      Login
-                    </LoadingButton>
+                      Quên mật khẩu
+                    </NavLink>
+                  </Stack>
 
-                    <Paragraph>
-                      Don't have an account?
-                      <NavLink
-                        to="/session/signup"
-                        style={{
-                          color: theme.palette.primary.main,
-                          marginLeft: 5,
-                        }}
-                      >
-                        Register
-                      </NavLink>
-                    </Paragraph>
-                  </form>
-                )}
-              </Formik>
+                  <LoadingButton
+                    type="submit"
+                    color="primary"
+                    loading={loading}
+                    variant="contained"
+                    sx={{ my: 1 }}
+                  >
+                    Đăng nhập
+                  </LoadingButton>
+                </FormProvider>
+              </form>
             </ContentBox>
           </Grid>
         </Grid>

@@ -1,15 +1,24 @@
-import { styled, TextField, TextFieldProps } from '@mui/material'
+import {
+  InputAdornment,
+  InputProps,
+  styled,
+  TextField,
+  TextFieldProps,
+} from '@mui/material'
 import * as React from 'react'
 import { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 export type IFormInputTextProps = {
+  iconStart?: React.ReactElement
+  iconEnd?: React.ReactElement
   name: string
+  inputProps?: InputProps
 } & TextFieldProps
 
 const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
-    height: 48,
+    height: 40,
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
@@ -18,7 +27,13 @@ const CssTextField = styled(TextField)({
   },
 })
 
-const FormInputText: FC<IFormInputTextProps> = ({ name, ...otherProps }) => {
+const FormInputText: FC<IFormInputTextProps> = ({
+  name,
+  iconStart,
+  iconEnd,
+  inputProps,
+  ...otherProps
+}) => {
   const {
     control,
     formState: { errors },
@@ -37,6 +52,16 @@ const FormInputText: FC<IFormInputTextProps> = ({ name, ...otherProps }) => {
           helperText={
             errors[name] ? (errors[name]?.message as unknown as string) : ''
           }
+          InputProps={{
+            ...inputProps,
+            sx: { cursor: iconEnd ? 'pointer' : 'default' },
+            startAdornment: iconStart ? (
+              <InputAdornment position="start">{iconStart}</InputAdornment>
+            ) : null,
+            endAdornment: iconEnd ? (
+              <InputAdornment position="end">{iconEnd}</InputAdornment>
+            ) : null,
+          }}
         />
       )}
     />

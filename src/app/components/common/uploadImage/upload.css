@@ -1,0 +1,32 @@
+#fileSelect {
+  height: 200px;
+  display: flex;
+  margin: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed gray;
+  position: relative;
+}
+
+#fileSelect img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 150px;
+}
+
+#fileSelect .uploader__icon-delete {
+  color: red;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 25px;
+}
+
+#fileSelect .content {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

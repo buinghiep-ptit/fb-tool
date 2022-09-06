@@ -1,5 +1,6 @@
 import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
+import DetailPlace from './managerPlace/detailPlace/detailPlace'
 
 const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
 const ManagerFeed = Loadable(lazy(() => import('./ManagerFeed')))
@@ -23,6 +24,10 @@ const ManagementRoutes = [
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,
+  },
+  {
+    path: '/chi-tiet-dia-danh',
+    element: <DetailPlace />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },

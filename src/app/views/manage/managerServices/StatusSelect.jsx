@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 
-export default function BasicSelect() {
+export default function StatusSelect() {
   const [status, setStatus] = React.useState('')
 
   const handleChange = event => {
@@ -24,9 +24,9 @@ export default function BasicSelect() {
           onChange={handleChange}
           sx={{ mb: 3, width: '75%' }}
         >
-          <MenuItem value={'all'}>Tất cả</MenuItem>
-          <MenuItem value={'approved'}>Đã duyệt</MenuItem>
-          <MenuItem value={'pending'}>Chờ hậu kiểm</MenuItem>
+          <MenuItem value="all">Tất cả</MenuItem>
+          <MenuItem value="approved">Đã duyệt</MenuItem>
+          <MenuItem value="pending">Chờ hậu kiểm</MenuItem>
           <MenuItem value="infringe">Vi phạm</MenuItem>
           <MenuItem value="remove">Xoá</MenuItem>
         </Select>

@@ -7,7 +7,6 @@ import {
   styled,
   TextField,
   Table,
-  MenuItem,
 } from '@mui/material'
 import { Breadcrumb } from 'app/components'
 import { Formik, Form } from 'formik'
@@ -15,8 +14,9 @@ import * as Yup from 'yup'
 import { values } from 'lodash'
 import { H4, Paragraph } from 'app/components/Typography'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
-import BasicSelect from 'app/components/common/BasicSelect'
+import StatusSelect from './StatusSelect'
+import TypeSelect from './TypeSelect'
+import { NavLink } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -129,8 +129,8 @@ export default function ServiceSetting(props) {
       <Grid container>
         <Grid
           item
-          sm={6}
-          xs={6}
+          sm={4}
+          xs={4}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -150,13 +150,12 @@ export default function ServiceSetting(props) {
 
         <Grid
           item
-          sm={6}
-          xs={6}
+          sm={4}
+          xs={4}
           sx={{
             display: 'flex',
             alignItems: 'center',
             margin: '20px 0',
-            justifyContent: 'space-between',
           }}
         >
           <H4
@@ -166,12 +165,33 @@ export default function ServiceSetting(props) {
             children={undefined}
             ellipsis={undefined}
           >
-            Trạng thái:
+            Loại dịch vụ
+          </H4>
+        </Grid>
+
+        <Grid
+          item
+          sm={4}
+          xs={4}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '20px 0',
+          }}
+        >
+          <H4
+            variant="h1"
+            component="h2"
+            className={undefined}
+            children={undefined}
+            ellipsis={undefined}
+          >
+            Trạng thái
           </H4>
         </Grid>
       </Grid>
       <Grid container>
-        <Grid item sm={6} xs={6}>
+        <Grid item sm={4} xs={4}>
           <Formik
             onSubmit={values => {
               console.log(values)
@@ -209,15 +229,19 @@ export default function ServiceSetting(props) {
           </Formik>
         </Grid>
 
-        <Grid item sm={6} xs={6}>
-          <BasicSelect></BasicSelect>
+        <Grid item sm={4} xs={4}>
+          <TypeSelect></TypeSelect>
+        </Grid>
+
+        <Grid item sm={4} xs={4}>
+          <StatusSelect></StatusSelect>
         </Grid>
       </Grid>
       <Grid container>
         <Grid
           item
-          sm={6}
-          xs={6}
+          sm={4}
+          xs={4}
           sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
         >
           <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
@@ -230,7 +254,7 @@ export default function ServiceSetting(props) {
             children={undefined}
             ellipsis={undefined}
           >
-            Thêm dịch vụ
+            <NavLink to="/chi-tiet-dich-vu">Thêm dịch vụ</NavLink>
           </Paragraph>
         </Grid>
       </Grid>

@@ -10,6 +10,9 @@ const ManagerToolPostFeed = Loadable(
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetiing')),
 )
+const ManagerServiceDetail = Loadable(
+  lazy(() => import('./managerServices/ServiceDetail')),
+)
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
 )
@@ -24,6 +27,7 @@ const ManagementRoutes = [
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
+  { path: '/chi-tiet-dich-vu', element: <ManagerServiceDetail /> },
 ]
 
 export default ManagementRoutes

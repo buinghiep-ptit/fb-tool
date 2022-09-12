@@ -47,50 +47,53 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 }
 
-const DialogCustom = React.forwardRef(({ title, children, maxWidth }, ref) => {
-  const [open, setOpen] = React.useState(false)
+const DialogCustom = React.forwardRef(
+  ({ title, children, maxWidth, fetchData }, ref) => {
+    const [open, setOpen] = React.useState(false)
 
-  React.useImperativeHandle(ref, () => ({
-    handleClickOpen: () => {
+    React.useImperativeHandle(ref, () => ({
+      handleClickOpen: () => {
+        setOpen(true)
+      },
+      handleClose: () => {
+        setOpen(false)
+      },
+    }))
+
+    const handleClickOpen = () => {
       setOpen(true)
-    },
-    handleClose: () => {
+    }
+
+    const handleClose = () => {
       setOpen(false)
-    },
-  }))
+      fetchData()
+    }
 
-  const handleClickOpen = () => {
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  return (
-    <div>
-      <BootstrapDialog
-        fullWidth={true}
-        maxWidth={maxWidth}
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
-        open={open}
-      >
-        <BootstrapDialogTitle
-          id="customized-dialog-title"
+    return (
+      <div>
+        <BootstrapDialog
+          fullWidth={true}
+          maxWidth={maxWidth}
           onClose={handleClose}
+          aria-labelledby="customized-dialog-title"
+          open={open}
         >
-          {title}
-        </BootstrapDialogTitle>
-        <DialogContent dividers>{children}</DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleClose}>
-            Save changes
-          </Button>
-        </DialogActions>
-      </BootstrapDialog>
-    </div>
-  )
-})
+          <BootstrapDialogTitle
+            id="customized-dialog-title"
+            onClose={handleClose}
+          >
+            {title}
+          </BootstrapDialogTitle>
+          <DialogContent dividers>{children}</DialogContent>
+          <DialogActions>
+            <Button autoFocus onClick={handleClose}>
+              Save changes
+            </Button>
+          </DialogActions>
+        </BootstrapDialog>
+      </div>
+    )
+  },
+)
 
 export default DialogCustom

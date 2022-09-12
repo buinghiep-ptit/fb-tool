@@ -181,28 +181,31 @@ export default function ManagerLocation(props) {
                 handleSubmit,
               }) => (
                 <form onSubmit={handleSubmit}>
-                  <TextField
-                    id="namePlace"
-                    fullWidth
-                    size="medium"
-                    type="text"
-                    name="namePlace"
-                    label="Tên địa danh/địa chỉ"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    value={values.namePlace}
-                    onChange={handleChange}
-                    helperText={touched.namePlace && errors.namePlace}
-                    error={Boolean(errors.namePlace && touched.namePlace)}
-                    sx={{ mb: 3 }}
-                  />
-                  {/* <Autocomplete
-                    sx={{ width: 300 }}
-                    options={options}
-                    renderInput={params => (
-                      <TextField {...params} label="Controllable" />
-                    )}
-                  /> */}
+                  <div style={{ display: 'flex' }}>
+                    <TextField
+                      id="namePlace"
+                      fullWidth
+                      size="medium"
+                      type="text"
+                      name="namePlace"
+                      label="Tên địa danh/địa chỉ"
+                      variant="outlined"
+                      onBlur={handleBlur}
+                      value={values.namePlace}
+                      onChange={handleChange}
+                      helperText={touched.namePlace && errors.namePlace}
+                      error={Boolean(errors.namePlace && touched.namePlace)}
+                      sx={{ mb: 3 }}
+                    />
+                    <Autocomplete
+                      sx={{ width: 300, marginLeft: 10 }}
+                      options={options}
+                      renderInput={params => (
+                        <TextField {...params} label="Trạng thái" />
+                      )}
+                    />
+                  </div>
+
                   <Button color="primary" variant="contained" type="submit">
                     <Icon>search</Icon>
                   </Button>

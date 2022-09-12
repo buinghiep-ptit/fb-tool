@@ -60,7 +60,7 @@ const ManagementRoutes = [
     element: <ManagerPlace />,
   },
   {
-    path: '/chi-tiet-dia-danh',
+    path: '/chi-tiet-dia-danh/:id',
     element: <DetailPlace />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },

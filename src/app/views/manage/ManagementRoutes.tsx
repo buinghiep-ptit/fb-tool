@@ -1,17 +1,25 @@
 import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
+import { Outlet } from 'react-router-dom'
+import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
 )
+const UserDetail = Loadable(lazy(() => import('./accounts/users/UserDetail')))
+const CreateUser = Loadable(lazy(() => import('./accounts/users/CreateUser')))
+
 const CustomerAccounts = Loadable(
   lazy(() => import('./accounts/ManagementCustomerAccounts')),
 )
 const CustomerDetail = Loadable(
-  lazy(() => import('./accounts/CustomerInfoDetail')),
+  lazy(() => import('./accounts/customers/CustomerInfoDetail')),
+)
+const ChangePassword = Loadable(
+  lazy(() => import('./accounts/customers/details/ChangePassword')),
 )
 const CustomerHistory = Loadable(
-  lazy(() => import('./accounts/CustomerOrderHistoryDetail')),
+  lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
 )
 const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
@@ -27,15 +35,54 @@ const ManagerForbiddenWord = Loadable(
 )
 
 const ManagementRoutes = [
-  { path: '/quan-ly-tai-khoan-admin', element: <AdminAccounts /> },
+  {
+    path: '/quan-ly-tai-khoan-admin',
+    element: (
+      <>
+        <AdminAccounts />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':id/chi-tiet',
+        element: <UserDetail title="Chi tiết tài khoản" />,
+      },
+      {
+        path: 'them-moi',
+        element: <CreateUser title="Thêm mới tài khoản" />,
+      },
+    ],
+  },
   { path: '/quan-ly-tai-khoan-khach-hang', element: <CustomerAccounts /> },
   {
-    path: '/quan-ly-tai-khoan-khach-hang/:id/info',
-    element: <CustomerDetail />,
-  },
-  {
-    path: '/quan-ly-tai-khoan-khach-hang/:id/history',
-    element: <CustomerHistory />,
+    path: '/quan-ly-tai-khoan-khach-hang/:customerId',
+    element: (
+      <>
+        <LayoutCustomer>
+          <Outlet />
+        </LayoutCustomer>
+      </>
+    ),
+    children: [
+      {
+        // index: true,
+        path: 'info',
+        element: (
+          <>
+            <CustomerDetail />
+            <Outlet />
+          </>
+        ),
+        children: [
+          {
+            path: 'doi-mat-khau',
+            element: <ChangePassword title="Đổi mật khẩu" />,
+          },
+        ],
+      },
+      { path: 'history', element: <CustomerHistory /> },
+    ],
   },
   {
     path: '/quan-ly-feeds',

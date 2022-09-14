@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
-import { Card, Grid, IconButton } from '@mui/material'
+import { Card, Grid, IconButton, Typography } from '@mui/material'
 import { Box, Stack, styled, useTheme } from '@mui/system'
 import { MuiCheckBox } from 'app/components/common/MuiCheckbox'
 import FormInputText from 'app/components/common/MuiInputText'
@@ -35,7 +35,7 @@ const StyledSpan = styled(Span)(({ mode }) => ({
 }))
 
 const JWTRoot = styled(JustifyBox)(() => ({
-  background: '#1A2038',
+  background: '#2F9B42', //'#1A2038',
   minHeight: '100% !important',
   '& .card': {
     maxWidth: 800,
@@ -85,7 +85,7 @@ const JwtLogin = () => {
     try {
       await login(values)
       navigate(from, { replace: true })
-    } catch (e) {
+    } catch (error) {
       setLoading(false)
     }
   }
@@ -103,6 +103,7 @@ const JwtLogin = () => {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
+              <MuiTypography variant="h6">Hệ thống quản trị</MuiTypography>
               <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
               <img
                 src="/assets/images/login/bg-login.png"
@@ -173,7 +174,7 @@ const JwtLogin = () => {
                     color="primary"
                     loading={loading}
                     variant="contained"
-                    sx={{ my: 1 }}
+                    sx={{ my: 1, height: 40 }}
                   >
                     Đăng nhập
                   </LoadingButton>

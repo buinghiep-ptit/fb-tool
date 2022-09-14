@@ -1,25 +1,27 @@
-import { TableColumn, TitleFeeds } from 'app/models'
+import { TableColumn } from 'app/models'
+import { ILogsActionCustomer } from 'app/models/account'
+import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
 
-export const columnsFeedLogs: readonly TableColumn<TitleFeeds>[] = [
+export const columnLogsCustomer: readonly TableColumn<ILogsActionCustomer>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
-  { id: 'action', label: 'Hành động', minWidth: 170 },
+  { id: 'processName', label: 'Hành động', minWidth: 170 },
   {
-    id: 'user',
+    id: 'email',
     label: 'Người xử lý',
+    minWidth: 150,
+    align: 'center',
+  },
+  {
+    id: 'note',
+    label: 'Lý do',
     minWidth: 170,
     align: 'center',
   },
   {
-    id: 'status',
-    label: 'Trạng thái xử lý',
-    minWidth: 170,
-    align: 'center',
-  },
-  {
-    id: 'datePublished',
-    label: 'Trạng thái xử lý',
+    id: 'actionDate',
+    label: 'Thời gian',
     minWidth: 170,
     align: 'right',
-    //   format: (value: number) => value.toLocaleString('en-US'),
+    format: (value: string) => ISODateTimeFormatter(value),
   },
 ]

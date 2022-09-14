@@ -75,34 +75,17 @@ export const AuthProvider = ({ children }) => {
   const login = async payload => {
     const response = await loginUser(payload)
     const { accessToken } = response
-
     setSession(accessToken)
-
-    dispatch({
-      type: 'LOGIN',
-      payload: {
-        user: {
-          address: null,
-          birthday: '20/12/1991',
-          districtId: null,
-          districtName: null,
-          email: 'nghiepbvptit@gmail.com',
-          firstName: null,
-          fullName: 'Bùi Văn Nghiệp',
-          gender: 'MALE',
-          id: 3,
-          imageUrl:
-            'https://api-dev.fcare.club/auth/api/customer/image?fileName=foxcare%2Ffoxcare_1661709140872_avatardownload.jpeg',
-          lastName: null,
-          mobilePhone: '0975452750',
-          provinceId: null,
-          provinceName: null,
-          wardId: null,
-          wardLevel: null,
-          wardName: null,
+    let user = null
+    if (accessToken) {
+      user = await getProfile()
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          user,
         },
-      },
-    })
+      })
+    }
   }
 
   const register = async (email, username, password) => {
@@ -138,7 +121,7 @@ export const AuthProvider = ({ children }) => {
           setSession(accessToken)
           const response = await getProfile()
           const user = response
-          console.log('user:', user)
+
           dispatch({
             type: 'INIT',
             payload: {
@@ -156,7 +139,6 @@ export const AuthProvider = ({ children }) => {
           })
         }
       } catch (err) {
-        console.error(err)
         dispatch({
           type: 'INIT',
           payload: {

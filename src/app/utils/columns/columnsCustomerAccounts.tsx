@@ -3,13 +3,13 @@ import { Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
-import { DateTimeConverter } from '../formatters/dateTimeConverter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
   {
-    id: 'phoneNumber',
+    id: 'mobilePhone',
     label: 'Số điện thoại',
     minWidth: 120,
     action: (value: any) => (
@@ -20,31 +20,31 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
   },
   { id: 'email', label: 'Email', minWidth: 200, align: 'center' },
   {
-    id: 'displayName',
-    label: 'Tên hiện thị',
+    id: 'fullName',
+    label: 'Tên hiển thị',
     minWidth: 150,
     align: 'center',
   },
   {
-    id: 'accountType',
+    id: 'customerType',
     label: 'Loại tài khoản',
     minWidth: 120,
     align: 'center',
-    format: (value: number) => LabelFormatter(value, 'accountType'),
+    format: (value: number) => LabelFormatter(value, 'customerType'),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian đăng ký',
     minWidth: 170,
     align: 'center',
-    format: (value: number) => DateTimeConverter(value),
+    format: (value: string) => ISODateTimeFormatter(value),
   },
   {
-    id: 'dateUpdated',
-    label: 'Thời gian cập nhật',
-    minWidth: 170,
+    id: 'lastLoginDate',
+    label: 'Thời gian đăng nhập lần cuối',
+    minWidth: 200,
     align: 'center',
-    format: (value: number) => DateTimeConverter(value),
+    format: (value: string) => (value ? ISODateTimeFormatter(value) : null),
   },
 
   {

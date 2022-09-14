@@ -55,5 +55,21 @@ export interface TableColumn<T> {
   align?: 'center' | 'right' | 'left'
   status?: (param?: any) => ReactElement
   action?: (param?: any) => ReactElement
-  format?: (param: number) => string
+  format?: (param: any) => string | null
+}
+
+export interface IErrorResponse {
+  code?: string
+  error?: string
+  errorDescription?: string
+}
+export interface ISuccessResponse {
+  verify?: string
+  response?: string
+  status?: string
+  accessToken?: string
+  expiresIn?: number
+  created?: number
+  tokenType?: string
+  url?: string
 }

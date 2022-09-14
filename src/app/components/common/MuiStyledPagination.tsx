@@ -102,7 +102,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 }
 
 export default function MuiTablePagination({
-  rowsPerPageOptions = [10, 25, 100],
+  rowsPerPageOptions = [10, 20, 100],
   count,
   rowsPerPage,
   page,

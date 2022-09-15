@@ -33,6 +33,11 @@ export const updateDetailPlace = async (id: any, prams: any): Promise<any> => {
   return data
 }
 
+export const createPlace = async (prams: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/camp-areas`, prams)
+  return data
+}
+
 // Event Api
 
 export const getListEvent = async (id: any, params: any): Promise<any> => {

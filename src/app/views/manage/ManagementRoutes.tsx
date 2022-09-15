@@ -28,8 +28,11 @@ const ManagerForbiddenWord = Loadable(
 const DetailPlace = Loadable(
   lazy(() => import('./managerPlace/detailPlace/detailPlace')),
 )
+const DetailCampGround = Loadable(
+  lazy(() => import('./managerLocation/detailCampGround/detailCampground')),
+)
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
-
+const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
 const ManagementRoutes = [
   { path: '/quan-ly-tai-khoan-admin', element: <AdminAccounts /> },
   { path: '/quan-ly-tai-khoan-khach-hang', element: <CustomerAccounts /> },
@@ -60,8 +63,16 @@ const ManagementRoutes = [
     element: <ManagerPlace />,
   },
   {
+    path: '/them-dia-danh',
+    element: <CreatePlace />,
+  },
+  {
     path: '/chi-tiet-dia-danh/:id',
     element: <DetailPlace />,
+  },
+  {
+    path: '/chi-tiet-diem-camp/:id',
+    element: <DetailCampGround />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },

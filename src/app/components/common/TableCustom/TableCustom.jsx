@@ -11,9 +11,8 @@ import {
   TablePagination,
   Switch,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { SimpleCard } from 'app/components'
-import { updatePlaceStatus } from 'app/apis/place/place.service'
 import { Link } from 'react-router-dom'
 import { cloneDeep } from 'lodash'
 
@@ -47,6 +46,7 @@ const TableCustom = ({
   onDeleteData,
   onAddData,
   filter,
+  updateStatus,
 }) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
@@ -109,31 +109,31 @@ const TableCustom = ({
 
           <TableBody>
             {dataTable.map((data, index) => (
-              <TableRow key={index}>
+              <TableRow key={data.id}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
                     case 'image':
                       return (
-                        <TableCell align="center" key={id}>
+                        <TableCell align="center" key={`${element}${id}`}>
                           <img src={data[element]} />
                         </TableCell>
                       )
                     case 'index':
                       return (
-                        <TableCell align="center" key={id}>
+                        <TableCell align="center" key={`${element}${id}`}>
                           {index + 1}
                         </TableCell>
                       )
                     case 'status':
+                      if (data[element] === 0) {
+                        return data[element]
+                      }
                       return (
-                        <TableCell align="center" key={id}>
+                        <TableCell align="center" key={`${element}${id}`}>
                           <Switch
                             defaultChecked={data[element]}
                             onChange={e => {
-                              updatePlaceStatus(
-                                data.id,
-                                e.target.checked ? 1 : -1,
-                              )
+                              updateStatus(data.id, e.target.checked ? 1 : -1)
                               fetchDataTable(filterTable)
                             }}
                           />
@@ -179,15 +179,15 @@ const TableCustom = ({
                       )
                     case 'linkDetail':
                       return (
-                        <TableCell align="center" key={id}>
-                          <Link to={`/chi-tiet-dia-danh/${data.id}`}>
-                            {data[element]}
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <Link to={`${data[element].path}${data.id}`}>
+                            {data[element].link}
                           </Link>
                         </TableCell>
                       )
                     default:
                       return (
-                        <TableCell align="center" key={id}>
+                        <TableCell align="center" key={`${element}${id}`}>
                           {data[element]}
                         </TableCell>
                       )

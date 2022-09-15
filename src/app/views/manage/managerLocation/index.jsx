@@ -1,20 +1,20 @@
-import {
-  Box,
-  Button,
-  Grid,
-  Icon,
-  styled,
-  TextField,
-  Autocomplete,
-} from '@mui/material'
+import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
-import { Formik, Form } from 'formik'
-import * as Yup from 'yup'
-import { values } from 'lodash'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
+import { tableModel } from './const'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
+import {
+  deleteCampGround,
+  getListCampGround,
+  updateCampGroundStatus,
+} from 'app/apis/campGround/ground.service'
+import { cloneDeep } from 'lodash'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -25,135 +25,50 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-// form field validation schema
-// const validationSchema = Yup.object().shape({
-//   password: Yup.string()
-//     .min(6, 'Password must be 6 character length')
-//     .required('Password is required!'),
-// })
-
-const dataList = [
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: false,
-    action: ['edit'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-]
-
-const tableModel = {
-  headCell: [
-    {
-      name: 'STT',
-      width: 50,
-    },
-    {
-      name: 'Ảnh',
-      width: null,
-    },
-    {
-      name: 'Tên địa danh',
-      width: null,
-    },
-    {
-      name: 'Số điểm camp',
-      width: null,
-    },
-    {
-      name: 'Sự kiện',
-      width: null,
-    },
-    {
-      name: 'Địa chỉ',
-      width: null,
-    },
-    {
-      name: 'Loại hình',
-      width: null,
-    },
-    {
-      name: 'Trạng thái',
-      width: null,
-    },
-
-    {
-      name: 'Hành động',
-      width: null,
-    },
-  ],
-  bodyCell: [
-    'index',
-    'imagePlace',
-    'namePlace',
-    'quantity',
-    'event',
-    'address',
-    'type',
-    'status',
-    'action',
-  ],
-}
-
 export default function ManagerLocation(props) {
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [inputFilter, setInputFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState(null)
+  const [listCampGround, setListCampGround] = useState([])
+  const [totalListCampGround, setTotalListCampground] = useState()
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage)
+  const fetchListCampGround = async param => {
+    await getListCampGround(param)
+      .then(data => {
+        const newList = cloneDeep(data.content).map(campGround => {
+          const convertCampGround = {}
+          convertCampGround.id = campGround.id
+          convertCampGround.imageGround = campGround.imgUrl
+          convertCampGround.linkDetail = {
+            link: campGround.name,
+            path: '/chi-tiet-diem-camp/',
+          }
+          convertCampGround.place = campGround.campAreaName
+          convertCampGround.contact =
+            campGround.merchantEmail + campGround.merchantMobilePhone
+          convertCampGround.address = campGround.address
+          convertCampGround.type = campGround.campType
+          if (convertCampGround.status !== 0) {
+            convertCampGround.status = campGround.status === 1 ? true : false
+          }
+          convertCampGround.action = ['edit', 'delete']
+          return convertCampGround
+        })
+
+        setListCampGround(newList)
+        setTotalListCampground(data.totalElements)
+      })
+      .catch(err => console.log(err))
   }
 
-  const handleChangeRowsPerPage = event => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-  const handleFormSubmit = values => {
-    console.log('submit')
-  }
-  const options = ['Option 1', 'Option 2']
+  React.useEffect(() => {
+    const param = {
+      name: inputFilter,
+      status: statusFilter,
+      page: 0,
+      size: 5,
+    }
+    fetchListCampGround(param)
+  }, [])
 
   return (
     <Container>
@@ -163,55 +78,57 @@ export default function ManagerLocation(props) {
       <SimpleCard>
         <Grid container>
           <Grid item sm={6} xs={6}>
-            <Formik
-              onSubmit={values => {
-                console.log(values)
-              }}
-              initialValues={{
-                namePlace: '',
-              }}
-              // validationSchema={validationSchema}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                handleChange,
-                handleBlur,
-                handleSubmit,
-              }) => (
-                <form onSubmit={handleSubmit}>
-                  <div style={{ display: 'flex' }}>
-                    <TextField
-                      id="namePlace"
-                      fullWidth
-                      size="medium"
-                      type="text"
-                      name="namePlace"
-                      label="Tên địa danh/địa chỉ"
-                      variant="outlined"
-                      onBlur={handleBlur}
-                      value={values.namePlace}
-                      onChange={handleChange}
-                      helperText={touched.namePlace && errors.namePlace}
-                      error={Boolean(errors.namePlace && touched.namePlace)}
-                      sx={{ mb: 3 }}
-                    />
-                    <Autocomplete
-                      sx={{ width: 300, marginLeft: 10 }}
-                      options={options}
-                      renderInput={params => (
-                        <TextField {...params} label="Trạng thái" />
-                      )}
-                    />
-                  </div>
+            <div style={{ display: 'flex' }}>
+              <TextField
+                style={{ marginRight: '50px' }}
+                id="namePlace"
+                fullWidth
+                size="medium"
+                type="text"
+                name="namePlace"
+                label="Tên địa danh/địa chỉ"
+                variant="outlined"
+                sx={{ mb: 3 }}
+                onChange={e => {
+                  setInputFilter(e.target.value)
+                }}
+              />
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">
+                  Trạng thái
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Trạng thái"
+                  onChange={e => {
+                    console.log(e.target.value)
+                    setStatusFilter(e.target.value)
+                  }}
+                >
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
+                  <MenuItem value={0}>Lưu nháp</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
 
-                  <Button color="primary" variant="contained" type="submit">
-                    <Icon>search</Icon>
-                  </Button>
-                </form>
-              )}
-            </Formik>
+            <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              onClick={() => {
+                console.log(inputFilter, statusFilter)
+                fetchListCampGround({
+                  name: inputFilter,
+                  status: statusFilter,
+                  page: 0,
+                  size: 5,
+                })
+              }}
+            >
+              <Icon>search</Icon>
+            </Button>
           </Grid>
         </Grid>
         <Grid container>
@@ -237,9 +154,14 @@ export default function ManagerLocation(props) {
         </Grid>
         <TableCustom
           title="Danh sách địa điểm Camp"
-          dataTable={dataList}
+          dataTable={listCampGround || []}
           tableModel={tableModel}
           pagination={true}
+          updateStatus={updateCampGroundStatus}
+          totalData={parseInt(totalListCampGround, 0)}
+          fetchDataTable={fetchListCampGround}
+          filter={{ name: inputFilter, status: statusFilter }}
+          onDeleteData={deleteCampGround}
         />
       </SimpleCard>
     </Container>

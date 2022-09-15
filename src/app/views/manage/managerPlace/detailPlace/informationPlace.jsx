@@ -11,16 +11,15 @@ import {
 } from 'app/apis/common/common.service'
 
 import { useForm, Controller } from 'react-hook-form'
-import { object, string } from 'yup'
+
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
 
 export default function InformationPlace(props) {
   const [hashtag, setHashtag] = React.useState([])
-  const [namePlace, setNamePlace] = React.useState('')
   const [provinceId, setProvinceId] = React.useState(null)
   const [districtId, setDistrictId] = React.useState('')
-  const [wardId, setWardId] = React.useState()
-  const [place, setPlace] = React.useState()
-  const [description, setDescription] = React.useState('')
+
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
@@ -40,19 +39,24 @@ export default function InformationPlace(props) {
   ]
 
   const params = useParams()
-  const schema = object().shape({
-    namePlace: string().required('Username is required'),
-  })
+
+  const schema = yup
+    .object({
+      namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
+      province: yup.object().required(),
+      district: yup.object().required(),
+      description: yup.string().required('Vui lòng nhập mô tả').trim(),
+    })
+    .required()
 
   const {
     control,
-    register,
     handleSubmit,
     setValue,
     getValues,
     formState: { errors },
   } = useForm({
-    validationSchema: schema,
+    resolver: yupResolver(schema),
     defaultValues: {
       namePlace: '',
       province: null,
@@ -67,6 +71,7 @@ export default function InformationPlace(props) {
   const addHashTag = e => {
     if (e.keyCode === 13) {
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
+      e.preventDefault()
     }
   }
 
@@ -79,7 +84,7 @@ export default function InformationPlace(props) {
         .then(data => {
           setHashtag(data.tags)
           setValue('hashtag', data.tags)
-          setNamePlace(data.name)
+
           setValue('namePlace', data.name)
           setProvinceId(data.idProvince)
           setValue('address', data.address)
@@ -88,8 +93,7 @@ export default function InformationPlace(props) {
             res.find(province => province.id === data.idProvince),
           )
           setDistrictId(data.idDistrict)
-          setWardId(data.idWard)
-          setDescription(data.description)
+
           setValue('description', data.description)
 
           getDistricts(data.idProvince)
@@ -173,7 +177,13 @@ export default function InformationPlace(props) {
               name="namePlace"
               control={control}
               render={({ field }) => (
-                <TextField {...field} label="Tên địa danh" variant="outlined" />
+                <TextField
+                  {...field}
+                  label="Tên địa danh"
+                  variant="outlined"
+                  error={errors.namePlace}
+                  helperText={errors.namePlace?.message}
+                />
               )}
             />
           </Grid>
@@ -194,6 +204,10 @@ export default function InformationPlace(props) {
                   }}
                   renderInput={params => (
                     <TextField
+                      error={errors.province}
+                      helperText={
+                        errors.province ? 'Vui lòng chọn tỉnh/thành' : ''
+                      }
                       {...params}
                       label="Tỉnh/thành phố"
                       margin="normal"
@@ -218,7 +232,15 @@ export default function InformationPlace(props) {
                   getOptionLabel={option => option.name}
                   sx={{ width: 200, marginRight: 5 }}
                   renderInput={params => (
-                    <TextField {...params} label="Quận huyện" margin="normal" />
+                    <TextField
+                      {...params}
+                      label="Quận huyện"
+                      margin="normal"
+                      error={errors.district}
+                      helperText={
+                        errors.district ? 'Vui lòng chọn quận/huyện' : ''
+                      }
+                    />
                   )}
                 />
               )}
@@ -246,6 +268,8 @@ export default function InformationPlace(props) {
               name="address"
               render={({ field }) => (
                 <TextField
+                  error={errors.address}
+                  helperText={errors.address?.message}
                   {...field}
                   label="Địa danh"
                   variant="outlined"
@@ -312,6 +336,8 @@ export default function InformationPlace(props) {
               name="description"
               render={({ field }) => (
                 <TextField
+                  error={errors.description}
+                  helperText={errors.description?.message}
                   {...field}
                   label="Mô tả"
                   margin="normal"

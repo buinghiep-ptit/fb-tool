@@ -5,8 +5,13 @@ import { cloneDeep } from 'lodash'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
-import { deletePlace, getListPlace } from 'app/apis/place/place.service'
+import {
+  deletePlace,
+  getListPlace,
+  updatePlaceStatus,
+} from 'app/apis/place/place.service'
 import { tableModel } from './const'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -21,6 +26,7 @@ export default function ManagerPlace(props) {
   const [listPlace, setListPlace] = useState()
   const [totalPlace, setTotalPlace] = useState()
   const [inputNamePlace, setInputNamePlace] = useState('')
+  const navigate = useNavigate()
 
   const fetchListPlace = async param => {
     await getListPlace(param)
@@ -29,7 +35,10 @@ export default function ManagerPlace(props) {
           const convertPlace = {}
           convertPlace.id = place.id
           convertPlace.image = place.imgUrl
-          convertPlace.linkDetail = place.name
+          convertPlace.linkDetail = {
+            link: place.name,
+            path: '/chi-tiet-dia-danh/',
+          }
           convertPlace.quantity = place.campGroundAmount
           convertPlace.event = place.eventName
           convertPlace.address = place.address
@@ -94,7 +103,14 @@ export default function ManagerPlace(props) {
             xs={6}
             sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
           >
-            <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
+            <Icon
+              fontSize="large"
+              color="primary"
+              sx={{ marginRight: '5px' }}
+              onClick={() => {
+                navigate('/them-dia-danh')
+              }}
+            >
               add_circle
             </Icon>
             <Paragraph
@@ -116,6 +132,7 @@ export default function ManagerPlace(props) {
           pagination={true}
           fetchDataTable={fetchListPlace}
           onDeleteData={deletePlace}
+          updateStatus={updatePlaceStatus}
           filter={{ name: inputNamePlace }}
         />
       </SimpleCard>

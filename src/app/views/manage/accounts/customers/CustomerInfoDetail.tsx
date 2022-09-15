@@ -1,20 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
-  AddAPhoto,
   AddBox,
   CameraAltRounded,
+  ChangeCircleSharp,
+  CheckCircleOutlineRounded,
+  ClearSharp,
   LockClockSharp,
+  LockOpenSharp,
   PasswordSharp,
 } from '@mui/icons-material'
 import {
-  Avatar,
-  Button,
   Chip,
   Divider,
+  FormHelperText,
   Grid,
+  IconButton,
   MenuItem,
   Stack,
-  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
@@ -29,6 +31,8 @@ import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useUpdateCustomer } from 'app/hooks/queries/useCustomerData'
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeISOFormatter'
@@ -44,11 +48,11 @@ import * as Yup from 'yup'
 
 type ISearchFilters = {
   email?: string
-  phoneNumber?: string
-  displayName?: string
+  mobilePhone?: string
+  fullName?: string
   otp?: number
   avatar?: any
-  cusType?: string | number
+  type?: string | number
 }
 
 type RHFLabelProps = {
@@ -86,6 +90,33 @@ const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png']
 export default function CustomerDetail(props: Props) {
   const navigation = useNavigate()
   const { customerId } = useParams()
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email('Email không hợp lệ')
+      .required('Email là bắt buộc'),
+    mobilePhone: Yup.string()
+      .required('SĐT là bắt buộc')
+      .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, 'Số điện thoại không hợp lệ'),
+    displayName: Yup.string()
+      .min(0, 'email must be at least 0 characters')
+      .max(256, 'email must be at almost 256 characters'),
+    avatar: Yup.mixed()
+      .test(
+        'fileSize',
+        'Dung lượng file quá lớn (< 10MB)',
+        file => !file || (file && file.size <= FILE_SIZE),
+      )
+      .test('fileFormat', 'Chỉ hỗ trợ ảnh .jpg | .jpeg | .png | .gif', file => {
+        return !file || (file && SUPPORTED_FORMATS.includes(file.type))
+      }),
+  })
+
+  const methods = useForm<ISearchFilters>({
+    defaultValues: { avatar: null },
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+  })
 
   const queryResults = useQueries({
     queries: [
@@ -135,7 +166,7 @@ export default function CustomerDetail(props: Props) {
       case 1:
         return '#2F9B42'
       case -1:
-        return '#cccccc'
+        return '#AAAAAA'
 
       case -2:
         return '#FF3D57'
@@ -144,44 +175,41 @@ export default function CustomerDetail(props: Props) {
         return '#ff9e43'
 
       default:
-        return '2F9B42'
+        return '#AAAAAA'
     }
   }
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
-    phoneNumber: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
-    displayName: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
-    avatar: Yup.mixed()
-      .test(
-        'fileSize',
-        'Dung lượng file quá lớn (tối đa 10MB)',
-        file => !file || (file && file.size <= FILE_SIZE),
-      )
-      .test('fileFormat', 'Chỉ hỗ trợ ảnh .jpg | .jpeg | .png | .gif', file => {
-        console.log('fileFormat test: ', file)
-        return !file || (file && SUPPORTED_FORMATS.includes(file.type))
-      }),
-  })
+  const getLabelByCusStatus = (status: number) => {
+    switch (status) {
+      case 1:
+        return 'Hoạt động'
+      case -1:
+        return 'Xoá'
 
-  const methods = useForm<ISearchFilters>({
-    defaultValues: { avatar: null },
-    mode: 'onChange',
-    resolver: yupResolver(validationSchema),
-  })
+      case -2:
+        return 'Khoá'
+
+      case -3:
+        return 'Khoá tạm thời'
+
+      default:
+        return 'Không hoạt động'
+    }
+  }
+
+  const onSuccess = (data: any) => {
+    toastSuccess({ message: 'Cập nhật tài khoản thành công' })
+  }
+
+  const { mutate: updateCustomer, isLoading: updateLoading } =
+    useUpdateCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
     console.log('values: ', values)
+    updateCustomer({ ...values, cusId: customerId })
   }
-
   if (isLoading) return <MuiLoading />
 
   if (isError)
@@ -197,12 +225,43 @@ export default function CustomerDetail(props: Props) {
         <FormProvider {...methods}>
           <Grid container spacing={3}>
             <Grid item sm={7} xs={12}>
+              {customer.data?.status !== -1 && (
+                <Box pb={3}>
+                  <Grid container spacing={2}>
+                    <Grid item sm={3} xs={6}>
+                      <MuiButton
+                        disabled={
+                          !!Object.keys(methods.formState.errors).length
+                        }
+                        title="Lưu"
+                        loading={updateLoading}
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        sx={{ width: '100%' }}
+                        startIcon={<LockClockSharp />}
+                      />
+                    </Grid>
+                    <Grid item sm={3} xs={6}>
+                      <MuiButton
+                        onClick={() => methods.reset()}
+                        title="Huỷ"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ width: '100%' }}
+                        startIcon={<PasswordSharp />}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+
               <Box>
                 <Grid container alignItems={'center'} pb={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">Email:</MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <FormInputText
                       type="email"
                       name="email"
@@ -214,32 +273,32 @@ export default function CustomerDetail(props: Props) {
                   </Grid>
                 </Grid>
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       Số điện thoại:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <FormInputText
                       type="text"
                       name="mobilePhone"
                       size="small"
-                      placeholder="Nhập tên tài khoản"
+                      placeholder="Nhập SĐT"
                       fullWidth
                       defaultValue={customer?.data?.mobilePhone ?? ''}
                     />
                   </Grid>
                 </Grid>
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       Tên hiển thị:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <FormInputText
                       type="text"
-                      name="displayName"
+                      name="fullName"
                       placeholder="Nhập họ và tên"
                       size="small"
                       fullWidth
@@ -248,12 +307,12 @@ export default function CustomerDetail(props: Props) {
                   </Grid>
                 </Grid>
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       OTP trong ngày:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <Stack flexDirection={'row'} alignItems={'center'}>
                       <Box flex={1}>
                         <SelectDropDown
@@ -295,12 +354,12 @@ export default function CustomerDetail(props: Props) {
                 </Grid>
 
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       Đăng ký bằng:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <MuiTypography
                       variant="subtitle2"
                       pb={1}
@@ -312,12 +371,12 @@ export default function CustomerDetail(props: Props) {
                   </Grid>
                 </Grid>
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       Lần cuối đăng nhập:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <MuiTypography variant="subtitle2" color="primary">
                       {customer?.data?.lastLoginDate
                         ? ISODateTimeFormatter(
@@ -328,41 +387,15 @@ export default function CustomerDetail(props: Props) {
                   </Grid>
                 </Grid>
                 <Grid container alignItems={'center'} py={1}>
-                  <Grid item sm={4} xs={12}>
+                  <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">
                       Mã giới thiệu:
                     </MuiTypography>
                   </Grid>
-                  <Grid item sm={8} xs={12}>
+                  <Grid item sm={8} md={9} xs={12}>
                     <MuiTypography variant="subtitle2" color="primary">
                       {customer?.data?.referralCode}
                     </MuiTypography>
-                  </Grid>
-                </Grid>
-              </Box>
-
-              <Box py={3}>
-                <Grid container spacing={2}>
-                  <Grid item sm={6} xs={12}>
-                    <MuiButton
-                      disabled={!!Object.keys(methods.formState.errors).length}
-                      title="Lưu"
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{ width: '100%' }}
-                      startIcon={<LockClockSharp />}
-                    />
-                  </Grid>
-                  <Grid item sm={6} xs={12}>
-                    <MuiButton
-                      onClick={() => methods.reset()}
-                      title="Huỷ"
-                      variant="outlined"
-                      color="secondary"
-                      sx={{ width: '100%' }}
-                      startIcon={<PasswordSharp />}
-                    />
                   </Grid>
                 </Grid>
               </Box>
@@ -370,34 +403,7 @@ export default function CustomerDetail(props: Props) {
 
             <Grid item sm={5} xs={12}>
               <Stack alignItems={'center'} justifyContent={'center'}>
-                <Grid container spacing={2}>
-                  <Grid item sm={6} xs={12}>
-                    <MuiButton
-                      title="Khoá"
-                      variant="outlined"
-                      color="error"
-                      type="submit"
-                      sx={{ width: '100%' }}
-                      startIcon={<LockClockSharp />}
-                    />
-                  </Grid>
-                  <Grid item sm={6} xs={12}>
-                    <MuiButton
-                      onClick={() =>
-                        navigation(`doi-mat-khau`, {
-                          state: { modal: true },
-                        })
-                      }
-                      title="Đổi mật khẩu"
-                      variant="outlined"
-                      color="secondary"
-                      sx={{ width: '100%' }}
-                      startIcon={<PasswordSharp />}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Stack alignItems={'center'} p={3} gap={2}>
+                <Stack alignItems={'center'} px={3} gap={2}>
                   <Box
                     width={200}
                     height={200}
@@ -407,6 +413,9 @@ export default function CustomerDetail(props: Props) {
                       position: 'relative',
                       backgroundPosition: 'center',
                       backgroundSize: 'cover',
+                      boxShadow:
+                        '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
+
                       backgroundImage: `url(${
                         methods.watch('avatar')
                           ? URL.createObjectURL(methods.watch('avatar'))
@@ -428,10 +437,6 @@ export default function CustomerDetail(props: Props) {
                             // multiple
                             {...props}
                             onChange={event => {
-                              console.log(
-                                'onchange:',
-                                event.target.files && event.target.files[0],
-                              )
                               if (event.target.files?.length) {
                                 field.onChange(event.target.files[0])
                               }
@@ -455,9 +460,8 @@ export default function CustomerDetail(props: Props) {
                         }}
                       >
                         <CameraAltRounded
-                          color="primary"
                           fontSize="large"
-                          sx={{ width: 40, height: 40 }}
+                          sx={{ width: 40, height: 40, color: '#121828' }}
                         />
                       </Box>
                     </label>
@@ -488,45 +492,143 @@ export default function CustomerDetail(props: Props) {
                       />
                     </Box>
                   </Box>
-                  {methods.formState.errors.avatar && (
-                    <MuiTypography color="error" fontSize="0.75rem">
-                      {methods.formState.errors.avatar?.message as string}
-                    </MuiTypography>
+
+                  {methods.getValues('avatar') && (
+                    <Stack
+                      maxWidth={'100%'}
+                      flexDirection={'row'}
+                      gap={0.5}
+                      alignItems={'center'}
+                    >
+                      <CheckCircleOutlineRounded color="primary" />
+                      <MuiTypography fontSize="0.75rem">
+                        {methods.getValues('avatar').name as string}
+                      </MuiTypography>
+                      <IconButton
+                        onClick={() => {
+                          methods.clearErrors('avatar')
+                          methods.setValue('avatar', null)
+                        }}
+                      >
+                        <ClearSharp color="error" />
+                      </IconButton>
+                    </Stack>
                   )}
 
-                  <Box>
-                    <Stack flexDirection={'row'} pb={2}>
-                      <Stack alignItems={'center'}>
-                        <MuiTypography variant="subtitle1" color="primary">
-                          {customer?.data?.followers}
-                        </MuiTypography>
-                        <MuiTypography variant="subtitle2" color="primary">
-                          Người theo dõi
-                        </MuiTypography>
-                      </Stack>
-                      <Divider
-                        orientation="vertical"
-                        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
-                        flexItem
-                      />
-                      <Stack alignItems={'center'}>
-                        <MuiTypography variant="subtitle1" color="primary">
-                          {customer?.data?.following}
-                        </MuiTypography>
-                        <MuiTypography variant="subtitle2" color="primary">
-                          Đang theo dõi
-                        </MuiTypography>
-                      </Stack>
+                  {methods.formState.errors.avatar && (
+                    <FormHelperText error>
+                      {methods.formState.errors.avatar?.message as string}
+                    </FormHelperText>
+                  )}
+
+                  <Stack flexDirection={'row'}>
+                    <Stack alignItems={'center'}>
+                      <MuiTypography variant="subtitle1" color="primary">
+                        {customer?.data?.followers}
+                      </MuiTypography>
+                      <MuiTypography variant="subtitle2">
+                        Người theo dõi
+                      </MuiTypography>
                     </Stack>
+                    <Divider
+                      orientation="vertical"
+                      sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                      flexItem
+                    />
+                    <Stack alignItems={'center'}>
+                      <MuiTypography variant="subtitle1" color="primary">
+                        {customer?.data?.following}
+                      </MuiTypography>
+                      <MuiTypography variant="subtitle2">
+                        Đang theo dõi
+                      </MuiTypography>
+                    </Stack>
+                  </Stack>
+
+                  <Stack flexDirection={'row'} alignItems="center">
                     <SelectDropDown
-                      name="cusType"
+                      name="type"
                       defaultValue={customer?.data?.type ?? 1}
+                      sx={{ minWidth: 120 }}
                     >
                       <MenuItem value={1}>Thường</MenuItem>
                       <MenuItem value={2}>KOL</MenuItem>
                     </SelectDropDown>
-                  </Box>
+                    <Chip
+                      label={getLabelByCusStatus(
+                        customer.data?.status as number,
+                      )}
+                      size="small"
+                      // color={true ? 'primary' : 'default'}
+                      sx={{
+                        mx: 1,
+                        flex: 1,
+                        backgroundColor: getColorByCusStatus(
+                          customer.data?.status as number,
+                        ),
+                        color: '#FFFFFF',
+                      }}
+                    />
+                  </Stack>
                 </Stack>
+
+                {customer.data?.status !== -1 && (
+                  <Stack flexDirection={'row'} my={3}>
+                    {customer.data?.status !== -2 && (
+                      <>
+                        <MuiButton
+                          title={'Khoá TK'}
+                          variant="text"
+                          color="error"
+                          onClick={() =>
+                            navigation('khoa-tai-khoan', {
+                              state: { modal: true, data: customer.data },
+                            })
+                          }
+                          startIcon={<LockClockSharp />}
+                        />
+                        <Divider
+                          orientation="vertical"
+                          sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                          flexItem
+                        />
+                      </>
+                    )}
+
+                    {customer.data?.status !== 1 && (
+                      <>
+                        <MuiButton
+                          title={'Mở khóa'}
+                          variant="text"
+                          color="primary"
+                          onClick={() =>
+                            navigation('mo-khoa-tai-khoan', {
+                              state: { modal: true, data: customer.data },
+                            })
+                          }
+                          startIcon={<LockOpenSharp />}
+                        />
+                        <Divider
+                          orientation="vertical"
+                          sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                          flexItem
+                        />
+                      </>
+                    )}
+                    <MuiButton
+                      onClick={() =>
+                        navigation(`doi-mat-khau`, {
+                          state: { modal: true },
+                        })
+                      }
+                      title="Đổi MK"
+                      variant="text"
+                      color="secondary"
+                      sx={{ flex: 1 }}
+                      startIcon={<ChangeCircleSharp />}
+                    />
+                  </Stack>
+                )}
               </Stack>
             </Grid>
           </Grid>

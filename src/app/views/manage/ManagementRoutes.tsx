@@ -18,6 +18,12 @@ const CustomerDetail = Loadable(
 const ChangePassword = Loadable(
   lazy(() => import('./accounts/customers/details/ChangePassword')),
 )
+const LockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/LockCustomer')),
+)
+const UnlockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/UnlockCustomer')),
+)
 const CustomerHistory = Loadable(
   lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
 )
@@ -78,6 +84,14 @@ const ManagementRoutes = [
           {
             path: 'doi-mat-khau',
             element: <ChangePassword title="Đổi mật khẩu" />,
+          },
+          {
+            path: 'mo-khoa-tai-khoan',
+            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+          },
+          {
+            path: 'khoa-tai-khoan',
+            element: <LockCustomer title="Khoá tài khoản" />,
           },
         ],
       },

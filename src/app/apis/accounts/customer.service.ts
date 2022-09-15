@@ -42,3 +42,34 @@ export const changePasswordCustomer = async (
   )
   return data
 }
+
+export const updateCustomer = async (
+  customerId: number,
+  payload: ICustomerDetail,
+): Promise<any> => {
+  const { data } = await http.put<any>(
+    `/api/customer/${customerId}/update`,
+    payload,
+  )
+  return data
+}
+
+export const lockCustomer = async (
+  customerId: number,
+  payload: {
+    lockType?: number
+    lockDuration?: number
+    reason?: string
+  },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/customer/${customerId}/lock`,
+    payload,
+  )
+  return data
+}
+
+export const unLockCustomer = async (customerId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/customer/${customerId}/unlock`)
+  return data
+}

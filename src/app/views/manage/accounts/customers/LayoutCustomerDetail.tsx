@@ -51,7 +51,7 @@ export function LayoutCustomer({ children, ...props }: Props) {
         <Box mt={-2} pb={2}>
           <MuiNavTabs navItems={navItems} customerId={customerId ?? 0} />
         </Box>
-        <SimpleCard title="">{children}</SimpleCard>
+        <SimpleCard>{children}</SimpleCard>
       </React.Fragment>
     </Container>
   )

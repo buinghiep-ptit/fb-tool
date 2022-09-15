@@ -22,10 +22,10 @@ export interface IUser {
 
 export interface ICustomer {
   id?: number
-  phoneNumber?: string
+  mobilePhone?: string
   displayName?: string
   email?: string
-  accountType?: 0 | 1
+  customerType?: number
   dateCreated?: number
   dateUpdated?: number
   status?: number

@@ -13,6 +13,8 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { SimpleCard } from 'app/components'
+import { Link } from 'react-router-dom'
+import { cloneDeep } from 'lodash'
 
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: 'pre',
@@ -34,17 +36,48 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }))
 
-const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
+const TableCustom = ({
+  title,
+  totalData,
+  dataTable,
+  tableModel,
+  pagination,
+  fetchDataTable,
+  onDeleteData,
+  onAddData,
+  filter,
+  updateStatus,
+}) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
-
+  const [filterTable, setFilterTable] = useState({ name: '', size: 5, page: 0 })
   const handleChangePage = (_, newPage) => {
+    console.log('xx')
     setPage(newPage)
+    filter.page = newPage
+    filter.size = rowsPerPage
+    setFilterTable(cloneDeep(filter))
+    fetchDataTable(filter)
   }
 
   const handleChangeRowsPerPage = event => {
     setRowsPerPage(+event.target.value)
     setPage(0)
+    filter.page = 0
+    filter.size = +event.target.value
+    setFilterTable(cloneDeep(filter))
+    fetchDataTable(filter)
+  }
+
+  const handleDeleteAction = async id => {
+    const res = await onDeleteData(id)
+    if (res) fetchDataTable({ ...filterTable })
+  }
+
+  const handleAddAction = async id => {
+    console.log('xxx')
+    const res = await onAddData(id)
+    if (res) fetchDataTable({ ...filterTable })
   }
 
   return (
@@ -53,12 +86,12 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
         <StyledTable>
           <TableHead>
             <TableRow>
-              {tableModel.headCell.map((cell, index) => {
+              {tableModel.headCell.map(cell => {
                 if (cell.width) {
                   return (
                     <TableCell
                       align="center"
-                      key={index}
+                      key={cell.name}
                       style={{ width: cell.width }}
                     >
                       {cell.name}
@@ -66,7 +99,7 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
                   )
                 }
                 return (
-                  <TableCell align="center" key={index}>
+                  <TableCell align="center" key={cell.name}>
                     {cell.name}
                   </TableCell>
                 )
@@ -76,29 +109,85 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
 
           <TableBody>
             {dataTable.map((data, index) => (
-              <TableRow key={index}>
-                <TableCell align="center">{index + 1}</TableCell>
+              <TableRow key={data.id}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
-                    case 'status':
+                    case 'image':
                       return (
-                        <TableCell align="center" key={id}>
-                          <Switch checked={data[element]} />
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <img src={data[element]} />
+                        </TableCell>
+                      )
+                    case 'index':
+                      return (
+                        <TableCell align="center" key={`${element}${id}`}>
+                          {index + 1}
+                        </TableCell>
+                      )
+                    case 'status':
+                      if (data[element] === 0) {
+                        return data[element]
+                      }
+                      return (
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <Switch
+                            defaultChecked={data[element]}
+                            onChange={e => {
+                              updateStatus(data.id, e.target.checked ? 1 : -1)
+                              fetchDataTable(filterTable)
+                            }}
+                          />
                         </TableCell>
                       )
                     case 'action':
                       return (
                         <TableCell align="right" key={id}>
-                          {data[element].map((type, indexType) => (
-                            <IconButton key={indexType}>
-                              <Icon color="error">{type}</Icon>
-                            </IconButton>
-                          ))}
+                          {data[element].map((type, indexType) => {
+                            if (type === 'delete') {
+                              return (
+                                <IconButton
+                                  key={indexType}
+                                  onClick={() => {
+                                    handleDeleteAction(data.id)
+                                  }}
+                                >
+                                  <Icon color="error">{type}</Icon>
+                                </IconButton>
+                              )
+                            }
+
+                            if (type === 'add') {
+                              return (
+                                <IconButton
+                                  key={indexType}
+                                  onClick={() => {
+                                    handleAddAction(data.id)
+                                  }}
+                                >
+                                  <Icon color="error">{type}</Icon>
+                                </IconButton>
+                              )
+                            }
+
+                            return (
+                              <IconButton key={indexType}>
+                                <Icon color="error">{type}</Icon>
+                              </IconButton>
+                            )
+                          })}
+                        </TableCell>
+                      )
+                    case 'linkDetail':
+                      return (
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <Link to={`${data[element].path}${data.id}`}>
+                            {data[element].link}
+                          </Link>
                         </TableCell>
                       )
                     default:
                       return (
-                        <TableCell align="center" key={id}>
+                        <TableCell align="center" key={`${element}${id}`}>
                           {data[element]}
                         </TableCell>
                       )
@@ -114,7 +203,7 @@ const TableCustom = ({ title, dataTable, tableModel, pagination }) => {
             page={page}
             component="div"
             rowsPerPage={rowsPerPage}
-            count={dataTable.length}
+            count={totalData || 0}
             onPageChange={handleChangePage}
             rowsPerPageOptions={[5, 10, 25]}
             onRowsPerPageChange={handleChangeRowsPerPage}

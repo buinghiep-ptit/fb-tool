@@ -27,7 +27,7 @@ const UnlockCustomer = Loadable(
 const CustomerHistory = Loadable(
   lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
 )
-const ManagerCamp = Loadable(lazy(() => import('./ManagerCamp')))
+
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
@@ -39,7 +39,14 @@ const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
 )
-
+const DetailPlace = Loadable(
+  lazy(() => import('./managerPlace/detailPlace/detailPlace')),
+)
+const DetailCampGround = Loadable(
+  lazy(() => import('./managerLocation/detailCampGround/detailCampground')),
+)
+const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
+const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
 const ManagementRoutes = [
   {
     path: '/quan-ly-tai-khoan-admin',
@@ -116,8 +123,21 @@ const ManagementRoutes = [
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,
   },
-  { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerCamp /> },
+  {
+    path: '/them-dia-danh',
+    element: <CreatePlace />,
+  },
+  {
+    path: '/chi-tiet-dia-danh/:id',
+    element: <DetailPlace />,
+  },
+  {
+    path: '/chi-tiet-diem-camp/:id',
+    element: <DetailCampGround />,
+  },
+  { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
+  { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },
 ]
 export default ManagementRoutes

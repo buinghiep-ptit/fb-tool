@@ -137,7 +137,7 @@ const Layout1Topbar = () => {
               <UserMenu>
                 <Hidden xsDown>
                   <Span>
-                    Hi <strong>{user.fullName}</strong>
+                    Chào, <strong>{user.email.split('@')[0]}</strong>
                   </Span>
                 </Hidden>
                 <Avatar src={user.avatar} sx={{ cursor: 'pointer' }} />

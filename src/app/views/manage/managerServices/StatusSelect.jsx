@@ -25,10 +25,8 @@ export default function StatusSelect() {
           sx={{ mb: 3, width: '75%' }}
         >
           <MenuItem value="all">Tất cả</MenuItem>
-          <MenuItem value="approved">Đã duyệt</MenuItem>
-          <MenuItem value="pending">Chờ hậu kiểm</MenuItem>
-          <MenuItem value="infringe">Vi phạm</MenuItem>
-          <MenuItem value="remove">Xoá</MenuItem>
+          <MenuItem value="effect">Hiệu lực</MenuItem>
+          <MenuItem value="invalid">Không hiệu lực</MenuItem>
         </Select>
       </FormControl>
     </Box>

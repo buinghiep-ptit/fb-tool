@@ -22,7 +22,7 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
       color: '#fff',
       '& + .MuiSwitch-track': {
         opacity: 1,
-        backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
+        backgroundColor: theme.palette.primary,
       },
     },
   },
@@ -54,7 +54,7 @@ export function MuiSwitch({ checked, ...props }: IMuiSwitchProps) {
   return (
     <Stack direction="row" spacing={1} alignItems="center" {...props}>
       <AntSwitch
-        defaultChecked={checked}
+        checked={checked}
         inputProps={{ 'aria-label': 'ant design' }}
       />
     </Stack>

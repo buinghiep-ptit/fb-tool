@@ -41,14 +41,14 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   const noDataFound =
     !isFetching && (!memoizedData || !(memoizedData as T[]).length)
 
-  const cellFormatter = (cell: any, value: any) => {
+  const cellFormatter = (cell: any, row: any, value: any) => {
     if (cell.status) {
       return cell.status(value)
     }
     if (cell.action) {
-      return cell.action(value)
+      return cell.action(value ? value : row.status)
     }
-    return cell.format && typeof value === 'number' ? cell.format(value) : value
+    return cell.format ? cell.format(value) : value
   }
 
   return (
@@ -58,9 +58,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
           {!isFetching && (
             <TableHead>
               <TableRow>
-                {columns.map(column => (
+                {columns.map((column, idx) => (
                   <TableCell
-                    key={column.id as string}
+                    key={idx}
                     align={column.align}
                     sx={{
                       minWidth: column.minWidth,
@@ -84,7 +84,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.id}
+                    key={row.userId ?? row.customerId ?? row.id ?? index}
                     sx={{
                       '&.MuiTableRow-hover': {
                         '&:hover': {
@@ -97,7 +97,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                       const value = idx === 0 ? index + 1 : row[column.id]
                       return (
                         <TableCell
-                          key={column.id as string}
+                          key={idx}
                           align={column.align}
                           onClick={() => onClickRow?.(column, row)}
                           sx={{
@@ -109,7 +109,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                             // textOverflow: 'ellipsis',
                           }}
                         >
-                          {cellFormatter(column, value)}
+                          {cellFormatter(column, row, value)}
                         </TableCell>
                       )
                     })}
@@ -122,7 +122,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                   <TableRow key={skeleton}>
                     {Array.from({ length: columns.length }, (x, i) => i).map(
                       elm => (
-                        <TableCell key={elm} sx={{ px: 2 }}>
+                        <TableCell key={elm} sx={{ px: 1 }}>
                           <Skeleton height={28} />
                         </TableCell>
                       ),
@@ -135,7 +135,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         </Table>
         {noDataFound && (
           <Box my={2} textAlign="center">
-            No Data Found
+            Không tìm thấy bản ghi
           </Box>
         )}
       </TableContainer>

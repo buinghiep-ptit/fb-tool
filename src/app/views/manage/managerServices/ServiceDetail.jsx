@@ -54,6 +54,8 @@ export default function ServiceDetail(props) {
     'Thứ 7:',
     'Chủ nhật:',
   ]
+
+  const status = [{ label: 'Hiệu lực' }, { label: 'Không hiệu lực' }]
   return (
     <Container>
       <Box className="breadcrumb">
@@ -231,7 +233,7 @@ export default function ServiceDetail(props) {
                   {date}
                 </InputLabel>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={4} sx={{ display: 'flex', alignItems: 'center' }}>
                 <TextField
                   variant="outlined"
                   sx={{
@@ -241,10 +243,46 @@ export default function ServiceDetail(props) {
                     width: '50%',
                   }}
                 />
-                <Span>(Người/Sản phẩm)</Span>
+                <Span>(VNĐ/Ngày)</Span>
               </Grid>
             </Grid>
           ))}
+
+          <Grid item xs={3} sx={{ display: 'flex', alignItems: 'center' }}>
+            <InputLabel
+              sx={{
+                color: 'Black',
+                fontSize: '15px',
+                fontWeight: '500',
+              }}
+            >
+              Trạng thái:
+            </InputLabel>
+          </Grid>
+          <Grid item xs={9} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Autocomplete
+              disablePortal
+              id="status"
+              options={status}
+              sx={{ marginRight: 5, width: '75%' }}
+              renderInput={params => (
+                <TextField {...params} label="Trạng thái" margin="normal" />
+              )}
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container sx={{ marginTop: '20px ' }}>
+          <Grid item xs={2}>
+            <StyledButton variant="contained" color="primary">
+              Lưu
+            </StyledButton>
+          </Grid>
+          <Grid item xs={2}>
+            <StyledButton variant="contained" color="primary">
+              Huỷ
+            </StyledButton>
+          </Grid>
         </Grid>
       </SimpleCard>
     </Container>

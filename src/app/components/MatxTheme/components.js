@@ -49,6 +49,12 @@ export const components = {
         fontSize: '14px',
         textTransform: 'none',
         fontWeight: '400',
+        '&.MuiButton-containedPrimary:hover': {
+          backgroundColor: '#218332',
+        },
+        '&.MuiButton-containedSecondary:hover': {
+          backgroundColor: '#218332',
+        },
       },
       contained: {
         boxShadow: themeShadows[8],

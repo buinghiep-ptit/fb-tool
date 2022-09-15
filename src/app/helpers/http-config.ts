@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import queryString from 'query-string'
+import { toastError } from './toastNofication'
 // const camelize = require('camelize')
 
 enum StatusCode {
@@ -16,7 +17,6 @@ const headers: Readonly<Record<string, string | boolean>> = {
   'X-Requested-With': 'XMLHttpRequest',
 }
 
-let isRefreshing = false
 let failedQueue = [] as any
 
 const processQueue = (error: any, token: string | null) => {
@@ -79,7 +79,11 @@ class Http {
 
         return originalRequest
       },
-      (error: any) => Promise.reject(error),
+      (error: any) => {
+        console.log('error request:', error)
+
+        Promise.reject(error)
+      },
     )
 
     http.interceptors.response.use(
@@ -107,53 +111,13 @@ class Http {
         if (
           error.response?.status &&
           error.response.status === 401 &&
-          !originalRequest._retry
+          error.response.config.url !== '/api/account'
         ) {
-          if (isRefreshing) {
-            return new Promise(function (resolve, reject) {
-              failedQueue.push({ resolve, reject })
-            })
-              .then(token => {
-                originalRequest.headers.Authorization = `Bearer ${token}`
-                return http(originalRequest)
-              })
-              .catch((error: any) => {
-                throw error
-              })
-          }
-
-          originalRequest._retry = true
-          isRefreshing = true
-
-          const clientRefreshToken = 'clientRefreshToken'
-          const deviceId = 'deviceId'
-
-          return new Promise(function (resolve, reject) {
-            axios
-              .post(
-                `${process.env.REACT_PUBLIC_API_URL}/auth/api/authenticate/refresh`,
-                {
-                  refresh_token: clientRefreshToken,
-                  device_id: deviceId,
-                },
-              )
-              .then(res => {
-                if (res.data.access_token) {
-                  http.defaults.headers.common.Authorization = `Bearer ${res.data.access_token}`
-                  originalRequest.headers.Authorization = `Bearer ${res.data.access_token}`
-                  processQueue(null, res.data.access_token)
-                  resolve(http(originalRequest))
-                }
-              })
-              .catch((error: any) => {
-                processQueue(error, null)
-                reject(error)
-              })
-              .then(() => {
-                isRefreshing = false
-              })
-          })
+          window.localStorage.clear()
+          window.location.href = '/session/signin'
+          // originalRequest._retry = true
         }
+        toastError(error)
 
         throw error
       },

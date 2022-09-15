@@ -5,7 +5,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 export interface ISelectDropDownProps extends SelectProps {
   name: string
   defaultValue?: string | number
-  children: React.ReactElement[]
+  children: React.ReactElement[] | React.ReactElement
 }
 
 export function SelectDropDown({

@@ -17,7 +17,6 @@ import { Navigate, useLocation } from 'react-router-dom'
 // };
 
 type Props = {
-  // eslint-disable-next-line prettier/prettier
   children: ReactElement
 }
 
@@ -31,7 +30,6 @@ const AuthGuard = ({ children }: Props) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('vao day')
       if (isValidToken(accessToken)) {
         setIsAuth(true)
       } else {
@@ -68,7 +66,7 @@ const AuthGuard = ({ children }: Props) => {
 
   return (
     <>
-      {isAuth && isAuthenticated ? (
+      {isAuthenticated ? (
         children
       ) : (
         <Navigate replace to="/session/signin" state={{ from: pathname }} />

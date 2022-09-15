@@ -4,10 +4,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import 'perfect-scrollbar/css/perfect-scrollbar.css'
 import ReactDOM from 'react-dom'
 import { BrowserRouter } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import App from './app/App'
+import './app/assets/scss/material-kit-react.scss?v=1.9.0'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
-import './app/assets/scss/material-kit-react.scss?v=1.9.0'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +25,7 @@ ReactDOM.render(
       <BrowserRouter>
         <CssBaseline />
         <App />
+        <ToastContainer autoClose={3000} />
       </BrowserRouter>
     </StyledEngineProvider>
     <ReactQueryDevtools initialIsOpen={false} />

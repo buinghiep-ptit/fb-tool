@@ -1,4 +1,5 @@
-export interface ILoginPayload {
-  phoneNubmer?: string
+export interface IAuthPayload {
+  email?: string
   password?: string
+  rememberMe?: boolean
 }

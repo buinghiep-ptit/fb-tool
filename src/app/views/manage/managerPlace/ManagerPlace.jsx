@@ -1,12 +1,17 @@
 import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
-import { Formik, Form } from 'formik'
-import * as Yup from 'yup'
-import { values } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
+import {
+  deletePlace,
+  getListPlace,
+  updatePlaceStatus,
+} from 'app/apis/place/place.service'
+import { tableModel } from './const'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -17,134 +22,46 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-// form field validation schema
-// const validationSchema = Yup.object().shape({
-//   password: Yup.string()
-//     .min(6, 'Password must be 6 character length')
-//     .required('Password is required!'),
-// })
-
-const dataList = [
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: false,
-    action: ['edit'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-  {
-    imagePlace: 'image',
-    namePlace: 'name',
-    quantity: 10,
-    event: '1231',
-    address: 'address',
-    type: 'adasd',
-    status: true,
-    action: ['edit', 'delete'],
-  },
-]
-
-const tableModel = {
-  headCell: [
-    {
-      name: 'STT',
-      width: 50,
-    },
-    {
-      name: 'Ảnh',
-      width: null,
-    },
-    {
-      name: 'Tên địa danh',
-      width: null,
-    },
-    {
-      name: 'Số điểm camp',
-      width: null,
-    },
-    {
-      name: 'Sự kiện',
-      width: null,
-    },
-    {
-      name: 'Địa chỉ',
-      width: null,
-    },
-    {
-      name: 'Loại hình',
-      width: null,
-    },
-    {
-      name: 'Trạng thái',
-      width: null,
-    },
-
-    {
-      name: 'Hành động',
-      width: null,
-    },
-  ],
-  bodyCell: [
-    'index',
-    'imagePlace',
-    'namePlace',
-    'quantity',
-    'event',
-    'address',
-    'type',
-    'status',
-    'action',
-  ],
-}
-
 export default function ManagerPlace(props) {
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [listPlace, setListPlace] = useState()
+  const [totalPlace, setTotalPlace] = useState()
+  const [inputNamePlace, setInputNamePlace] = useState('')
+  const navigate = useNavigate()
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage)
+  const fetchListPlace = async param => {
+    await getListPlace(param)
+      .then(data => {
+        const newList = cloneDeep(data.content).map(place => {
+          const convertPlace = {}
+          convertPlace.id = place.id
+          convertPlace.image = place.imgUrl
+          convertPlace.linkDetail = {
+            link: place.name,
+            path: '/chi-tiet-dia-danh/',
+          }
+          convertPlace.quantity = place.campGroundAmount
+          convertPlace.event = place.eventName
+          convertPlace.address = place.address
+          convertPlace.type = place.campType
+          convertPlace.status = place.status === 1 ? true : false
+          convertPlace.action = ['edit', 'delete']
+          return convertPlace
+        })
+
+        setListPlace(newList)
+        setTotalPlace(data.totalElements)
+      })
+      .catch(err => console.log(err))
   }
 
-  const handleChangeRowsPerPage = event => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-  const handleFormSubmit = values => {
-    console.log('submit')
-  }
+  React.useEffect(() => {
+    const param = {
+      name: inputNamePlace,
+      page: 0,
+      size: 5,
+    }
+    fetchListPlace(param)
+  }, [])
 
   return (
     <Container>
@@ -154,45 +71,29 @@ export default function ManagerPlace(props) {
       <SimpleCard>
         <Grid container>
           <Grid item sm={6} xs={6}>
-            <Formik
-              onSubmit={values => {
-                console.log(values)
+            <TextField
+              id="namePlace"
+              fullWidth
+              size="medium"
+              type="text"
+              name="namePlace"
+              label="Tên địa danh/địa chỉ"
+              variant="outlined"
+              sx={{ mb: 3 }}
+              onChange={e => {
+                setInputNamePlace(e.target.value)
               }}
-              initialValues={{
-                namePlace: '',
+            />
+            <Button
+              color="primary"
+              variant="contained"
+              type="button"
+              onClick={() => {
+                fetchListPlace({ name: inputNamePlace, page: 0, size: 5 })
               }}
-              // validationSchema={validationSchema}
             >
-              {({
-                values,
-                errors,
-                touched,
-                handleChange,
-                handleBlur,
-                handleSubmit,
-              }) => (
-                <form onSubmit={handleSubmit}>
-                  <TextField
-                    id="namePlace"
-                    fullWidth
-                    size="medium"
-                    type="text"
-                    name="namePlace"
-                    label="Tên địa danh/địa chỉ"
-                    variant="outlined"
-                    onBlur={handleBlur}
-                    value={values.namePlace}
-                    onChange={handleChange}
-                    helperText={touched.namePlace && errors.namePlace}
-                    error={Boolean(errors.namePlace && touched.namePlace)}
-                    sx={{ mb: 3 }}
-                  />
-                  <Button color="primary" variant="contained" type="submit">
-                    <Icon>search</Icon>
-                  </Button>
-                </form>
-              )}
-            </Formik>
+              <Icon>search</Icon>
+            </Button>
           </Grid>
         </Grid>
         <Grid container>
@@ -202,7 +103,14 @@ export default function ManagerPlace(props) {
             xs={6}
             sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
           >
-            <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
+            <Icon
+              fontSize="large"
+              color="primary"
+              sx={{ marginRight: '5px' }}
+              onClick={() => {
+                navigate('/them-dia-danh')
+              }}
+            >
               add_circle
             </Icon>
             <Paragraph
@@ -218,9 +126,14 @@ export default function ManagerPlace(props) {
         </Grid>
         <TableCustom
           title="Danh sách địa điểm Camp"
-          dataTable={dataList}
+          dataTable={listPlace || []}
           tableModel={tableModel}
+          totalData={parseInt(totalPlace, 0)}
           pagination={true}
+          fetchDataTable={fetchListPlace}
+          onDeleteData={deletePlace}
+          updateStatus={updatePlaceStatus}
+          filter={{ name: inputNamePlace }}
         />
       </SimpleCard>
     </Container>

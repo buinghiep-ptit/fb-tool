@@ -13,6 +13,7 @@ export type IFormInputTextProps = {
   iconStart?: React.ReactElement
   iconEnd?: React.ReactElement
   name: string
+  defaultValue?: string
   inputProps?: InputProps
 } & TextFieldProps
 
@@ -29,6 +30,7 @@ const CssTextField = styled(TextField)({
 
 const FormInputText: FC<IFormInputTextProps> = ({
   name,
+  defaultValue,
   iconStart,
   iconEnd,
   inputProps,
@@ -42,7 +44,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
     <Controller
       control={control}
       name={name}
-      defaultValue=""
+      defaultValue={defaultValue}
       render={({ field }) => (
         <CssTextField
           {...field}

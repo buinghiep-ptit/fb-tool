@@ -4,11 +4,8 @@ export const isValidToken = (accessToken: string) => {
   if (!accessToken) {
     return false
   }
-
   const decodedToken = jwtDecode(accessToken)
   const currentTime = Date.now() / 1000
-
-  console.log('expired:', (decodedToken as any)?.exp)
 
   return (decodedToken as any)?.exp > currentTime + 5 * 60
 }

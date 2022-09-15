@@ -5,7 +5,10 @@ import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import FormTextArea from 'app/components/common/MuiTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useLockCustomer } from 'app/hooks/queries/useCustomerData'
+import {
+  useLockCustomer,
+  useUnLockCustomer,
+} from 'app/hooks/queries/useCustomerData'
 import { ICustomerDetail } from 'app/models/account'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -17,8 +20,6 @@ type Props = {
 }
 
 type FormData = {
-  lockType?: number
-  lockDuration?: number
   reason?: string
 }
 
@@ -36,14 +37,6 @@ export default function LockCustomer({ title }: Props) {
     }, 1000)
   }
   const validationSchema = Yup.object().shape({
-    lockType: Yup.string(),
-    lockDuration: Yup.string().when('lockType', {
-      is: (lockType: string) => lockType && lockType === '2',
-      then: Yup.string()
-        .required('Không được để trống')
-        .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
-    }),
-
     reason: Yup.string()
       .required('Lý do không được bỏ trống')
       .max(256, 'Nội dung không được vượt quá 255 ký tự'),
@@ -54,16 +47,13 @@ export default function LockCustomer({ title }: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const { mutate: lockCustomer, isLoading } = useLockCustomer(onSuccess)
+  const { mutate: unlockCustomer, isLoading } = useUnLockCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
     console.log(values)
-    lockCustomer({
+    unlockCustomer({
       customerId,
       ...values,
-      lockDuration:
-        Number(values.lockType) === 2 ? Number(values.lockDuration) : 0,
-      lockType: Number(values.lockType),
     })
   }
 

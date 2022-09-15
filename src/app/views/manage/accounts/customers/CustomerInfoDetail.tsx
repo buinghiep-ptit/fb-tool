@@ -15,6 +15,7 @@ import {
   FormHelperText,
   Grid,
   IconButton,
+  LinearProgress,
   MenuItem,
   Stack,
 } from '@mui/material'
@@ -225,38 +226,7 @@ export default function CustomerDetail(props: Props) {
         <FormProvider {...methods}>
           <Grid container spacing={3}>
             <Grid item sm={7} xs={12}>
-              {customer.data?.status !== -1 && (
-                <Box pb={3}>
-                  <Grid container spacing={2}>
-                    <Grid item sm={3} xs={6}>
-                      <MuiButton
-                        disabled={
-                          !!Object.keys(methods.formState.errors).length
-                        }
-                        title="Lưu"
-                        loading={updateLoading}
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        sx={{ width: '100%' }}
-                        startIcon={<LockClockSharp />}
-                      />
-                    </Grid>
-                    <Grid item sm={3} xs={6}>
-                      <MuiButton
-                        onClick={() => methods.reset()}
-                        title="Huỷ"
-                        variant="outlined"
-                        color="secondary"
-                        sx={{ width: '100%' }}
-                        startIcon={<PasswordSharp />}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-              )}
-
-              <Box>
+              <Box pb={0.5}>
                 <Grid container alignItems={'center'} pb={1}>
                   <Grid item sm={4} md={3} xs={12}>
                     <MuiTypography variant="subtitle2">Email:</MuiTypography>
@@ -399,6 +369,39 @@ export default function CustomerDetail(props: Props) {
                   </Grid>
                 </Grid>
               </Box>
+
+              {updateLoading && <LinearProgress />}
+
+              {customer.data?.status !== -1 && (
+                <Box pt={3}>
+                  <Grid container spacing={2}>
+                    <Grid item sm={3} xs={6}>
+                      <MuiButton
+                        disabled={
+                          !!Object.keys(methods.formState.errors).length
+                        }
+                        title="Lưu"
+                        loading={updateLoading}
+                        variant="contained"
+                        color="primary"
+                        type="submit"
+                        sx={{ width: '100%' }}
+                        startIcon={<LockClockSharp />}
+                      />
+                    </Grid>
+                    <Grid item sm={3} xs={6}>
+                      <MuiButton
+                        onClick={() => methods.reset()}
+                        title="Huỷ"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{ width: '100%' }}
+                        startIcon={<PasswordSharp />}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
             </Grid>
 
             <Grid item sm={5} xs={12}>
@@ -562,6 +565,7 @@ export default function CustomerDetail(props: Props) {
                       // color={true ? 'primary' : 'default'}
                       sx={{
                         mx: 1,
+                        px: 1,
                         flex: 1,
                         backgroundColor: getColorByCusStatus(
                           customer.data?.status as number,

@@ -69,7 +69,15 @@ export const lockCustomer = async (
   return data
 }
 
-export const unLockCustomer = async (customerId: number): Promise<any> => {
-  const { data } = await http.post<any>(`/api/customer/${customerId}/unlock`)
+export const unLockCustomer = async (
+  customerId: number,
+  payload: {
+    reason?: string
+  },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/customer/${customerId}/unlock`,
+    payload,
+  )
   return data
 }

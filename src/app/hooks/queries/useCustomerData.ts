@@ -76,7 +76,11 @@ export const useUnLockCustomer = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
 
   return useMutation(
-    (payload: Record<string, any>) => unLockCustomer(payload.customerId),
+    (payload: Record<string, any>) =>
+      unLockCustomer(
+        payload.customerId,
+        extractFromObject(payload, ['reason']) as any,
+      ),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['customer'])

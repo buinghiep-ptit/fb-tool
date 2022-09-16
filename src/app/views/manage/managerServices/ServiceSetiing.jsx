@@ -48,7 +48,6 @@ const serviceList = [
   {
     image: 'image1',
     nameService: 'name1',
-    type: 'Tính theo đầu người',
     typeService: 'Trọn gói',
     address: 'address',
     quantity: 10,
@@ -58,7 +57,6 @@ const serviceList = [
   {
     image: 'image2',
     nameService: 'name2',
-    type: 'Tính theo số lượng hai ba hai',
     typeService: 'Thuê theo giờ',
     address: 'address',
     quantity: 20,
@@ -79,10 +77,6 @@ const tableModel = {
     },
     {
       name: 'Tên dịch vụ',
-      width: null,
-    },
-    {
-      name: 'Loại',
       width: null,
     },
     {
@@ -111,7 +105,6 @@ const tableModel = {
     'index',
     'image',
     'nameService',
-    'type',
     'typeService',
     'address',
     'quantity',

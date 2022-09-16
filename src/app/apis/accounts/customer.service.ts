@@ -23,11 +23,24 @@ export const getCustomerDetail = async (
   return data
 }
 
-export const fetchLogsCustomer = async (
-  customerId: number | string,
-): Promise<ILogsCustomerResponse> => {
+type LogsFilters = {
+  customerId?: any
+  page?: number
+  size?: number
+}
+
+export const fetchLogsCustomer = async ({
+  customerId,
+  page,
+  size,
+}: LogsFilters): Promise<ILogsCustomerResponse> => {
+  const params = {
+    page,
+    size,
+  }
   const { data } = await http.get<ILogsCustomerResponse>(
     `/api/customer/${customerId}/action-history`,
+    { params },
   )
   return data
 }
@@ -78,6 +91,18 @@ export const unLockCustomer = async (
   const { data } = await http.post<any>(
     `/api/customer/${customerId}/unlock`,
     payload,
+  )
+  return data
+}
+
+export const addOtpCountCustomer = async (
+  customerId: number,
+  params: {
+    otpType?: string
+  },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/customer/${customerId}/reset-otp/${params.otpType}`,
   )
   return data
 }

@@ -105,7 +105,7 @@ export default function ManagerFeed(props: Props) {
   )
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    // setPage(newPage)
+    setPage(newPage)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
@@ -121,8 +121,8 @@ export default function ManagerFeed(props: Props) {
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    // setRowsPerPage(+event.target.value)
-    // setPage(0)
+    setRowsPerPage(+event.target.value)
+    setPage(0)
     setFilters(prevFilters => {
       return {
         ...prevFilters,

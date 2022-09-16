@@ -106,7 +106,7 @@ export default function AdminAccounts(props: Props) {
   }: UseQueryResult<IUserResponse, Error> = useUsersData(filters)
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    // setPage(newPage)
+    setPage(newPage)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
@@ -122,8 +122,8 @@ export default function AdminAccounts(props: Props) {
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    // setRowsPerPage(+event.target.value)
-    // setPage(0)
+    setSize(+event.target.value)
+    setPage(0)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
@@ -292,8 +292,8 @@ export default function AdminAccounts(props: Props) {
           />
           <MuiStyledPagination
             component="div"
-            rowsPerPageOptions={[10, 20, 100]}
-            count={data?.content?.length as number}
+            rowsPerPageOptions={[20, 50, 100]}
+            count={data?.totalElements as number}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}

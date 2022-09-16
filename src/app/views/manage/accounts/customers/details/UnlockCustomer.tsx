@@ -5,12 +5,9 @@ import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import FormTextArea from 'app/components/common/MuiTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import {
-  useLockCustomer,
-  useUnLockCustomer,
-} from 'app/hooks/queries/useCustomerData'
+import { useUnLockCustomer } from 'app/hooks/queries/useCustomerData'
 import { ICustomerDetail } from 'app/models/account'
-import React, { useState } from 'react'
+import React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'

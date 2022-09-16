@@ -1,7 +1,5 @@
 import { styled, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import { Breadcrumb, SimpleCard } from 'app/components'
-import React, { ReactElement } from 'react'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',

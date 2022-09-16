@@ -1,6 +1,6 @@
 import { styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { Breadcrumb, SimpleCard } from 'app/components'
+import { Breadcrumb } from 'app/components'
 import { MuiNavTabs } from 'app/components/common/MuiNavTabs'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
@@ -51,7 +51,7 @@ export function LayoutCustomer({ children, ...props }: Props) {
         <Box mt={-2} pb={2}>
           <MuiNavTabs navItems={navItems} customerId={customerId ?? 0} />
         </Box>
-        <SimpleCard>{children}</SimpleCard>
+        {children}
       </React.Fragment>
     </Container>
   )

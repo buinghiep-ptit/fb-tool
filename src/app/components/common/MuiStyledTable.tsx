@@ -84,7 +84,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.userId ?? row.customerId ?? row.id ?? index}
+                    key={index} //row.userId ?? row.customerId ?? row.id ??
                     sx={{
                       '&.MuiTableRow-hover': {
                         '&:hover': {

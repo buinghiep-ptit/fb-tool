@@ -20,6 +20,9 @@ export type IFormInputTextProps = {
 const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
     height: 40,
+    '&:focused': {
+      caretColor: '#0062cc',
+    },
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
@@ -56,7 +59,10 @@ const FormInputText: FC<IFormInputTextProps> = ({
           }
           InputProps={{
             ...inputProps,
-            sx: { cursor: iconEnd ? 'pointer' : 'default' },
+            sx: {
+              cursor: iconEnd ? 'pointer' : 'default',
+              caretColor: '#218332',
+            },
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,

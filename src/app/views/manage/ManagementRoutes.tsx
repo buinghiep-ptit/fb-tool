@@ -115,7 +115,7 @@ const ManagementRoutes = [
     ),
     // children: [{ path: 'report-infringe', element: <ReportInfringe /> }],
   },
-  { path: '/quan-ly-feeds/:id', element: <FeedDetail /> },
+  { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
   { path: '/quan-ly-feeds/xet-duyet', element: <ReportInfringe /> },
   { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },

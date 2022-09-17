@@ -37,9 +37,10 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
-} from 'app/hooks/queries/useCustomerData'
+} from 'app/hooks/queries/useCustomersData'
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
+import { getColorByCusStatus } from 'app/utils/common'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeISOFormatter'
 import { useState } from 'react'
 import {
@@ -83,7 +84,12 @@ const RHFLabel = ({ control, name, options }: RHFLabelProps) => {
         watchToString(watchOtp).maxPerDay
       }`}
       size="small"
-      color={true ? 'primary' : 'default'}
+      color={
+        (watchToString(watchOtp)?.numToday ?? 0) <
+        (watchToString(watchOtp)?.maxPerDay ?? 0)
+          ? 'primary'
+          : 'default'
+      }
       sx={{ mx: 1 }}
     />
   )
@@ -172,24 +178,6 @@ export default function CustomerDetail(props: Props) {
 
       default:
         return 'OTP đăng ký'
-    }
-  }
-
-  const getColorByCusStatus = (status: number) => {
-    switch (status) {
-      case 1:
-        return '#2F9B42'
-      case -1:
-        return '#AAAAAA'
-
-      case -2:
-        return '#FF3D57'
-
-      case -3:
-        return '#ff9e43'
-
-      default:
-        return '#AAAAAA'
     }
   }
 

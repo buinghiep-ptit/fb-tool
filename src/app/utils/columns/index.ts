@@ -1,2 +1,3 @@
 export * from './columnsFeeds'
-export * from './columnsFeedLogs'
+export * from './columnsFeedLogsReports'
+export * from './columnsFeedLogsActions'

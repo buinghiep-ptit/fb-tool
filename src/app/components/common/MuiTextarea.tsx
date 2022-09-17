@@ -1,22 +1,16 @@
 import {
   FormHelperText,
-  InputAdornment,
-  InputProps,
-  styled,
   TextareaAutosize,
   TextareaAutosizeProps,
-  TextField,
-  TextFieldProps,
 } from '@mui/material'
-import * as React from 'react'
 import { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-import { MuiTypography } from './MuiTypography'
 
 export type IFormTextAreaProps = {
   name: string
   defaultValue?: string
-} & TextareaAutosizeProps
+} & TextareaAutosizeProps &
+  any
 
 const FormTextArea: FC<IFormTextAreaProps> = ({
   name,

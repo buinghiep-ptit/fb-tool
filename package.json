@@ -72,8 +72,8 @@
     "eject": "react-scripts eject",
     "ghp": "react-scripts build && gh-pages -d build",
     "type-check": "tsc",
-    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx src/",
-    "lint:fix": "eslint . --fix --ext .ts,.tsx,.js,.jsx src/",
+    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx src/app",
+    "lint:fix": "eslint . --fix --ext .ts,.tsx,.js,.jsx src/app",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky install"

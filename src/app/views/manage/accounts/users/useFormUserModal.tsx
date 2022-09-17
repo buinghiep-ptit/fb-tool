@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Grid, MenuItem } from '@mui/material'
+import { Grid, LinearProgress, MenuItem } from '@mui/material'
 import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiInputText'
 import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
@@ -20,7 +20,7 @@ const useFormUserModal = (data?: any) => {
     resolver: yupResolver(validationSchema),
   })
 
-  const getContent = () => {
+  const getContent = (isLoading: boolean) => {
     return (
       <Box
         sx={{
@@ -113,13 +113,13 @@ const useFormUserModal = (data?: any) => {
                 defaultValue={data?.role ? data?.role : 1}
               >
                 <MenuItem value={1}>Admin</MenuItem>
-                <MenuItem value={2}>User</MenuItem>
-                <MenuItem value={3}>Saler</MenuItem>
-                <MenuItem value={4}>Vận hành</MenuItem>
+                <MenuItem value={2}>CS</MenuItem>
+                <MenuItem value={3}>Sale</MenuItem>
               </SelectDropDown>
             </Grid>
           </Grid>
         </FormProvider>
+        {isLoading && <LinearProgress />}
       </Box>
     )
   }

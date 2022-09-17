@@ -5,7 +5,7 @@ import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import FormTextArea from 'app/components/common/MuiTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useUnLockCustomer } from 'app/hooks/queries/useCustomerData'
+import { useUnLockCustomer } from 'app/hooks/queries/useCustomersData'
 import { ICustomerDetail } from 'app/models/account'
 import React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -29,9 +29,7 @@ export default function LockCustomer({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật mật khẩu thành công' })
-    setTimeout(() => {
-      navigate(-1)
-    }, 1000)
+    navigate(-1)
   }
   const validationSchema = Yup.object().shape({
     reason: Yup.string()
@@ -47,7 +45,6 @@ export default function LockCustomer({ title }: Props) {
   const { mutate: unlockCustomer, isLoading } = useUnLockCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
-    console.log(values)
     unlockCustomer({
       customerId,
       ...values,

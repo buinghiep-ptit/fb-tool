@@ -11,7 +11,7 @@ import * as React from 'react'
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
-    background-color: #f1f1f1;
+    // background-color: #f1f1f1;
   }
   &:last-child td,
   &:last-child th {

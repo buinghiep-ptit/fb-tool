@@ -1,6 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { ArticleSharp, ReportSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, styled } from '@mui/material'
+import {
+  ArticleSharp,
+  ChangeCircleSharp,
+  ClearOutlined,
+  ClearRounded,
+  ClearSharp,
+  ReportSharp,
+  SearchSharp,
+} from '@mui/icons-material'
+import {
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  MenuItem,
+  Select,
+  Stack,
+  styled,
+} from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchFeeds } from 'app/apis/feed/feed.service'
@@ -14,9 +31,10 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeed, IFeedResponse } from 'app/models'
-import { columnFeeds } from 'app/utils/columns/columnsFeeds'
-import { useEffect, useState } from 'react'
+import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
+import { columnFeeds } from 'app/utils/columns'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import React, { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { NavLink, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -32,32 +50,30 @@ const Container = styled('div')<Props>(({ theme }) => ({
 
 export interface Props {}
 
-type ISearchFilters = {
-  email?: string
-  hashtag?: string
-  status?: string
-  range?: string
-  feedcamp?: boolean
-  page?: number
-  rowsPerPage?: number
-}
-
 export default function ManagerFeed(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
+  const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const [size, setSize] = useState<number>(20)
+  const [isReset, setIsReset] = useState<boolean>(false)
 
-  const [defaultValues] = useState<ISearchFilters>({
-    status: 'all',
-    range: 'public',
-    feedcamp: false,
+  const [defaultValues] = useState<IFeedsFilters>({
+    status: queryParams.status ?? 'all',
+    isCampdi: queryParams.isCampdi ? true : false,
+    isReported: queryParams.isReported ? true : false,
+    search: queryParams.search ?? '',
+    hashtag: queryParams.hashtag ?? '',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
   })
 
-  const [filters, setFilters] = useState<ISearchFilters>(defaultValues)
+  const [filters, setFilters] = useState<IFeedsFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
 
   const validationSchema = Yup.object().shape({
-    email: Yup.string()
+    search: Yup.string()
       .min(0, 'email must be at least 0 characters')
       .max(256, 'email must be at almost 256 characters'),
     hashtag: Yup.string()
@@ -65,28 +81,11 @@ export default function ManagerFeed(props: Props) {
       .max(256, 'hashtag must be at almost 256 characters'),
   })
 
-  const methods = useForm<ISearchFilters>({
+  const methods = useForm<IFeedsFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  useEffect(() => {
-    if (searchParams) {
-      const queryParams = Object.fromEntries([...searchParams])
-      if (!!Object.keys(queryParams).length) {
-        setPage(parseInt(queryParams.page) || 0)
-        setRowsPerPage(parseInt(queryParams.rowsPerPage) || 10)
-
-        setFilters(prevFilters => {
-          return {
-            ...prevFilters,
-            ...queryParams,
-          }
-        })
-      }
-    }
-  }, [searchParams])
 
   const {
     data,
@@ -96,7 +95,7 @@ export default function ManagerFeed(props: Props) {
     error,
   }: UseQueryResult<IFeedResponse, Error> = useQuery<IFeedResponse, Error>(
     ['feeds', filters],
-    () => fetchFeeds({ page: page, sortId: 4 }),
+    () => fetchFeeds(filters),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,
@@ -109,55 +108,77 @@ export default function ManagerFeed(props: Props) {
     setFilters(prevFilters => {
       return {
         ...prevFilters,
-        page: newPage,
+        page: +newPage,
       }
     })
     navigate('', {
       ...filters,
-      page: newPage,
+      page: +newPage,
     } as any)
   }
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setRowsPerPage(+event.target.value)
+    setSize(+event.target.value)
     setPage(0)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
         page: 0,
-        rowsPerPage: +event.target.value,
+        size: +event.target.value,
       }
     })
     navigate('', {
       ...filters,
-      rowsPerPage: +event.target.value,
+      size: +event.target.value,
     } as any)
   }
 
-  const onSubmitHandler: SubmitHandler<ISearchFilters> = (
-    values: ISearchFilters,
+  const onSubmitHandler: SubmitHandler<IFeedsFilters> = (
+    values: IFeedsFilters,
   ) => {
+    setIsReset(false)
     setFilters(prevFilters => {
       return {
-        ...prevFilters,
-        ...values,
+        ...extractMergeFiltersObject(prevFilters, values),
         page,
-        rowsPerPage,
+        size,
       }
     })
+
     navigate('', {
-      ...filters,
-      ...values,
+      ...extractMergeFiltersObject(filters, values),
       page,
-      rowsPerPage,
+      size,
+    } as any)
+  }
+
+  const onResetFilters = () => {
+    setIsReset(true)
+    methods.reset({
+      status: 'all',
+      isCampdi: false,
+      isReported: false,
+      search: '',
+      hashtag: '',
+      page: 0,
+      size: 20,
+    })
+    setFilters({
+      page,
+      size,
+    })
+
+    navigate('', {
+      page,
+      size,
     } as any)
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      navigate(`${row.id}`, {})
+      navigate(`${14 ?? row.feedId}`, {})
     }
     console.log('cell:', cell, 'row:', row)
   }
@@ -167,17 +188,11 @@ export default function ManagerFeed(props: Props) {
   if (isError)
     return (
       <Box my={2} textAlign="center">
-        <MuiTypography variant="h1">
+        <MuiTypography variant="h5">
           Have an errors: {error.message}
         </MuiTypography>
       </Box>
     )
-  // if (!isLoading && !(data as IFeedResponse).content?.length)
-  //   return (
-  //     <Box my={2} textAlign="center">
-  //       <MuiTypography variant="h1">No Data Found</MuiTypography>
-  //     </Box>
-  //   )
 
   return (
     <Container>
@@ -194,10 +209,23 @@ export default function ManagerFeed(props: Props) {
                 </MuiTypography>
                 <FormInputText
                   type="text"
-                  name="email"
+                  name="search"
                   size="small"
                   placeholder="Nhập email, sđt, tên"
                   fullWidth
+                  defaultValue=""
+                  iconEnd={
+                    methods.watch('search')?.length ? (
+                      <IconButton
+                        onClick={() => methods.setValue('search', '')}
+                        edge="end"
+                      >
+                        <ClearOutlined fontSize="small" />
+                      </IconButton>
+                    ) : (
+                      <React.Fragment />
+                    )
+                  }
                   // focused
                   // required
                 />
@@ -212,6 +240,19 @@ export default function ManagerFeed(props: Props) {
                   placeholder="Nhập hashtag"
                   size="small"
                   fullWidth
+                  defaultValue=""
+                  iconEnd={
+                    methods.watch('hashtag')?.length ? (
+                      <IconButton
+                        onClick={() => methods.setValue('hashtag', '')}
+                        edge="end"
+                      >
+                        <ClearOutlined fontSize="small" />
+                      </IconButton>
+                    ) : (
+                      <React.Fragment />
+                    )
+                  }
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
@@ -220,68 +261,101 @@ export default function ManagerFeed(props: Props) {
                 </MuiTypography>
                 <SelectDropDown name="status">
                   <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="approved">Đã duyệt</MenuItem>
-                  <MenuItem value="pending">Chờ hậu kiểm</MenuItem>
-                  <MenuItem value="infringe">Vi phạm</MenuItem>
-                  <MenuItem value="remove">Xoá</MenuItem>
+                  <MenuItem value="1">Đã duyệt</MenuItem>
+                  <MenuItem value="0">Chờ hậu kiểm</MenuItem>
+                  <MenuItem value="-1">Vi phạm</MenuItem>
+                  <MenuItem value="-2">Xoá</MenuItem>
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
+                <MuiTypography
+                  variant="subtitle2"
+                  pb={1}
+                  sx={{ opacity: 0.35 }}
+                >
                   Phạm vi
                 </MuiTypography>
-                <SelectDropDown name="range" disabled>
-                  <MenuItem value="public">Công khai</MenuItem>
+                <FormControl
+                  sx={{
+                    width: '100%',
+                    '& .MuiInputBase-root': {
+                      height: 40,
+                    },
+                  }}
+                >
+                  <Select defaultValue={'all'} name="range" disabled>
+                    <MenuItem value="all">Công khai</MenuItem>
+                    <MenuItem value="friends">Bạn bè</MenuItem>
+                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
+                  </Select>
+                </FormControl>
+
+                {/* <SelectDropDown name="range" disabled defaultValue={'all'}>
+                  <MenuItem value="all">Công khai</MenuItem>
                   <MenuItem value="friends">Bạn bè</MenuItem>
                   <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                </SelectDropDown>
+                </SelectDropDown> */}
               </Grid>
-
-              <Grid item sm={3} xs={12}>
-                <MuiCheckBox name="feedcamp" />
-              </Grid>
+            </Grid>
+            <Grid item sm={4} xs={12} pt={2}>
+              <MuiCheckBox name="isCampdi" label="Feed Campdi" />
+              <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
             </Grid>
           </FormProvider>
-        </form>
 
-        <Box pt={2}>
-          <Grid container spacing={2}>
-            <Grid item sm={3} xs={12}>
-              <MuiButton
-                title="Tìm kiếm"
-                variant="contained"
-                color="primary"
-                type="submit"
-                sx={{ width: '100%' }}
-                startIcon={<SearchSharp />}
-              />
-            </Grid>
-            <Grid item sm={3} xs={12}></Grid>
-            <Grid item sm={3} xs={12}>
-              <MuiButton
-                title="Hậu kiểm"
-                variant="outlined"
-                color="secondary"
-                type="submit"
-                sx={{ width: '100%' }}
-                startIcon={<ArticleSharp />}
-              />
-            </Grid>
-            <Grid item sm={3} xs={12}>
-              <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+          <Box pt={3}>
+            <Grid container spacing={2}>
+              <Grid item sm={2} xs={12}>
                 <MuiButton
-                  title="Báo cáo vi phạm"
-                  variant="outlined"
-                  color="error"
+                  loading={!isReset && isFetching}
+                  title="Tìm kiếm"
+                  variant="contained"
+                  color="primary"
                   type="submit"
                   sx={{ width: '100%' }}
-                  startIcon={<ReportSharp />}
+                  startIcon={<SearchSharp />}
                 />
-              </NavLink>
+              </Grid>
+              <Grid item sm={2} xs={12}>
+                <MuiButton
+                  loading={isReset && isFetching}
+                  title="Tạo lại"
+                  variant="outlined"
+                  color="primary"
+                  onClick={onResetFilters}
+                  sx={{ width: '100%' }}
+                  startIcon={<ChangeCircleSharp />}
+                />
+              </Grid>
+              <Grid item sm={8} xs={12}>
+                <Stack flexDirection={'row'} justifyContent={'flex-end'}>
+                  <MuiButton
+                    title="Hậu kiểm"
+                    variant="text"
+                    color="secondary"
+                    type="submit"
+                    startIcon={<ArticleSharp />}
+                  />
+                  <Divider
+                    orientation="vertical"
+                    sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                    flexItem
+                  />
+                  <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+                    <MuiButton
+                      title="Báo cáo vi phạm"
+                      variant="text"
+                      color="error"
+                      type="submit"
+                      sx={{ flex: 1 }}
+                      startIcon={<ReportSharp />}
+                    />
+                  </NavLink>
+                </Stack>
+              </Grid>
             </Grid>
-          </Grid>
-        </Box>
-
+          </Box>
+        </form>
         <Box mt={3}>
           <MuiStyledTable
             rows={data?.content as IFeed[]}
@@ -291,9 +365,9 @@ export default function ManagerFeed(props: Props) {
           />
           <MuiStyledPagination
             component="div"
-            rowsPerPageOptions={[10, 25, 100]}
+            rowsPerPageOptions={[20, 50, 100]}
             count={data?.totalElements as number}
-            rowsPerPage={rowsPerPage}
+            rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

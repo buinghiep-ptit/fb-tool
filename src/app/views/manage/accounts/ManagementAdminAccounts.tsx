@@ -3,8 +3,7 @@ import { PersonAddAltSharp, SearchSharp } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import { Grid, MenuItem, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchUsers } from 'app/apis/accounts/user.service'
+import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiInputText'
@@ -230,10 +229,8 @@ export default function AdminAccounts(props: Props) {
                 <SelectDropDown name="role">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value="1">Admin</MenuItem>
-                  <MenuItem value="2">User</MenuItem>
-                  <MenuItem value="3">Saler</MenuItem>
-                  <MenuItem value="4">Vận hành</MenuItem>
-                  {/* <MenuItem value="operators">Vận hành</MenuItem> */}
+                  <MenuItem value="2">CS</MenuItem>
+                  <MenuItem value="3">Sale</MenuItem>
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>

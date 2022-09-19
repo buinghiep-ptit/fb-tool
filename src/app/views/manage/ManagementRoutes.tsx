@@ -30,6 +30,7 @@ const CustomerHistory = Loadable(
 
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
+const PostCheck = Loadable(lazy(() => import('./feeds/PostCheck')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
@@ -117,7 +118,7 @@ const ManagementRoutes = [
   },
   { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
-  { path: '/quan-ly-feeds/xet-duyet', element: <ReportInfringe /> },
+  { path: '/quan-ly-feeds/hau-kiem', element: <PostCheck /> },
   { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
   {
     path: '/quan-ly-thong-tin-dia-danh',

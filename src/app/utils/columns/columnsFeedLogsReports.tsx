@@ -1,5 +1,6 @@
 import { TableColumn, TitleReportsDecline } from 'app/models'
 import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsFeedLogsReports: readonly TableColumn<TitleReportsDecline>[] =
   [
@@ -16,6 +17,7 @@ export const columnsFeedLogsReports: readonly TableColumn<TitleReportsDecline>[]
       label: 'Trạng thái tố cáo',
       minWidth: 170,
       align: 'center',
+      status: (value: any) => LabelFormatter(value, 'feed-reports'),
     },
     {
       id: 'reportDate',

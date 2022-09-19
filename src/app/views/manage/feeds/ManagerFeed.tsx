@@ -333,7 +333,7 @@ export default function ManagerFeed(props: Props) {
                     title="Hậu kiểm"
                     variant="text"
                     color="secondary"
-                    type="submit"
+                    onClick={() => navigate(`hau-kiem`, {})}
                     startIcon={<ArticleSharp />}
                   />
                   <Divider

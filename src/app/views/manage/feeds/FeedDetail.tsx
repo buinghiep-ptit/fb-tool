@@ -9,18 +9,20 @@ import {
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import MediaItem from 'app/components/common/MediaItem'
+import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IActionHistory, IReportDecline } from 'app/models'
+import { IActionHistory, IMediaOverall, IReportDecline } from 'app/models'
 import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
 import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
+import { number } from 'yup/lib/locale'
 
 export interface Props {}
 
@@ -34,27 +36,40 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function FeedDetail(props: Props) {
-  const medias = [
-    {
+  const mediaDefault: IMediaOverall = {
+    id: 1,
+    mediaFormat: 1,
+    url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
+    detail: {
       id: 1,
-      name: 'God of game',
-      backgroundImage: '/assets/videos/thumbnail.jpeg',
-      clip: { clip: '/assets/videos/download.mp4', video: 'video1' },
+      coverImgUrl:
+        'https://img.meta.com.vn/Data/image/2021/07/27/good-girl-nghia-la-gi-2.jpg',
     },
-    {
-      id: 2,
-      name: 'God of game',
-      backgroundImage: '/assets/videos/thumbnail.jpeg',
-      clip: null,
-    },
-    ,
-    {
-      id: 3,
-      name: 'God of game',
-      backgroundImage: '/assets/videos/thumbnail.jpeg',
-      clip: null,
-    },
-  ]
+  }
+  // const medias = [
+  //   {
+  //     id: 1,
+  //     name: 'God of game',
+  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
+  //     clip: {
+  //       clip: 'https://dev09-minio.campdi.vn/camping/tiktok03.mp4',
+  //       video: 'video1',
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'God of game',
+  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
+  //     clip: null,
+  //   },
+  //   ,
+  //   {
+  //     id: 3,
+  //     name: 'God of game',
+  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
+  //     clip: null,
+  //   },
+  // ]
 
   const { feedId } = useParams()
 
@@ -213,18 +228,51 @@ export default function FeedDetail(props: Props) {
       <Stack gap={3}>
         <SimpleCard title="Chi tiết Feed">
           <Box>
-            <Chip
-              label={getLabelByCusStatus(feed.data?.status as number)}
-              size="small"
-              // color={true ? 'primary' : 'default'}
-              sx={{
-                px: 1,
-                backgroundColor: getColorByCusStatus(
-                  feed.data?.status as number,
-                ),
-                color: '#FFFFFF',
-              }}
-            />
+            <Grid container spacing={2} mb={2}>
+              <Grid item sm={2} xs={12}>
+                <MuiButton
+                  title="Duyệt"
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  sx={{ width: '100%' }}
+                  startIcon={<ApprovalSharp />}
+                />
+              </Grid>
+              <Grid item sm={2} xs={12}>
+                <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+                  <MuiButton
+                    title="Vi phạm"
+                    variant="outlined"
+                    color="error"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<ReportSharp />}
+                  />
+                </NavLink>
+              </Grid>
+              <Grid
+                item
+                sm={8}
+                xs={12}
+                display="flex"
+                justifyContent="flex-end"
+              >
+                <Chip
+                  label={getLabelByCusStatus(feed.data?.status as number)}
+                  size="small"
+                  // color={true ? 'primary' : 'default'}
+                  sx={{
+                    px: 1,
+                    backgroundColor: getColorByCusStatus(
+                      feed.data?.status as number,
+                    ),
+                    color: '#FFFFFF',
+                  }}
+                />
+              </Grid>
+            </Grid>
+
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
                 <Box>
@@ -251,38 +299,21 @@ export default function FeedDetail(props: Props) {
                   </Stack>
                 </Box>
               </Grid>
-              <Grid item sm={2} xs={12}></Grid>
-              <Grid item sm={2} xs={12}>
-                <MuiButton
-                  title="Duyệt"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<ApprovalSharp />}
-                />
-              </Grid>
-              <Grid item sm={2} xs={12}>
-                <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
-                  <MuiButton
-                    title="Vi phạm"
-                    variant="outlined"
-                    color="error"
-                    type="submit"
-                    sx={{ width: '100%' }}
-                    startIcon={<ReportSharp />}
-                  />
-                </NavLink>
-              </Grid>
             </Grid>
-            <Box
+
+            {/* <Box
               width={300}
               sx={{ position: 'relative', cursor: 'pointer', py: 2 }}
             >
-              {medias.map(media => (
-                <MediaItem key={(media as any).id} game={media as any} />
-              ))}
-            </Box>
+              {medias.map(media => ( */}
+            {/* <MediaItem game={medias[0] as any} /> */}
+            <Grid container spacing={2}>
+              <Grid item sm={6} xs={12}>
+                <MediaViewItem orientation="horizontal" media={mediaDefault} />
+              </Grid>
+            </Grid>
+            {/* ))}
+            </Box> */}
           </Box>
         </SimpleCard>
 

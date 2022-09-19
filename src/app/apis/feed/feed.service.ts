@@ -57,3 +57,8 @@ export const fetchActionsHistory = async ({
   )
   return data
 }
+
+export const fetchPostsCheck = async (): Promise<IFeedDetail[]> => {
+  const { data } = await http.get<IFeedDetail[]>(`/api/feed/post-check`)
+  return data
+}

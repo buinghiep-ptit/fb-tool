@@ -5,20 +5,28 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import GeneralInformation from './generalInformation'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Button } from '@mui/material'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+
 import {
   getDistricts,
   getProvinces,
   getWards,
 } from 'app/apis/common/common.service'
-import { getDetailCampGround } from 'app/apis/campGround/ground.service'
+import {
+  deleteCampGround,
+  getDetailCampGround,
+  updateCampGround,
+  getListCampArea,
+} from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
 import Feature from './feature'
+import { cloneDeep } from 'lodash'
+import { INTERNET, seasonsById, VEHICLES } from '../const'
 
 export default function InformationCampGround() {
   const [provinceId, setProvinceId] = React.useState(null)
@@ -27,7 +35,12 @@ export default function InformationCampGround() {
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
+  const [feature, setFeature] = React.useState({})
+  const [campAreas, setCampAreas] = React.useState([])
+  const [idMerchant, setIdMerchant] = React.useState()
   const params = useParams()
+  const navigate = useNavigate()
+
   const schema = yup
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
@@ -45,10 +58,104 @@ export default function InformationCampGround() {
     formState: { errors },
   } = useForm({
     // resolver: yupResolver(schema),
+    defaultValues: {
+      nameCampground: '',
+      province: null,
+      district: null,
+      ward: null,
+      address: '',
+      description: '',
+      hashtag: [],
+      campGroundSeasons: [],
+      contact: '',
+      openTime: '',
+      closeTime: '',
+      topographic: '',
+      capacity: '',
+      status: '',
+      viettel: false,
+      mobiphone: false,
+      vinaphone: false,
+      vietnamMobile: false,
+      speedViettel: null,
+      speedMobiphone: null,
+      speedVinaphone: null,
+      speedVietnamMobile: null,
+      bus: false,
+      car: false,
+      motobike: false,
+      campAreas: [],
+    },
   })
+
+  const updateFeature = newFeature => {
+    setFeature(cloneDeep(newFeature))
+  }
 
   const onSubmit = data => {
     console.log(data)
+    console.log(feature)
+    const dataUpdate = new Object()
+    dataUpdate.campGroundInternets = []
+    const arrInternet = [
+      { provider: 'viettel', speed: 'speedViettel' },
+      { provider: 'vinaphone', speed: 'speedVinaphone' },
+      { provider: 'mobilephone', speed: 'speedMobiphone' },
+      { provider: 'vietnamMobile', speed: 'speedVietnamMobile' },
+    ]
+    arrInternet.forEach((item, index) => {
+      if (data[item.provider]) {
+        dataUpdate.campGroundInternets.push({
+          idInternet: index + 1,
+          signalQuality: data[item.speed],
+        })
+      }
+    })
+
+    dataUpdate.id = params.id
+    dataUpdate.name = data.nameCampground
+    dataUpdate.description = data.description
+    dataUpdate.policy = ''
+    dataUpdate.idMerchant = idMerchant
+    dataUpdate.idTopography = data.topographic
+    dataUpdate.idProvince = data.province.id
+    dataUpdate.idDistrict = data.district.id
+    dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
+    dataUpdate.contact = data.contact
+    dataUpdate.idWard = data.ward.id
+    dataUpdate.openTime = data.openTime
+    dataUpdate.closeTime = data.closeTime
+    dataUpdate.address = data.address
+    dataUpdate.capacity = data.capacity
+    dataUpdate.latitude = 0
+    dataUpdate.longitude = 0
+    dataUpdate.isPopular = 0
+    dataUpdate.status = data.status
+    dataUpdate.medias = []
+    dataUpdate.campAreas = data.campAreas.map(areas => areas.id)
+    dataUpdate.tags = data.hashtag.map(tag => {
+      return {
+        value: tag.value,
+      }
+    })
+    dataUpdate.campTypes = [0]
+    dataUpdate.campGroundSeasons = data.campGroundSeasons.map(
+      season => season.id,
+    )
+
+    dataUpdate.campGroundUtilities = feature.utility.map(item => parseInt(item))
+    dataUpdate.campGroundVehicles = []
+    if (data.bus) dataUpdate.campGroundVehicles.push(1)
+    if (data.car) dataUpdate.campGroundVehicles.push(2)
+    if (data.motobike) dataUpdate.campGroundVehicles.push(3)
+    dataUpdate.freeParking = true
+    updateCampGround(params.id, dataUpdate)
+  }
+
+  const fetchListCampArea = async () => {
+    const res = await getListCampArea()
+    console.log(res)
+    setCampAreas(res)
   }
 
   const fetchInforCampGround = async () => {
@@ -58,44 +165,69 @@ export default function InformationCampGround() {
     if (res) {
       getDetailCampGround(params.id)
         .then(data => {
-          //   setHashtag(data.tags)
-          //   setValue('hashtag', data.tags)
-          //   setValue('namePlace', data.name)
-          //   setProvinceId(data.idProvince)
-          //   setValue('address', data.address)
-          //   setValue(
-          //     'province',
-          //     res.find(province => province.id === data.idProvince),
-          //   )
-          //   setDistrictId(data.idDistrict)
-          //   setValue('description', data.description)
-          //   getDistricts(data.idProvince)
-          //     .then(dataDistrict => {
-          //       setDistricts(dataDistrict)
-          //       setValue(
-          //         'district',
-          //         dataDistrict.find(district => district.id == data.idProvince),
-          //       )
-          //     })
-          //     .catch(err => console.log(err))
-          //   if (data.idDistrict) {
-          //     getWards(data.idDistrict)
-          //       .then(dataWard => {
-          //         setWards(dataWard)
-          //         setValue(
-          //           'ward',
-          //           dataWard.find(ward => ward.id == data.idDistrict),
-          //         )
-          //       })
-          //       .catch(err => console.log(err))
-          //   }
+          setIdMerchant(data.idMerchant)
+          setHashtag(data.tags)
+          setValue('campAreas', data.campAreas)
+          setValue('hashtag', data.tags)
+          setValue('nameCampground', data.name)
+          setProvinceId(data.idProvince)
+          setValue(
+            'province',
+            res.find(province => province.id === data.idProvince),
+          )
+          setValue('contact', data.contact)
+          setValue('openTime', data.openTime)
+          setValue('closeTime', data.closeTime)
+          setFeature({ utility: data.campGroundUtilities })
+          const seasons = data.campGroundSeasons.map(item => seasonsById[item])
+          setValue('campGroundSeasons', seasons)
+          setDistrictId(data.idDistrict)
+          setValue('address', data.address)
+          setValue('description', data.description)
+          setValue('topographic', data.idTopography)
+          setValue('capacity', data.capacity)
+          setValue('status', data.status)
+          data.campGroundInternets.forEach(item => {
+            setValue(INTERNET[item.idInternet].name, true)
+            setValue(INTERNET[item.idInternet].speed, item.signalQuality)
+          })
+          data.campGroundVehicles.forEach(item => {
+            setValue(VEHICLES[item]?.name, true)
+          })
+          getDistricts(data.idProvince)
+            .then(dataDistrict => {
+              setDistricts(dataDistrict)
+              setValue(
+                'district',
+                dataDistrict.find(district => district.id == data.idProvince),
+              )
+            })
+            .catch(err => console.log(err))
+          if (data.idDistrict) {
+            getWards(data.idDistrict)
+              .then(dataWard => {
+                setWards(dataWard)
+                setValue(
+                  'ward',
+                  dataWard.find(ward => ward.id == data.idDistrict),
+                )
+              })
+              .catch(err => console.log(err))
+          }
         })
         .catch(err => console.log(err))
     }
   }
 
+  const handleDeleteCampGround = async () => {
+    // const res = await deleteCampGround(params.id)
+    // if (res) {
+    //   navigate('/quan-ly-thong-tin-diem-camp')
+    // }
+    navigate('/quan-ly-thong-tin-diem-camp')
+  }
+
   React.useEffect(() => {
-    console.log('xx')
     if (provinceId)
       getDistricts(provinceId)
         .then(dataDistrict => {
@@ -118,6 +250,7 @@ export default function InformationCampGround() {
   }, [districtId])
 
   React.useEffect(() => {
+    fetchListCampArea()
     fetchInforCampGround()
   }, [])
 
@@ -143,6 +276,7 @@ export default function InformationCampGround() {
             getValues={getValues}
             setValue={setValue}
             hashtag={hashtag}
+            campAreas={campAreas}
           />
         </AccordionDetails>
       </Accordion>
@@ -189,12 +323,25 @@ export default function InformationCampGround() {
           <Typography>4. Đặc điểm</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Feature control={control} errors={errors} />
+          <Feature
+            control={control}
+            errors={errors}
+            getValues={getValues}
+            feature={feature}
+            updateFeature={updateFeature}
+          />
         </AccordionDetails>
       </Accordion>
       <div style={{ marginTop: '50px' }}>
         <Button color="primary" type="submit" variant="contained">
           Lưu
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={handleDeleteCampGround}
+        >
+          Xóa
         </Button>
       </div>
     </form>

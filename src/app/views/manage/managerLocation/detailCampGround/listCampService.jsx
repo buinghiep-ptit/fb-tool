@@ -10,50 +10,46 @@ import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
 import {
-  getListCampGround,
-  updateCampGroundStatus,
+  deleteCampGroundService,
+  getListCampGroundService,
+  updateCampGroundServiceStatus,
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
-
-const Container = styled('div')(({ theme }) => ({
-  margin: '30px',
-  [theme.breakpoints.down('sm')]: { margin: '16px' },
-  '& .breadcrumb': {
-    marginBottom: '30px',
-    [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
-  },
-}))
+import { useParams } from 'react-router-dom'
 
 export default function ListCampService(props) {
   const [inputFilter, setInputFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState(null)
-  const [listCampGround, setListCampGround] = useState([])
-  const [totalListCampGround, setTotalListCampground] = useState()
+  const [typeFilter, setTypeFilter] = useState(null)
+  const [listCampGroundService, setListCampGroundService] = useState([])
+  const [totalListCampGroundService, setTotalListCampgroundService] = useState()
 
-  const fetchListCampGround = async param => {
-    await getListCampGround(param)
+  const params = useParams()
+
+  const fetchListCampGroundService = async param => {
+    await getListCampGroundService(params.id, param)
       .then(data => {
-        const newList = cloneDeep(data.content).map(campGround => {
-          const convertCampGround = {}
-          convertCampGround.id = campGround.id
-          convertCampGround.imageGround = campGround.imgUrl
-          convertCampGround.linkDetail = {
-            link: campGround.name,
+        const newList = cloneDeep(data.content).map(campGroundService => {
+          const convertCampGroundService = {}
+          convertCampGroundService.id = campGroundService.id
+          convertCampGroundService.image = campGroundService.imgUrl
+          convertCampGroundService.linkDetail = {
+            link: campGroundService.name,
             path: '/chi-tiet-diem-camp/',
           }
-          convertCampGround.place = campGround.campAreaName
-          convertCampGround.contact =
-            campGround.merchantEmail + campGround.merchantMobilePhone
-          convertCampGround.address = campGround.address
-          convertCampGround.type = campGround.campType
-          if (convertCampGround.status !== 0) {
-            convertCampGround.status = campGround.status === 1 ? true : false
-          }
-          return convertCampGround
+          convertCampGroundService.type = campGroundService.type
+
+          convertCampGroundService.quantity = campGroundService.capacity
+
+          convertCampGroundService.status =
+            campGroundService.status === 1 ? true : false
+
+          convertCampGroundService.action = ['edit', 'delete']
+          return convertCampGroundService
         })
 
-        setListCampGround(newList)
-        setTotalListCampground(data.totalElements)
+        setListCampGroundService(newList)
+        setTotalListCampgroundService(data.totalElements)
       })
       .catch(err => console.log(err))
   }
@@ -62,11 +58,14 @@ export default function ListCampService(props) {
     const param = {
       name: inputFilter,
       status: statusFilter,
+      type: typeFilter,
       page: 0,
       size: 5,
     }
-    fetchListCampGround(param)
+    fetchListCampGroundService(param)
   }, [])
+
+  console.log(tableModel)
 
   return (
     <SimpleCard>
@@ -80,13 +79,31 @@ export default function ListCampService(props) {
               size="medium"
               type="text"
               name="namePlace"
-              label="Tên địa danh/địa chỉ"
+              label="Tên dịch vụ"
               variant="outlined"
               sx={{ mb: 3 }}
               onChange={e => {
                 setInputFilter(e.target.value)
               }}
             />
+            <FormControl fullWidth style={{ marginRight: '50px' }}>
+              <InputLabel id="demo-simple-select-label">
+                Loại dịch vụ
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Trạng thái"
+                onChange={e => {
+                  console.log(e.target.value)
+                  setTypeFilter(e.target.value)
+                }}
+              >
+                <MenuItem value={0}>Nghỉ</MenuItem>
+                <MenuItem value={1}>Thuê</MenuItem>
+                <MenuItem value={2}>Khác</MenuItem>
+              </Select>
+            </FormControl>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
@@ -111,7 +128,7 @@ export default function ListCampService(props) {
             type="submit"
             onClick={() => {
               console.log(inputFilter, statusFilter)
-              fetchListCampGround({
+              fetchListCampGroundService({
                 name: inputFilter,
                 status: statusFilter,
                 page: 0,
@@ -146,13 +163,14 @@ export default function ListCampService(props) {
       </Grid>
       <TableCustom
         title="Danh sách địa điểm Camp"
-        dataTable={listCampGround || []}
+        dataTable={listCampGroundService || []}
         tableModel={tableModel}
         pagination={true}
-        updateStatus={updateCampGroundStatus}
-        totalData={parseInt(totalListCampGround, 0)}
-        fetchDataTable={fetchListCampGround}
-        filter={{ name: inputFilter, status: statusFilter }}
+        onDeleteData={deleteCampGroundService}
+        updateStatus={updateCampGroundServiceStatus}
+        totalData={parseInt(totalListCampGroundService, 0)}
+        fetchDataTable={fetchListCampGroundService}
+        filter={{ name: inputFilter, status: statusFilter, type: typeFilter }}
       />
     </SimpleCard>
   )

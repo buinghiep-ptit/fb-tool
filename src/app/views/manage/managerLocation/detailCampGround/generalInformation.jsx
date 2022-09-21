@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Grid, TextField, Autocomplete } from '@mui/material'
 import { Controller } from 'react-hook-form'
+import { seasons } from '../const'
 
 export default function GeneralInformation({
   control,
@@ -13,6 +14,7 @@ export default function GeneralInformation({
   getValues,
   setValue,
   hashtag,
+  campAreas,
 }) {
   const addHashTag = e => {
     if (e.keyCode === 13) {
@@ -20,20 +22,42 @@ export default function GeneralInformation({
       e.preventDefault()
     }
   }
+
   return (
     <div>
       <Grid container>
         <Grid item xs={12} md={12}>
           <Controller
-            name="namePlace"
+            name="nameCampground"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
                 label="Tên địa danh"
                 variant="outlined"
-                error={errors.namePlace}
-                helperText={errors.namePlace?.message}
+                error={errors.nameCampground}
+                helperText={errors.nameCampground?.message}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Controller
+            name="campAreas"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                multiple
+                disablePortal
+                {...field}
+                options={campAreas}
+                getOptionLabel={option => option.name}
+                onChange={(_, data) => {
+                  field.onChange(data)
+                }}
+                renderInput={params => (
+                  <TextField {...params} label="Địa danh" margin="normal" />
+                )}
               />
             )}
           />
@@ -147,16 +171,28 @@ export default function GeneralInformation({
         </Grid>
         <Grid item xs={12} md={12}>
           <Controller
-            name="season"
+            name="campGroundSeasons"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Autocomplete
                 {...field}
-                label="Mùa thích hợp"
-                variant="outlined"
-                margin="normal"
-                // error={errors.namePlace}
-                // helperText={errors.namePlace?.message}
+                multiple
+                options={[...seasons]}
+                getOptionLabel={option => option.value}
+                defaultValue={[{ id: 0, value: 'Xuân' }]}
+                filterSelectedOptions
+                sx={{ width: 400, marginRight: 5 }}
+                onChange={(_, data) => field.onChange(data)}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Mùa thích hợp"
+                    placeholder="Chọn mùa thích hợp"
+                    fullWidth
+                    margin="normal"
+                  />
+                )}
               />
             )}
           />

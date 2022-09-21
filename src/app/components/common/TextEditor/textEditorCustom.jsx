@@ -26,10 +26,10 @@ class EditorConvertToHTML extends Component {
           editorClassName="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
         />
-        {/* <textarea
+        <textarea
           disabled
           value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
-        /> */}
+        />
       </div>
     )
   }

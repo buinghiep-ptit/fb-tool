@@ -66,7 +66,7 @@ const DialogCustom = React.forwardRef(
 
     const handleClose = () => {
       setOpen(false)
-      fetchData()
+      if (fetchData) fetchData()
     }
 
     return (

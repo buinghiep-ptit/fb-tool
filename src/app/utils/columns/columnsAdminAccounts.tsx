@@ -1,13 +1,14 @@
 import { Chip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
-import { TitleAccounts } from 'app/models/account'
-import { DateTimeConverter } from '../formatters/dateTimeConverter'
+import { TitleUsers } from 'app/models/account'
+import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { LabelFormatter } from '../formatters/labelFormatter'
 
-export const columnsAdminAccounts: readonly TableColumn<TitleAccounts>[] = [
+export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
   {
-    id: 'account',
+    id: 'email',
     label: 'Tài khoản',
     minWidth: 120,
     action: (value: any) => (
@@ -22,16 +23,17 @@ export const columnsAdminAccounts: readonly TableColumn<TitleAccounts>[] = [
     label: 'Quyền',
     minWidth: 120,
     align: 'center',
+    format: (value: number) => LabelFormatter(value, 'role'),
   },
   {
-    id: 'dateUpdated',
+    id: 'updateDate',
     label: 'Thời gian cập nhật',
     minWidth: 170,
     align: 'center',
-    format: (value: number) => DateTimeConverter(value),
+    format: (value: string) => ISODateTimeFormatter(value),
   },
   {
-    id: 'userUpdated',
+    id: 'updateBy',
     label: 'Người cập nhật',
     minWidth: 150,
     align: 'center',

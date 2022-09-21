@@ -3,7 +3,7 @@ import { SearchSharp } from '@mui/icons-material'
 import { Grid, MenuItem, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchFeeds } from 'app/apis/feed/feed.service'
+import { fetchCustomers } from 'app/apis/accounts/customer.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiInputText'
@@ -13,8 +13,7 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeedResponse } from 'app/models'
-import { ICustomer } from 'app/models/account'
+import { ICustomer, ICustomerResponse } from 'app/models/account'
 import { columnCustomerAccounts } from 'app/utils/columns/columnsCustomerAccounts'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -30,54 +29,31 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-const DATA: (ICustomer & { action?: number })[] = [
-  {
-    id: 1,
-    phoneNumber: '0975452750',
-    displayName: 'nghiepbv2',
-    email: 'nghiepbvptit@gmail.com',
-    accountType: 1,
-    dateCreated: 1661869487000,
-    dateUpdated: 1661869487000,
-    status: 0,
-    action: 0,
-  },
-  {
-    id: 2,
-    phoneNumber: '0975452750',
-    displayName: 'nghiepbv2',
-    email: 'nghiepbvptit@gmail.com',
-    accountType: 0,
-    dateCreated: 1661869487000,
-    dateUpdated: 1661869487000,
-    status: 1,
-    action: 1,
-  },
-]
-
 export interface Props {}
 
 type ISearchFilters = {
-  account?: string
-  email?: string
-  role?: string
-  status?: string
+  search?: string
+  cusType?: number | string
+  status?: number | string
   page?: number
-  rowsPerPage?: number
+  size?: number
+  sort?: string
 }
 
 export default function CustomerAccounts(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
-
+  const [size, setSize] = useState<number>(20)
   const [defaultValues] = useState<ISearchFilters>({
-    role: 'all',
+    cusType: 'all',
     status: 'all',
   })
-
-  const [filters, setFilters] = useState<ISearchFilters>(defaultValues)
+  const [filters, setFilters] = useState<ISearchFilters>({
+    page,
+    size,
+    sort: 'email,asc',
+  })
 
   const validationSchema = Yup.object().shape({
     account: Yup.string()
@@ -99,7 +75,7 @@ export default function CustomerAccounts(props: Props) {
       const queryParams = Object.fromEntries([...searchParams])
       if (!!Object.keys(queryParams).length) {
         setPage(parseInt(queryParams.page) || 0)
-        setRowsPerPage(parseInt(queryParams.rowsPerPage) || 10)
+        setSize(parseInt(queryParams.size) || 20)
 
         setFilters(prevFilters => {
           return {
@@ -117,15 +93,14 @@ export default function CustomerAccounts(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IFeedResponse, Error> = useQuery<IFeedResponse, Error>(
-    ['feeds', filters],
-    () => fetchFeeds({ page: page, sortId: 4 }),
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-      enabled: !!filters,
-    },
-  )
+  }: UseQueryResult<ICustomerResponse, Error> = useQuery<
+    ICustomerResponse,
+    Error
+  >(['customers', filters], () => fetchCustomers(filters), {
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
+    enabled: !!filters,
+  })
 
   const handleChangePage = (event: unknown, newPage: number) => {
     // setPage(newPage)
@@ -150,39 +125,41 @@ export default function CustomerAccounts(props: Props) {
       return {
         ...prevFilters,
         page: 0,
-        rowsPerPage: +event.target.value,
+        size: parseInt(event.target.value, 10),
       }
     })
     navigate('', {
       ...filters,
-      rowsPerPage: +event.target.value,
+      size: parseInt(event.target.value, 10),
     } as any)
   }
 
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    removeParamsHasDefaultValue(values)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
         ...values,
-        page,
-        rowsPerPage,
       }
     })
     navigate('', {
       ...filters,
       ...values,
-      page,
-      rowsPerPage,
     } as any)
+  }
+
+  const removeParamsHasDefaultValue = (objParams: Record<string, any>) => {
+    Object.keys(objParams).forEach(key => {
+      if (objParams[key] === 'all') objParams[key] = ''
+    })
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      if (cell.id === 'phoneNumber') {
-        console.log('Navige detail user')
-        navigate(`${row.id}/info`, {})
+      if (cell.id === 'mobilePhone') {
+        navigate(`${row.customerId}/info`, {})
       } else if (cell.id === 'action') {
         console.log('Toggle active user')
       }
@@ -194,7 +171,7 @@ export default function CustomerAccounts(props: Props) {
   if (isError)
     return (
       <Box my={2} textAlign="center">
-        <MuiTypography variant="h1">
+        <MuiTypography variant="h5">
           Have an errors: {error.message}
         </MuiTypography>
       </Box>
@@ -215,8 +192,9 @@ export default function CustomerAccounts(props: Props) {
                 </MuiTypography>
                 <FormInputText
                   type="text"
-                  name="account"
+                  name="search"
                   size="small"
+                  defaultValue=""
                   placeholder="Nhập Email, SĐT, Tên hiển thị"
                   fullWidth
                 />
@@ -225,10 +203,10 @@ export default function CustomerAccounts(props: Props) {
                 <MuiTypography variant="subtitle2" pb={1}>
                   Loại tài khoản
                 </MuiTypography>
-                <SelectDropDown name="role">
+                <SelectDropDown name="cusType">
                   <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="user">Thường</MenuItem>
-                  <MenuItem value="kol">KOL</MenuItem>
+                  <MenuItem value={1}>Thường</MenuItem>
+                  <MenuItem value={2}>KOL</MenuItem>
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
@@ -237,9 +215,10 @@ export default function CustomerAccounts(props: Props) {
                 </MuiTypography>
                 <SelectDropDown name="status">
                   <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="active">Hoạt động</MenuItem>
-                  <MenuItem value="de-active">Khoá</MenuItem>
-                  <MenuItem value="deleted">Xoá</MenuItem>
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  <MenuItem value={-1}>Không hoạt động</MenuItem>
+                  <MenuItem value={-2}>Khoá</MenuItem>
+                  <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
@@ -261,16 +240,16 @@ export default function CustomerAccounts(props: Props) {
 
         <Box mt={3}>
           <MuiStyledTable
-            rows={DATA as ICustomer[]}
+            rows={data?.content as ICustomer[]}
             columns={columnCustomerAccounts}
             onClickRow={onClickRow}
             isFetching={isFetching}
           />
           <MuiStyledPagination
             component="div"
-            rowsPerPageOptions={[10, 25, 100]}
-            count={DATA.length as number}
-            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[10, 20, 100]}
+            count={data?.content?.length as number}
+            rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}

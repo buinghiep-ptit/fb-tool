@@ -1,17 +1,31 @@
 import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
+import { Outlet } from 'react-router-dom'
+import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
 )
+const UserDetail = Loadable(lazy(() => import('./accounts/users/UserDetail')))
+const CreateUser = Loadable(lazy(() => import('./accounts/users/CreateUser')))
+
 const CustomerAccounts = Loadable(
   lazy(() => import('./accounts/ManagementCustomerAccounts')),
 )
 const CustomerDetail = Loadable(
-  lazy(() => import('./accounts/CustomerInfoDetail')),
+  lazy(() => import('./accounts/customers/CustomerInfoDetail')),
+)
+const ChangePassword = Loadable(
+  lazy(() => import('./accounts/customers/details/ChangePassword')),
+)
+const LockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/LockCustomer')),
+)
+const UnlockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/UnlockCustomer')),
 )
 const CustomerHistory = Loadable(
-  lazy(() => import('./accounts/CustomerOrderHistoryDetail')),
+  lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
 )
 
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
@@ -34,15 +48,62 @@ const DetailCampGround = Loadable(
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
 const ManagementRoutes = [
-  { path: '/quan-ly-tai-khoan-admin', element: <AdminAccounts /> },
+  {
+    path: '/quan-ly-tai-khoan-admin',
+    element: (
+      <>
+        <AdminAccounts />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':id/chi-tiet',
+        element: <UserDetail title="Chi tiết tài khoản" />,
+      },
+      {
+        path: 'them-moi',
+        element: <CreateUser title="Thêm mới tài khoản" />,
+      },
+    ],
+  },
   { path: '/quan-ly-tai-khoan-khach-hang', element: <CustomerAccounts /> },
   {
-    path: '/quan-ly-tai-khoan-khach-hang/:id/info',
-    element: <CustomerDetail />,
-  },
-  {
-    path: '/quan-ly-tai-khoan-khach-hang/:id/history',
-    element: <CustomerHistory />,
+    path: '/quan-ly-tai-khoan-khach-hang/:customerId',
+    element: (
+      <>
+        <LayoutCustomer>
+          <Outlet />
+        </LayoutCustomer>
+      </>
+    ),
+    children: [
+      {
+        // index: true,
+        path: 'info',
+        element: (
+          <>
+            <CustomerDetail />
+            <Outlet />
+          </>
+        ),
+        children: [
+          {
+            path: 'doi-mat-khau',
+            element: <ChangePassword title="Đổi mật khẩu" />,
+          },
+          {
+            path: 'mo-khoa-tai-khoan',
+            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+          },
+          {
+            path: 'khoa-tai-khoan',
+            element: <LockCustomer title="Khoá tài khoản" />,
+          },
+        ],
+      },
+      { path: 'history', element: <CustomerHistory /> },
+    ],
   },
   {
     path: '/quan-ly-feeds',

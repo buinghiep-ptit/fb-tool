@@ -61,7 +61,8 @@ const Layout1Sidenav = () => {
         return sideNavWidth
     }
   }
-  const primaryRGB = convertHexToRGB(theme.palette.primary.main)
+  // const primaryRGB = convertHexToRGB(theme.palette.primary.main)
+  const primaryRGB = convertHexToRGB('#218332')
 
   const updateSidebarMode = sidebarSettings => {
     updateSettings({

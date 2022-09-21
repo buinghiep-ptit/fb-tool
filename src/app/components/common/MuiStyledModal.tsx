@@ -1,21 +1,15 @@
-import * as React from 'react'
-import Button from '@mui/material/Button'
-import { styled } from '@mui/material/styles'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import IconButton from '@mui/material/IconButton'
+import { ApprovalRounded, CancelOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
-import Typography from '@mui/material/Typography'
-import { MuiButton } from './MuiButton'
-import {
-  AccessibleSharp,
-  ApprovalRounded,
-  ApprovalSharp,
-  CancelOutlined,
-} from '@mui/icons-material'
+import { LoadingButton } from '@mui/lab'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import IconButton from '@mui/material/IconButton'
+import { styled } from '@mui/material/styles'
 import { Stack } from '@mui/system'
+import * as React from 'react'
+import { MuiButton } from './MuiButton'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -36,7 +30,15 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
   const { children, onClose, ...other } = props
 
   return (
-    <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
+    <DialogTitle
+      sx={{
+        m: 0,
+        p: 2,
+        color: theme => theme.palette.primary.contrastText,
+        backgroundColor: theme => theme.palette.primary.main,
+      }}
+      {...other}
+    >
       {children}
       {onClose ? (
         <IconButton
@@ -46,7 +48,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             position: 'absolute',
             right: 8,
             top: 8,
-            color: theme => theme.palette.grey[500],
+            color: theme => theme.palette.primary.contrastText,
           }}
         >
           <CloseIcon />
@@ -59,29 +61,30 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 type Props = {
   title: string
   open: boolean
-  setOpenModal: (value: boolean) => void
+  onCloseModal: () => void
   children?: React.ReactElement
+  onSubmit?: any
+  isLoading?: boolean
 }
 
 export default function MuiStyledModal({
   title,
   open,
-  setOpenModal,
+  onCloseModal,
+  onSubmit,
   children,
+  isLoading,
 }: Props) {
   //   const [open, setOpen] = React.useState(false)
   return (
     <BootstrapDialog
-      onClose={() => setOpenModal(false)}
+      onClose={onCloseModal}
       aria-labelledby="customized-dialog-title"
       open={open}
       maxWidth={'sm'}
       fullWidth={true}
     >
-      <BootstrapDialogTitle
-        id="customized-dialog-title"
-        onClose={() => setOpenModal(false)}
-      >
+      <BootstrapDialogTitle id="customized-dialog-title" onClose={onCloseModal}>
         {title}
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
@@ -109,16 +112,17 @@ export default function MuiStyledModal({
             type="submit"
             sx={{ width: '100%', flex: 1 }}
             startIcon={<ApprovalRounded />}
-            onClick={() => setOpenModal(false)}
+            onClick={() => onSubmit()}
+            loading={isLoading}
           />
           <MuiButton
             title="Đóng"
             variant="outlined"
-            color="error"
+            color="secondary"
             type="submit"
             sx={{ width: '100%', flex: 1 }}
             startIcon={<CancelOutlined />}
-            onClick={() => setOpenModal(false)}
+            onClick={onCloseModal}
           />
         </Stack>
       </DialogActions>

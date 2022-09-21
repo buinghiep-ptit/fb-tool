@@ -1,4 +1,4 @@
-import { Box, styled, TypographyProps } from '@mui/material'
+import { Box, styled, Typography, TypographyProps } from '@mui/material'
 import clsx from 'clsx'
 import { ReactNode } from 'react'
 
@@ -8,11 +8,13 @@ type TypoProps = {
   ellipsis?: string
 } & TypographyProps
 
-const StyledTypography = styled(Box)<TypoProps>(({ theme, ellipsis }) => ({
-  whiteSpace: ellipsis ? 'nowrap' : 'normal',
-  overflow: ellipsis ? 'hidden' : '',
-  textOverflow: ellipsis ? 'ellipsis' : '',
-}))
+const StyledTypography = styled(Typography)<TypoProps>(
+  ({ theme, ellipsis }) => ({
+    whiteSpace: ellipsis ? 'nowrap' : 'normal',
+    overflow: ellipsis ? 'hidden' : '',
+    textOverflow: ellipsis ? 'ellipsis' : '',
+  }),
+)
 
 export const MuiTypography = ({
   children,

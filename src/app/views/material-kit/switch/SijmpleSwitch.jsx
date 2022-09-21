@@ -15,7 +15,7 @@ export default function SimpleSwitch() {
   return (
     <Box>
       <Switch
-        value="checkedA"
+        // value="checkedA"
         checked={state.checkedA}
         onChange={handleChange('checkedA')}
         inputProps={{ 'aria-label': 'secondary checkbox' }}

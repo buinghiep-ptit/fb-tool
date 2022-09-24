@@ -2,6 +2,7 @@ import { http } from 'app/helpers/http-config'
 import {
   ICustomerDetail,
   ICustomerResponse,
+  ICustomerTiny,
   ILogsCustomerResponse,
 } from 'app/models/account'
 
@@ -104,5 +105,10 @@ export const addOtpCountCustomer = async (
   const { data } = await http.post<any>(
     `/api/customer/${customerId}/reset-otp/${params.otpType}`,
   )
+  return data
+}
+
+export const customerSystemDefault = async (): Promise<ICustomerTiny> => {
+  const { data } = await http.get<ICustomerTiny>(`/api/customer/campdi`)
   return data
 }

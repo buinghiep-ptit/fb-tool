@@ -5,6 +5,7 @@ import {
   IFeedResponse,
   IReportDeclineResponse,
 } from 'app/models'
+import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
 
 type Props = {
   feedId?: number
@@ -60,5 +61,25 @@ export const fetchActionsHistory = async ({
 
 export const fetchPostsCheck = async (): Promise<IFeedDetail[]> => {
   const { data } = await http.get<IFeedDetail[]>(`/api/feed/post-check`)
+  return data
+}
+
+export const fetchCampAreas = async (params: {
+  page?: number
+  size?: number
+}): Promise<ICampAreaResponse> => {
+  const { data } = await http.get<ICampAreaResponse>(`/api/camp-areas`, {
+    params,
+  })
+  return data
+}
+
+export const fetchCampGrounds = async (params: {
+  page?: number
+  size?: number
+}): Promise<ICampGroundResponse> => {
+  const { data } = await http.get<ICampGroundResponse>(`/api/camp-grounds`, {
+    params,
+  })
   return data
 }

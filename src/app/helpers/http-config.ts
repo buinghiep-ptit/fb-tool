@@ -43,7 +43,7 @@ class Http {
       baseURL: process.env.REACT_APP_API_URL,
       headers: headers as any,
       paramsSerializer: (params: any) => queryString.stringify(params),
-      timeout: 15000,
+      timeout: 5 * 60 * 1000,
       withCredentials: true,
     })
     const currentExecutingRequests: any = {}
@@ -66,16 +66,16 @@ class Http {
         // const language = await AsyncStorage.getItem('currentLanguage')
         // req.headers.lang = language ?? 'vi'
 
-        if (currentExecutingRequests[req.url as keyof object]) {
-          const source = currentExecutingRequests[req.url ?? '']
-          delete currentExecutingRequests[req.url ?? '']
-          source.cancel()
-        }
+        // if (currentExecutingRequests[req.url as keyof object]) {
+        //   const source = currentExecutingRequests[req.url ?? '']
+        //   delete currentExecutingRequests[req.url ?? '']
+        //   source.cancel()
+        // }
 
-        const CancelToken = axios.CancelToken
-        const source = CancelToken.source()
-        originalRequest.cancelToken = source.token
-        currentExecutingRequests[req.url ?? ''] = source
+        // const CancelToken = axios.CancelToken
+        // const source = CancelToken.source()
+        // originalRequest.cancelToken = source.token
+        // currentExecutingRequests[req.url ?? ''] = source
 
         return originalRequest
       },

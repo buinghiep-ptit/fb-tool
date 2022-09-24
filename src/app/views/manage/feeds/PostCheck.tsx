@@ -1,4 +1,4 @@
-import { Avatar, Divider, Grid, Stack, styled } from '@mui/material'
+import { Avatar, Chip, Divider, Grid, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchPostsCheck } from 'app/apis/feed/feed.service'
@@ -69,8 +69,23 @@ export default function PostCheck(props: Props) {
                 >
                   <Stack flexDirection={'column'}>
                     <MuiTypography variant="subtitle2">ThangND44</MuiTypography>
-                    <MuiTypography variant="body2">Nôi Dung</MuiTypography>
-                    <MuiTypography variant="body2">#hashtag</MuiTypography>
+                    <MuiTypography variant="body2">
+                      {post.content}
+                    </MuiTypography>
+                    <Stack flexDirection={'row'} gap={1} my={1}>
+                      {post?.tags?.map(tag => (
+                        <Chip
+                          key={tag.id}
+                          label={`#${tag.value}`}
+                          size="small"
+                          // color={true ? 'primary' : 'default'}
+                          sx={{
+                            px: 1,
+                            backgroundColor: '#DDD',
+                          }}
+                        />
+                      ))}
+                    </Stack>
                   </Stack>
 
                   <Stack flexDirection={'row'} gap={1}>
@@ -98,7 +113,7 @@ export default function PostCheck(props: Props) {
                     />
                   </Box>
                 ) : (
-                  <Box width={'75%'}>
+                  <Box width={'75%'} mt={-2}>
                     <ImageListView medias={post.medias} />
                   </Box>
                 )}

@@ -35,10 +35,8 @@ function useDimensions(targetRef: any) {
 
 function srcset(image: string, size: number, rows = 1, cols = 1) {
   return {
-    src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${size * cols}&h=${
-      size * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
+    src: `${image}`,
+    srcSet: `${image}`,
   }
 }
 const transformData = (images: any, dimensions: any) => {
@@ -120,17 +118,15 @@ const transformData = (images: any, dimensions: any) => {
   }
 }
 
-const regex = /^http[^ \!@\$\^&\(\)\+\=]+(\.png|\.jpeg|\.gif|\.jpg)$/
+const regexImgUrl = /^http[^ \!@\$\^&\(\)\+\=]+(\.png|\.jpeg|\.gif|\.jpg)$/
 
 export function ImageListView({ medias }: IImageListViewProps) {
   const targetRef = React.useRef(null)
   const dimensions = useDimensions(targetRef)
   const imgSize = React.useMemo(
     () => ({ ...transformData(medias, dimensions) }),
-    [dimensions],
+    [dimensions, medias],
   )
-
-  console.log('imgSize:', imgSize.images)
 
   return (
     <Box ref={targetRef}>
@@ -153,15 +149,23 @@ export function ImageListView({ medias }: IImageListViewProps) {
             index: number,
           ) => (
             <ImageListItem
-              sx={{ cursor: 'pointer', borderRadius: 1, overflow: 'hidden' }}
+              sx={{
+                cursor: 'pointer',
+                borderRadius: 1,
+                overflow: 'hidden',
+              }}
               key={item.id}
               cols={item.cols || 1}
               rows={item.rows || 1}
             >
               <img
-                onClick={() => console.log('show modal with pos:', index)}
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('show modal with pos:', index)
+                }}
                 {...srcset(
-                  item.url && regex.test(item.url)
+                  item.url // && regex.test(item.url)
                     ? item.url
                     : 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
                   121,
@@ -170,6 +174,13 @@ export function ImageListView({ medias }: IImageListViewProps) {
                 )}
                 alt={item.title}
                 loading="lazy"
+                onLoad={() => {
+                  URL.revokeObjectURL(
+                    item.url
+                      ? item.url
+                      : 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+                  )
+                }}
               />
               {imgSize.images.length > 5 && index === 4 && (
                 <Box
@@ -200,145 +211,3 @@ export function ImageListView({ medias }: IImageListViewProps) {
     </Box>
   )
 }
-
-const itemData1 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 4, // len 1: row = 4 len 2: row = 2
-    // cols: 4, // len 1: col = 4 len 2: col = 2
-  },
-]
-
-const itemData2 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 2, // len 1: row = 4 len 2: row = 2
-    // cols: 2, // len 1: col = 4 len 2: col = 2
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    // title: 'Burger',
-    // rows: 2, // len 2: row = 2
-    // cols: 2, // len 2: col = 2
-  },
-]
-
-const itemData3 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 6,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    // title: 'Burger',
-    // rows: 3,
-    // cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    // title: 'Camera',
-    // rows: 3,
-    // cols: 2,
-  },
-]
-
-const itemData4 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 6,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    // title: 'Burger',
-    // rows: 2,
-    // cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    // title: 'Camera',
-    // rows: 2,
-    // cols: 2,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-    // title: 'Camera',
-    // rows: 2,
-    // cols: 2,
-  },
-]
-
-const itemData5 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 6,
-    // cols: 6,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    // title: 'Burger',
-    // rows: 6,
-    // cols: 6,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    // title: 'Camera',
-    // rows: 4,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-    // title: 'Coffee',
-    // rows: 4,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-    // title: 'Hats',
-    // rows: 4,
-    // cols: 4,
-  },
-]
-
-const itemData6 = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    // title: 'Breakfast',
-    // rows: 6,
-    // cols: 6,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-    // title: 'Burger',
-    // rows: 6,
-    // cols: 6,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-    // title: 'Camera',
-    // rows: 4,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-    // title: 'Coffee',
-    // rows: 4,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-    // title: 'Hats',
-    // rows: 4,
-    // cols: 4,
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-    // title: 'Basketball',
-  },
-]

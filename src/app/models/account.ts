@@ -46,6 +46,15 @@ export interface ICustomerDetail {
   otpCount?: OtpCount[]
 }
 
+export interface ICustomerTiny {
+  id?: number
+  email?: string
+  mobilePhone?: string
+  fullName?: string
+  avatar?: string
+  status?: number
+}
+
 export type OtpCount = {
   type?: number
   numToday?: number

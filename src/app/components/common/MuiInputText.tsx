@@ -17,7 +17,7 @@ export type IFormInputTextProps = {
   inputProps?: InputProps
 } & TextFieldProps
 
-const CssTextField = styled(TextField)({
+export const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
     height: 40,
     '&:focused': {

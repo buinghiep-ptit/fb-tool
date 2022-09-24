@@ -3,8 +3,6 @@ import {
   ArticleSharp,
   ChangeCircleSharp,
   ClearOutlined,
-  ClearRounded,
-  ClearSharp,
   ReportSharp,
   SearchSharp,
 } from '@mui/icons-material'
@@ -34,7 +32,7 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
 import { columnFeeds } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { NavLink, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'

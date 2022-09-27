@@ -36,6 +36,9 @@ const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )
+const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
+const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
+
 const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
@@ -118,8 +121,25 @@ const ManagementRoutes = [
   },
   { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
-  { path: '/quan-ly-feeds/hau-kiem', element: <PostCheck /> },
+  {
+    path: '/quan-ly-feeds/hau-kiem',
+    element: (
+      <>
+        <PostCheck />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':feedId/vi-pham',
+        element: <ReportInfringe title="Vi phạm" />,
+      },
+    ],
+  },
   { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
+  { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
+  { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
+  { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,

@@ -73,7 +73,7 @@ const ForgotPasswordRoot = styled(JustifyBox)(() => ({
 }))
 
 const defaultValues = {
-  email: 'giangcm@fpt.com.vn',
+  email: '',
 }
 
 const ForgotPassword = () => {
@@ -282,7 +282,7 @@ const ForgotPassword = () => {
                     loading={loading}
                     color="primary"
                     type="submit"
-                    sx={{ height: 40 }}
+                    sx={{ height: 52 }}
                     disabled={
                       Object.keys(methods?.formState?.errors).length > 0
                     }

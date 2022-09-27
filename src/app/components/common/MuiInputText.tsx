@@ -13,13 +13,14 @@ export type IFormInputTextProps = {
   iconStart?: React.ReactElement
   iconEnd?: React.ReactElement
   name: string
+  label?: string
   defaultValue?: string
   inputProps?: InputProps
 } & TextFieldProps
 
 export const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
-    height: 40,
+    // height: 40,
     '&:focused': {
       caretColor: '#0062cc',
     },
@@ -33,6 +34,7 @@ export const CssTextField = styled(TextField)({
 
 const FormInputText: FC<IFormInputTextProps> = ({
   name,
+  label = '',
   defaultValue,
   iconStart,
   iconEnd,
@@ -52,6 +54,8 @@ const FormInputText: FC<IFormInputTextProps> = ({
         <CssTextField
           {...field}
           {...otherProps}
+          label={label}
+          size="medium"
           variant="outlined"
           error={!!errors[name]}
           helperText={

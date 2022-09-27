@@ -64,6 +64,33 @@ export const fetchPostsCheck = async (): Promise<IFeedDetail[]> => {
   return data
 }
 
+export const approveFeed = async (feedId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/${feedId}/approve`)
+  return data
+}
+
+export const violateFeed = async (
+  feedId: number,
+  payload: { reason?: string },
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/${feedId}/violate`, payload)
+
+  return data
+}
+
+export const unLockCustomer = async (
+  customerId: number,
+  payload: {
+    reason?: string
+  },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/customer/${customerId}/unlock`,
+    payload,
+  )
+  return data
+}
+
 export const fetchCampAreas = async (params: {
   page?: number
   size?: number
@@ -81,5 +108,10 @@ export const fetchCampGrounds = async (params: {
   const { data } = await http.get<ICampGroundResponse>(`/api/camp-grounds`, {
     params,
   })
+  return data
+}
+
+export const createFeed = async (payload: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed`, payload)
   return data
 }

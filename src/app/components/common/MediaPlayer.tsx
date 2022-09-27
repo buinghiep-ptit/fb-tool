@@ -6,10 +6,6 @@ import { Waypoint } from 'react-waypoint'
 import Duration from './Duration'
 import LoadingItem from './LoadingItem'
 
-export interface IMediaPlayerProps {
-  url: string
-}
-
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 8,
   borderRadius: 4,
@@ -32,8 +28,12 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
     //   'radial-gradient(#f6ce95 0%, #f6ce95 16%, transparent 42%)',
   },
 }))
+export interface IMediaPlayerProps {
+  url: string
+  setDuration?: (dur: number) => void
+}
 
-export function MediaPlayer({ url }: IMediaPlayerProps) {
+export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
   const [loading, setLoading] = React.useState(true)
 
   const [state, setState] = React.useState({
@@ -73,6 +73,7 @@ export function MediaPlayer({ url }: IMediaPlayerProps) {
   }
 
   const handleDuration = (duration: number) => {
+    if (setDuration) setDuration(duration)
     setState(prev => ({ ...prev, duration: duration }))
   }
 

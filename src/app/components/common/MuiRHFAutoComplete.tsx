@@ -102,7 +102,7 @@ export function MuiRHFAutoComplete({
             )
           }}
           renderInput={params => (
-            <CssTextField
+            <TextField
               {...params}
               label={label}
               error={!!errors[name]}

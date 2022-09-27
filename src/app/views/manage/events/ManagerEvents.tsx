@@ -1,25 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PersonAddAltSharp, SearchSharp } from '@mui/icons-material'
-import { LoadingButton } from '@mui/lab'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { UseQueryResult } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { fetchEvents } from 'app/apis/events/event.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useUpdateUserData, useUsersData } from 'app/hooks/queries/useUsersData'
+import {
+  useDeleteEvent,
+  useUpdateStatusEvent,
+} from 'app/hooks/queries/useEventsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IUser, IUserResponse } from 'app/models/account'
-import { columnsAdminAccounts } from 'app/utils/columns/columnsAdminAccounts'
+import { IEventOverall, IEventResponse } from 'app/models'
+import { columnsEvents } from 'app/utils/columns/columnsEvents'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const Container = styled('div')<Props>(({ theme }) => ({
@@ -31,46 +33,30 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-type ISearchFilters = {
-  account?: string
-  email?: string
-  role?: string
-  status?: string
-  page?: number
-  size?: number
-  sort?: string
-}
-
 export interface Props {}
 
-export default function AdminAccounts(props: Props) {
-  const navigation = useNavigate()
+type ISearchFilters = {
+  areaNameOrAddress?: string
+  page?: number
+  size?: number
+  sort?: string[]
+}
+
+export default function ManagerEvents(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
-  const [defaultValues] = useState<ISearchFilters>({
-    role: 'all',
-    status: 'all',
-  })
+  const [defaultValues] = useState<ISearchFilters>({})
   const [filters, setFilters] = useState<ISearchFilters>({
     page,
     size,
-    sort: 'email,asc',
   })
 
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Cập nhật tài khoản thành công' })
-  }
-  const { mutate: editUser } = useUpdateUserData(onRowUpdateSuccess)
-
   const validationSchema = Yup.object().shape({
-    account: Yup.string()
+    areaNameOrAddress: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
       .max(256, 'hashtag must be at almost 256 characters'),
-    email: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -102,7 +88,20 @@ export default function AdminAccounts(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IUserResponse, Error> = useUsersData(filters)
+  }: UseQueryResult<IEventResponse, Error> = useQuery<IEventResponse, Error>(
+    ['events', filters],
+    () => fetchEvents(filters),
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      enabled: !!filters,
+    },
+  )
+  const onRowUpdateSuccess = (data: any) => {
+    toastSuccess({ message: 'Cập nhật thành công' })
+  }
+  const { mutate: updateStatus } = useUpdateStatusEvent(onRowUpdateSuccess)
+  const { mutate: deleteEvent } = useDeleteEvent(onRowUpdateSuccess)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -160,15 +159,19 @@ export default function AdminAccounts(props: Props) {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      if (cell.id === 'email') {
-        navigation(`${row.userId}/chi-tiet`, {
-          state: { modal: true, data: row },
-        })
-      } else if (cell.id === 'action') {
-        editUser({
-          ...row,
+      if (cell.id === 'name') {
+        navigate(`${row.id}/chi-tiet`, {})
+      } else if (cell.id === 'status') {
+        console.log('status')
+        updateStatus({
+          eventId: row.id,
           status: row.status * -1,
         })
+      } else if (cell.id === 'edit') {
+        navigate(`${row.id}/chinh-sua`, {})
+        console.log('edit')
+      } else if (cell.id === 'delete') {
+        deleteEvent(row.id)
       }
     }
   }
@@ -187,100 +190,55 @@ export default function AdminAccounts(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
       </Box>
-      <SimpleCard title="Quản lý TK Admin">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+      <SimpleCard title="Quản lý sự kiện">
+        <form
+          onSubmit={methods.handleSubmit(onSubmitHandler)}
+          noValidate
+          autoComplete="off"
+        >
           <FormProvider {...methods}>
             <Grid container spacing={2}>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Tài khoản
-                </MuiTypography>
                 <FormInputText
+                  label={'Tên sự kiện/Địa chỉ'}
                   type="text"
-                  name="account"
+                  name="areaNameOrAddress"
                   defaultValue=""
-                  size="small"
-                  placeholder="Nhập tên tài khoản"
-                  fullWidth
-                  // focused
-                  // required
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Email
-                </MuiTypography>
-                <FormInputText
-                  type="email"
-                  name="email"
-                  defaultValue=""
-                  placeholder="Nhập Email"
-                  size="small"
+                  placeholder="Nhập tên sự kiện, địa chỉ"
                   fullWidth
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Quyền
-                </MuiTypography>
-                <SelectDropDown name="role">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="1">Admin</MenuItem>
-                  <MenuItem value="2">CS</MenuItem>
-                  <MenuItem value="3">Sale</MenuItem>
-                </SelectDropDown>
+                <MuiButton
+                  title="Tìm kiếm"
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  sx={{ width: '100%' }}
+                  startIcon={<SearchSharp />}
+                />
               </Grid>
+              <Grid item sm={3} xs={12}></Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Trạng thái
-                </MuiTypography>
-                <SelectDropDown name="status">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="1">Hoạt động</MenuItem>
-                  <MenuItem value="-1">Không hoạt động</MenuItem>
-                </SelectDropDown>
+                <MuiButton
+                  onClick={() => navigate(`them-moi-su-kien`, {})}
+                  title="Tạo mới sự kiện"
+                  variant="contained"
+                  color="primary"
+                  sx={{ width: '100%' }}
+                  startIcon={<AddBoxSharp />}
+                />
               </Grid>
             </Grid>
-
-            <Box mt={3}>
-              <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
-                  <MuiButton
-                    loading={isFetching}
-                    title="Tìm kiếm"
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    sx={{ width: '100%' }}
-                    startIcon={<SearchSharp />}
-                  />
-                </Grid>
-                <Grid item sm={6} xs={12}></Grid>
-                <Grid item sm={3} xs={12}>
-                  <MuiButton
-                    onClick={() =>
-                      navigation(`them-moi`, {
-                        state: { modal: true },
-                      })
-                    }
-                    title="Thêm tài koản"
-                    variant="contained"
-                    color="primary"
-                    sx={{ width: '100%' }}
-                    startIcon={<PersonAddAltSharp />}
-                  />
-                </Grid>
-              </Grid>
-            </Box>
           </FormProvider>
         </form>
 
         <Box mt={3}>
           <MuiStyledTable
-            rows={data?.content as IUser[]}
-            columns={columnsAdminAccounts}
+            rows={data?.content as IEventOverall[]}
+            columns={columnsEvents}
             onClickRow={onClickRow}
             isFetching={isFetching}
           />

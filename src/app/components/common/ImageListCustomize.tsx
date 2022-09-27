@@ -1,12 +1,15 @@
-import { ImageList, ImageListItem } from '@mui/material'
+import {
+  CircularProgress,
+  ImageList,
+  ImageListItem,
+  Typography,
+} from '@mui/material'
 import { Box } from '@mui/system'
+import { FileInfoProgress } from 'app/hooks/useFilesUpload'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IMediaDetail, IMediaOverall } from 'app/models'
+import { Image, IMediaDetail, IMediaOverall } from 'app/models'
 import * as React from 'react'
-
-export interface IImageListViewProps {
-  medias?: IMediaDetail[]
-}
+import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 
 function useDimensions(targetRef: any) {
   const getDimensions = () => {
@@ -120,7 +123,38 @@ const transformData = (images: any, dimensions: any) => {
 
 const regexImgUrl = /^http[^ \!@\$\^&\(\)\+\=]+(\.png|\.jpeg|\.gif|\.jpg)$/
 
-export function ImageListView({ medias }: IImageListViewProps) {
+type ProgressProps = {
+  value: number
+}
+
+export function CircularProgressWithLabel(props: ProgressProps) {
+  return (
+    <>
+      <CircularProgress
+        variant="determinate"
+        {...props}
+        sx={{
+          borderRadius: '100%',
+          boxShadow: 'inset 0 0 0px 4px #EDFDEF',
+          backgroundColor: 'transparent',
+        }}
+        thickness={4}
+      />
+      <AbsoluteFillObject>
+        <MuiTypography color="primary" fontSize="0.75rem" fontWeight="600">
+          {`${Math.round(props.value)}%`}
+        </MuiTypography>
+      </AbsoluteFillObject>
+    </>
+  )
+}
+
+export interface IImageListViewProps {
+  progressInfos?: { val: FileInfoProgress[] } // 0: preview upload, 1: preview data
+  medias?: Image[]
+}
+
+export function ImageListView({ progressInfos, medias }: IImageListViewProps) {
   const targetRef = React.useRef(null)
   const dimensions = useDimensions(targetRef)
   const imgSize = React.useMemo(
@@ -167,7 +201,7 @@ export function ImageListView({ medias }: IImageListViewProps) {
                 {...srcset(
                   item.url // && regex.test(item.url)
                     ? item.url
-                    : 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+                    : 'https://batdongsantoanquoc.net/no-image.png',
                   121,
                   item.rows,
                   item.cols,
@@ -178,32 +212,30 @@ export function ImageListView({ medias }: IImageListViewProps) {
                   URL.revokeObjectURL(
                     item.url
                       ? item.url
-                      : 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
+                      : 'https://batdongsantoanquoc.net/no-image.png',
                   )
                 }}
               />
               {imgSize.images.length > 5 && index === 4 && (
-                <Box
+                <AbsoluteFillObject
+                  bgcolor="rgba(0, 0, 0, 0.7)"
                   onMouseDown={() => console.log('show modal last pos:', index)}
-                  sx={{
-                    display: 'flex',
-                    width: '100%',
-                    height: '100%',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  }}
                 >
                   <MuiTypography color={'primary'} variant="h4">
                     +{imgSize.images.length - 5}
                   </MuiTypography>
-                </Box>
+                </AbsoluteFillObject>
               )}
+
+              {progressInfos?.val &&
+                progressInfos.val[index] &&
+                (progressInfos.val[index].percentage ?? 0) < 100 && (
+                  <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
+                    <CircularProgressWithLabel
+                      value={progressInfos.val[index].percentage ?? 0}
+                    />
+                  </AbsoluteFillObject>
+                )}
             </ImageListItem>
           ),
         )}

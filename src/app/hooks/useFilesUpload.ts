@@ -7,9 +7,17 @@ export type FileInfoResult = {
   size: number
 }
 
-export const UploadFiles = () => {
+export type FileInfoProgress = {
+  index?: number
+  percentage?: number
+  fileName?: string
+}
+
+export const useUploadFiles = () => {
   const [selectedFiles, setSelectedFiles] = useState(undefined)
-  const [progressInfos, setProgressInfos] = useState({ val: [] })
+  const [progressInfos, setProgressInfos] = useState<{
+    val: FileInfoProgress[]
+  }>({ val: [] })
   const [message, setMessage] = useState<string[]>([])
   const [fileInfos, setFileInfos] = useState<FileInfoResult[]>([])
   const progressInfosRef = useRef<any>(null)
@@ -46,9 +54,11 @@ export const UploadFiles = () => {
       })
   }
 
-  const uploadFiles = async () => {
+  const uploadFiles = async (f?: any) => {
+    console.log('selectedFiles:', selectedFiles)
     const files = Array.from(selectedFiles as any)
     const _progressInfos = files.map((file: any) => ({
+      index: file.id ?? 0,
       percentage: 0,
       fileName: file.name,
     }))
@@ -57,7 +67,7 @@ export const UploadFiles = () => {
       val: _progressInfos,
     }
 
-    const uploadPromises = files.map((file, index) => upload(index, file))
+    const uploadPromises = files.map((file: any) => upload(file.id ?? 0, file))
 
     const filesResult = await Promise.all(uploadPromises)
     setFileInfos([...filesResult])
@@ -67,7 +77,7 @@ export const UploadFiles = () => {
 
   return [
     (files: any) => selectFiles(files),
-    uploadFiles,
+    (f?: any) => uploadFiles(f),
     progressInfos,
     message,
     fileInfos,

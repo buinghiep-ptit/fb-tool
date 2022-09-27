@@ -31,7 +31,7 @@ const FormTextArea: FC<IFormTextAreaProps> = ({
           <TextareaAutosize
             {...field}
             {...otherProps}
-            minRows={3}
+            minRows={5}
             maxRows={5}
             style={{
               width: '100%',

@@ -3,14 +3,17 @@ import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchPostsCheck } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IFeedDetail, IMediaDetail, IMediaOverall } from 'app/models'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import { IFeedDetail, Image, IMediaOverall } from 'app/models'
 import _ from 'lodash'
 import * as React from 'react'
-import { ImageListView } from './components/ImageListCustomize'
+import { useNavigate } from 'react-router-dom'
 
 export interface Props {}
 
@@ -24,6 +27,8 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function PostCheck(props: Props) {
+  const navigate = useNavigate()
+
   const {
     data: posts,
     isLoading,
@@ -38,6 +43,16 @@ export default function PostCheck(props: Props) {
     },
   )
 
+  const onSuccess = (data: any) => {
+    toastSuccess({ message: 'Duyệt bài đăng thành công' })
+  }
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+
+  const approveFeed = (feedId: number) => {
+    approve(feedId)
+  }
+
   const mediaDefault: IMediaOverall = {
     id: 1,
     mediaFormat: 1,
@@ -50,7 +65,6 @@ export default function PostCheck(props: Props) {
   }
 
   const renderRowItem = (post: IFeedDetail, index: number) => {
-    console.log('post:', post)
     return (
       <>
         <Grid container spacing={2} justifyContent="center">
@@ -58,7 +72,11 @@ export default function PostCheck(props: Props) {
             <Stack flexDirection={'row'} gap={2}>
               <Avatar
                 alt="avatar"
-                src="/assets/images/app/avatar-default.svg"
+                src={
+                  post.customerInfo?.avatar
+                    ? post.customerInfo?.avatar
+                    : '/assets/images/app/avatar-default.svg'
+                }
                 sx={{ width: 56, height: 56 }}
               />
               <Stack flex={1} gap={2}>
@@ -68,7 +86,9 @@ export default function PostCheck(props: Props) {
                   justifyContent={'space-between'}
                 >
                   <Stack flexDirection={'column'}>
-                    <MuiTypography variant="subtitle2">ThangND44</MuiTypography>
+                    <MuiTypography variant="subtitle2">
+                      {post.customerInfo?.fullName}
+                    </MuiTypography>
                     <MuiTypography variant="body2">
                       {post.content}
                     </MuiTypography>
@@ -93,28 +113,31 @@ export default function PostCheck(props: Props) {
                       title="Duyệt"
                       variant="contained"
                       color="primary"
-                      type="submit"
+                      onClick={() => approveFeed(post.id ?? 0)}
+                      loading={approveLoading}
                     />
                     <MuiButton
                       title="Vi phạm"
                       variant="outlined"
                       color="error"
-                      type="submit"
+                      onClick={() =>
+                        navigate(`${post.id ?? 0}/vi-pham`, {
+                          state: { modal: true },
+                        })
+                      }
                     />
                   </Stack>
                 </Stack>
-                {post.medias &&
-                !_.isEmpty(post.medias) &&
-                post.medias[0]?.url?.includes('.mp4') ? (
+                {post.type === 1 ? (
                   <Box width={'50%'}>
                     <MediaViewItem
-                      media={post.medias[0]}
+                      media={post.video as any}
                       orientation="vertical"
                     />
                   </Box>
                 ) : (
                   <Box width={'75%'} mt={-2}>
-                    <ImageListView medias={post.medias} />
+                    <ImageListView medias={post.images as Image[]} />
                   </Box>
                 )}
               </Stack>

@@ -42,6 +42,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     !isFetching && (!memoizedData || !(memoizedData as T[]).length)
 
   const cellFormatter = (cell: any, row: any, value: any) => {
+    if (cell.media) {
+      return cell.media(value)
+    }
     if (cell.status) {
       return cell.status(value)
     }

@@ -23,15 +23,18 @@ export interface IFeed {
 
 export interface IFeedDetail {
   id?: number
+  type?: number // 1: video, 2: images
   idSrcType?: number // Liên kết với 1:Địa danh 2:Điểm camp 4:Sản phẩm
   idSrc?: number
   webUrl?: string | null
   idCustomer?: number
+  customerInfo?: ICustomerInfo
   viewScope?: number // Phạm vi hiển thị 1:Công khai 2:Bạn bè 3:Chỉ mình tôi
   isAllowComment?: number // Cho phép comment 0:Không 1:Có
   content?: string
   status?: number
-  medias?: IMediaOverall[]
+  video?: IMediaOverall
+  images?: IMediaOverall[]
   tags?: ITags[]
   createdBy?: number
   lastModifiedBy?: number
@@ -39,6 +42,15 @@ export interface IFeedDetail {
   dateUpdated?: string
   handledBy?: number
   handleExpireTime?: string | null
+}
+
+export interface ICustomerInfo {
+  id?: number
+  email?: string
+  mobilePhone?: string
+  fullName?: string
+  avatar?: string
+  status?: number
 }
 
 export interface IMediaOverall {
@@ -59,6 +71,17 @@ export interface IMediaDetail {
   duration?: number | null
   height?: number | null
   width?: number | null
+}
+
+export interface Image {
+  id?: number
+  idSrc?: number
+  srcType?: number
+  mediaType?: number
+  mediaFormat?: number
+  url?: string
+  status?: number
+  detail?: IMediaDetail[]
 }
 
 export interface ITags {

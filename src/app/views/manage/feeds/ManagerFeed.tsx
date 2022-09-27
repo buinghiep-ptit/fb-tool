@@ -277,7 +277,7 @@ export default function ManagerFeed(props: Props) {
                   sx={{
                     width: '100%',
                     '& .MuiInputBase-root': {
-                      height: 40,
+                      // height: 40,
                     },
                   }}
                 >

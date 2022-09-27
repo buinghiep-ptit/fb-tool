@@ -48,7 +48,8 @@ export interface TableColumn<T> {
   align?: 'center' | 'right' | 'left'
   status?: (param?: any) => ReactElement | string
   action?: (param?: any) => ReactElement
-  format?: (param: any) => string | null
+  format?: (param: any) => string | null | ReactElement
+  media?: (param: any) => string | null | ReactElement
 }
 
 export interface IUserProfile {

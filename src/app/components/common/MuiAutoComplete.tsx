@@ -59,7 +59,7 @@ export function MuiAutoComplete({
             )
           }}
           renderInput={params => (
-            <CssTextField
+            <TextField
               sx={{ my: 0 }}
               {...params}
               margin="normal"

@@ -49,9 +49,9 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const defaultValues = {
-  email: 'giangcm@fpt.com.vn',
-  password: 'abc123456',
-  rememberMe: true,
+  email: '',
+  password: '',
+  rememberMe: false,
 }
 
 // form field validation schema
@@ -174,7 +174,7 @@ const JwtLogin = () => {
                     color="primary"
                     loading={loading}
                     variant="contained"
-                    sx={{ my: 1, height: 40 }}
+                    sx={{ width: '100%', my: 1, height: 52 }}
                   >
                     Đăng nhập
                   </LoadingButton>

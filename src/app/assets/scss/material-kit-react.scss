@@ -46,3 +46,11 @@ textarea:focus {
   outline: none !important;
   border: 1.5px solid #2f9b42 !important;
 }
+.editor {
+  min-height: 300px;
+  border: 1px solid rgb(215, 215, 215);
+
+  .rdw-editor-main {
+    padding: 0 20px 10px;
+  }
+}

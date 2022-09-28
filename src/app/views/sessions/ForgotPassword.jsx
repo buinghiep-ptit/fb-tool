@@ -22,7 +22,7 @@ import {
   resetPasswordInit,
 } from 'app/apis/auth/auth.service'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'

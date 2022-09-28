@@ -13,19 +13,24 @@ import {
   fetchCampGrounds,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
-import { MuiAutoComplete } from 'app/components/common/MuiAutoComplete'
-import { MuiAutocompleteWithTags } from 'app/components/common/MuiAutocompleteWithTags'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
-import FormTextArea from 'app/components/common/MuiTextarea'
+import { MuiAutocompleteWithTags } from 'app/components/common/MuiRHFAutocompleteWithTags'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { UploadMedias } from 'app/components/common/UploadPreviewer'
+import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { ICustomer, ICustomerResponse, ICustomerTiny, ITags } from 'app/models'
+import { useUploadFiles } from 'app/hooks/useFilesUpload'
+import {
+  ICustomer,
+  ICustomerResponse,
+  ICustomerTiny,
+  IMediaOverall,
+  ITags,
+} from 'app/models'
 import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -56,7 +61,9 @@ const Container = styled('div')<Props>(({ theme }) => ({
 
 export default function ManagerToolPostFeed(props: Props) {
   const [accountList, setAccountList] = useState<ICustomer[]>([])
-  const [files, setFiles] = useState([])
+  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
+    [],
+  )
   const [loading, setLoading] = useState(false)
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: 2,
@@ -157,12 +164,17 @@ export default function ManagerToolPostFeed(props: Props) {
     // methods.setValue('customer', accounts.length && accounts[0])
   }, [methods.setValue, methods.watch('cusType'), customers, customerCampdi])
 
-  const [selectFiles, uploadFiles, progressInfos, message, fileInfos] =
-    useUploadFiles()
+  const [
+    selectFiles,
+    uploadFiles,
+    uploading,
+    progressInfos,
+    message,
+    fileInfos,
+  ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    setLoading(true)
-    uploadFiles()
+    console.log(values)
   }
 
   const createNewFeed = async (payload: any) => {
@@ -172,42 +184,42 @@ export default function ManagerToolPostFeed(props: Props) {
   }
 
   useEffect(() => {
-    if (fileInfos && fileInfos.length) {
-      console.log('getValues:', methods.getValues())
-      const files =
-        fileConfigs.mediaFormat === 1
-          ? Object.assign(
-              {},
-              {
-                mediaType: 6,
-                mediaFormat: 1,
-                url: fileInfos[0].url,
-              },
-            )
-          : fileInfos.map(file =>
-              Object.assign(
-                {},
-                {
-                  mediaType: 6,
-                  mediaFormat: 2,
-                  url: file.url,
-                },
-              ),
-            )
-      const payload = {
-        type: Number(methods.getValues('type')),
-        idSrcType: Number(methods.getValues('cusType')),
-        idSrc: Number(methods.getValues('camp').id),
-        webUrl: methods.getValues('webUrl'),
-        idCustomer: methods.getValues('customer').customerId,
-        content: methods.getValues('content'),
-        video: fileConfigs.mediaFormat === 1 ? files : null,
-        images: fileConfigs.mediaFormat === 2 ? files : [],
-        tags: methods.getValues('hashtag'),
-      }
-      createNewFeed(payload)
-      setLoading(false)
-    }
+    // if (fileInfos && fileInfos.length) {
+    //   console.log('getValues:', methods.getValues())
+    //   const files =
+    //     fileConfigs.mediaFormat === 1
+    //       ? Object.assign(
+    //           {},
+    //           {
+    //             mediaType: 6,
+    //             mediaFormat: 1,
+    //             url: fileInfos[0].url,
+    //           },
+    //         )
+    //       : fileInfos.map(file =>
+    //           Object.assign(
+    //             {},
+    //             {
+    //               mediaType: 6,
+    //               mediaFormat: 2,
+    //               url: file.url,
+    //             },
+    //           ),
+    //         )
+    //   const payload = {
+    //     type: Number(methods.getValues('type')),
+    //     idSrcType: Number(methods.getValues('cusType')),
+    //     idSrc: Number(methods.getValues('camp').id),
+    //     webUrl: methods.getValues('webUrl'),
+    //     idCustomer: methods.getValues('customer').customerId,
+    //     content: methods.getValues('content'),
+    //     video: fileConfigs.mediaFormat === 1 ? files : null,
+    //     images: fileConfigs.mediaFormat === 2 ? files : [],
+    //     tags: methods.getValues('hashtag'),
+    //   }
+    //   createNewFeed(payload)
+    //   setLoading(false)
+    // }
   }, [fileInfos])
 
   useEffect(() => {
@@ -236,10 +248,6 @@ export default function ManagerToolPostFeed(props: Props) {
     }))
     methods.clearErrors('customer')
   }, [methods.watch('cusType')])
-
-  useEffect(() => {
-    return () => files.forEach(file => URL.revokeObjectURL((file as any).url))
-  }, [])
 
   const getTitleLinked = (type?: number | string) => {
     switch (type) {
@@ -413,12 +421,16 @@ export default function ManagerToolPostFeed(props: Props) {
                     }}
                     position="relative"
                   >
-                    {/* <UploadMedias
+                    <UploadPreviewer
                       name="files"
+                      mediasSrcPreviewer={mediasSrcPreviewer}
+                      setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
+                      uploadFiles={uploadFiles}
+                      uploading={uploading}
                       progressInfos={progressInfos}
-                    /> */}
+                    />
                   </Box>
                 </Stack>
               </Grid>

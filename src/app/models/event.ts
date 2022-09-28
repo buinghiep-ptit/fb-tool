@@ -6,7 +6,7 @@ export interface IEventResponse extends IPagingResponse {
 }
 
 export interface IEventOverall {
-  name?: 'string'
+  name?: string
   tags: ITags
   mediaUrl?: string
   startDate?: string

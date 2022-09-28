@@ -38,9 +38,7 @@ export function MuiRHFDatePicker({
           disableFuture={false}
           value={value}
           inputFormat="DD/MM/YYYY"
-          onChange={(value: any) =>
-            onChange(moment(new Date(value)).format('YYYY-MM-DD'))
-          }
+          onChange={(value: any) => onChange(value)}
           renderInput={(params: any) => (
             <TextField
               {...params}

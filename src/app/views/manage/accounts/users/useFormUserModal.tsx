@@ -1,8 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Grid, LinearProgress, MenuItem } from '@mui/material'
+import { Grid, LinearProgress, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import FormInputText from 'app/components/common/MuiInputText'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -35,89 +35,52 @@ const useFormUserModal = (data?: any) => {
         }}
       >
         <FormProvider {...methods}>
-          <Grid container alignItems={'center'} py={1}>
-            <Grid item sm={4} xs={12}>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Tên đăng nhập:*
-              </MuiTypography>
-            </Grid>
-            <Grid item sm={8} xs={12}>
-              <FormInputText
-                type="email"
-                name="email"
-                size="small"
-                placeholder="Nhập tên tài khoản"
-                fullWidth
-                defaultValue={data?.email ? data?.email : ''}
-              />
-            </Grid>
-          </Grid>
-          <Grid container alignItems={'center'} py={1}>
-            <Grid item sm={4} xs={12}>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Email:*
-              </MuiTypography>
-            </Grid>
-            <Grid item sm={8} xs={12}>
-              <FormInputText
-                type="email"
-                name="email"
-                placeholder="Nhập Email"
-                size="small"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-          <Grid container alignItems={'center'} py={1}>
-            <Grid item sm={4} xs={12}>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Họ và tên:*
-              </MuiTypography>
-            </Grid>
-            <Grid item sm={8} xs={12}>
-              <FormInputText
-                type="text"
-                name="name"
-                placeholder="Nhập họ và tên"
-                size="small"
-                fullWidth
-                defaultValue=""
-              />
-            </Grid>
-          </Grid>
-          <Grid container alignItems={'center'} py={1}>
-            <Grid item sm={4} xs={12}>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Trạng thái:*
-              </MuiTypography>
-            </Grid>
-            <Grid item sm={8} xs={12}>
-              <SelectDropDown
-                name="status"
-                defaultValue={data?.status ? data?.status : 1}
-              >
-                <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={-1}>Không hoạt động</MenuItem>
-              </SelectDropDown>
-            </Grid>
-          </Grid>
-          <Grid container alignItems={'center'} py={1}>
-            <Grid item sm={4} xs={12}>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Nhóm quyền:*
-              </MuiTypography>
-            </Grid>
-            <Grid item sm={8} xs={12}>
-              <SelectDropDown
-                name="role"
-                defaultValue={data?.role ? data?.role : 1}
-              >
-                <MenuItem value={1}>Admin</MenuItem>
-                <MenuItem value={2}>CS</MenuItem>
-                <MenuItem value={3}>Sale</MenuItem>
-              </SelectDropDown>
-            </Grid>
-          </Grid>
+          <Stack gap={3} py={3}>
+            <FormInputText
+              label={'Tên đăng nhập *'}
+              type="email"
+              name="email"
+              size="small"
+              placeholder="Nhập tên tài khoản"
+              fullWidth
+              defaultValue={data?.email ? data?.email : ''}
+            />
+            <FormInputText
+              label={'Email *'}
+              type="email"
+              name="email"
+              placeholder="Nhập Email"
+              size="small"
+              fullWidth
+            />
+            <FormInputText
+              label={'Họ và tên *'}
+              type="text"
+              name="name"
+              placeholder="Nhập họ và tên"
+              size="small"
+              fullWidth
+              defaultValue=""
+            />
+            <SelectDropDown
+              label=" Trạng thái *"
+              name="status"
+              defaultValue={data?.status ? data?.status : 1}
+            >
+              <MenuItem value={1}>Hoạt động</MenuItem>
+              <MenuItem value={-1}>Không hoạt động</MenuItem>
+            </SelectDropDown>
+
+            <SelectDropDown
+              label="Nhóm quyền *"
+              name="role"
+              defaultValue={data?.role ? data?.role : 1}
+            >
+              <MenuItem value={1}>Admin</MenuItem>
+              <MenuItem value={2}>CS</MenuItem>
+              <MenuItem value={3}>Sale</MenuItem>
+            </SelectDropDown>
+          </Stack>
         </FormProvider>
         {isLoading && <LinearProgress />}
       </Box>

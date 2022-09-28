@@ -53,6 +53,7 @@
     "react-dropzone": "^14.2.2",
     "react-hook-form": "^7.34.2",
     "react-material-ui-form-validator": "^3.0.0",
+    "react-number-format": "^5.0.0",
     "react-perfect-scrollbar": "^1.5.8",
     "react-player": "^2.11.0",
     "react-redux": "^7.2.6",

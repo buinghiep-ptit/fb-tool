@@ -1,5 +1,6 @@
 import {
   InputAdornment,
+  InputBaseComponentProps,
   InputProps,
   styled,
   TextField,
@@ -8,15 +9,6 @@ import {
 import * as React from 'react'
 import { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
-
-export type IFormInputTextProps = {
-  iconStart?: React.ReactElement
-  iconEnd?: React.ReactElement
-  name: string
-  label?: string
-  defaultValue?: string
-  inputProps?: InputProps
-} & TextFieldProps
 
 export const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
@@ -32,10 +24,23 @@ export const CssTextField = styled(TextField)({
   },
 })
 
+export type IFormInputTextProps = {
+  formatType?: 'currency' | 'phone' | 'default'
+  inputComponent?: React.ElementType<InputBaseComponentProps> | undefined
+  iconStart?: React.ReactElement
+  iconEnd?: React.ReactElement
+  name: string
+  label?: string
+  defaultValue?: string
+  inputProps?: InputProps
+} & TextFieldProps
+
 const FormInputText: FC<IFormInputTextProps> = ({
   name,
   label = '',
+  formatType = 'default',
   defaultValue,
+  inputComponent,
   iconStart,
   iconEnd,
   inputProps,
@@ -53,6 +58,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
       render={({ field }) => (
         <CssTextField
           {...field}
+          value={formatType !== 'default' ? 0 : field.value}
           {...otherProps}
           label={label}
           size="medium"
@@ -67,6 +73,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
               cursor: iconEnd ? 'pointer' : 'default',
               caretColor: '#218332',
             },
+            inputComponent: inputComponent,
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,

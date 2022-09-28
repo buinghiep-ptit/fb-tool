@@ -6,9 +6,9 @@ import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -194,25 +194,19 @@ export default function AdminAccounts(props: Props) {
           <FormProvider {...methods}>
             <Grid container spacing={2}>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Tài khoản
-                </MuiTypography>
                 <FormInputText
+                  label={'Tài khoản'}
                   type="text"
                   name="account"
                   defaultValue=""
                   size="small"
                   placeholder="Nhập tên tài khoản"
                   fullWidth
-                  // focused
-                  // required
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Email
-                </MuiTypography>
                 <FormInputText
+                  label={'Email'}
                   type="email"
                   name="email"
                   defaultValue=""
@@ -222,10 +216,7 @@ export default function AdminAccounts(props: Props) {
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Quyền
-                </MuiTypography>
-                <SelectDropDown name="role">
+                <SelectDropDown name="role" label="Quyền">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value="1">Admin</MenuItem>
                   <MenuItem value="2">CS</MenuItem>
@@ -233,10 +224,7 @@ export default function AdminAccounts(props: Props) {
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Trạng thái
-                </MuiTypography>
-                <SelectDropDown name="status">
+                <SelectDropDown name="status" label="Trạng thái">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value="1">Hoạt động</MenuItem>
                   <MenuItem value="-1">Không hoạt động</MenuItem>

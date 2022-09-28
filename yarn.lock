@@ -9356,6 +9356,13 @@ react-material-ui-form-validator@^3.0.0:
     prop-types "^15.0.0"
     react-form-validator-core "1.1.2"
 
+react-number-format@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/react-number-format/-/react-number-format-5.0.0.tgz#db82a847def927a543bd661d9522855d3e09927a"
+  integrity sha512-wrGJd3Ygv/UHCMyoixjRySM/RQ7SY6WOppL5nL/nnd49Wz2xUMeVIHEkclnerBE2eicmEBevO3iaIkJp2izQBQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-perfect-scrollbar@^1.5.8:
   version "1.5.8"
   resolved "https://registry.yarnpkg.com/react-perfect-scrollbar/-/react-perfect-scrollbar-1.5.8.tgz#380959387a325c5c9d0268afc08b3f73ed5b3078"

@@ -6,9 +6,9 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCustomers } from 'app/apis/accounts/customer.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -187,10 +187,8 @@ export default function CustomerAccounts(props: Props) {
           <FormProvider {...methods}>
             <Grid container spacing={2}>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Email, SĐT, Tên hiển thị
-                </MuiTypography>
                 <FormInputText
+                  label={'Email, SĐT, Tên hiển thị'}
                   type="text"
                   name="search"
                   size="small"
@@ -200,20 +198,14 @@ export default function CustomerAccounts(props: Props) {
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Loại tài khoản
-                </MuiTypography>
-                <SelectDropDown name="cusType">
+                <SelectDropDown name="cusType" label="Loại tài khoản">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value={1}>Thường</MenuItem>
                   <MenuItem value={2}>KOL</MenuItem>
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Trạng thái
-                </MuiTypography>
-                <SelectDropDown name="status">
+                <SelectDropDown name="status" label="Trạng thái">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
@@ -222,9 +214,6 @@ export default function CustomerAccounts(props: Props) {
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  {'Tìm kiếm'}
-                </MuiTypography>
                 <MuiButton
                   title="Tìm kiếm"
                   variant="contained"

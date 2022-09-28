@@ -11,6 +11,7 @@ import {
   FormControl,
   Grid,
   IconButton,
+  InputLabel,
   MenuItem,
   Select,
   Stack,
@@ -21,10 +22,10 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchFeeds } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { MuiCheckBox } from 'app/components/common/MuiCheckbox'
-import FormInputText from 'app/components/common/MuiInputText'
+import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -202,10 +203,8 @@ export default function ManagerFeed(props: Props) {
           <FormProvider {...methods}>
             <Grid container spacing={2}>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Email, SĐT, Tên hiển thị
-                </MuiTypography>
                 <FormInputText
+                  label={'Email, SĐT, Tên hiển thị'}
                   type="text"
                   name="search"
                   size="small"
@@ -229,10 +228,8 @@ export default function ManagerFeed(props: Props) {
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Hashtag
-                </MuiTypography>
                 <FormInputText
+                  label={'Hashtag'}
                   type="text"
                   name="hashtag"
                   placeholder="Nhập hashtag"
@@ -254,10 +251,7 @@ export default function ManagerFeed(props: Props) {
                 />
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Trạng thái
-                </MuiTypography>
-                <SelectDropDown name="status">
+                <SelectDropDown name="status" label="Trạng thái">
                   <MenuItem value="all">Tất cả</MenuItem>
                   <MenuItem value="1">Đã duyệt</MenuItem>
                   <MenuItem value="0">Chờ hậu kiểm</MenuItem>
@@ -266,13 +260,6 @@ export default function ManagerFeed(props: Props) {
                 </SelectDropDown>
               </Grid>
               <Grid item sm={3} xs={12}>
-                <MuiTypography
-                  variant="subtitle2"
-                  pb={1}
-                  sx={{ opacity: 0.35 }}
-                >
-                  Phạm vi
-                </MuiTypography>
                 <FormControl
                   sx={{
                     width: '100%',
@@ -281,6 +268,10 @@ export default function ManagerFeed(props: Props) {
                     },
                   }}
                 >
+                  <InputLabel id="demo-simple-select-helper-label">
+                    {'Phạm vi'}
+                  </InputLabel>
+
                   <Select defaultValue={'all'} name="range" disabled>
                     <MenuItem value="all">Công khai</MenuItem>
                     <MenuItem value="friends">Bạn bè</MenuItem>

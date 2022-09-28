@@ -1,13 +1,8 @@
-import {
-  CircularProgress,
-  ImageList,
-  ImageListItem,
-  Typography,
-} from '@mui/material'
+import { CircularProgress, ImageList, ImageListItem } from '@mui/material'
 import { Box } from '@mui/system'
-import { FileInfoProgress } from 'app/hooks/useFilesUpload'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { Image, IMediaDetail, IMediaOverall } from 'app/models'
+import { FileInfoProgress } from 'app/hooks/useFilesUpload'
+import { IMediaOverall } from 'app/models'
 import * as React from 'react'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 
@@ -151,10 +146,15 @@ export function CircularProgressWithLabel(props: ProgressProps) {
 
 export interface IImageListViewProps {
   progressInfos?: { val: FileInfoProgress[] } // 0: preview upload, 1: preview data
-  medias?: Image[]
+  medias?: IMediaOverall[]
+  oldMedias?: IMediaOverall[]
 }
 
-export function ImageListView({ progressInfos, medias }: IImageListViewProps) {
+export function ImageListView({
+  progressInfos,
+  medias,
+  oldMedias,
+}: IImageListViewProps) {
   const targetRef = React.useRef(null)
   const dimensions = useDimensions(targetRef)
   const imgSize = React.useMemo(
@@ -188,7 +188,7 @@ export function ImageListView({ progressInfos, medias }: IImageListViewProps) {
                 borderRadius: 1,
                 overflow: 'hidden',
               }}
-              key={item.id}
+              key={index}
               cols={item.cols || 1}
               rows={item.rows || 1}
             >
@@ -228,11 +228,15 @@ export function ImageListView({ progressInfos, medias }: IImageListViewProps) {
               )}
 
               {progressInfos?.val &&
-                progressInfos.val[index] &&
-                (progressInfos.val[index].percentage ?? 0) < 100 && (
+                progressInfos.val[index - (oldMedias?.length ?? 0)] &&
+                (progressInfos.val[index - (oldMedias?.length ?? 0)]
+                  .percentage ?? 0) < 100 && (
                   <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
                     <CircularProgressWithLabel
-                      value={progressInfos.val[index].percentage ?? 0}
+                      value={
+                        progressInfos.val[index - (oldMedias?.length ?? 0)]
+                          .percentage ?? 0
+                      }
                     />
                   </AbsoluteFillObject>
                 )}

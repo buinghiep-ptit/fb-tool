@@ -81,7 +81,7 @@ export interface Image {
   mediaFormat?: number
   url?: string
   status?: number
-  detail?: IMediaDetail[]
+  detail?: IMediaDetail
 }
 
 export interface ITags {

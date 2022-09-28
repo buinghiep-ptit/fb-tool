@@ -1,4 +1,4 @@
-import { uploadImage } from 'app/apis/uploads/image.service'
+import { uploadImage } from 'app/apis/uploads/upload.service'
 import { useRef, useState } from 'react'
 
 export type FileInfoResult = {
@@ -14,20 +14,22 @@ export type FileInfoProgress = {
 }
 
 export const useUploadFiles = () => {
-  const [selectedFiles, setSelectedFiles] = useState(undefined)
+  const [uploading, setUploading] = useState<boolean>(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [progressInfos, setProgressInfos] = useState<{
     val: FileInfoProgress[]
   }>({ val: [] })
   const [message, setMessage] = useState<string[]>([])
   const [fileInfos, setFileInfos] = useState<FileInfoResult[]>([])
-  const progressInfosRef = useRef<any>(null)
+  const progressInfosRef = useRef<{ val: FileInfoProgress[] }>({ val: [] })
 
   const selectFiles = (selectedFiles: any) => {
     setSelectedFiles(selectedFiles)
     setProgressInfos({ val: [] })
   }
 
-  const upload = (idx: number, file: any) => {
+  const upload = (file: any, idx: number) => {
+    if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
 
     return uploadImage(file, (event: any) => {
@@ -54,11 +56,10 @@ export const useUploadFiles = () => {
       })
   }
 
-  const uploadFiles = async (f?: any) => {
-    console.log('selectedFiles:', selectedFiles)
-    const files = Array.from(selectedFiles as any)
-    const _progressInfos = files.map((file: any) => ({
-      index: file.id ?? 0,
+  const uploadFiles = async (files?: File[]) => {
+    setUploading(true)
+    const selectedFilesToArr = Array.from(files ?? [])
+    const _progressInfos = selectedFilesToArr.map(file => ({
       percentage: 0,
       fileName: file.name,
     }))
@@ -67,17 +68,20 @@ export const useUploadFiles = () => {
       val: _progressInfos,
     }
 
-    const uploadPromises = files.map((file: any) => upload(file.id ?? 0, file))
+    const uploadPromises = selectedFilesToArr.map((file, index) =>
+      upload(file, index),
+    )
 
     const filesResult = await Promise.all(uploadPromises)
-    setFileInfos([...filesResult])
-
+    setFileInfos(prev => [...prev, ...filesResult])
+    setUploading(false)
     setMessage([])
   }
 
   return [
-    (files: any) => selectFiles(files),
-    (f?: any) => uploadFiles(f),
+    (files?: File[]) => selectFiles(files),
+    (files?: File[]) => uploadFiles(files),
+    uploading,
     progressInfos,
     message,
     fileInfos,

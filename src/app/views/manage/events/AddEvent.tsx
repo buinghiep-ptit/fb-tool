@@ -5,29 +5,26 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { createEvent, getEventDetail } from 'app/apis/events/event.service'
+import { getEventDetail } from 'app/apis/events/event.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import { MuiAutocompleteWithTags } from 'app/components/common/MuiAutocompleteWithTags'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { MuiCheckBox } from 'app/components/common/MuiCheckbox'
-import FormInputText from 'app/components/common/MuiInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
+import { MuiAutocompleteWithTags } from 'app/components/common/MuiRHFAutocompleteWithTags'
+import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { UploadMedias } from 'app/components/common/UploadPreviewer'
-import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
+import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useCreateEvent } from 'app/hooks/queries/useEventsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
@@ -76,24 +73,33 @@ export default function AddEvent(props: Props) {
   })
 
   const validationSchema = Yup.object().shape({
-    startDate: Yup.string()
-      .nullable()
-      .test('startDate', 'Ngày bắt đầu phải nhỏ hơn ngày kết thúc', value => {
-        console.log(
-          moment().diff(moment(new Date(value as any), 'YYYY-MM-DD'), 'years'),
-        )
-        return moment().diff(moment(value, 'YYYY-MM-DD'), 'days') >= 1
-      })
-      .required('Chọn ngày bắt đầu'),
-    endDate: Yup.string().nullable().required('Chọn ngày kết thúc'),
     name: Yup.string().required('Tên không được bỏ trống'),
-    files: Yup.mixed()
-      .required('Vui lòng chọn file')
-      .test(
-        'fileSize',
-        'Dung lượng file quá lớn (10MB/ảnh và 3phút/video)',
-        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-      ),
+    startDate: Yup.date()
+      //   .min(new Date(), 'Tối thiều là hôm nay')
+      .typeError('Sai dịnh dạng.')
+      .nullable()
+      .required('Chọn ngày bắt đầu'),
+    endDate: Yup.date()
+      .when('startDate', (startDate, yup) => {
+        if (startDate && startDate != 'Invalid Date') {
+          const dayAfter = new Date(startDate.getTime() + 86400000)
+          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+        }
+        return yup
+      })
+      .typeError('Sai định dạng.')
+      .nullable()
+      .required('Chọn ngày kết thúc.'),
+    amount: Yup.string().nullable(),
+    // files: Yup.mixed()
+    //   .required('Vui lòng chọn file')
+    //   .test(
+    //     'fileSize',
+    //     fileConfigs.mediaFormat === 1
+    //       ? 'Dung lượng video tối đa 3phút'
+    //       : 'Dung lượng ảnh tối đa 10MB/ảnh',
+    //     files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
+    //   ),
   })
 
   const methods = useForm<SchemaType>({
@@ -102,8 +108,14 @@ export default function AddEvent(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const [selectFiles, uploadFiles, progressInfos, message, fileInfos] =
-    useUploadFiles()
+  const [
+    selectFiles,
+    uploadFiles,
+    uploading,
+    progressInfos,
+    message,
+    fileInfos,
+  ] = useUploadFiles()
 
   const {
     data: event,
@@ -124,8 +136,11 @@ export default function AddEvent(props: Props) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
       defaultValues.hashtag = event.tags
-      defaultValues.amount = event.amount
+      defaultValues.amount = event.amount ?? 0
       defaultValues.status = event.status
+      defaultValues.editor_content = event.content
+      defaultValues.startDate = event.startDate
+      defaultValues.endDate = event.endDate
       defaultValues.editor_content = event.content
 
       setMediasSrcPreviewer(event.medias ?? [])
@@ -136,52 +151,53 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     console.log(values)
-    setLoading(true)
-    uploadFiles()
+    console.log(
+      'a:',
+      moment(new Date(values.startDate as any)).format('YYYY-MM-DD'),
+    )
   }
-
-  const createNewEvent = async (payload: any) => {
-    try {
-      const response = await createEvent(payload)
-      setLoading(false)
-    } catch (error) {}
+  const onRowUpdateSuccess = (data: any) => {
+    toastSuccess({ message: 'Thêm mới thành công' })
   }
+  const { mutate: add } = useCreateEvent(onRowUpdateSuccess)
 
   useEffect(() => {
-    if (fileInfos && fileInfos.length) {
-      console.log('getValues:', methods.getValues())
-      const files =
-        fileConfigs.mediaFormat === 1
-          ? [
-              {
-                mediaType: 6,
-                mediaFormat: 1,
-                url: fileInfos[0].url,
-              },
-            ]
-          : fileInfos.map(file =>
-              Object.assign(
-                {},
-                {
-                  mediaType: 6,
-                  mediaFormat: 2,
-                  url: file.url,
-                },
-              ),
-            )
-      const payload = {
-        name: methods.getValues('name'),
-        content: methods.getValues('editor_content'),
-        medias: files,
-        isEveryYear: methods.getValues('isEveryYear') ? 1 : 0,
-        startDate: '2022-09-27',
-        endDate: '2022-09-27',
-        amount: Number(methods.getValues('amount') ?? 0),
-        status: Number(methods.getValues('status') ?? -1),
-        tags: methods.getValues('hashtag'),
-      }
-      createNewEvent(payload)
-    }
+    // if (fileInfos && fileInfos.length) {
+    //   console.log('getValues:', methods.getValues())
+    //   const files =
+    //     fileConfigs.mediaFormat === 1
+    //       ? [
+    //           {
+    //             mediaType: 6,
+    //             mediaFormat: 1,
+    //             url: fileInfos[0].url,
+    //           },
+    //         ]
+    //       : fileInfos.map(file =>
+    //           Object.assign(
+    //             {},
+    //             {
+    //               mediaType: 6,
+    //               mediaFormat: 2,
+    //               url: file.url,
+    //             },
+    //           ),
+    //         )
+    //   const payload: IEventDetail = {
+    //     name: methods.getValues('name'),
+    //     content: methods.getValues('editor_content'),
+    //     medias: files,
+    //     isEveryYear: methods.getValues('isEveryYear') ? 1 : 0,
+    //     startDate: '2022-09-27',
+    //     endDate: '2022-09-27',
+    //     amount: Number(methods.getValues('amount') ?? 0),
+    //     status: Number(methods.getValues('status') ?? -1),
+    //     tags: methods.getValues('hashtag') ?? [],
+    //   }
+    //   //   add(payload)
+    //   setLoading(false)
+    //   // reset values
+    // }
   }, [fileInfos])
 
   useEffect(() => {
@@ -237,7 +253,6 @@ export default function AddEvent(props: Props) {
                     <Grid item sm={6} xs={6}>
                       <MuiButton
                         title="Lưu"
-                        loading={false}
                         variant="contained"
                         color="primary"
                         type="submit"
@@ -265,7 +280,6 @@ export default function AddEvent(props: Props) {
                       name="name"
                       label={'Tên sự kiện'}
                       defaultValue=""
-                      size="small"
                       placeholder="Nhập tên events"
                       fullWidth
                     />
@@ -315,19 +329,17 @@ export default function AddEvent(props: Props) {
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
                   </Stack>
 
-                  <Stack>
-                    <FormInputText
-                      type="number"
-                      name="amount"
-                      label={'Giá tham gia'}
-                      defaultValue=""
-                      placeholder="0"
-                      fullWidth
-                      iconEnd={
-                        <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
-                      }
-                    />
-                  </Stack>
+                  <MuiRHFNumericFormatInput
+                    type="text"
+                    name="amount"
+                    label="Giá tham gia"
+                    placeholder="Nhập giá"
+                    defaultValue=""
+                    iconEnd={
+                      <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                    }
+                    fullWidth
+                  />
 
                   <Stack>
                     <SelectDropDown name="status" label="Trạng thái">
@@ -358,12 +370,14 @@ export default function AddEvent(props: Props) {
                     }}
                     position="relative"
                   >
-                    <UploadMedias
+                    <UploadPreviewer
                       name="files"
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
+                      uploadFiles={uploadFiles}
+                      uploading={uploading}
                       progressInfos={progressInfos}
                     />
                   </Box>
@@ -375,12 +389,7 @@ export default function AddEvent(props: Props) {
                   <MuiTypography variant="subtitle2" pb={1}>
                     Nội dung
                   </MuiTypography>
-                  <Controller
-                    name="editor_content"
-                    control={methods.control}
-                    defaultValue=""
-                    render={({ field }) => <WYSIWYGEditor {...field} />}
-                  />
+                  <RHFWYSIWYGEditor name="editor_content" />
                 </Stack>
               </Grid>
             </Grid>

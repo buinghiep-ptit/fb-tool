@@ -27,9 +27,9 @@ import {
 } from 'app/apis/accounts/customer.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -254,165 +254,137 @@ export default function CustomerDetail(props: Props) {
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
           <FormProvider {...methods}>
             <Grid container spacing={3}>
-              <Grid item sm={7} xs={12}>
-                <Box pb={0.5}>
-                  <Grid container alignItems={'center'} pb={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">Email:</MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <FormInputText
-                        type="email"
-                        name="email"
-                        placeholder="Nhập Email"
-                        size="small"
-                        fullWidth
-                        defaultValue={customer?.data?.email ?? ''}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        Số điện thoại:
-                      </MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <FormInputText
-                        type="text"
-                        name="mobilePhone"
-                        size="small"
-                        placeholder="Nhập SĐT"
-                        fullWidth
-                        defaultValue={customer?.data?.mobilePhone ?? ''}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        Tên hiển thị:
-                      </MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <FormInputText
-                        type="text"
-                        name="fullName"
-                        placeholder="Nhập họ và tên"
-                        size="small"
-                        fullWidth
-                        defaultValue={customer?.data?.fullName ?? ''}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        OTP trong ngày:
-                      </MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <Stack flexDirection={'row'} alignItems={'center'}>
-                        <Box flex={1}>
-                          <SelectDropDown
-                            name="otp"
-                            defaultValue={
-                              (customer?.data?.otpCount &&
-                                customer?.data?.otpCount[0]?.type) ??
-                              0
-                            }
-                          >
-                            {customer?.data?.otpCount?.length ? (
-                              customer?.data?.otpCount?.map(item => (
-                                <MenuItem key={item.type} value={item.type}>
-                                  {convertOtpToLabel(item.type ?? 0)}
-                                </MenuItem>
-                              ))
-                            ) : (
-                              <MenuItem value={0}>{'number'}</MenuItem>
-                            )}
-                          </SelectDropDown>
-                        </Box>
-
-                        <RHFLabel
-                          control={methods.control}
-                          name={'otp'}
-                          options={customer?.data?.otpCount ?? []}
-                        />
-
-                        <MuiButton
-                          onClick={() =>
-                            addOtpCount({
-                              customerId: (customerId ?? 0) as number,
-                              otpType: methods.getValues(
-                                'otp',
-                              ) as unknown as string,
-                            })
-                          }
-                          loading={addOtpLoading}
-                          title="Thêm lượt"
-                          variant="outlined"
-                          color="primary"
-                          sx={{ flex: 1 }}
-                          startIcon={<AddBox />}
-                        />
-                      </Stack>
-                    </Grid>
-                  </Grid>
-
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        Đăng ký bằng:
-                      </MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <MuiTypography
-                        variant="subtitle2"
-                        pb={1}
-                        color="primary"
-                        sx={{ textDecorationLine: 'underline' }}
+              <Grid item sm={6} xs={12}>
+                <Stack gap={3}>
+                  <FormInputText
+                    label={'Email'}
+                    type="email"
+                    name="email"
+                    placeholder="Nhập Email"
+                    size="small"
+                    fullWidth
+                    defaultValue={customer?.data?.email ?? ''}
+                  />
+                  <FormInputText
+                    label={' Số điện thoại'}
+                    type="text"
+                    name="mobilePhone"
+                    size="small"
+                    placeholder="Nhập SĐT"
+                    fullWidth
+                    defaultValue={customer?.data?.mobilePhone ?? ''}
+                  />
+                  <FormInputText
+                    label={'Tên hiển thị'}
+                    type="text"
+                    name="fullName"
+                    placeholder="Nhập họ và tên"
+                    size="small"
+                    fullWidth
+                    defaultValue={customer?.data?.fullName ?? ''}
+                  />
+                  <Stack flexDirection={'row'} alignItems={'center'}>
+                    <Box flex={1}>
+                      <SelectDropDown
+                        label="OTP trong ngày"
+                        name="otp"
+                        defaultValue={
+                          (customer?.data?.otpCount &&
+                            customer?.data?.otpCount[0]?.type) ??
+                          0
+                        }
                       >
-                        {customer?.data?.registeredBy}
-                      </MuiTypography>
+                        {customer?.data?.otpCount?.length ? (
+                          customer?.data?.otpCount?.map(item => (
+                            <MenuItem key={item.type} value={item.type}>
+                              {convertOtpToLabel(item.type ?? 0)}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem value={0}>{'number'}</MenuItem>
+                        )}
+                      </SelectDropDown>
+                    </Box>
+
+                    <RHFLabel
+                      control={methods.control}
+                      name={'otp'}
+                      options={customer?.data?.otpCount ?? []}
+                    />
+
+                    <MuiButton
+                      onClick={() =>
+                        addOtpCount({
+                          customerId: (customerId ?? 0) as number,
+                          otpType: methods.getValues(
+                            'otp',
+                          ) as unknown as string,
+                        })
+                      }
+                      loading={addOtpLoading}
+                      title="Thêm lượt"
+                      variant="outlined"
+                      color="primary"
+                      sx={{ flex: 1 }}
+                      startIcon={<AddBox />}
+                    />
+                  </Stack>
+
+                  <Stack gap={1.5}>
+                    <Grid container alignItems={'center'}>
+                      <Grid item sm={6} md={4} xs={6}>
+                        <MuiTypography variant="subtitle2">
+                          Đăng ký bằng:
+                        </MuiTypography>
+                      </Grid>
+                      <Grid item sm={6} md={8} xs={6}>
+                        <MuiTypography
+                          variant="subtitle2"
+                          pb={1}
+                          color="primary"
+                          sx={{ textDecorationLine: 'underline' }}
+                        >
+                          {customer?.data?.registeredBy}
+                        </MuiTypography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        Lần cuối đăng nhập:
-                      </MuiTypography>
+                    <Grid container alignItems={'center'}>
+                      <Grid item sm={6} md={4} xs={6}>
+                        <MuiTypography variant="subtitle2">
+                          Lần cuối đăng nhập:
+                        </MuiTypography>
+                      </Grid>
+                      <Grid item sm={6} md={8} xs={6}>
+                        <MuiTypography variant="subtitle2" color="primary">
+                          {customer?.data?.lastLoginDate
+                            ? ISODateTimeFormatter(
+                                customer?.data?.lastLoginDate ?? '',
+                              )
+                            : ''}
+                        </MuiTypography>
+                      </Grid>
                     </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <MuiTypography variant="subtitle2" color="primary">
-                        {customer?.data?.lastLoginDate
-                          ? ISODateTimeFormatter(
-                              customer?.data?.lastLoginDate ?? '',
-                            )
-                          : ''}
-                      </MuiTypography>
+                    <Grid container alignItems={'center'}>
+                      <Grid item sm={6} md={4} xs={6}>
+                        <MuiTypography variant="subtitle2">
+                          Mã giới thiệu:
+                        </MuiTypography>
+                      </Grid>
+                      <Grid item sm={6} md={8} xs={6}>
+                        <MuiTypography variant="subtitle2" color="primary">
+                          {customer?.data?.referralCode}
+                        </MuiTypography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                  <Grid container alignItems={'center'} py={1}>
-                    <Grid item sm={4} md={3} xs={12}>
-                      <MuiTypography variant="subtitle2">
-                        Mã giới thiệu:
-                      </MuiTypography>
-                    </Grid>
-                    <Grid item sm={8} md={9} xs={12}>
-                      <MuiTypography variant="subtitle2" color="primary">
-                        {customer?.data?.referralCode}
-                      </MuiTypography>
-                    </Grid>
-                  </Grid>
-                </Box>
+                  </Stack>
+                </Stack>
 
                 {updateLoading && <LinearProgress />}
 
                 {customer.data?.status !== -1 && (
                   <Box pt={3}>
                     <Grid container spacing={2}>
-                      <Grid item sm={3} xs={6}>
+                      <Grid item sm={6} xs={6}>
                         <MuiButton
                           disabled={
                             !!Object.keys(methods.formState.errors).length
@@ -426,7 +398,7 @@ export default function CustomerDetail(props: Props) {
                           startIcon={<LockClockSharp />}
                         />
                       </Grid>
-                      <Grid item sm={3} xs={6}>
+                      <Grid item sm={6} xs={6}>
                         <MuiButton
                           onClick={() => methods.reset()}
                           title="Huỷ"
@@ -441,7 +413,7 @@ export default function CustomerDetail(props: Props) {
                 )}
               </Grid>
 
-              <Grid item sm={5} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <Stack alignItems={'center'} justifyContent={'center'}>
                   <Stack alignItems={'center'} px={3} gap={2}>
                     <Box
@@ -587,6 +559,7 @@ export default function CustomerDetail(props: Props) {
 
                     <Stack flexDirection={'row'} alignItems="center">
                       <SelectDropDown
+                        label="Loại TK"
                         name="type"
                         defaultValue={customer?.data?.type ?? 1}
                         sx={{ minWidth: 120 }}

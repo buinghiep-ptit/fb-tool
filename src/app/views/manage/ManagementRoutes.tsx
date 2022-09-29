@@ -18,25 +18,35 @@ const CustomerDetail = Loadable(
 const ChangePassword = Loadable(
   lazy(() => import('./accounts/customers/details/ChangePassword')),
 )
+const LockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/LockCustomer')),
+)
+const UnlockCustomer = Loadable(
+  lazy(() => import('./accounts/customers/details/UnlockCustomer')),
+)
 const CustomerHistory = Loadable(
   lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
 )
 
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
+const PostCheck = Loadable(lazy(() => import('./feeds/PostCheck')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )
+const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
+const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
+
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetiing')),
 )
-const ManagerServiceDetail = Loadable(
-  lazy(() => import('./managerServices/ServiceDetail')),
-)
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
+)
+const ManagerServiceDetail = Loadable(
+  lazy(() => import('./managerServices/ServiceDetail')),
 )
 const DetailPlace = Loadable(
   lazy(() => import('./managerPlace/detailPlace/detailPlace')),
@@ -91,6 +101,14 @@ const ManagementRoutes = [
             path: 'doi-mat-khau',
             element: <ChangePassword title="Đổi mật khẩu" />,
           },
+          {
+            path: 'mo-khoa-tai-khoan',
+            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+          },
+          {
+            path: 'khoa-tai-khoan',
+            element: <LockCustomer title="Khoá tài khoản" />,
+          },
         ],
       },
       { path: 'history', element: <CustomerHistory /> },
@@ -106,10 +124,27 @@ const ManagementRoutes = [
     ),
     // children: [{ path: 'report-infringe', element: <ReportInfringe /> }],
   },
-  { path: '/quan-ly-feeds/:id', element: <FeedDetail /> },
+  { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
-  { path: '/quan-ly-feeds/xet-duyet', element: <ReportInfringe /> },
+  {
+    path: '/quan-ly-feeds/hau-kiem',
+    element: (
+      <>
+        <PostCheck />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':feedId/vi-pham',
+        element: <ReportInfringe title="Vi phạm" />,
+      },
+    ],
+  },
   { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
+  { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
+  { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
+  { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,

@@ -18,7 +18,7 @@ export interface IButtonProps extends ButtonProps {
 
 const StyledButton = styled(Button)({
   boxShadow: 'none',
-  height: 40,
+  height: 52,
 })
 
 export function MuiButton({

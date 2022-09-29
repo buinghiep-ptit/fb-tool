@@ -1,5 +1,6 @@
 import {
   InputAdornment,
+  InputBaseComponentProps,
   InputProps,
   styled,
   TextField,
@@ -9,17 +10,12 @@ import * as React from 'react'
 import { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
-export type IFormInputTextProps = {
-  iconStart?: React.ReactElement
-  iconEnd?: React.ReactElement
-  name: string
-  defaultValue?: string
-  inputProps?: InputProps
-} & TextFieldProps
-
-const CssTextField = styled(TextField)({
+export const CssTextField = styled(TextField)({
   '& .MuiInputBase-root': {
-    height: 40,
+    // height: 40,
+    '&:focused': {
+      caretColor: '#0062cc',
+    },
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
@@ -28,9 +24,23 @@ const CssTextField = styled(TextField)({
   },
 })
 
+export type IFormInputTextProps = {
+  formatType?: 'currency' | 'phone' | 'default'
+  inputComponent?: React.ElementType<InputBaseComponentProps> | undefined
+  iconStart?: React.ReactElement
+  iconEnd?: React.ReactElement
+  name: string
+  label?: string
+  defaultValue?: string
+  inputProps?: InputProps
+} & TextFieldProps
+
 const FormInputText: FC<IFormInputTextProps> = ({
   name,
+  label = '',
+  formatType = 'default',
   defaultValue,
+  inputComponent,
   iconStart,
   iconEnd,
   inputProps,
@@ -48,7 +58,10 @@ const FormInputText: FC<IFormInputTextProps> = ({
       render={({ field }) => (
         <CssTextField
           {...field}
+          value={formatType !== 'default' ? 0 : field.value}
           {...otherProps}
+          label={label}
+          size="medium"
           variant="outlined"
           error={!!errors[name]}
           helperText={
@@ -56,7 +69,11 @@ const FormInputText: FC<IFormInputTextProps> = ({
           }
           InputProps={{
             ...inputProps,
-            sx: { cursor: iconEnd ? 'pointer' : 'default' },
+            sx: {
+              cursor: iconEnd ? 'pointer' : 'default',
+              caretColor: '#218332',
+            },
+            inputComponent: inputComponent,
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,

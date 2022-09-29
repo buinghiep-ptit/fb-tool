@@ -17,14 +17,11 @@ export default function CreateUser({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Thêm mới tài khoản thành công' })
-    setTimeout(() => {
-      navigate(-1)
-    }, 1000)
+    navigate(-1)
   }
   const { mutate: createUser } = useCreateUserData(onSuccess)
 
   const onSubmitHandler: SubmitHandler<any> = (values: any) => {
-    console.log('onSubmitHandler:', values)
     createUser({
       ...values,
     })

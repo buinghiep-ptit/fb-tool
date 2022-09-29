@@ -3,8 +3,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import { Card, Grid, IconButton, Typography } from '@mui/material'
 import { Box, Stack, styled, useTheme } from '@mui/system'
-import { MuiCheckBox } from 'app/components/common/MuiCheckbox'
-import FormInputText from 'app/components/common/MuiInputText'
+import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
 import useAuth from 'app/hooks/useAuth'
@@ -49,9 +49,9 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const defaultValues = {
-  email: 'giangcm@fpt.com.vn',
-  password: 'abc123456',
-  rememberMe: true,
+  email: '',
+  password: '',
+  rememberMe: false,
 }
 
 // form field validation schema
@@ -174,7 +174,7 @@ const JwtLogin = () => {
                     color="primary"
                     loading={loading}
                     variant="contained"
-                    sx={{ my: 1, height: 40 }}
+                    sx={{ width: '100%', my: 1, height: 52 }}
                   >
                     Đăng nhập
                   </LoadingButton>

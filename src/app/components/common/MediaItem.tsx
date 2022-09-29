@@ -1,4 +1,5 @@
 import { PlayArrowRounded } from '@mui/icons-material'
+import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { Background } from './Background'
 import { Video } from './Video'
@@ -27,8 +28,9 @@ function MediaItem({ game }: Props) {
     setHover(false)
   }
   return (
-    <div
-      className=""
+    <Box
+      sx={{ flex: 1 }}
+      bgcolor={'red'}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -43,7 +45,7 @@ function MediaItem({ game }: Props) {
         )}
       </Background>
       {showVideo && <Video src={clip.clip} videoId={clip.video} />}
-    </div>
+    </Box>
   )
 }
 

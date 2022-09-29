@@ -27,7 +27,7 @@
       1,
       { "extensions": [".ts", ".tsx", ".js", ".jsx"] }
     ],
-    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/rules-of-hooks": "off",
     "import/no-anonymous-default-export": [2, { "allowArrowFunction": true }],
     "import/no-unresolved": [0],
     "import/extensions": [0],
@@ -41,7 +41,12 @@
     "@typescript-eslint/no-shadow": "off",
     "@typescript-eslint/default-param-last": "off",
     "@typescript-eslint/no-this-alias": "off",
-    "@typescript-eslint/no-implied-eval": "off"
+    "@typescript-eslint/no-implied-eval": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/no-loop-func": "off",
+    "@typescript-eslint/no-throw-literal": "off"
   },
   "ignorePatterns": ["src/assets/*", "**/*.config.js"],
   "parser": "@typescript-eslint/parser",

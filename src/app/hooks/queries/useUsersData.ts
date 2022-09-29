@@ -11,12 +11,12 @@ import {
 } from 'app/apis/accounts/user.service'
 import { IUser, IUserResponse } from 'app/models/account'
 
-function extractFromObject<T, K extends keyof T>(
+export function extractFromObject<T, K extends keyof T>(
   obj: T,
   keys: K[],
 ): Pick<T, K> {
   return keys.reduce((newObj, curr) => {
-    newObj[curr] = obj[curr]
+    if (!!obj[curr]) newObj[curr] = obj[curr]
 
     return newObj
   }, {} as Pick<T, K>)

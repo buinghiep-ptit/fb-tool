@@ -22,10 +22,10 @@ export interface IUser {
 
 export interface ICustomer {
   id?: number
-  phoneNumber?: string
+  mobilePhone?: string
   displayName?: string
   email?: string
-  accountType?: 0 | 1
+  customerType?: number
   dateCreated?: number
   dateUpdated?: number
   status?: number
@@ -44,6 +44,15 @@ export interface ICustomerDetail {
   type?: number
   status?: number
   otpCount?: OtpCount[]
+}
+
+export interface ICustomerTiny {
+  id?: number
+  email?: string
+  mobilePhone?: string
+  fullName?: string
+  avatar?: string
+  status?: number
 }
 
 export type OtpCount = {

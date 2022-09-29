@@ -11,7 +11,7 @@ import * as React from 'react'
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
-    background-color: #f1f1f1;
+    // background-color: #f1f1f1;
   }
   &:last-child td,
   &:last-child th {
@@ -42,6 +42,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     !isFetching && (!memoizedData || !(memoizedData as T[]).length)
 
   const cellFormatter = (cell: any, row: any, value: any) => {
+    if (cell.media) {
+      return cell.media(value)
+    }
     if (cell.status) {
       return cell.status(value)
     }
@@ -84,7 +87,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={row.userId ?? row.customerId ?? row.id ?? index}
+                    key={index} //row.userId ?? row.customerId ?? row.id ??
                     sx={{
                       '&.MuiTableRow-hover': {
                         '&:hover': {

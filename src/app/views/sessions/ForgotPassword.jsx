@@ -22,7 +22,7 @@ import {
   resetPasswordInit,
 } from 'app/apis/auth/auth.service'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
@@ -73,7 +73,7 @@ const ForgotPasswordRoot = styled(JustifyBox)(() => ({
 }))
 
 const defaultValues = {
-  email: 'giangcm@fpt.com.vn',
+  email: '',
 }
 
 const ForgotPassword = () => {
@@ -282,7 +282,7 @@ const ForgotPassword = () => {
                     loading={loading}
                     color="primary"
                     type="submit"
-                    sx={{ height: 40 }}
+                    sx={{ height: 52 }}
                     disabled={
                       Object.keys(methods?.formState?.errors).length > 0
                     }

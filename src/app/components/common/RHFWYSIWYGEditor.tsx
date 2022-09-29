@@ -5,9 +5,10 @@ import WYSIWYGEditor from './WYSIWYGEditor'
 type Props = {
   name: string
   defaultValue?: any
+  resetEditor?: (x: boolean) => void
 }
 
-const RHFWYSIWYGEditor = ({ name, defaultValue, ...props }: Props) => {
+const RHFWYSIWYGEditor = ({ name, resetEditor, ...props }: Props) => {
   const {
     formState: { errors },
     control,

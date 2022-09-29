@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material'
 import { TableColumn, TitleFeeds } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
@@ -10,7 +10,7 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     id: 'content',
     label: 'Nội dung',
     minWidth: 170,
-    align: 'center',
+    align: 'left',
   },
   {
     id: 'customerType',
@@ -29,13 +29,13 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'mediaType',
     label: 'Loại media',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
   },
   {
     id: 'status',
     label: 'Trạng thái',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
     status: (value: any) => LabelFormatter(value, 'feed'),
   },

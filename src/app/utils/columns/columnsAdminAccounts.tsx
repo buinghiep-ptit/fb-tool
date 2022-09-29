@@ -2,7 +2,7 @@ import { Chip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleUsers } from 'app/models/account'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [

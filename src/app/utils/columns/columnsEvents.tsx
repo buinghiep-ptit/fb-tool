@@ -3,7 +3,7 @@ import { Chip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },

@@ -19,9 +19,12 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import { useCreateEvent } from 'app/hooks/queries/useEventsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
+import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -54,9 +57,8 @@ const Container = styled('div')<Props>(({ theme }) => ({
 
 export default function AddEvent(props: Props) {
   const { eventId } = useParams()
-  const [loading, setLoading] = useState(false)
   const [fileConfigs, setFileConfigs] = useState({
-    mediaFormat: 2,
+    mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
   })
@@ -65,7 +67,7 @@ export default function AddEvent(props: Props) {
   )
 
   const [defaultValues] = useState<SchemaType>({
-    typeFile: 2,
+    typeFile: EMediaFormat.IMAGE,
     isEveryYear: false,
     hashtag: [{ value: 'hashtag' }],
     status: 1,
@@ -91,15 +93,15 @@ export default function AddEvent(props: Props) {
       .nullable()
       .required('Chọn ngày kết thúc.'),
     amount: Yup.string().nullable(),
-    // files: Yup.mixed()
-    //   .required('Vui lòng chọn file')
-    //   .test(
-    //     'fileSize',
-    //     fileConfigs.mediaFormat === 1
-    //       ? 'Dung lượng video tối đa 3phút'
-    //       : 'Dung lượng ảnh tối đa 10MB/ảnh',
-    //     files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-    //   ),
+    files: Yup.mixed()
+      .required('Vui lòng chọn file')
+      .test(
+        'fileSize',
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? 'Dung lượng video tối đa 3phút'
+          : 'Dung lượng ảnh tối đa 10MB/ảnh',
+        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
+      ),
   })
 
   const methods = useForm<SchemaType>({
@@ -124,7 +126,7 @@ export default function AddEvent(props: Props) {
     isError,
     error,
   }: UseQueryResult<IEventDetail, Error> = useQuery<IEventDetail, Error>(
-    ['feeds', eventId],
+    ['feed', eventId],
     () => getEventDetail(Number(eventId ?? 0)),
     {
       enabled: !!eventId,
@@ -150,68 +152,45 @@ export default function AddEvent(props: Props) {
   }, [event])
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log(values)
-    console.log(
-      'a:',
-      moment(new Date(values.startDate as any)).format('YYYY-MM-DD'),
-    )
+    const files = fileInfos.map(file => ({
+      mediaType: EMediaType.POST,
+      mediaFormat: fileConfigs.mediaFormat,
+      url: file.url,
+    }))
+
+    const payload: IEventDetail = {
+      name: values.name,
+      content: values.editor_content,
+      medias: files,
+      isEveryYear: values.isEveryYear ? 1 : 0,
+      startDate: GtmToYYYYMMDD(values.startDate as string),
+      endDate: GtmToYYYYMMDD(values.endDate as string),
+      amount: Number(values.amount ?? 0),
+      status: Number(values.status ?? -1),
+      tags: values.hashtag ?? [],
+    }
+    add(payload)
   }
   const onRowUpdateSuccess = (data: any) => {
     toastSuccess({ message: 'Thêm mới thành công' })
+    setMediasSrcPreviewer([])
+    methods.reset()
   }
-  const { mutate: add } = useCreateEvent(onRowUpdateSuccess)
+  const { mutate: add, isLoading: createLoading } =
+    useCreateEvent(onRowUpdateSuccess)
 
   useEffect(() => {
-    // if (fileInfos && fileInfos.length) {
-    //   console.log('getValues:', methods.getValues())
-    //   const files =
-    //     fileConfigs.mediaFormat === 1
-    //       ? [
-    //           {
-    //             mediaType: 6,
-    //             mediaFormat: 1,
-    //             url: fileInfos[0].url,
-    //           },
-    //         ]
-    //       : fileInfos.map(file =>
-    //           Object.assign(
-    //             {},
-    //             {
-    //               mediaType: 6,
-    //               mediaFormat: 2,
-    //               url: file.url,
-    //             },
-    //           ),
-    //         )
-    //   const payload: IEventDetail = {
-    //     name: methods.getValues('name'),
-    //     content: methods.getValues('editor_content'),
-    //     medias: files,
-    //     isEveryYear: methods.getValues('isEveryYear') ? 1 : 0,
-    //     startDate: '2022-09-27',
-    //     endDate: '2022-09-27',
-    //     amount: Number(methods.getValues('amount') ?? 0),
-    //     status: Number(methods.getValues('status') ?? -1),
-    //     tags: methods.getValues('hashtag') ?? [],
-    //   }
-    //   //   add(payload)
-    //   setLoading(false)
-    //   // reset values
-    // }
-  }, [fileInfos])
-
-  useEffect(() => {
-    if (Number(methods.watch('typeFile') ?? 0) === 2) {
+    if (Number(methods.watch('typeFile') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
         ...prev,
-        mediaFormat: 2,
+        mediaFormat: EMediaFormat.IMAGE,
         multiple: true,
         accept: 'image/*',
       }))
     } else {
       setFileConfigs(prev => ({
         ...prev,
-        mediaFormat: 1,
+        mediaFormat: EMediaFormat.VIDEO,
         accept: 'video/*',
         multiple: false,
       }))
@@ -257,6 +236,7 @@ export default function AddEvent(props: Props) {
                         color="primary"
                         type="submit"
                         sx={{ width: '100%' }}
+                        loading={createLoading}
                         startIcon={<ApprovalRounded />}
                       />
                     </Grid>
@@ -272,7 +252,7 @@ export default function AddEvent(props: Props) {
                     </Grid>
                   </Grid>
 
-                  {loading && <LinearProgress sx={{ mt: 0.5 }} />}
+                  {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
 
                   <Stack>
                     <FormInputText
@@ -366,7 +346,10 @@ export default function AddEvent(props: Props) {
                   <Box
                     width={{
                       sx: '100%',
-                      md: fileConfigs.mediaFormat === 1 ? 300 : 500,
+                      md:
+                        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+                          ? 300
+                          : 500,
                     }}
                     position="relative"
                   >

@@ -8,7 +8,6 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import MediaItem from 'app/components/common/MediaItem'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -22,7 +21,6 @@ import {
 } from 'app/utils/columns'
 import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
-import { number } from 'yup/lib/locale'
 
 export interface Props {}
 
@@ -46,31 +44,6 @@ export default function FeedDetail(props: Props) {
         'https://img.meta.com.vn/Data/image/2021/07/27/good-girl-nghia-la-gi-2.jpg',
     },
   }
-  // const medias = [
-  //   {
-  //     id: 1,
-  //     name: 'God of game',
-  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
-  //     clip: {
-  //       clip: 'https://dev09-minio.campdi.vn/camping/tiktok03.mp4',
-  //       video: 'video1',
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'God of game',
-  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
-  //     clip: null,
-  //   },
-  //   ,
-  //   {
-  //     id: 3,
-  //     name: 'God of game',
-  //     backgroundImage: '/assets/videos/thumbnail.jpeg',
-  //     clip: null,
-  //   },
-  // ]
-
   const { feedId } = useParams()
 
   const [pageReports, setPageReports] = useState<number>(0)

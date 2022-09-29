@@ -11,6 +11,9 @@ const WYSIWYGEditor = React.forwardRef(({ onChange, value }, ref) => {
   const [updated, setUpdated] = useState(false)
 
   useEffect(() => {
+    if (!value) {
+      setUpdated(false)
+    }
     if (!updated) {
       const defaultValue = value ? value : ''
       const blocksFromHtml = htmlToDraft(defaultValue)
@@ -21,7 +24,7 @@ const WYSIWYGEditor = React.forwardRef(({ onChange, value }, ref) => {
       const newEditorState = EditorState.createWithContent(contentState)
       setEditorState(newEditorState)
     }
-  }, [value])
+  }, [value, updated])
 
   const onEditorStateChange = editorState => {
     setUpdated(true)

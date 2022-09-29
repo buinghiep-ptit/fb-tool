@@ -166,17 +166,6 @@ export default function CustomerAccounts(props: Props) {
     }
   }
 
-  if (isLoading) return <MuiLoading />
-
-  if (isError)
-    return (
-      <Box my={2} textAlign="center">
-        <MuiTypography variant="h5">
-          Have an errors: {error.message}
-        </MuiTypography>
-      </Box>
-    )
-
   return (
     <Container>
       <Box className="breadcrumb">
@@ -229,15 +218,16 @@ export default function CustomerAccounts(props: Props) {
 
         <Box mt={3}>
           <MuiStyledTable
-            rows={data?.content as ICustomer[]}
+            rows={data ? (data?.content as ICustomer[]) : []}
             columns={columnCustomerAccounts}
             onClickRow={onClickRow}
             isFetching={isFetching}
+            error={isError ? error : null}
           />
           <MuiStyledPagination
             component="div"
             rowsPerPageOptions={[20, 50, 100]}
-            count={data?.totalElements as number}
+            count={data ? (data?.totalElements as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}

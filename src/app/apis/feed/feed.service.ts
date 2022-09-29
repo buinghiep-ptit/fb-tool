@@ -111,7 +111,7 @@ export const fetchCampGrounds = async (params: {
   return data
 }
 
-export const createFeed = async (payload: any): Promise<any> => {
-  const { data } = await http.post<any>(`/api/feed`, payload)
+export const createFeed = async (payload: IFeedDetail): Promise<any> => {
+  const { data } = await http.post<IFeedDetail>(`/api/feed`, payload)
   return data
 }

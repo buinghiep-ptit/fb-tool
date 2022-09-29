@@ -22,16 +22,20 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
+import { useCreateFeed } from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
   ICustomerResponse,
   ICustomerTiny,
+  IFeedDetail,
   IMediaOverall,
   ITags,
 } from 'app/models'
 import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
+import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -64,14 +68,13 @@ export default function ManagerToolPostFeed(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
-  const [loading, setLoading] = useState(false)
   const [fileConfigs, setFileConfigs] = useState({
-    mediaFormat: 2,
+    mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
   })
   const [defaultValues] = useState<SchemaType>({
-    type: 2,
+    type: EMediaFormat.IMAGE,
     cusType: 0,
     idSrcType: 1,
     customer: null,
@@ -97,7 +100,9 @@ export default function ManagerToolPostFeed(props: Props) {
       .required('Vui lòng chọn file')
       .test(
         'fileSize',
-        'Dung lượng file quá lớn (10MB/ảnh và 3phút/video)',
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? 'Dung lượng video tối đa 3phút'
+          : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
   })
@@ -174,66 +179,51 @@ export default function ManagerToolPostFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log(values)
+    const files = fileInfos.map(file => ({
+      mediaType: EMediaType.POST,
+      mediaFormat: fileConfigs.mediaFormat,
+      url: file.url,
+    }))
+
+    const payload: IFeedDetail = {
+      type: Number(values.type ?? 0),
+      idSrcType: Number(values.idSrcType ?? 0),
+      idSrc: Number(values.camp?.id ?? 0),
+      webUrl: values.webUrl,
+      idCustomer:
+        Number(values.cusType) === 0
+          ? (values.customer as any)?.id
+          : values.customer.customerId,
+      content: values.content,
+      video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
+      images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
+      tags: values.hashtag ?? [],
+      viewScope: 1,
+      isAllowComment: 1,
+    }
+    add(payload)
   }
 
-  const createNewFeed = async (payload: any) => {
-    try {
-      const response = await createFeed(payload)
-    } catch (error) {}
+  const onRowUpdateSuccess = (data: any) => {
+    toastSuccess({ message: 'Thêm mới thành công' })
+    setMediasSrcPreviewer([])
+    methods.reset()
   }
+  const { mutate: add, isLoading: createLoading } =
+    useCreateFeed(onRowUpdateSuccess)
 
   useEffect(() => {
-    // if (fileInfos && fileInfos.length) {
-    //   console.log('getValues:', methods.getValues())
-    //   const files =
-    //     fileConfigs.mediaFormat === 1
-    //       ? Object.assign(
-    //           {},
-    //           {
-    //             mediaType: 6,
-    //             mediaFormat: 1,
-    //             url: fileInfos[0].url,
-    //           },
-    //         )
-    //       : fileInfos.map(file =>
-    //           Object.assign(
-    //             {},
-    //             {
-    //               mediaType: 6,
-    //               mediaFormat: 2,
-    //               url: file.url,
-    //             },
-    //           ),
-    //         )
-    //   const payload = {
-    //     type: Number(methods.getValues('type')),
-    //     idSrcType: Number(methods.getValues('cusType')),
-    //     idSrc: Number(methods.getValues('camp').id),
-    //     webUrl: methods.getValues('webUrl'),
-    //     idCustomer: methods.getValues('customer').customerId,
-    //     content: methods.getValues('content'),
-    //     video: fileConfigs.mediaFormat === 1 ? files : null,
-    //     images: fileConfigs.mediaFormat === 2 ? files : [],
-    //     tags: methods.getValues('hashtag'),
-    //   }
-    //   createNewFeed(payload)
-    //   setLoading(false)
-    // }
-  }, [fileInfos])
-
-  useEffect(() => {
-    if (Number(methods.watch('type') ?? 0) === 2) {
+    if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
         ...prev,
-        mediaFormat: 2,
+        mediaFormat: EMediaFormat.IMAGE,
         multiple: true,
         accept: 'image/*',
       }))
     } else {
       setFileConfigs(prev => ({
         ...prev,
-        mediaFormat: 1,
+        mediaFormat: EMediaFormat.VIDEO,
         accept: 'video/*',
         multiple: false,
       }))
@@ -373,7 +363,7 @@ export default function ManagerToolPostFeed(props: Props) {
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
                   </Stack>
 
-                  {loading && <LinearProgress sx={{ mt: 0.5 }} />}
+                  {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
 
                   <Grid container spacing={2} mt={1}>
                     <Grid item sm={6} xs={6}>

@@ -41,7 +41,7 @@ import {
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
 import { getColorByCusStatus } from 'app/utils/common'
-import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { useState } from 'react'
 import {
   Controller,

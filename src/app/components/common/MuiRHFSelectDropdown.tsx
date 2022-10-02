@@ -6,7 +6,7 @@ export interface ISelectDropDownProps extends SelectProps {
   name: string
   label?: string
   defaultValue?: string | number
-  children: React.ReactElement[] | React.ReactElement
+  children: React.ReactElement[] | React.ReactElement | any
 }
 
 export function SelectDropDown({

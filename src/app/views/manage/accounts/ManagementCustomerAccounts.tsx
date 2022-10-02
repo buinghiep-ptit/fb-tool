@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCustomers } from 'app/apis/accounts/customer.service'
@@ -159,7 +159,7 @@ export default function CustomerAccounts(props: Props) {
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
       if (cell.id === 'mobilePhone') {
-        navigate(`${row.customerId}/info`, {})
+        navigate(`${row.customerId}/thong-tin`, {})
       } else if (cell.id === 'action') {
         console.log('Toggle active user')
       }
@@ -171,52 +171,53 @@ export default function CustomerAccounts(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản KH' }]} />
       </Box>
-      <SimpleCard title="Quản lý TK KH">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Email, SĐT, Tên hiển thị'}
-                  type="text"
-                  name="search"
-                  size="small"
-                  defaultValue=""
-                  placeholder="Nhập Email, SĐT, Tên hiển thị"
-                  fullWidth
-                />
+      <Stack gap={3}>
+        <SimpleCard title="Quản lý TK KH">
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={3} xs={12}>
+                  <FormInputText
+                    label={'Email, SĐT, Tên hiển thị'}
+                    type="text"
+                    name="search"
+                    size="small"
+                    defaultValue=""
+                    placeholder="Nhập Email, SĐT, Tên hiển thị"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="cusType" label="Loại tài khoản">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Thường</MenuItem>
+                    <MenuItem value={2}>KOL</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Hoạt động</MenuItem>
+                    <MenuItem value={-1}>Không hoạt động</MenuItem>
+                    <MenuItem value={-2}>Khoá</MenuItem>
+                    <MenuItem value={-3}>Khoá tạm thời</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="cusType" label="Loại tài khoản">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Thường</MenuItem>
-                  <MenuItem value={2}>KOL</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="status" label="Trạng thái">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={-2}>Khoá</MenuItem>
-                  <MenuItem value={-3}>Khoá tạm thời</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
-
-        <Box mt={3}>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+        <SimpleCard>
           <MuiStyledTable
             rows={data ? (data?.content as ICustomer[]) : []}
             columns={columnCustomerAccounts}
@@ -233,8 +234,8 @@ export default function CustomerAccounts(props: Props) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

@@ -1,4 +1,6 @@
 import {
+  Icon,
+  IconButton,
   InputAdornment,
   InputBaseComponentProps,
   InputProps,
@@ -48,8 +50,17 @@ const FormInputText: FC<IFormInputTextProps> = ({
 }) => {
   const {
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext()
+
+  const val = watch(name)
+
+  const clearInput = () => {
+    setValue(name, '')
+  }
+
   return (
     <Controller
       control={control}
@@ -77,8 +88,15 @@ const FormInputText: FC<IFormInputTextProps> = ({
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,
-            endAdornment: iconEnd ? (
-              <InputAdornment position="end">{iconEnd}</InputAdornment>
+            // endAdornment: iconEnd ? (
+            //   <InputAdornment position="end">{iconEnd}</InputAdornment>
+            // ) : null,
+            endAdornment: !!val ? (
+              <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
+                <IconButton sx={{ p: 0, m: 0 }} onClick={clearInput}>
+                  <Icon fontSize="small">clear</Icon>
+                </IconButton>
+              </InputAdornment>
             ) : null,
           }}
         />

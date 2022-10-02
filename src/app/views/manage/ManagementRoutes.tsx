@@ -1,7 +1,8 @@
 import Loadable from 'app/components/Loadable'
+import { navCustomerDetail } from 'app/utils/navbars'
 import { lazy } from 'react'
-import { Outlet } from 'react-router-dom'
-import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
+import { Navigate, Outlet } from 'react-router-dom'
+import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -38,7 +39,14 @@ const ManagerToolPostFeed = Loadable(
 )
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
-
+const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
+const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
+const UnAvailableOrder = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/UnAvailableOrder')),
+)
+const AvailablePayment = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/AvailablePayment')),
+)
 const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
@@ -51,6 +59,7 @@ const DetailCampGround = Loadable(
 )
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
+
 const ManagementRoutes = [
   {
     path: '/quan-ly-tai-khoan-admin',
@@ -75,16 +84,14 @@ const ManagementRoutes = [
   {
     path: '/quan-ly-tai-khoan-khach-hang/:customerId',
     element: (
-      <>
-        <LayoutCustomer>
-          <Outlet />
-        </LayoutCustomer>
-      </>
+      <LayoutWithNavTabs navInfo={navCustomerDetail as any}>
+        <Outlet />
+      </LayoutWithNavTabs>
     ),
     children: [
       {
         // index: true,
-        path: 'info',
+        path: 'thong-tin',
         element: (
           <>
             <CustomerDetail />
@@ -106,18 +113,12 @@ const ManagementRoutes = [
           },
         ],
       },
-      { path: 'history', element: <CustomerHistory /> },
+      { path: 'lich-su-dat-cho', element: <CustomerHistory /> },
     ],
   },
   {
     path: '/quan-ly-feeds',
-    element: (
-      <>
-        <ManagerFeed />
-        {/* <Outlet /> */}
-      </>
-    ),
-    // children: [{ path: 'report-infringe', element: <ReportInfringe /> }],
+    element: <ManagerFeed />,
   },
   { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
@@ -140,6 +141,44 @@ const ManagementRoutes = [
   { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
   { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
   { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },
+  {
+    path: '/quan-ly-don-hang',
+    children: [
+      {
+        index: true,
+        element: <Navigate to="xu-ly" replace />,
+      },
+      {
+        path: ':source',
+        children: [
+          { index: true, element: <OrdersHistory /> },
+          // { path: ':orderId', element: <OrderDetail /> },
+        ],
+      },
+      {
+        path: ':source/:orderId',
+        element: (
+          <>
+            <OrderDetail />
+            <Outlet />
+          </>
+        ),
+        children: [
+          {
+            path: 'het-cho',
+            element: <UnAvailableOrder title="Chi tiết đơn hàng (Hết chỗ)" />,
+          },
+          {
+            path: 'con-cho',
+            element: (
+              <AvailablePayment title="Chi tiết đơn hàng (Còn chỗ, chờ thanh toán)" />
+            ),
+          },
+        ],
+      },
+    ],
+  },
+
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,

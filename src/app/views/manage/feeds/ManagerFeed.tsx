@@ -187,154 +187,157 @@ export default function ManagerFeed(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
       </Box>
-      <SimpleCard title="Quản lý Feed">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Email, SĐT, Tên hiển thị'}
-                  type="text"
-                  name="search"
-                  size="small"
-                  placeholder="Nhập email, sđt, tên"
-                  fullWidth
-                  defaultValue=""
-                  iconEnd={
-                    methods.watch('search')?.length ? (
-                      <IconButton
-                        onClick={() => methods.setValue('search', '')}
-                        edge="end"
-                      >
-                        <ClearOutlined fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <React.Fragment />
-                    )
-                  }
-                  // focused
-                  // required
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Hashtag'}
-                  type="text"
-                  name="hashtag"
-                  placeholder="Nhập hashtag"
-                  size="small"
-                  fullWidth
-                  defaultValue=""
-                  iconEnd={
-                    methods.watch('hashtag')?.length ? (
-                      <IconButton
-                        onClick={() => methods.setValue('hashtag', '')}
-                        edge="end"
-                      >
-                        <ClearOutlined fontSize="small" />
-                      </IconButton>
-                    ) : (
-                      <React.Fragment />
-                    )
-                  }
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="status" label="Trạng thái">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="1">Đã duyệt</MenuItem>
-                  <MenuItem value="0">Chờ hậu kiểm</MenuItem>
-                  <MenuItem value="-1">Vi phạm</MenuItem>
-                  <MenuItem value="-2">Xoá</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <FormControl
-                  sx={{
-                    width: '100%',
-                    '& .MuiInputBase-root': {
-                      // height: 40,
-                    },
-                  }}
-                >
-                  <InputLabel id="demo-simple-select-helper-label">
-                    {'Phạm vi'}
-                  </InputLabel>
+      <Stack gap={3}>
+        <SimpleCard title="Quản lý Feed">
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={3} xs={12}>
+                  <FormInputText
+                    label={'Email, SĐT, Tên hiển thị'}
+                    type="text"
+                    name="search"
+                    size="small"
+                    placeholder="Nhập email, sđt, tên"
+                    fullWidth
+                    defaultValue=""
+                    iconEnd={
+                      methods.watch('search')?.length ? (
+                        <IconButton
+                          onClick={() => methods.setValue('search', '')}
+                          edge="end"
+                        >
+                          <ClearOutlined fontSize="small" />
+                        </IconButton>
+                      ) : (
+                        <React.Fragment />
+                      )
+                    }
+                    // focused
+                    // required
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <FormInputText
+                    label={'Hashtag'}
+                    type="text"
+                    name="hashtag"
+                    placeholder="Nhập hashtag"
+                    size="small"
+                    fullWidth
+                    defaultValue=""
+                    iconEnd={
+                      methods.watch('hashtag')?.length ? (
+                        <IconButton
+                          onClick={() => methods.setValue('hashtag', '')}
+                          edge="end"
+                        >
+                          <ClearOutlined fontSize="small" />
+                        </IconButton>
+                      ) : (
+                        <React.Fragment />
+                      )
+                    }
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Đã duyệt</MenuItem>
+                    <MenuItem value="0">Chờ hậu kiểm</MenuItem>
+                    <MenuItem value="-1">Vi phạm</MenuItem>
+                    <MenuItem value="-2">Xoá</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <FormControl
+                    sx={{
+                      width: '100%',
+                      '& .MuiInputBase-root': {
+                        // height: 40,
+                      },
+                    }}
+                  >
+                    <InputLabel id="demo-simple-select-helper-label">
+                      {'Phạm vi'}
+                    </InputLabel>
 
-                  <Select defaultValue={'all'} name="range" disabled>
-                    <MenuItem value="all">Công khai</MenuItem>
-                    <MenuItem value="friends">Bạn bè</MenuItem>
-                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                  </Select>
-                </FormControl>
+                    <Select defaultValue={'all'} name="range" disabled>
+                      <MenuItem value="all">Công khai</MenuItem>
+                      <MenuItem value="friends">Bạn bè</MenuItem>
+                      <MenuItem value="me">Chỉ mình tôi</MenuItem>
+                    </Select>
+                  </FormControl>
 
-                {/* <SelectDropDown name="range" disabled defaultValue={'all'}>
+                  {/* <SelectDropDown name="range" disabled defaultValue={'all'}>
                   <MenuItem value="all">Công khai</MenuItem>
                   <MenuItem value="friends">Bạn bè</MenuItem>
                   <MenuItem value="me">Chỉ mình tôi</MenuItem>
                 </SelectDropDown> */}
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid item sm={4} xs={12} pt={2}>
-              <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-              <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
-            </Grid>
-          </FormProvider>
+              <Grid item sm={4} xs={12} pt={2}>
+                <MuiCheckBox name="isCampdi" label="Feed Campdi" />
+                <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
+              </Grid>
+            </FormProvider>
 
-          <Box pt={3}>
-            <Grid container spacing={2}>
-              <Grid item sm={2} xs={12}>
-                <MuiButton
-                  loading={!isReset && isFetching}
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-              <Grid item sm={2} xs={12}>
-                <MuiButton
-                  loading={isReset && isFetching}
-                  title="Tạo lại"
-                  variant="outlined"
-                  color="primary"
-                  onClick={onResetFilters}
-                  sx={{ width: '100%' }}
-                  startIcon={<ChangeCircleSharp />}
-                />
-              </Grid>
-              <Grid item sm={8} xs={12}>
-                <Stack flexDirection={'row'} justifyContent={'flex-end'}>
+            <Box pt={3}>
+              <Grid container spacing={2}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
-                    title="Hậu kiểm"
-                    variant="text"
-                    color="secondary"
-                    onClick={() => navigate(`hau-kiem`, {})}
-                    startIcon={<ArticleSharp />}
+                    loading={!isReset && isFetching}
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
                   />
-                  <Divider
-                    orientation="vertical"
-                    sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
-                    flexItem
+                </Grid>
+                <Grid item sm={2} xs={12}>
+                  <MuiButton
+                    loading={isReset && isFetching}
+                    title="Tạo lại"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<ChangeCircleSharp />}
                   />
-                  <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+                </Grid>
+                <Grid item sm={8} xs={12}>
+                  <Stack flexDirection={'row'} justifyContent={'flex-end'}>
                     <MuiButton
-                      title="Báo cáo vi phạm"
+                      title="Hậu kiểm"
                       variant="text"
-                      color="error"
-                      type="submit"
-                      sx={{ flex: 1 }}
-                      startIcon={<ReportSharp />}
+                      color="secondary"
+                      onClick={() => navigate(`hau-kiem`, {})}
+                      startIcon={<ArticleSharp />}
                     />
-                  </NavLink>
-                </Stack>
+                    <Divider
+                      orientation="vertical"
+                      sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                      flexItem
+                    />
+                    <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+                      <MuiButton
+                        title="Báo cáo vi phạm"
+                        variant="text"
+                        color="error"
+                        type="submit"
+                        sx={{ flex: 1 }}
+                        startIcon={<ReportSharp />}
+                      />
+                    </NavLink>
+                  </Stack>
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
-        </form>
-        <Box mt={3}>
+            </Box>
+          </form>
+        </SimpleCard>
+
+        <SimpleCard>
           <MuiStyledTable
             rows={data ? (data?.content as IFeed[]) : []}
             columns={columnFeeds}
@@ -351,8 +354,8 @@ export default function ManagerFeed(props: Props) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

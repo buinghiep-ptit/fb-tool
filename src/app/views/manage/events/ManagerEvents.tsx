@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, styled } from '@mui/material'
+import { Grid, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchEvents } from 'app/apis/events/event.service'
@@ -181,50 +181,52 @@ export default function ManagerEvents(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
       </Box>
-      <SimpleCard title="Quản lý sự kiện">
-        <form
-          onSubmit={methods.handleSubmit(onSubmitHandler)}
-          noValidate
-          autoComplete="off"
-        >
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Tên sự kiện/Địa chỉ'}
-                  type="text"
-                  name="areaNameOrAddress"
-                  defaultValue=""
-                  placeholder="Nhập tên sự kiện, địa chỉ"
-                  fullWidth
-                />
+      <Stack gap={3}>
+        <SimpleCard title="Quản lý sự kiện">
+          <form
+            onSubmit={methods.handleSubmit(onSubmitHandler)}
+            noValidate
+            autoComplete="off"
+          >
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={3} xs={12}>
+                  <FormInputText
+                    label={'Tên sự kiện/Địa chỉ'}
+                    type="text"
+                    name="areaNameOrAddress"
+                    defaultValue=""
+                    placeholder="Nhập tên sự kiện, địa chỉ"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}></Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    onClick={() => navigate(`them-moi-su-kien`, {})}
+                    title="Tạo mới sự kiện"
+                    variant="contained"
+                    color="primary"
+                    sx={{ width: '100%' }}
+                    startIcon={<AddBoxSharp />}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}></Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  onClick={() => navigate(`them-moi-su-kien`, {})}
-                  title="Tạo mới sự kiện"
-                  variant="contained"
-                  color="primary"
-                  sx={{ width: '100%' }}
-                  startIcon={<AddBoxSharp />}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
+            </FormProvider>
+          </form>
+        </SimpleCard>
 
-        <Box mt={3}>
+        <SimpleCard>
           <MuiStyledTable
             rows={data ? (data?.content as IEventOverall[]) : []}
             columns={columnsEvents}
@@ -241,8 +243,8 @@ export default function ManagerEvents(props: Props) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

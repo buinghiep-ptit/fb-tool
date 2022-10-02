@@ -10,6 +10,7 @@ export const extractMergeFiltersObject = (
     if (
       mergeFilters[key] === 'all' ||
       mergeFilters[key] === '' ||
+      mergeFilters[key] === undefined ||
       (typeof mergeFilters[key] === 'boolean' && !mergeFilters[key])
     )
       delete mergeFilters[key]

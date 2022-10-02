@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PersonAddAltSharp, SearchSharp } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
@@ -178,83 +178,84 @@ export default function AdminAccounts(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
       </Box>
-      <SimpleCard title="Quản lý TK Admin">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Tài khoản'}
-                  type="text"
-                  name="account"
-                  defaultValue=""
-                  size="small"
-                  placeholder="Nhập tên tài khoản"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Email'}
-                  type="email"
-                  name="email"
-                  defaultValue=""
-                  placeholder="Nhập Email"
-                  size="small"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="role" label="Quyền">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="1">Admin</MenuItem>
-                  <MenuItem value="2">CS</MenuItem>
-                  <MenuItem value="3">Sale</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="status" label="Trạng thái">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value="1">Hoạt động</MenuItem>
-                  <MenuItem value="-1">Không hoạt động</MenuItem>
-                </SelectDropDown>
-              </Grid>
-            </Grid>
-
-            <Box mt={3}>
+      <Stack gap={3}>
+        <SimpleCard title="Quản lý TK Admin">
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
-                  <MuiButton
-                    loading={isFetching}
-                    title="Tìm kiếm"
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    sx={{ width: '100%' }}
-                    startIcon={<SearchSharp />}
+                  <FormInputText
+                    label={'Tài khoản'}
+                    type="text"
+                    name="account"
+                    defaultValue=""
+                    size="small"
+                    placeholder="Nhập tên tài khoản"
+                    fullWidth
                   />
                 </Grid>
-                <Grid item sm={6} xs={12}></Grid>
                 <Grid item sm={3} xs={12}>
-                  <MuiButton
-                    onClick={() =>
-                      navigation(`them-moi`, {
-                        state: { modal: true },
-                      })
-                    }
-                    title="Thêm tài koản"
-                    variant="contained"
-                    color="primary"
-                    sx={{ width: '100%' }}
-                    startIcon={<PersonAddAltSharp />}
+                  <FormInputText
+                    label={'Email'}
+                    type="email"
+                    name="email"
+                    defaultValue=""
+                    placeholder="Nhập Email"
+                    size="small"
+                    fullWidth
                   />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="role" label="Quyền">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Admin</MenuItem>
+                    <MenuItem value="2">CS</MenuItem>
+                    <MenuItem value="3">Sale</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Hoạt động</MenuItem>
+                    <MenuItem value="-1">Không hoạt động</MenuItem>
+                  </SelectDropDown>
                 </Grid>
               </Grid>
-            </Box>
-          </FormProvider>
-        </form>
 
-        <Box mt={3}>
+              <Box mt={3}>
+                <Grid container spacing={2}>
+                  <Grid item sm={3} xs={12}>
+                    <MuiButton
+                      loading={isFetching}
+                      title="Tìm kiếm"
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      sx={{ width: '100%' }}
+                      startIcon={<SearchSharp />}
+                    />
+                  </Grid>
+                  <Grid item sm={6} xs={12}></Grid>
+                  <Grid item sm={3} xs={12}>
+                    <MuiButton
+                      onClick={() =>
+                        navigation(`them-moi`, {
+                          state: { modal: true },
+                        })
+                      }
+                      title="Thêm tài koản"
+                      variant="contained"
+                      color="primary"
+                      sx={{ width: '100%' }}
+                      startIcon={<PersonAddAltSharp />}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+        <SimpleCard>
           <MuiStyledTable
             rows={data ? (data?.content as IUser[]) : []}
             columns={columnsAdminAccounts}
@@ -271,8 +272,8 @@ export default function AdminAccounts(props: Props) {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

@@ -33,7 +33,7 @@ export default function GeneralInformation({
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Tên địa danh"
+                label="Tên điểm camp*"
                 variant="outlined"
                 error={errors.nameCampground}
                 helperText={errors.nameCampground?.message}
@@ -52,6 +52,14 @@ export default function GeneralInformation({
                 {...field}
                 options={campAreas}
                 getOptionLabel={option => option.name}
+                renderOption={(props, option, index) => {
+                  const key = `listItem-${index}-${option.id}`
+                  return (
+                    <li {...props} key={key}>
+                      {option.name}
+                    </li>
+                  )
+                }}
                 onChange={(_, data) => {
                   field.onChange(data)
                 }}

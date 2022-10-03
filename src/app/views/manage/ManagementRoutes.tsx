@@ -2,6 +2,7 @@ import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
 import { Outlet } from 'react-router-dom'
 import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
+import CreateMerchant from './managerMerchant/CreactMerchant'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -32,6 +33,7 @@ const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
+const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const ManagerToolPostFeed = Loadable(
   lazy(() => import('./ManagerToolPostFeed')),
 )
@@ -47,6 +49,9 @@ const DetailCampGround = Loadable(
 )
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
+const UpdateMerchant = Loadable(
+  lazy(() => import('./managerMerchant/updateMerchant')),
+)
 const ManagementRoutes = [
   {
     path: '/quan-ly-tai-khoan-admin',
@@ -124,8 +129,20 @@ const ManagementRoutes = [
     element: <ManagerPlace />,
   },
   {
+    path: '/quan-ly-thong-tin-doi-tac',
+    element: <ManagerMerchant />,
+  },
+  {
     path: '/them-dia-danh',
     element: <CreatePlace />,
+  },
+  {
+    path: '/them-doi-tac',
+    element: <CreateMerchant />,
+  },
+  {
+    path: '/cap-nhat-thong-tin-doi-tac/:id',
+    element: <UpdateMerchant />,
   },
   {
     path: '/chi-tiet-dia-danh/:id',
@@ -133,7 +150,11 @@ const ManagementRoutes = [
   },
   {
     path: '/chi-tiet-diem-camp/:id',
-    element: <DetailCampGround />,
+    element: <DetailCampGround action="edit" />,
+  },
+  {
+    path: '/them-diem-camp',
+    element: <DetailCampGround action="create" />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },

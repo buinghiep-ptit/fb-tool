@@ -45,6 +45,11 @@ export const updateCampGround = async (id: any, params: any): Promise<any> => {
   return data
 }
 
+export const createCampGround = async (params: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/camp-grounds/`, params)
+  return data
+}
+
 // Service
 
 export const updateCampGroundServiceStatus = async (id: any): Promise<any> => {

@@ -65,8 +65,6 @@ export default function ListCampService(props) {
     fetchListCampGroundService(param)
   }, [])
 
-  console.log(tableModel)
-
   return (
     <SimpleCard>
       <Grid container>
@@ -95,7 +93,6 @@ export default function ListCampService(props) {
                 id="demo-simple-select"
                 label="Trạng thái"
                 onChange={e => {
-                  console.log(e.target.value)
                   setTypeFilter(e.target.value)
                 }}
               >
@@ -111,7 +108,6 @@ export default function ListCampService(props) {
                 id="demo-simple-select"
                 label="Trạng thái"
                 onChange={e => {
-                  console.log(e.target.value)
                   setStatusFilter(e.target.value)
                 }}
               >
@@ -127,7 +123,6 @@ export default function ListCampService(props) {
             variant="contained"
             type="submit"
             onClick={() => {
-              console.log(inputFilter, statusFilter)
               fetchListCampGroundService({
                 name: inputFilter,
                 status: statusFilter,

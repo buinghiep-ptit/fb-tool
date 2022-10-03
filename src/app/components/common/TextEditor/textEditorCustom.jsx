@@ -14,6 +14,12 @@ class EditorConvertToHTML extends Component {
     this.setState({
       editorState,
     })
+    console.log(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
+    this.props.setDescription(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
   }
 
   render() {

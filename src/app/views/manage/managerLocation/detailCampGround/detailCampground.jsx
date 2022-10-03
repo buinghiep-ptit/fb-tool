@@ -19,7 +19,7 @@ const Container = styled('div')(({ theme }) => ({
 
 const MENU_DETAL = ['Thông tin', 'Danh sách dịch vụ']
 
-export default function DetailCampGround(props) {
+export default function DetailCampGround({ action }) {
   const [value, setValue] = React.useState('1')
 
   const handleChange = (event, newValue) => {
@@ -32,35 +32,40 @@ export default function DetailCampGround(props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý điểm camp', path: '/quan-ly-thong-tin-diem-camp' },
-            { name: 'Chi tiết điểm camp' },
+            {
+              name: action === 'edit' ? 'Chi tiết điểm camp' : 'Thêm điểm camp',
+            },
           ]}
         />
       </Box>
       <SimpleCard>
         <Box sx={{ width: '100%', typography: 'body1' }}>
-          <TabContext value={value}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList
-                onChange={handleChange}
-                aria-label="lab API tabs example"
-                variant="fullWidth"
-              >
-                {MENU_DETAL.map((itemMenu, index) => (
-                  <Tab
-                    label={itemMenu}
-                    value={(index + 1).toString()}
-                    key={index}
-                  />
-                ))}
-              </TabList>
-            </Box>
-            <TabPanel value="1" sx={{ backgroundColor: '#fafafa' }}>
-              <InformationCampGround />
-            </TabPanel>
-            <TabPanel value="2" sx={{ backgroundColor: '#fafafa' }}>
-              <ListCampService />
-            </TabPanel>
-          </TabContext>
+          {action === 'create' && <InformationCampGround action="create" />}
+          {action === 'edit' && (
+            <TabContext value={value}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <TabList
+                  onChange={handleChange}
+                  aria-label="lab API tabs example"
+                  variant="fullWidth"
+                >
+                  {MENU_DETAL.map((itemMenu, index) => (
+                    <Tab
+                      label={itemMenu}
+                      value={(index + 1).toString()}
+                      key={index}
+                    />
+                  ))}
+                </TabList>
+              </Box>
+              <TabPanel value="1" sx={{ backgroundColor: '#fafafa' }}>
+                <InformationCampGround action="edit" />
+              </TabPanel>
+              <TabPanel value="2" sx={{ backgroundColor: '#fafafa' }}>
+                <ListCampService />
+              </TabPanel>
+            </TabContext>
+          )}
         </Box>
       </SimpleCard>
     </Container>

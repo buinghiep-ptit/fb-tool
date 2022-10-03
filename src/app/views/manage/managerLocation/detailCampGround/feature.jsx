@@ -21,6 +21,7 @@ export default function Feature({
   control,
   errors,
   feature,
+  action,
   updateFeature,
   getValues,
 }) {
@@ -46,7 +47,7 @@ export default function Feature({
   }
 
   React.useEffect(() => {
-    fetchListUnlinkedUtility()
+    if (action === 'edit') fetchListUnlinkedUtility()
   }, [])
 
   return (

@@ -9,26 +9,27 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Button } from '@mui/material'
-import { useParams, useNavigate } from 'react-router-dom'
-
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
 import {
   getDistricts,
   getProvinces,
   getWards,
 } from 'app/apis/common/common.service'
 import {
-  deleteCampGround,
   getDetailCampGround,
   updateCampGround,
   getListCampArea,
+  createCampGround,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
 import Feature from './feature'
 import { cloneDeep } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
+import { toastSuccess } from 'app/helpers/toastNofication'
 
-export default function InformationCampGround() {
+export default function InformationCampGround({ action }) {
   const [provinceId, setProvinceId] = React.useState(null)
   const [districtId, setDistrictId] = React.useState('')
   const [hashtag, setHashtag] = React.useState([])
@@ -38,12 +39,20 @@ export default function InformationCampGround() {
   const [feature, setFeature] = React.useState({})
   const [campAreas, setCampAreas] = React.useState([])
   const [idMerchant, setIdMerchant] = React.useState()
+  const [medias, setMedias] = React.useState([])
+  const [description, setDescription] = React.useState()
   const params = useParams()
+
+  const introductionRef = React.useRef()
+
   const navigate = useNavigate()
 
   const schema = yup
     .object({
-      namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
+      nameCampground: yup
+        .string()
+        .required('Vui lòng nhập tên địa danh')
+        .trim(),
       province: yup.object().required(),
       district: yup.object().required(),
       description: yup.string().required('Vui lòng nhập mô tả').trim(),
@@ -77,10 +86,10 @@ export default function InformationCampGround() {
       mobiphone: false,
       vinaphone: false,
       vietnamMobile: false,
-      speedViettel: null,
-      speedMobiphone: null,
-      speedVinaphone: null,
-      speedVietnamMobile: null,
+      speedViettel: -1,
+      speedMobiphone: -1,
+      speedVinaphone: -1,
+      speedVietnamMobile: -1,
       bus: false,
       car: false,
       motobike: false,
@@ -92,10 +101,48 @@ export default function InformationCampGround() {
     setFeature(cloneDeep(newFeature))
   }
 
-  const onSubmit = data => {
-    console.log(data)
-    console.log(feature)
+  const handleDataImageUpload = async () => {
+    const introData = introductionRef.current.getIntro()
+    const fileUpload = [...introData].map(file => {
+      console.log(file)
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const token = window.localStorage.getItem('accessToken')
+        const res = axios({
+          method: 'post',
+          url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        return res
+      } catch (e) {
+        console.log(e)
+      }
+    })
+
+    const response = await Promise.all(fileUpload)
+    if (response) return response.map(item => item.data.url)
+  }
+
+  const onSubmit = async data => {
+    const listUrlImage = await handleDataImageUpload()
+    console.log(listUrlImage)
+    const mediasUpdate = listUrlImage.map(url => {
+      const media = new Object()
+      media.srcType = 2
+      media.mediaType = 1
+      media.mediaFormat = 2
+      media.url = url
+      return media
+    })
+
     const dataUpdate = new Object()
+    dataUpdate.medias = [...medias, ...mediasUpdate]
+    dataUpdate.description = description
     dataUpdate.campGroundInternets = []
     const arrInternet = [
       { provider: 'viettel', speed: 'speedViettel' },
@@ -114,15 +161,15 @@ export default function InformationCampGround() {
 
     dataUpdate.id = params.id
     dataUpdate.name = data.nameCampground
-    dataUpdate.description = data.description
+
     dataUpdate.policy = ''
     dataUpdate.idMerchant = idMerchant
     dataUpdate.idTopography = data.topographic
-    dataUpdate.idProvince = data.province.id
-    dataUpdate.idDistrict = data.district.id
+    dataUpdate.idProvince = data.province?.id
+    dataUpdate.idDistrict = data.district?.id
     dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
     dataUpdate.contact = data.contact
-    dataUpdate.idWard = data.ward.id
+    dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
     dataUpdate.address = data.address
@@ -131,7 +178,6 @@ export default function InformationCampGround() {
     dataUpdate.longitude = 0
     dataUpdate.isPopular = 0
     dataUpdate.status = data.status
-    dataUpdate.medias = []
     dataUpdate.campAreas = data.campAreas.map(areas => areas.id)
     dataUpdate.tags = data.hashtag.map(tag => {
       return {
@@ -139,22 +185,31 @@ export default function InformationCampGround() {
       }
     })
     dataUpdate.campTypes = [0]
-    dataUpdate.campGroundSeasons = data.campGroundSeasons.map(
+    dataUpdate.campGroundSeasons = (data.campGroundSeasons || []).map(
       season => season.id,
     )
 
-    dataUpdate.campGroundUtilities = feature.utility.map(item => parseInt(item))
+    dataUpdate.campGroundUtilities = (feature.utility || []).map(item =>
+      parseInt(item),
+    )
     dataUpdate.campGroundVehicles = []
     if (data.bus) dataUpdate.campGroundVehicles.push(1)
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
     dataUpdate.freeParking = true
-    updateCampGround(params.id, dataUpdate)
+    console.log(dataUpdate)
+
+    if (action === 'create') {
+      const res = await createCampGround(dataUpdate)
+      if (res) toastSuccess({ message: 'Điểm camp đã được tạo' })
+    } else {
+      const res = await updateCampGround(params.id, dataUpdate)
+      if (res) toastSuccess({ message: 'Thông tin đã được cập nhật' })
+    }
   }
 
   const fetchListCampArea = async () => {
     const res = await getListCampArea()
-    console.log(res)
     setCampAreas(res)
   }
 
@@ -163,59 +218,64 @@ export default function InformationCampGround() {
     setProvinces(res)
 
     if (res) {
-      getDetailCampGround(params.id)
-        .then(data => {
-          setIdMerchant(data.idMerchant)
-          setHashtag(data.tags)
-          setValue('campAreas', data.campAreas)
-          setValue('hashtag', data.tags)
-          setValue('nameCampground', data.name)
-          setProvinceId(data.idProvince)
-          setValue(
-            'province',
-            res.find(province => province.id === data.idProvince),
-          )
-          setValue('contact', data.contact)
-          setValue('openTime', data.openTime)
-          setValue('closeTime', data.closeTime)
-          setFeature({ utility: data.campGroundUtilities })
-          const seasons = data.campGroundSeasons.map(item => seasonsById[item])
-          setValue('campGroundSeasons', seasons)
-          setDistrictId(data.idDistrict)
-          setValue('address', data.address)
-          setValue('description', data.description)
-          setValue('topographic', data.idTopography)
-          setValue('capacity', data.capacity)
-          setValue('status', data.status)
-          data.campGroundInternets.forEach(item => {
-            setValue(INTERNET[item.idInternet].name, true)
-            setValue(INTERNET[item.idInternet].speed, item.signalQuality)
-          })
-          data.campGroundVehicles.forEach(item => {
-            setValue(VEHICLES[item]?.name, true)
-          })
-          getDistricts(data.idProvince)
-            .then(dataDistrict => {
-              setDistricts(dataDistrict)
-              setValue(
-                'district',
-                dataDistrict.find(district => district.id == data.idProvince),
-              )
+      if (action === 'edit') {
+        getDetailCampGround(params.id)
+          .then(data => {
+            setMedias(data.medias)
+            setIdMerchant(data.idMerchant)
+            setHashtag(data.tags)
+            setValue('campAreas', data.campAreas)
+            setValue('hashtag', data.tags)
+            setValue('nameCampground', data.name)
+            setProvinceId(data.idProvince)
+            setValue(
+              'province',
+              res.find(province => province.id === data.idProvince),
+            )
+            setValue('contact', data.contact)
+            setValue('openTime', data.openTime)
+            setValue('closeTime', data.closeTime)
+            setFeature({ utility: data.campGroundUtilities })
+            const seasons = data.campGroundSeasons.map(
+              item => seasonsById[item],
+            )
+            setValue('campGroundSeasons', seasons)
+            setDistrictId(data.idDistrict)
+            setValue('address', data.address)
+            setValue('description', data.description)
+            setValue('topographic', data.idTopography)
+            setValue('capacity', data.capacity)
+            setValue('status', data.status)
+            data.campGroundInternets.forEach(item => {
+              setValue(INTERNET[item.idInternet].name, true)
+              setValue(INTERNET[item.idInternet].speed, item.signalQuality)
             })
-            .catch(err => console.log(err))
-          if (data.idDistrict) {
-            getWards(data.idDistrict)
-              .then(dataWard => {
-                setWards(dataWard)
+            data.campGroundVehicles.forEach(item => {
+              setValue(VEHICLES[item]?.name, true)
+            })
+            getDistricts(data.idProvince)
+              .then(dataDistrict => {
+                setDistricts(dataDistrict)
                 setValue(
-                  'ward',
-                  dataWard.find(ward => ward.id == data.idDistrict),
+                  'district',
+                  dataDistrict.find(district => district.id == data.idProvince),
                 )
               })
               .catch(err => console.log(err))
-          }
-        })
-        .catch(err => console.log(err))
+            if (data.idDistrict) {
+              getWards(data.idDistrict)
+                .then(dataWard => {
+                  setWards(dataWard)
+                  setValue(
+                    'ward',
+                    dataWard.find(ward => ward.id == data.idDistrict),
+                  )
+                })
+                .catch(err => console.log(err))
+            }
+          })
+          .catch(err => console.log(err))
+      }
     }
   }
 
@@ -253,7 +313,7 @@ export default function InformationCampGround() {
     fetchListCampArea()
     fetchInforCampGround()
   }, [])
-
+  console.log('re render')
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Accordion>
@@ -311,7 +371,13 @@ export default function InformationCampGround() {
           <Typography>3. Giới thiệu</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Introduction />
+          <Introduction
+            setDescription={setDescription}
+            ref={introductionRef}
+            medias={medias}
+            setMedias={setMedias}
+          />
+          {description}
         </AccordionDetails>
       </Accordion>
       <Accordion>
@@ -324,6 +390,7 @@ export default function InformationCampGround() {
         </AccordionSummary>
         <AccordionDetails>
           <Feature
+            action={action}
             control={control}
             errors={errors}
             getValues={getValues}
@@ -333,7 +400,12 @@ export default function InformationCampGround() {
         </AccordionDetails>
       </Accordion>
       <div style={{ marginTop: '50px' }}>
-        <Button color="primary" type="submit" variant="contained">
+        <Button
+          color="primary"
+          type="submit"
+          variant="contained"
+          style={{ marginRight: '10px' }}
+        >
           Lưu
         </Button>
         <Button

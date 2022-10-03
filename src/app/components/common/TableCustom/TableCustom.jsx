@@ -52,7 +52,6 @@ const TableCustom = ({
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [filterTable, setFilterTable] = useState({ name: '', size: 5, page: 0 })
   const handleChangePage = (_, newPage) => {
-    console.log('xx')
     setPage(newPage)
     filter.page = newPage
     filter.size = rowsPerPage
@@ -75,7 +74,6 @@ const TableCustom = ({
   }
 
   const handleAddAction = async id => {
-    console.log('xxx')
     const res = await onAddData(id)
     if (res) fetchDataTable({ ...filterTable })
   }
@@ -92,7 +90,7 @@ const TableCustom = ({
                     <TableCell
                       align="center"
                       key={cell.name}
-                      style={{ width: cell.width }}
+                      style={{ minWidth: cell.width }}
                     >
                       {cell.name}
                     </TableCell>

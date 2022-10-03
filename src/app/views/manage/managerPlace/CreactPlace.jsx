@@ -32,7 +32,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-export default function ManagerPlace(props) {
+export default function CreatePlace(props) {
   const [hashtag, setHashtag] = React.useState([])
 
   const [provinceId, setProvinceId] = React.useState(null)
@@ -98,7 +98,6 @@ export default function ManagerPlace(props) {
   }
 
   const onSubmit = async data => {
-    console.log(data)
     const paramDetail = {
       name: data.namePlace.trim(),
       description: data.description.trim(),

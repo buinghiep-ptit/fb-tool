@@ -1,14 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { FormControlLabel, LinearProgress, Radio, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import FormInputText from 'app/components/common/MuiInputText'
-import { MuiRadioGroup } from 'app/components/common/MuiRadioGroup'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { MuiRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
-import FormTextArea from 'app/components/common/MuiTextarea'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useLockCustomer } from 'app/hooks/queries/useCustomerData'
-import React, { useState } from 'react'
+import { useLockCustomer } from 'app/hooks/queries/useCustomersData'
+import React from 'react'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -53,9 +53,7 @@ export default function LockCustomer({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật mật khẩu thành công' })
-    setTimeout(() => {
-      navigate(-1)
-    }, 1000)
+    navigate(-1)
   }
   const validationSchema = Yup.object().shape({
     lockType: Yup.string(),
@@ -79,7 +77,6 @@ export default function LockCustomer({ title }: Props) {
   const { mutate: lockCustomer, isLoading } = useLockCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
-    console.log(values)
     lockCustomer({
       customerId,
       ...values,

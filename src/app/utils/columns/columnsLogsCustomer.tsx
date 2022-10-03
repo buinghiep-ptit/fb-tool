@@ -1,6 +1,6 @@
 import { TableColumn } from 'app/models'
 import { ILogsActionCustomer } from 'app/models/account'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnLogsCustomer: readonly TableColumn<ILogsActionCustomer>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },

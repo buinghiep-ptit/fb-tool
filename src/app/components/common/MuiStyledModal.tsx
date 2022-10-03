@@ -1,6 +1,5 @@
 import { ApprovalRounded, CancelOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
-import { LoadingButton } from '@mui/lab'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -60,7 +59,10 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 type Props = {
   title: string
+  submitText?: string
+  cancelText?: string
   open: boolean
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false | string
   onCloseModal: () => void
   children?: React.ReactElement
   onSubmit?: any
@@ -69,7 +71,10 @@ type Props = {
 
 export default function MuiStyledModal({
   title,
+  submitText = 'Xác nhận',
+  cancelText = 'Quay lại',
   open,
+  maxWidth = 'sm',
   onCloseModal,
   onSubmit,
   children,
@@ -81,7 +86,7 @@ export default function MuiStyledModal({
       onClose={onCloseModal}
       aria-labelledby="customized-dialog-title"
       open={open}
-      maxWidth={'sm'}
+      maxWidth={maxWidth as any}
       fullWidth={true}
     >
       <BootstrapDialogTitle id="customized-dialog-title" onClose={onCloseModal}>
@@ -105,25 +110,30 @@ export default function MuiStyledModal({
           width={'100%'}
           gap={2}
         >
-          <MuiButton
-            title="Lưu"
-            variant="contained"
-            color="primary"
-            type="submit"
-            sx={{ width: '100%', flex: 1 }}
-            startIcon={<ApprovalRounded />}
-            onClick={() => onSubmit()}
-            loading={isLoading}
-          />
-          <MuiButton
-            title="Đóng"
-            variant="outlined"
-            color="secondary"
-            type="submit"
-            sx={{ width: '100%', flex: 1 }}
-            startIcon={<CancelOutlined />}
-            onClick={onCloseModal}
-          />
+          {onSubmit && (
+            <MuiButton
+              title={submitText}
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ width: '100%', flex: 1 }}
+              startIcon={<ApprovalRounded />}
+              onClick={() => onSubmit()}
+              loading={isLoading}
+            />
+          )}
+
+          {onCloseModal && (
+            <MuiButton
+              title={cancelText}
+              variant="outlined"
+              color="secondary"
+              type="submit"
+              sx={{ width: '100%', flex: 1 }}
+              startIcon={<CancelOutlined />}
+              onClick={onCloseModal}
+            />
+          )}
         </Stack>
       </DialogActions>
     </BootstrapDialog>

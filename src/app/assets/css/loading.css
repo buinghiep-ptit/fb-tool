@@ -4,7 +4,7 @@
   height: 100%;
   left: 0;
   top: 0;
-  background: #fff;
+  background: 'transparent';
   z-index: 99999;
 }
 .sk-cube-grid {

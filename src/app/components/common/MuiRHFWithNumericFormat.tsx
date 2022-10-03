@@ -1,35 +1,26 @@
 import {
   InputAdornment,
   InputProps,
-  styled,
   TextField,
   TextFieldProps,
 } from '@mui/material'
 import * as React from 'react'
 import { FC } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-export type IFormInputTextProps = {
+export type Props = {
   iconStart?: React.ReactElement
   iconEnd?: React.ReactElement
   name: string
+  label?: string
   defaultValue?: string
   inputProps?: InputProps
 } & TextFieldProps
 
-const CssTextField = styled(TextField)({
-  '& .MuiInputBase-root': {
-    height: 40,
-  },
-  '& .MuiOutlinedInput-root': {
-    '& fieldset': {
-      //   border: 'none',
-    },
-  },
-})
-
-const FormInputText: FC<IFormInputTextProps> = ({
+const MuiRHFNumericFormatInput: FC<Props> = ({
   name,
+  label = '',
   defaultValue,
   iconStart,
   iconEnd,
@@ -46,17 +37,17 @@ const FormInputText: FC<IFormInputTextProps> = ({
       name={name}
       defaultValue={defaultValue}
       render={({ field }) => (
-        <CssTextField
-          {...field}
-          {...otherProps}
-          variant="outlined"
-          error={!!errors[name]}
-          helperText={
-            errors[name] ? (errors[name]?.message as unknown as string) : ''
-          }
+        <NumericFormat
+          value={!field.value ? field.value : null}
+          label={label}
+          defaultValue={0}
+          onValueChange={({ value: v }) => field.onChange(v)}
           InputProps={{
             ...inputProps,
-            sx: { cursor: iconEnd ? 'pointer' : 'default' },
+            sx: {
+              cursor: iconEnd ? 'pointer' : 'default',
+              caretColor: '#218332',
+            },
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,
@@ -64,9 +55,15 @@ const FormInputText: FC<IFormInputTextProps> = ({
               <InputAdornment position="end">{iconEnd}</InputAdornment>
             ) : null,
           }}
+          error={!!errors[name]}
+          helperText={
+            errors[name] ? (errors[name]?.message as unknown as string) : ''
+          }
+          customInput={TextField}
+          thousandSeparator=","
         />
       )}
     />
   )
 }
-export default FormInputText
+export default MuiRHFNumericFormatInput

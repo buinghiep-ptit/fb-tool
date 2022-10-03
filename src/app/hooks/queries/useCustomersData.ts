@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
+  addOtpCountCustomer,
   changePasswordCustomer,
   lockCustomer,
   unLockCustomer,
@@ -80,6 +81,25 @@ export const useUnLockCustomer = (onSuccess?: any, onError?: any) => {
       unLockCustomer(
         payload.customerId,
         extractFromObject(payload, ['reason']) as any,
+      ),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['customer'])
+        queryClient.invalidateQueries(['logs-customer'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useAddOtpCountCustomer = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    (payload: { customerId: number; otpType: string }) =>
+      addOtpCountCustomer(
+        payload.customerId,
+        extractFromObject(payload, ['otpType']) as any,
       ),
     {
       onSettled: () => {

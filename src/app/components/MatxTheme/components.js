@@ -130,8 +130,16 @@ export const components = {
     styleOverrides: {
       root: {
         borderRadius: '8px',
-        boxShadow:
-          '0px 3px 3px -2px rgb(0 0 0 / 6%), 0px 3px 4px 0px rgb(0 0 0 / 4%), 0px 1px 8px 0px rgb(0 0 0 / 4%) !important',
+        boxShadow: 'rgb(0 0 0 / 12%) 0px 0.5rem 1.25rem',
+        // '0px 3px 3px -2px rgb(0 0 0 / 6%), 0px 3px 4px 0px rgb(0 0 0 / 4%), 0px 1px 8px 0px rgb(0 0 0 / 4%) !important',
+      },
+    },
+  },
+  MuiAccordion: {
+    styleOverrides: {
+      root: {
+        borderRadius: '8px',
+        boxShadow: 'rgb(0 0 0 / 12%) 0px 0.5rem 1.25rem',
       },
     },
   },

@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { styled } from '@mui/material/styles'
-import Tabs from '@mui/material/Tabs'
-import Tab from '@mui/material/Tab'
 import Box from '@mui/material/Box'
-import { BoxProps } from '@mui/system'
+import { styled } from '@mui/material/styles'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import React, { ReactElement } from 'react'
 import { useNavigate } from 'react-router-dom'
+import SimpleCard from '../SimpleCard'
 
 interface StyledTabsProps {
   children?: React.ReactNode
@@ -50,47 +50,80 @@ const StyledTab = styled((props: StyledTabProps) => (
   },
 }))
 
-interface CustomizedNavTabsProps {
-  navItems: string[]
-  customerId: number | string
+function TabPanel(props: any) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+    </div>
+  )
 }
 
-export function MuiNavTabs({ customerId, ...props }: CustomizedNavTabsProps) {
+function a11yProps(index: number) {
+  return {
+    id: `full-width-tab-${index}`,
+    'aria-controls': `full-width-tabpanel-${index}`,
+  }
+}
+interface CustomizedNavTabsProps {
+  navInfo: { path: string; items: { tab: string; label: string }[] }
+  id: number | string
+  currentTab: number
+  data?: any
+  setCurrentTab: (tabIdx: number) => void
+  children?: ReactElement
+}
+
+export function MuiNavTabs({
+  id,
+  currentTab,
+  setCurrentTab,
+  data,
+  children,
+  ...props
+}: CustomizedNavTabsProps) {
   const navigate = useNavigate()
-  const { navItems } = props
-  const [value, setValue] = useState<number>(0)
+  const { navInfo } = props
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue)
-    switch (newValue) {
-      case 0:
-        navigate(`/quan-ly-tai-khoan-khach-hang/${customerId}/info`, {
-          replace: true,
-        })
-        break
-      case 1:
-        navigate(`/quan-ly-tai-khoan-khach-hang/${customerId}/history`, {
-          replace: true,
-        })
-        break
-      default:
-        break
+    setCurrentTab(newValue)
+    let path = ''
+    if (!id) {
+      path = `/${navInfo.path}/${navInfo.items[newValue].tab}`
+    } else {
+      path = `/${navInfo.path}/${id}/${navInfo.items[newValue].tab}`
     }
+    navigate(path, {
+      replace: true,
+    })
   }
 
   return (
-    // <Box sx={{ width: "100%" }}>
     <Box sx={{ bgcolor: 'transparent' }}>
       <StyledTabs
-        value={value}
+        value={currentTab}
         onChange={handleChange}
         aria-label="styled tabs example"
       >
-        {navItems.map(item => (
-          <StyledTab key={item} label={item} />
+        {navInfo.items.map((item, index) => (
+          <StyledTab key={item.tab} label={item.label} {...a11yProps(index)} />
         ))}
       </StyledTabs>
+      {navInfo.items.map((element: any, index: number) => (
+        <TabPanel key={element.tab} value={currentTab} index={index}>
+          <SimpleCard title="">
+            {children}
+            {/* {element.element(data)} */}
+          </SimpleCard>
+        </TabPanel>
+      ))}
     </Box>
-    // </Box>
   )
 }

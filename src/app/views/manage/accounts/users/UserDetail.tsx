@@ -25,9 +25,7 @@ export default function UserDetail({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật tài khoản thành công' })
-    setTimeout(() => {
-      navigate(-1)
-    }, 1000)
+    navigate(-1)
   }
   const { mutate: editUser, isLoading } = useUpdateUserData(onSuccess)
 
@@ -51,7 +49,7 @@ export default function UserDetail({ title }: Props) {
         onCloseModal={handleClose}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >
-        {getContent()}
+        {getContent(isLoading)}
       </MuiStyledModal>
     </React.Fragment>
   )

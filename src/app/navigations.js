@@ -21,6 +21,16 @@ export const navigations = [
     icon: 'event_note',
   },
   {
+    name: 'Quản lý sự kiện',
+    path: '/quan-ly-su-kien',
+    icon: 'event',
+  },
+  {
+    name: 'Quản lý đơn hàng',
+    path: '/quan-ly-don-hang',
+    icon: 'fact_check',
+  },
+  {
     name: 'Quản lý địa danh',
     path: '/quan-ly-thong-tin-dia-danh',
     icon: 'edit_location_alt',

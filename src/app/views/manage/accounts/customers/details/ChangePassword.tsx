@@ -3,12 +3,12 @@ import { RefreshSharp, Visibility, VisibilityOff } from '@mui/icons-material'
 import { IconButton, LinearProgress, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
-import FormTextArea from 'app/components/common/MuiTextarea'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useUpdatePasswordCustomer } from 'app/hooks/queries/useCustomerData'
+import { useUpdatePasswordCustomer } from 'app/hooks/queries/useCustomersData'
 import { ICustomerDetail } from 'app/models/account'
 import { generatePassword } from 'app/utils/generatePassword'
 import React, { useState } from 'react'
@@ -38,9 +38,7 @@ export default function ChangePassword({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật mật khẩu thành công' })
-    setTimeout(() => {
-      navigate(-1)
-    }, 1000)
+    navigate(-1)
   }
   const validationSchema = Yup.object().shape({
     password: Yup.string()
@@ -62,7 +60,6 @@ export default function ChangePassword({ title }: Props) {
     useUpdatePasswordCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
-    console.log(values)
     updatePassword({
       customerId: customerId as any,
       payload: { newPassword: values.password as string },

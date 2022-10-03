@@ -1,14 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCustomers } from 'app/apis/accounts/customer.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiInputText'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiSelectDropdown'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -103,7 +103,7 @@ export default function CustomerAccounts(props: Props) {
   })
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    // setPage(newPage)
+    setPage(newPage)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
@@ -119,8 +119,8 @@ export default function CustomerAccounts(props: Props) {
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    // setRowsPerPage(+event.target.value)
-    // setPage(0)
+    setSize(+event.target.value)
+    setPage(0)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
@@ -159,103 +159,83 @@ export default function CustomerAccounts(props: Props) {
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
       if (cell.id === 'mobilePhone') {
-        navigate(`${row.customerId}/info`, {})
+        navigate(`${row.customerId}/thong-tin`, {})
       } else if (cell.id === 'action') {
         console.log('Toggle active user')
       }
     }
   }
 
-  if (isLoading) return <MuiLoading />
-
-  if (isError)
-    return (
-      <Box my={2} textAlign="center">
-        <MuiTypography variant="h5">
-          Have an errors: {error.message}
-        </MuiTypography>
-      </Box>
-    )
-
   return (
     <Container>
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản KH' }]} />
       </Box>
-      <SimpleCard title="Quản lý TK KH">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Email, SĐT, Tên hiển thị
-                </MuiTypography>
-                <FormInputText
-                  type="text"
-                  name="search"
-                  size="small"
-                  defaultValue=""
-                  placeholder="Nhập Email, SĐT, Tên hiển thị"
-                  fullWidth
-                />
+      <Stack gap={3}>
+        <SimpleCard title="Quản lý TK KH">
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={3} xs={12}>
+                  <FormInputText
+                    label={'Email, SĐT, Tên hiển thị'}
+                    type="text"
+                    name="search"
+                    size="small"
+                    defaultValue=""
+                    placeholder="Nhập Email, SĐT, Tên hiển thị"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="cusType" label="Loại tài khoản">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Thường</MenuItem>
+                    <MenuItem value={2}>KOL</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Hoạt động</MenuItem>
+                    <MenuItem value={-1}>Không hoạt động</MenuItem>
+                    <MenuItem value={-2}>Khoá</MenuItem>
+                    <MenuItem value={-3}>Khoá tạm thời</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Loại tài khoản
-                </MuiTypography>
-                <SelectDropDown name="cusType">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Thường</MenuItem>
-                  <MenuItem value={2}>KOL</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  Trạng thái
-                </MuiTypography>
-                <SelectDropDown name="status">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={-2}>Khoá</MenuItem>
-                  <MenuItem value={-3}>Khoá tạm thời</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiTypography variant="subtitle2" pb={1}>
-                  {'Tìm kiếm'}
-                </MuiTypography>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
-
-        <Box mt={3}>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+        <SimpleCard>
           <MuiStyledTable
-            rows={data?.content as ICustomer[]}
+            rows={data ? (data?.content as ICustomer[]) : []}
             columns={columnCustomerAccounts}
             onClickRow={onClickRow}
             isFetching={isFetching}
+            error={isError ? error : null}
           />
           <MuiStyledPagination
             component="div"
-            rowsPerPageOptions={[10, 20, 100]}
-            count={data?.content?.length as number}
+            rowsPerPageOptions={[20, 50, 100]}
+            count={data ? (data?.totalElements as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

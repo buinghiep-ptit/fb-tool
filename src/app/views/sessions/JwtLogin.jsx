@@ -7,7 +7,9 @@ import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
+import { toastError } from 'app/helpers/toastNofication'
 import useAuth from 'app/hooks/useAuth'
+import { messages } from 'app/utils/messages'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -49,17 +51,32 @@ const JWTRoot = styled(JustifyBox)(() => ({
 
 // inital login credentials
 const defaultValues = {
-  email: 'nghiepbv2@fpt.com.vn',
-  password: 'Nghiepbv91',
+  email: '',
+  password: '',
   rememberMe: false,
 }
 
 // form field validation schema
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
+  email: Yup.string().email(messages.MSG12).required(messages.MSG1),
   password: Yup.string()
-    .matches('^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$', 'Mật khẩu không hợp lệ')
-    .required('Mật khẩu là bắt buộc'),
+    .test('latinChars', messages.MSG21, value => {
+      const regexStr = /^[\x20-\x7E]+$/
+      return regexStr.test(value)
+    })
+    .matches(/^\S*$/, messages.MSG21)
+    .matches(
+      // '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#!@$%^&*()+=]).{8,20}$',
+      // `Should contains at least 8 characters and at most 20 characters\n
+      // Should contains at least one digit\n
+      // Should contains at least one upper case alphabet\n
+      // Should contains at least one lower case alphabet\n
+      // Should contaregexStr = /[A-z\u00C0-\u00ff]+/gins at least one special character which includes !@#$%&*()+=^\n
+      // Should doesn't contain any white space`,
+      /^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g,
+      messages.MSG20,
+    )
+    .required(messages.MSG1),
 })
 
 const JwtLogin = () => {
@@ -86,6 +103,7 @@ const JwtLogin = () => {
       await login(values)
       navigate(from, { replace: true })
     } catch (error) {
+      if (error.data) methods.setError('password', { message: messages.MSG9 })
       setLoading(false)
     }
   }
@@ -118,26 +136,20 @@ const JwtLogin = () => {
               <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
                 <FormProvider {...methods}>
                   <Stack>
-                    <MuiTypography variant="subtitle2" pb={1}>
-                      Email
-                    </MuiTypography>
                     <FormInputText
                       type="text"
                       name="email"
-                      size="small"
+                      label={'Email'}
                       placeholder="Nhập email"
                       fullWidth
                     />
                   </Stack>
                   <Stack pt={2}>
-                    <MuiTypography variant="subtitle2" pb={1}>
-                      Mật khẩu
-                    </MuiTypography>
                     <FormInputText
                       type={showPassword.visibility ? 'text' : 'password'}
                       name="password"
                       placeholder="Nhập mật khẩu"
-                      size="small"
+                      label={'Mật khẩu'}
                       fullWidth
                       iconEnd={
                         <IconButton

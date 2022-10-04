@@ -16,8 +16,8 @@ export const navigations = [
     icon: 'feed',
   },
   {
-    name: 'Bài Feed Campdi',
-    path: '/tool-post-bai-feed',
+    name: 'Thêm mới Feed',
+    path: '/them-moi-feed',
     icon: 'event_note',
   },
   {
@@ -55,14 +55,14 @@ export const navigations = [
     name: 'Session/Auth',
     icon: 'security',
     children: [
-      { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
-      { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
+      // { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
+      // { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
       {
-        name: 'Forgot Password',
+        name: 'Quên mật khẩu',
         iconText: 'FP',
         path: '/session/forgot-password',
       },
-      { name: 'Error', iconText: '404', path: '/session/404' },
+      // { name: 'Error', iconText: '404', path: '/session/404' },
     ],
   },
   // { label: 'Components', type: 'label' },

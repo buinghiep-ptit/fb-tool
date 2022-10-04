@@ -61,6 +61,7 @@ export default function AddEvent(props: Props) {
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
+    mediaType: EMediaType.POST,
   })
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],

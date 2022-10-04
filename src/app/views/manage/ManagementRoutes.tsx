@@ -34,9 +34,7 @@ const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const PostCheck = Loadable(lazy(() => import('./feeds/PostCheck')))
 const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
-const ManagerToolPostFeed = Loadable(
-  lazy(() => import('./ManagerToolPostFeed')),
-)
+const PostFeed = Loadable(lazy(() => import('./feeds/PostFeed')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
@@ -137,7 +135,7 @@ const ManagementRoutes = [
       },
     ],
   },
-  { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
+  { path: '/them-moi-feed', element: <PostFeed /> },
   { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
   { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
   { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },

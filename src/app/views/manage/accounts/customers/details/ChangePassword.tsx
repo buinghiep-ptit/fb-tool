@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { messages } from 'app/utils/messages'
 
 type Props = {
   title: string
@@ -42,12 +43,15 @@ export default function ChangePassword({ title }: Props) {
   }
   const validationSchema = Yup.object().shape({
     password: Yup.string()
-      .matches(
-        // /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,32}$)/,
-        'Mật khẩu không hợp lệ',
-      )
-      .required('Mật khẩu là bắt buộc'),
+      .required(messages.MSG1)
+      .test('latinChars', messages.MSG21, value => {
+        const regexStr = /^[\x20-\x7E]+$/
+        if (value) {
+          return regexStr.test(value)
+        } else return false
+      })
+      .matches(/^\S*$/, messages.MSG21)
+      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20),
     note: Yup.string().max(256, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

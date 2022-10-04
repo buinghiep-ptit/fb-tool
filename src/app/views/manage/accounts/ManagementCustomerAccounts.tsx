@@ -7,15 +7,14 @@ import { fetchCustomers } from 'app/apis/accounts/customer.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { ICustomer, ICustomerResponse } from 'app/models/account'
 import { columnCustomerAccounts } from 'app/utils/columns/columnsCustomerAccounts'
-import { useEffect, useState } from 'react'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -43,17 +42,21 @@ type ISearchFilters = {
 export default function CustomerAccounts(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
+  const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
+
   const [defaultValues] = useState<ISearchFilters>({
-    cusType: 'all',
-    status: 'all',
+    search: queryParams.search ?? '',
+    cusType: queryParams.cusType ?? 'all',
+    status: queryParams.status ?? 'all',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
   })
-  const [filters, setFilters] = useState<ISearchFilters>({
-    page,
-    size,
-    sort: 'email,asc',
-  })
+
+  const [filters, setFilters] = useState<ISearchFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
 
   const validationSchema = Yup.object().shape({
     account: Yup.string()
@@ -69,23 +72,6 @@ export default function CustomerAccounts(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  useEffect(() => {
-    if (searchParams) {
-      const queryParams = Object.fromEntries([...searchParams])
-      if (!!Object.keys(queryParams).length) {
-        setPage(parseInt(queryParams.page) || 0)
-        setSize(parseInt(queryParams.size) || 20)
-
-        setFilters(prevFilters => {
-          return {
-            ...prevFilters,
-            ...queryParams,
-          }
-        })
-      }
-    }
-  }, [searchParams])
 
   const {
     data,
@@ -137,23 +123,19 @@ export default function CustomerAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    removeParamsHasDefaultValue(values)
     setFilters(prevFilters => {
       return {
-        ...prevFilters,
-        ...values,
+        ...extractMergeFiltersObject(prevFilters, values),
+        page,
+        size,
       }
     })
-    navigate('', {
-      ...filters,
-      ...values,
-    } as any)
-  }
 
-  const removeParamsHasDefaultValue = (objParams: Record<string, any>) => {
-    Object.keys(objParams).forEach(key => {
-      if (objParams[key] === 'all') objParams[key] = ''
-    })
+    navigate('', {
+      ...extractMergeFiltersObject(filters, values),
+      page,
+      size,
+    } as any)
   }
 
   const onClickRow = (cell: any, row: any) => {
@@ -161,7 +143,7 @@ export default function CustomerAccounts(props: Props) {
       if (cell.id === 'mobilePhone') {
         navigate(`${row.customerId}/thong-tin`, {})
       } else if (cell.id === 'action') {
-        console.log('Toggle active user')
+        navigate(`${row.customerId}/thong-tin`, {})
       }
     }
   }

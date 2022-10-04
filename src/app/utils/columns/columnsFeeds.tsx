@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material'
+import { Chip, Typography } from '@mui/material'
 import { TableColumn, TitleFeeds } from 'app/models'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
@@ -27,10 +27,18 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     format: (value: string) => ISODateTimeFormatter(value),
   },
   {
-    id: 'mediaType',
+    id: 'type',
     label: 'Loại media',
     minWidth: 100,
     align: 'center',
+    format: (value: any) => (
+      <Chip
+        label={value === 1 ? 'Video' : 'Ảnh'}
+        size="small"
+        color={'primary'}
+        sx={{ m: 0.5 }}
+      />
+    ),
   },
   {
     id: 'status',
@@ -40,9 +48,9 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     status: (value: any) => LabelFormatter(value, 'feed'),
   },
   {
-    id: 'acceptAccount',
+    id: 'handler',
     label: 'Người tiếp nhận',
-    minWidth: 170,
+    minWidth: 150,
     align: 'center',
   },
   {

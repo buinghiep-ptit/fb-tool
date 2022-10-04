@@ -1,17 +1,20 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { ApprovalRounded, CancelSharp } from '@mui/icons-material'
-import { Grid, LinearProgress, MenuItem, Stack, styled } from '@mui/material'
+import {
+  Grid,
+  Icon,
+  LinearProgress,
+  MenuItem,
+  Stack,
+  styled,
+} from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import {
   customerSystemDefault,
   fetchCustomers,
 } from 'app/apis/accounts/customer.service'
-import {
-  createFeed,
-  fetchCampAreas,
-  fetchCampGrounds,
-} from 'app/apis/feed/feed.service'
+import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -38,6 +41,7 @@ import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {}
@@ -63,7 +67,8 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export default function ManagerToolPostFeed(props: Props) {
+export default function PostFeed(props: Props) {
+  const navigate = useNavigate()
   const [accountList, setAccountList] = useState<ICustomer[]>([])
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
@@ -72,6 +77,7 @@ export default function ManagerToolPostFeed(props: Props) {
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
+    mediaType: EMediaType.POST,
   })
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
@@ -268,6 +274,27 @@ export default function ManagerToolPostFeed(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Post bài Feed' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+      >
+        <MuiButton
+          title="Xác nhận tạo bài"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={methods.handleSubmit(onSubmitHandler)}
+          startIcon={<Icon>done</Icon>}
+        />
+        <MuiButton
+          title="Huỷ tạo"
+          variant="contained"
+          color="secondary"
+          onClick={() => methods.reset()}
+          startIcon={<Icon>clear</Icon>}
+        />
+      </Stack>
       <SimpleCard title="Post bài">
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
           <FormProvider {...methods}>
@@ -365,7 +392,7 @@ export default function ManagerToolPostFeed(props: Props) {
 
                   {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
 
-                  <Grid container spacing={2} mt={1}>
+                  {/* <Grid container spacing={2} mt={1}>
                     <Grid item sm={6} xs={6}>
                       <MuiButton
                         title="Lưu"
@@ -387,7 +414,7 @@ export default function ManagerToolPostFeed(props: Props) {
                         startIcon={<CancelSharp />}
                       />
                     </Grid>
-                  </Grid>
+                  </Grid> */}
                 </Stack>
               </Grid>
 
@@ -427,6 +454,18 @@ export default function ManagerToolPostFeed(props: Props) {
             </Grid>
           </FormProvider>
         </form>
+
+        <Stack flexDirection={'row'} justifyContent={'flex-end'} mt={2}>
+          <MuiButton
+            title="Xem danh sách bài feed"
+            loading={false}
+            variant="text"
+            color="primary"
+            onClick={() => navigate('/quan-ly-feeds', {})}
+            sx={{ fontSize: '1rem' }}
+            endIcon={<Icon>arrow_forward</Icon>}
+          />
+        </Stack>
       </SimpleCard>
     </Container>
   )

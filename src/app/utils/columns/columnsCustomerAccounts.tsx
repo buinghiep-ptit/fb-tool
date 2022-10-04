@@ -1,13 +1,26 @@
 import { EditOutlined } from '@mui/icons-material'
-import { Typography } from '@mui/material'
+import { Avatar, styled, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
+const StyledAvatar = styled(Avatar)(() => ({
+  height: '32px',
+  width: '32px',
+}))
+
 export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'avatar',
+    label: '',
+    minWidth: 40,
+    media: (value: string) => (
+      <StyledAvatar src={value ?? '/assets/images/avatars/avatar-duck.jpeg'} />
+    ),
+  },
   {
     id: 'mobilePhone',
     label: 'Số điện thoại',

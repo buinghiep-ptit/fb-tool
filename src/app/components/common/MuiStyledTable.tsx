@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { Box } from '@mui/system'
 import { TableColumn } from 'app/models'
+import { messages } from 'app/utils/messages'
 import * as React from 'react'
 import { MuiTypography } from './MuiTypography'
 
@@ -145,7 +146,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         {noDataFound && (
           <Box
             my={2}
-            minHeight={300}
+            minHeight={200}
             display="flex"
             alignItems="center"
             justifyContent={'center'}
@@ -154,7 +155,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
             <Stack flexDirection={'row'} gap={1}>
               <FilterNone />
               <MuiTypography>
-                {error ? error.message : 'Không tìm thấy bản ghi'}
+                {error ? error.message : messages.MSG24}
               </MuiTypography>
             </Stack>
           </Box>

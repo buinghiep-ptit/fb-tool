@@ -1,8 +1,12 @@
-import { LinearProgress, Slider, styled } from '@mui/material'
+import { Icon, IconButton, LinearProgress, Slider, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import * as React from 'react'
+import { findDOMNode } from 'react-dom'
+import { hot } from 'react-hot-loader'
 import ReactPlayer from 'react-player'
 import { Waypoint } from 'react-waypoint'
+// import screenfull from 'screenfull'
+import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import Duration from './Duration'
 import LoadingItem from './LoadingItem'
 
@@ -33,16 +37,16 @@ export interface IMediaPlayerProps {
   setDuration?: (dur: number) => void
 }
 
-export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
+function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
   const [loading, setLoading] = React.useState(true)
 
   const [state, setState] = React.useState({
     url: null,
     pip: false,
     playing: false,
-    controls: false,
+    controls: true,
     light: false,
-    volume: 0.8,
+    volume: 1,
     muted: true,
     played: 0,
     loaded: 0,
@@ -59,6 +63,14 @@ export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
   }
   const handleExitViewport = function () {
     setState(prev => ({ ...prev, playing: false }))
+  }
+
+  const handleToggleMuted = () => {
+    setState(prev => ({ ...prev, muted: !prev.muted }))
+  }
+
+  const handleClickFullscreen = () => {
+    // screenfull.request(findDOMNode(playerRef) as any)
   }
 
   const handlePlayPause = () => {
@@ -94,6 +106,14 @@ export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
     )
   }
 
+  const handleReplay = () => {
+    setState(prev => ({
+      ...prev,
+      played: 0,
+    }))
+    playerRef.current.seekTo(0)
+  }
+
   return (
     <div
       style={{
@@ -114,6 +134,7 @@ export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             width="100%"
             height="100%"
             url={url}
+            controls={state.controls}
             playing={state.playing}
             muted={state.muted}
             onReady={() => setLoading(false)}
@@ -122,6 +143,44 @@ export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             onProgress={handleProgress}
             onDuration={handleDuration}
           />
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '4px',
+              left: '4px',
+              zIndex: 999,
+            }}
+          >
+            <IconButton onClick={handleToggleMuted}>
+              <Icon color="primary">
+                {state.muted ? 'volume_off' : 'volume_up'}
+              </Icon>
+            </IconButton>
+          </Box>
+
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '4px',
+              right: '4px',
+              zIndex: 999,
+            }}
+          >
+            <IconButton onClick={handleClickFullscreen}>
+              <Icon color="primary">crop_free</Icon>
+            </IconButton>
+          </Box>
+
+          {Math.ceil(state.duration * (1 - state.played)) === 0 ? (
+            <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.5)">
+              <IconButton onClick={handleReplay}>
+                <Icon color="primary" sx={{ fontSize: '32px !important' }}>
+                  history
+                </Icon>
+              </IconButton>
+            </AbsoluteFillObject>
+          ) : null}
+
           <Box
             sx={{
               position: 'absolute',
@@ -197,9 +256,12 @@ export function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
               />
             </Box>
           </Box>
+
           <LoadingItem loading={loading} className="video__loading" />
         </div>
       </Waypoint>
     </div>
   )
 }
+
+export default MediaPlayer

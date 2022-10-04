@@ -24,11 +24,9 @@ import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
 import { columnFeeds } from 'app/utils/columns'
@@ -177,9 +175,9 @@ export default function ManagerFeed(props: Props) {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      navigate(`${14 ?? row.feedId}`, {})
+      navigate(`${row.feedId}`, {})
     }
-    console.log('cell:', cell, 'row:', row)
+    navigate(`${row.feedId}`, {})
   }
 
   return (
@@ -320,7 +318,7 @@ export default function ManagerFeed(props: Props) {
                       sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
                       flexItem
                     />
-                    <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
+                    <NavLink to={'/quan-ly-feeds/hau-kiem'}>
                       <MuiButton
                         title="Báo cáo vi phạm"
                         variant="text"

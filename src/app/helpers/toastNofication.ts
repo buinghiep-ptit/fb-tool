@@ -7,14 +7,16 @@ enum StatusCode {
   InternalServerError = 500,
 }
 export const toastError = (error: {
+  data?: any
   response?: any
   message?: string
   request?: any
   code?: any
 }) => {
   let message = null
-  console.log(error.message)
-  if (error.code) {
+  if (error.data) {
+    message = error.data.errorDescription ?? ''
+  } else if (error.code) {
     if (error.code === 'ECONNABORTED')
       message = '[Lỗi Server] Không có phản hồi phía máy chủ'
   } else if (error.response) {

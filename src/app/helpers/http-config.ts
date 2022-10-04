@@ -80,8 +80,6 @@ class Http {
         return originalRequest
       },
       (error: any) => {
-        console.log('error request:', error)
-
         Promise.reject(error)
       },
     )
@@ -92,7 +90,13 @@ class Http {
           // here you clean the request
           delete currentExecutingRequests[response.request.responseURL]
         }
+        const responseData = response.data
+        if (responseData.code && parseInt(responseData.code) !== 200) {
+          const error = response
+          toastError(error)
 
+          return Promise.reject(response)
+        }
         return response
       },
       async (error: any) => {
@@ -114,6 +118,7 @@ class Http {
           error.response.config.url !== '/api/account'
         ) {
           window.localStorage.clear()
+          localStorage.removeItem('accessToken')
           window.location.href = '/session/signin'
           // originalRequest._retry = true
         }

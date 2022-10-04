@@ -48,3 +48,39 @@ export const LabelFormatter = (value?: number, key?: string) => {
   }
   return formatter
 }
+
+export const convertOtpToLabel = (type: number) => {
+  switch (type) {
+    case 1:
+      return 'OTP đăng ký'
+    case 2:
+      return 'OTP quên mật khẩu'
+
+    case 3:
+      return 'OTP đăng nhập'
+
+    case 4:
+      return 'OTP đổi SĐT'
+
+    default:
+      return 'OTP đăng ký'
+  }
+}
+
+export const getLabelByCusStatus = (status: number) => {
+  switch (status) {
+    case 1:
+      return 'Hoạt động'
+    case -1:
+      return 'Xoá'
+
+    case -2:
+      return 'Khoá'
+
+    case -3:
+      return 'Khoá tạm thời'
+
+    default:
+      return 'Không hoạt động'
+  }
+}

@@ -116,8 +116,6 @@ const transformData = (images: any, dimensions: any) => {
   }
 }
 
-const regexImgUrl = /^http[^ \!@\$\^&\(\)\+\=]+(\.png|\.jpeg|\.gif|\.jpg)$/
-
 type ProgressProps = {
   value: number
 }
@@ -148,12 +146,14 @@ export interface IImageListViewProps {
   progressInfos?: { val: FileInfoProgress[] } // 0: preview upload, 1: preview data
   medias?: IMediaOverall[]
   oldMedias?: IMediaOverall[]
+  onClickMedia?: (position?: number) => void
 }
 
 export function ImageListView({
   progressInfos,
   medias,
   oldMedias,
+  onClickMedia,
 }: IImageListViewProps) {
   const targetRef = React.useRef(null)
   const dimensions = useDimensions(targetRef)
@@ -196,7 +196,7 @@ export function ImageListView({
                 onClick={e => {
                   e.preventDefault()
                   e.stopPropagation()
-                  console.log('show modal with pos:', index)
+                  onClickMedia && onClickMedia(index)
                 }}
                 {...srcset(
                   item.url // && regex.test(item.url)

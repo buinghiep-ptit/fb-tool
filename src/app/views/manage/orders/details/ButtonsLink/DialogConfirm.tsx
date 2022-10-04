@@ -6,29 +6,29 @@ export interface IDiagLogConfirmProps {
   open?: boolean
   setOpen?: (open: boolean) => void
   onSubmit: () => void
+  children?: React.ReactElement
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false | string
 }
 
 export function DiagLogConfirm({
   title = '',
   open = false,
   setOpen,
+  maxWidth = 'sm',
   onSubmit,
+  children,
 }: IDiagLogConfirmProps) {
-  const getContent = () => {
-    return <></>
-  }
-
   return (
     <React.Fragment>
       <MuiStyledModal
         title={title}
         open={open}
-        maxWidth={'sm'}
+        maxWidth={maxWidth}
         onCloseModal={() => setOpen && setOpen(false)}
         isLoading={false}
         onSubmit={onSubmit}
       >
-        {getContent()}
+        {children}
       </MuiStyledModal>
     </React.Fragment>
   )

@@ -1,8 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   AddBox,
-  CameraAltRounded,
-  CancelSharp,
   ChangeCircleSharp,
   CheckCircleOutlineRounded,
   ClearSharp,
@@ -12,8 +10,8 @@ import {
 import {
   Chip,
   Divider,
-  FormHelperText,
   Grid,
+  Icon,
   IconButton,
   LinearProgress,
   MenuItem,
@@ -27,38 +25,43 @@ import {
 } from 'app/apis/accounts/customer.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
 } from 'app/hooks/queries/useCustomersData'
+import { useUploadFiles } from 'app/hooks/useFilesUpload'
+import { IMediaOverall } from 'app/models'
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
-import { getColorByCusStatus } from 'app/utils/common'
+import { getColorByCusStatus, regexImgUrl } from 'app/utils/common'
+import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
-import { useState } from 'react'
 import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-  useWatch,
-} from 'react-hook-form'
+  convertOtpToLabel,
+  getLabelByCusStatus,
+} from 'app/utils/formatters/labelFormatter'
+import { messages } from 'app/utils/messages'
+import { useEffect, useState } from 'react'
+import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
-type ISearchFilters = {
+type SchemaType = {
   email?: string
   mobilePhone?: string
   fullName?: string
   otp?: number
-  avatar?: any
+  typeFile?: number
+  files?: any
   type?: string | number
 }
 
@@ -96,45 +99,37 @@ const RHFLabel = ({ control, name, options }: RHFLabelProps) => {
 }
 
 export interface Props {}
-const FILE_SIZE = 10000000
-const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/gif', 'image/png']
 
 export default function CustomerDetail(props: Props) {
   const navigation = useNavigate()
   const { customerId } = useParams()
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(10)
+  const [fileConfigs] = useState({
+    mediaType: EMediaType.AVATAR,
+    mediaFormat: EMediaFormat.IMAGE,
+    accept: 'image/*',
+    multiple: false,
+  })
+  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
+    [],
+  )
   const [filters, setFilters] = useState({
     customerId,
     page,
     size,
   })
 
+  const [defaultValues] = useState<SchemaType>({ typeFile: EMediaFormat.IMAGE })
+
   const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email('Email không hợp lệ')
-      .required('Email là bắt buộc'),
+    email: Yup.string().email(messages.MSG12).required(messages.MSG1),
     mobilePhone: Yup.string()
-      .required('SĐT là bắt buộc')
+      .required(messages.MSG1)
       .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, 'Số điện thoại không hợp lệ'),
     displayName: Yup.string()
       .min(0, 'email must be at least 0 characters')
       .max(256, 'email must be at almost 256 characters'),
-    avatar: Yup.mixed()
-      .test(
-        'fileSize',
-        'Dung lượng file quá lớn (< 10MB)',
-        file => !file || (file && file.size <= FILE_SIZE),
-      )
-      .test('fileFormat', 'Chỉ hỗ trợ ảnh .jpg | .jpeg | .png | .gif', file => {
-        return !file || (file && SUPPORTED_FORMATS.includes(file.type))
-      }),
-  })
-
-  const methods = useForm<ISearchFilters>({
-    defaultValues: { avatar: null },
-    mode: 'onChange',
-    resolver: yupResolver(validationSchema),
   })
 
   const queryResults = useQueries({
@@ -163,41 +158,42 @@ export default function CustomerDetail(props: Props) {
     (query: UseQueryResult) => query.isFetching,
   )
 
-  const convertOtpToLabel = (type: number) => {
-    switch (type) {
-      case 1:
-        return 'OTP đăng ký'
-      case 2:
-        return 'OTP quên mật khẩu'
+  useEffect(() => {
+    if (!!customer.data) {
+      defaultValues.email = customer.data.email ?? ''
+      defaultValues.mobilePhone = customer.data.mobilePhone ?? ''
+      defaultValues.fullName = customer.data.fullName ?? ''
+      defaultValues.otp =
+        customer.data?.otpCount && customer.data?.otpCount[0].type
+      defaultValues.type = customer.data.type ?? 1
 
-      case 3:
-        return 'OTP đăng nhập'
+      setMediasSrcPreviewer([
+        {
+          mediaType: EMediaType.AVATAR,
+          mediaFormat: EMediaFormat.IMAGE,
+          url:
+            customer.data.avatar ?? '/assets/images/avatars/avatar-duck.jpeg',
+        },
+      ])
 
-      case 4:
-        return 'OTP đổi SĐT'
-
-      default:
-        return 'OTP đăng ký'
+      methods.reset({ ...defaultValues })
     }
-  }
+  }, [customer.data])
 
-  const getLabelByCusStatus = (status: number) => {
-    switch (status) {
-      case 1:
-        return 'Hoạt động'
-      case -1:
-        return 'Xoá'
+  const methods = useForm<SchemaType>({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+  })
 
-      case -2:
-        return 'Khoá'
-
-      case -3:
-        return 'Khoá tạm thời'
-
-      default:
-        return 'Không hoạt động'
-    }
-  }
+  const [
+    selectFiles,
+    uploadFiles,
+    uploading,
+    progressInfos,
+    message,
+    fileInfos,
+  ] = useUploadFiles()
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật thành công' })
@@ -209,10 +205,12 @@ export default function CustomerDetail(props: Props) {
   const { mutate: addOtpCount, isLoading: addOtpLoading } =
     useAddOtpCountCustomer(onSuccess)
 
-  const onSubmitHandler: SubmitHandler<ISearchFilters> = (
-    values: ISearchFilters,
-  ) => {
-    updateCustomer({ ...values, cusId: customerId })
+  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    updateCustomer({
+      ...values,
+      avatar: (fileInfos[0] && fileInfos[0].url) ?? '',
+      cusId: customerId,
+    })
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -250,49 +248,68 @@ export default function CustomerDetail(props: Props) {
 
   return (
     <Stack gap={3}>
-      <SimpleCard>
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={3}>
-              <Grid item sm={6} xs={12}>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+      >
+        {customer.data?.status !== -1 && (
+          <>
+            <MuiButton
+              disabled={!!Object.keys(methods.formState.errors).length}
+              title="Lưu thay đổi"
+              loading={updateLoading}
+              variant="contained"
+              color="primary"
+              onClick={methods.handleSubmit(onSubmitHandler)}
+              startIcon={<Icon>done</Icon>}
+            />
+            <MuiButton
+              title="Huỷ bỏ"
+              variant="contained"
+              color="secondary"
+              onClick={() => methods.reset()}
+              startIcon={<Icon>clear</Icon>}
+            />
+          </>
+        )}
+      </Stack>
+      <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+        <FormProvider {...methods}>
+          <Grid container spacing={3}>
+            <Grid item sm={6} xs={12}>
+              <SimpleCard>
                 <Stack gap={3}>
                   <FormInputText
                     label={'Email'}
                     type="email"
                     name="email"
                     placeholder="Nhập Email"
-                    size="small"
                     fullWidth
-                    defaultValue={customer?.data?.email ?? ''}
+                    defaultValue=""
                   />
                   <FormInputText
                     label={' Số điện thoại'}
                     type="text"
                     name="mobilePhone"
-                    size="small"
                     placeholder="Nhập SĐT"
                     fullWidth
-                    defaultValue={customer?.data?.mobilePhone ?? ''}
+                    defaultValue=""
                   />
                   <FormInputText
                     label={'Tên hiển thị'}
                     type="text"
                     name="fullName"
                     placeholder="Nhập họ và tên"
-                    size="small"
                     fullWidth
-                    defaultValue={customer?.data?.fullName ?? ''}
+                    defaultValue=""
                   />
                   <Stack flexDirection={'row'} alignItems={'center'}>
                     <Box flex={1}>
                       <SelectDropDown
                         label="OTP trong ngày"
                         name="otp"
-                        defaultValue={
-                          (customer?.data?.otpCount &&
-                            customer?.data?.otpCount[0]?.type) ??
-                          0
-                        }
+                        defaultValue=""
                       >
                         {customer?.data?.otpCount?.length ? (
                           customer?.data?.otpCount?.map(item => (
@@ -380,158 +397,50 @@ export default function CustomerDetail(props: Props) {
                 </Stack>
 
                 {updateLoading && <LinearProgress />}
+              </SimpleCard>
+            </Grid>
 
-                {customer.data?.status !== -1 && (
-                  <Box pt={3}>
-                    <Grid container spacing={2}>
-                      <Grid item sm={6} xs={6}>
-                        <MuiButton
-                          disabled={
-                            !!Object.keys(methods.formState.errors).length
-                          }
-                          title="Lưu"
-                          loading={updateLoading}
-                          variant="contained"
-                          color="primary"
-                          type="submit"
-                          sx={{ width: '100%' }}
-                          startIcon={<LockClockSharp />}
-                        />
-                      </Grid>
-                      <Grid item sm={6} xs={6}>
-                        <MuiButton
-                          onClick={() => methods.reset()}
-                          title="Huỷ"
-                          variant="outlined"
-                          color="secondary"
-                          sx={{ width: '100%' }}
-                          startIcon={<CancelSharp />}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-              </Grid>
-
-              <Grid item sm={6} xs={12}>
+            <Grid item sm={6} xs={12}>
+              <SimpleCard>
                 <Stack alignItems={'center'} justifyContent={'center'}>
                   <Stack alignItems={'center'} px={3} gap={2}>
-                    <Box
-                      width={200}
-                      height={200}
-                      sx={{
-                        bgcolor: 'gray',
-                        borderRadius: 100,
-                        position: 'relative',
-                        backgroundPosition: 'center',
-                        backgroundSize: 'cover',
-                        boxShadow:
-                          '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
+                    <>
+                      <UploadPreviewer
+                        name="files"
+                        mediasSrcPreviewer={mediasSrcPreviewer}
+                        setMediasSrcPreviewer={setMediasSrcPreviewer}
+                        mediaConfigs={fileConfigs}
+                        selectFiles={selectFiles}
+                        uploadFiles={uploadFiles}
+                        uploading={uploading}
+                        progressInfos={progressInfos}
+                      />
 
-                        backgroundImage: `url(${
-                          methods.watch('avatar')
-                            ? URL.createObjectURL(methods.watch('avatar'))
-                            : '/assets/images/avatars/avatar-duck.jpeg'
-                        })`,
-                      }}
-                    >
-                      <label>
-                        <Controller
-                          name="avatar"
-                          control={methods.control}
-                          defaultValue={[]}
-                          render={({ field }) => (
-                            <input
-                              style={{ display: 'none' }}
-                              type="file"
-                              name="avatar"
-                              accept="image/*"
-                              // multiple
-                              {...props}
-                              onChange={event => {
-                                if (event.target.files?.length) {
-                                  field.onChange(event.target.files[0])
-                                }
-                              }}
-                            />
-                          )}
-                        />
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            borderRadius: 100,
-                            backgroundColor: 'white',
-                            width: 50,
-                            height: 50,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                          }}
+                      {methods.getValues('files') && !uploading && (
+                        <Stack
+                          maxWidth={'100%'}
+                          flexDirection={'row'}
+                          gap={0.5}
+                          alignItems={'center'}
                         >
-                          <CameraAltRounded
-                            fontSize="large"
-                            sx={{ width: 40, height: 40, color: '#121828' }}
-                          />
-                        </Box>
-                      </label>
-                      <Box
-                        sx={{
-                          backgroundColor: '#ffffff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: 32,
-                          height: 32,
-                          position: 'absolute',
-                          bottom: 10,
-                          right: 20,
-                          borderRadius: 100,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 24,
-                            height: 24,
-                            bgcolor: getColorByCusStatus(
-                              customer.data?.status ?? 0,
-                            ),
-                            right: 0,
-                            borderRadius: 100,
-                          }}
-                        />
-                      </Box>
-                    </Box>
-
-                    {methods.getValues('avatar') && (
-                      <Stack
-                        maxWidth={'100%'}
-                        flexDirection={'row'}
-                        gap={0.5}
-                        alignItems={'center'}
-                      >
-                        <CheckCircleOutlineRounded color="primary" />
-                        <MuiTypography fontSize="0.75rem">
-                          {methods.getValues('avatar').name as string}
-                        </MuiTypography>
-                        <IconButton
-                          onClick={() => {
-                            methods.clearErrors('avatar')
-                            methods.setValue('avatar', null)
-                          }}
-                        >
-                          <ClearSharp color="error" />
-                        </IconButton>
-                      </Stack>
-                    )}
-
-                    {methods.formState.errors.avatar && (
-                      <FormHelperText error>
-                        {methods.formState.errors.avatar?.message as string}
-                      </FormHelperText>
-                    )}
+                          <CheckCircleOutlineRounded color="primary" />
+                          <MuiTypography fontSize="0.75rem">
+                            {
+                              (methods.getValues('files')[0].name ??
+                                '') as string
+                            }
+                          </MuiTypography>
+                          <IconButton
+                            onClick={() => {
+                              methods.clearErrors('files')
+                              methods.setValue('files', null)
+                            }}
+                          >
+                            <ClearSharp color="error" />
+                          </IconButton>
+                        </Stack>
+                      )}
+                    </>
 
                     <Stack flexDirection={'row'}>
                       <Stack alignItems={'center'}>
@@ -557,11 +466,11 @@ export default function CustomerDetail(props: Props) {
                       </Stack>
                     </Stack>
 
-                    <Stack flexDirection={'row'} alignItems="center">
+                    <Stack flexDirection={'row'} alignItems="center" gap={1}>
                       <SelectDropDown
                         label="Loại TK"
                         name="type"
-                        defaultValue={customer?.data?.type ?? 1}
+                        defaultValue=""
                         sx={{ minWidth: 120 }}
                       >
                         <MenuItem value={1}>Thường</MenuItem>
@@ -587,7 +496,7 @@ export default function CustomerDetail(props: Props) {
                   </Stack>
 
                   {customer.data?.status !== -1 && (
-                    <Stack flexDirection={'row'} my={3}>
+                    <Stack flexDirection={'row'}>
                       {customer.data?.status !== -2 && (
                         <>
                           <MuiButton
@@ -603,7 +512,7 @@ export default function CustomerDetail(props: Props) {
                           />
                           <Divider
                             orientation="vertical"
-                            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
+                            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
                             flexItem
                           />
                         </>
@@ -644,11 +553,11 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
                   )}
                 </Stack>
-              </Grid>
+              </SimpleCard>
             </Grid>
-          </FormProvider>
-        </form>
-      </SimpleCard>
+          </Grid>
+        </FormProvider>
+      </form>
 
       <SimpleCard title=" Logs hành động">
         <MuiStyledTable

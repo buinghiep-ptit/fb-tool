@@ -1,10 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Grid, LinearProgress, MenuItem, Stack } from '@mui/material'
+import { LinearProgress, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
-import { MuiTypography } from 'app/components/common/MuiTypography'
-import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 
@@ -37,30 +35,13 @@ const useFormUserModal = (data?: any) => {
         <FormProvider {...methods}>
           <Stack gap={3} py={3}>
             <FormInputText
-              label={'Tên đăng nhập *'}
-              type="email"
-              name="email"
-              size="small"
-              placeholder="Nhập tên tài khoản"
-              fullWidth
-              defaultValue={data?.email ? data?.email : ''}
-            />
-            <FormInputText
               label={'Email *'}
               type="email"
               name="email"
               placeholder="Nhập Email"
               size="small"
               fullWidth
-            />
-            <FormInputText
-              label={'Họ và tên *'}
-              type="text"
-              name="name"
-              placeholder="Nhập họ và tên"
-              size="small"
-              fullWidth
-              defaultValue=""
+              defaultValue={(data && data.email) ?? ''}
             />
             <SelectDropDown
               label=" Trạng thái *"

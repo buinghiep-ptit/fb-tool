@@ -8,13 +8,15 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
+import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IActionHistory, IMediaOverall, IReportDecline } from 'app/models'
+import { IActionHistory, Image, IReportDecline } from 'app/models'
 import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
@@ -34,17 +36,9 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function FeedDetail(props: Props) {
-  const mediaDefault: IMediaOverall = {
-    id: 1,
-    mediaFormat: 1,
-    url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-    detail: {
-      id: 1,
-      coverImgUrl:
-        'https://img.meta.com.vn/Data/image/2021/07/27/good-girl-nghia-la-gi-2.jpg',
-    },
-  }
   const { feedId } = useParams()
+  const [open, setOpen] = useState(false)
+  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
 
   const [pageReports, setPageReports] = useState<number>(0)
   const [sizeReports, setSizeReports] = useState<number>(5)
@@ -143,6 +137,21 @@ export default function FeedDetail(props: Props) {
         size: parseInt(event.target.value, 10),
       }
     })
+  }
+
+  const onClickMedia = (imgIndex?: number) => {
+    console.log('onClickMedia: ', imgIndex)
+    if (imgIndex === 4) setInitialIndexSlider(0)
+    else setInitialIndexSlider(imgIndex ?? 0)
+    setOpen(true)
+  }
+
+  const onRemoveMedia = (imgIndex?: number) => {
+    console.log('onRemoveMedia: ', imgIndex)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
   }
 
   const getColorByCusStatus = (status: number) => {
@@ -274,19 +283,30 @@ export default function FeedDetail(props: Props) {
               </Grid>
             </Grid>
 
-            {/* <Box
-              width={300}
-              sx={{ position: 'relative', cursor: 'pointer', py: 2 }}
-            >
-              {medias.map(media => ( */}
-            {/* <MediaItem game={medias[0] as any} /> */}
-            <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
-                <MediaViewItem orientation="horizontal" media={mediaDefault} />
-              </Grid>
-            </Grid>
-            {/* ))}
-            </Box> */}
+            <Stack flexDirection={'row'} justifyContent={'center'}>
+              {feed.data?.type === 1 ? (
+                <Box width={'50%'} maxWidth={320}>
+                  <MediaViewItem
+                    media={feed.data.video as any}
+                    orientation="vertical"
+                  />
+                </Box>
+              ) : (
+                <Box width={'75%'} maxWidth={{ md: '568px', xs: '568px' }}>
+                  <ImageListView
+                    medias={feed.data?.images as Image[]}
+                    onClickMedia={onClickMedia}
+                  />
+                  <ModalFullScreen
+                    data={feed.data?.images as Image[]}
+                    open={open}
+                    onCloseModal={handleClose}
+                    onSubmit={onRemoveMedia}
+                    initialIndexSlider={initialIndexSlider}
+                  />
+                </Box>
+              )}
+            </Stack>
           </Box>
         </SimpleCard>
 

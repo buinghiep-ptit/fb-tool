@@ -33,7 +33,6 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
@@ -42,7 +41,7 @@ import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IMediaOverall } from 'app/models'
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
-import { getColorByCusStatus, regexImgUrl } from 'app/utils/common'
+import { getColorByCusStatus } from 'app/utils/common'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import {
@@ -122,15 +121,35 @@ export default function CustomerDetail(props: Props) {
 
   const [defaultValues] = useState<SchemaType>({ typeFile: EMediaFormat.IMAGE })
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email(messages.MSG12).required(messages.MSG1),
-    mobilePhone: Yup.string()
-      .required(messages.MSG1)
-      .matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, 'Số điện thoại không hợp lệ'),
-    displayName: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      email: Yup.lazy(() =>
+        Yup.string()
+          .email()
+          .when(['mobilePhone'], {
+            is: (mobilePhone: any) => !mobilePhone,
+            then: Yup.string().required(messages.MSG1).email(messages.MSG12),
+            otherwise: Yup.string(),
+          }),
+      ),
+      mobilePhone: Yup.lazy(() =>
+        Yup.string().when(['email'], {
+          is: (email: any) => !email,
+          then: Yup.string()
+            .required(messages.MSG1)
+            .matches(
+              /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+              'Số điện thoại không hợp lệ',
+            ),
+          otherwise: Yup.string(),
+        }),
+      ),
+      displayName: Yup.string()
+        .min(0, 'email must be at least 0 characters')
+        .max(256, 'email must be at almost 256 characters'),
+    },
+    ['email', 'mobilePhone'] as any,
+  )
 
   const queryResults = useQueries({
     queries: [
@@ -189,6 +208,7 @@ export default function CustomerDetail(props: Props) {
   const [
     selectFiles,
     uploadFiles,
+    removeSelectedFiles,
     uploading,
     progressInfos,
     message,
@@ -257,7 +277,7 @@ export default function CustomerDetail(props: Props) {
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
-              title="Lưu thay đổi"
+              title="Lưu thông tin"
               loading={updateLoading}
               variant="contained"
               color="primary"
@@ -434,6 +454,16 @@ export default function CustomerDetail(props: Props) {
                             onClick={() => {
                               methods.clearErrors('files')
                               methods.setValue('files', null)
+                              removeSelectedFiles()
+                              setMediasSrcPreviewer([
+                                {
+                                  mediaType: EMediaType.AVATAR,
+                                  mediaFormat: EMediaFormat.IMAGE,
+                                  url:
+                                    (customer.data && customer.data.avatar) ??
+                                    '/assets/images/avatars/avatar-duck.jpeg',
+                                },
+                              ])
                             }}
                           >
                             <ClearSharp color="error" />

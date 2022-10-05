@@ -133,7 +133,11 @@ const JwtLogin = () => {
 
           <Grid item sm={6} xs={12}>
             <ContentBox>
-              <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+              <form
+                onSubmit={methods.handleSubmit(onSubmitHandler)}
+                noValidate
+                autoComplete="off"
+              >
                 <FormProvider {...methods}>
                   <Stack>
                     <FormInputText

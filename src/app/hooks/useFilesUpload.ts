@@ -56,6 +56,13 @@ export const useUploadFiles = () => {
       })
   }
 
+  const removeSelectedFiles = (index?: number) => {
+    if (index) {
+      fileInfos.slice(index, 1)
+      setFileInfos([...fileInfos])
+    } else setFileInfos([])
+  }
+
   const uploadFiles = async (files?: File[], mediaFormat?: 1 | 2) => {
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
@@ -81,6 +88,7 @@ export const useUploadFiles = () => {
   return [
     (files?: File[]) => selectFiles(files),
     (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
+    (index?: number) => removeSelectedFiles(index),
     uploading,
     progressInfos,
     message,

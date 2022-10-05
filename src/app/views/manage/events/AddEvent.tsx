@@ -114,6 +114,7 @@ export default function AddEvent(props: Props) {
   const [
     selectFiles,
     uploadFiles,
+    removeSelectedFiles,
     uploading,
     progressInfos,
     message,
@@ -361,6 +362,7 @@ export default function AddEvent(props: Props) {
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
+                      removeSelectedFiles={removeSelectedFiles}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

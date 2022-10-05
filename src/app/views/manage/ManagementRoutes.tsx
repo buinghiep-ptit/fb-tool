@@ -118,8 +118,22 @@ const ManagementRoutes = [
     path: '/quan-ly-feeds',
     element: <ManagerFeed />,
   },
-  { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
-  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
+  {
+    path: '/quan-ly-feeds/:feedId',
+    element: (
+      <>
+        <FeedDetail />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: 'vi-pham',
+        element: <ReportInfringe title="Vi phạm" />,
+      },
+    ],
+  },
+  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> }, // ?? unused
   {
     path: '/quan-ly-feeds/hau-kiem',
     element: (

@@ -12,12 +12,14 @@ type Props = {
   initialIndexSlider?: number
   items?: IMediaOverall[]
   onRemoveItem?: (index?: number) => void
+  mode?: 'view' | 'edit'
 }
 
 export default function SliderShow({
   initialIndexSlider = 0,
   items = [],
   onRemoveItem,
+  mode = 'view',
 }: Props) {
   const [state, setState] = useState<{
     slideIndex?: number
@@ -72,21 +74,25 @@ export default function SliderShow({
             <div key={index}>
               <div>
                 <img src={item.url} alt={''} />
-                <IconButton
-                  sx={{
-                    position: 'absolute',
-                    top: '16px',
-                    right: '16px',
-                    bgcolor: '#303030',
-                    borderRadius: 1,
-                  }}
-                  onClick={() => onRemoveItem && onRemoveItem(index)}
-                >
-                  <Icon sx={{ color: 'white' }}>delete</Icon>
-                  <MuiTypography sx={{ fontWeight: 500, color: 'white' }}>
-                    Xoá ảnh
-                  </MuiTypography>
-                </IconButton>
+                {onRemoveItem && (
+                  <IconButton
+                    sx={{
+                      position: 'absolute',
+                      top: '16px',
+                      right: '16px',
+                      bgcolor: '#303030',
+                      borderRadius: 1,
+                    }}
+                    onClick={() => onRemoveItem && onRemoveItem(index)}
+                  >
+                    <Icon sx={{ color: 'white' }}>delete</Icon>
+                    <MuiTypography
+                      sx={{ fontWeight: 500, color: 'white', px: 0.5 }}
+                    >
+                      Xoá ảnh
+                    </MuiTypography>
+                  </IconButton>
+                )}
               </div>
             </div>
           )

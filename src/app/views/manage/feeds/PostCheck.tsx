@@ -10,8 +10,7 @@ import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
-import { IFeedDetail, Image, IMediaOverall } from 'app/models'
-import _ from 'lodash'
+import { IFeedDetail, Image } from 'app/models'
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -51,17 +50,6 @@ export default function PostCheck(props: Props) {
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
-  }
-
-  const mediaDefault: IMediaOverall = {
-    id: 1,
-    mediaFormat: 1,
-    url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-    detail: {
-      id: 1,
-      coverImgUrl:
-        'https://img.meta.com.vn/Data/image/2021/07/27/good-girl-nghia-la-gi-2.jpg',
-    },
   }
 
   const renderRowItem = (post: IFeedDetail, index: number) => {

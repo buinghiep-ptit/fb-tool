@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { ApprovalRounded, CancelSharp } from '@mui/icons-material'
 import {
   Grid,
   Icon,
@@ -178,6 +177,7 @@ export default function PostFeed(props: Props) {
   const [
     selectFiles,
     uploadFiles,
+    removeSelectedFiles,
     uploading,
     progressInfos,
     message,
@@ -185,6 +185,8 @@ export default function PostFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    console.log('files:', values.files)
+
     const files = fileInfos.map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
@@ -207,7 +209,7 @@ export default function PostFeed(props: Props) {
       viewScope: 1,
       isAllowComment: 1,
     }
-    add(payload)
+    // add(payload)
   }
 
   const onRowUpdateSuccess = (data: any) => {
@@ -291,7 +293,11 @@ export default function PostFeed(props: Props) {
           title="Huỷ tạo"
           variant="contained"
           color="secondary"
-          onClick={() => methods.reset()}
+          onClick={() => {
+            setMediasSrcPreviewer([])
+            removeSelectedFiles()
+            methods.reset()
+          }}
           startIcon={<Icon>clear</Icon>}
         />
       </Stack>
@@ -391,30 +397,6 @@ export default function PostFeed(props: Props) {
                   </Stack>
 
                   {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
-
-                  {/* <Grid container spacing={2} mt={1}>
-                    <Grid item sm={6} xs={6}>
-                      <MuiButton
-                        title="Lưu"
-                        loading={false}
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        sx={{ width: '100%' }}
-                        startIcon={<ApprovalRounded />}
-                      />
-                    </Grid>
-                    <Grid item sm={6} xs={6}>
-                      <MuiButton
-                        onClick={() => methods.reset()}
-                        title="Huỷ"
-                        variant="outlined"
-                        color="secondary"
-                        sx={{ width: '100%' }}
-                        startIcon={<CancelSharp />}
-                      />
-                    </Grid>
-                  </Grid> */}
                 </Stack>
               </Grid>
 
@@ -445,6 +427,7 @@ export default function PostFeed(props: Props) {
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
+                      removeSelectedFiles={removeSelectedFiles}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

@@ -1,5 +1,4 @@
-import { ApprovalSharp, ReportSharp } from '@mui/icons-material'
-import { Chip, Grid, styled } from '@mui/material'
+import { Chip, Grid, Icon, styled } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
 import {
@@ -16,13 +15,20 @@ import MuiLoading from 'app/components/common/MuiLoadingApp'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IActionHistory, Image, IReportDecline } from 'app/models'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  IActionHistory,
+  Image,
+  IMediaOverall,
+  IReportDecline,
+} from 'app/models'
 import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
-import { useState } from 'react'
-import { NavLink, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export interface Props {}
 
@@ -36,9 +42,13 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function FeedDetail(props: Props) {
+  const navigate = useNavigate()
   const { feedId } = useParams()
   const [open, setOpen] = useState(false)
   const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
+    [],
+  )
 
   const [pageReports, setPageReports] = useState<number>(0)
   const [sizeReports, setSizeReports] = useState<number>(5)
@@ -91,6 +101,10 @@ export default function FeedDetail(props: Props) {
     (query: UseQueryResult) => query.isFetching,
   )
 
+  useEffect(() => {
+    setMediasSrcPreviewer(feed.data?.images ?? [])
+  }, [JSON.stringify(feed)])
+
   const handleChangePageReports = (event: unknown, newPage: number) => {
     setPageReports(newPage)
     setFiltersReports((prevFilters: any) => {
@@ -140,18 +154,28 @@ export default function FeedDetail(props: Props) {
   }
 
   const onClickMedia = (imgIndex?: number) => {
-    console.log('onClickMedia: ', imgIndex)
     if (imgIndex === 4) setInitialIndexSlider(0)
     else setInitialIndexSlider(imgIndex ?? 0)
     setOpen(true)
   }
 
   const onRemoveMedia = (imgIndex?: number) => {
-    console.log('onRemoveMedia: ', imgIndex)
+    mediasSrcPreviewer.splice(imgIndex ?? 0, 1)
+    setMediasSrcPreviewer([...mediasSrcPreviewer])
   }
 
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const onSuccess = (data: any) => {
+    toastSuccess({ message: 'Duyệt bài đăng thành công' })
+  }
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+
+  const approveFeed = (feedId: number) => {
+    approve(feedId)
   }
 
   const getColorByCusStatus = (status: number) => {
@@ -207,56 +231,36 @@ export default function FeedDetail(props: Props) {
           ]}
         />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+      >
+        <MuiButton
+          title="Duyệt bài"
+          variant="contained"
+          color="primary"
+          onClick={() => approveFeed(Number(feedId ?? 0))}
+          loading={approveLoading}
+          startIcon={<Icon>done</Icon>}
+        />
+        <MuiButton
+          title="Vi phạm"
+          variant="contained"
+          color="secondary"
+          onClick={() =>
+            navigate(`vi-pham`, {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>clear</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard title="Chi tiết Feed">
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item sm={2} xs={12}>
-                <MuiButton
-                  title="Duyệt"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<ApprovalSharp />}
-                />
-              </Grid>
-              <Grid item sm={2} xs={12}>
-                <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
-                  <MuiButton
-                    title="Vi phạm"
-                    variant="outlined"
-                    color="error"
-                    type="submit"
-                    sx={{ width: '100%' }}
-                    startIcon={<ReportSharp />}
-                  />
-                </NavLink>
-              </Grid>
-              <Grid
-                item
-                sm={8}
-                xs={12}
-                display="flex"
-                justifyContent="flex-end"
-              >
-                <Chip
-                  label={getLabelByCusStatus(feed.data?.status as number)}
-                  size="small"
-                  // color={true ? 'primary' : 'default'}
-                  sx={{
-                    px: 1,
-                    backgroundColor: getColorByCusStatus(
-                      feed.data?.status as number,
-                    ),
-                    color: '#FFFFFF',
-                  }}
-                />
-              </Grid>
-            </Grid>
-
             <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
+              <Grid item sm={8} xs={12}>
                 <Box>
                   <MuiTypography variant="subtitle2">[Nội dung]</MuiTypography>
                   <MuiTypography variant="body2">
@@ -281,6 +285,27 @@ export default function FeedDetail(props: Props) {
                   </Stack>
                 </Box>
               </Grid>
+
+              <Grid
+                item
+                sm={4}
+                xs={12}
+                display="flex"
+                justifyContent="flex-end"
+              >
+                <Chip
+                  label={getLabelByCusStatus(feed.data?.status as number)}
+                  size="small"
+                  // color={true ? 'primary' : 'default'}
+                  sx={{
+                    px: 1,
+                    backgroundColor: getColorByCusStatus(
+                      feed.data?.status as number,
+                    ),
+                    color: '#FFFFFF',
+                  }}
+                />
+              </Grid>
             </Grid>
 
             <Stack flexDirection={'row'} justifyContent={'center'}>
@@ -293,17 +318,22 @@ export default function FeedDetail(props: Props) {
                 </Box>
               ) : (
                 <Box width={'75%'} maxWidth={{ md: '568px', xs: '568px' }}>
-                  <ImageListView
-                    medias={feed.data?.images as Image[]}
-                    onClickMedia={onClickMedia}
-                  />
-                  <ModalFullScreen
-                    data={feed.data?.images as Image[]}
-                    open={open}
-                    onCloseModal={handleClose}
-                    onSubmit={onRemoveMedia}
-                    initialIndexSlider={initialIndexSlider}
-                  />
+                  {!!mediasSrcPreviewer.length && (
+                    <>
+                      <ImageListView
+                        medias={mediasSrcPreviewer as Image[]}
+                        onClickMedia={onClickMedia}
+                      />
+                      <ModalFullScreen
+                        mode="view"
+                        data={mediasSrcPreviewer as Image[]}
+                        open={open}
+                        onCloseModal={handleClose}
+                        // onSubmit={onRemoveMedia}
+                        initialIndexSlider={initialIndexSlider}
+                      />
+                    </>
+                  )}
                 </Box>
               )}
             </Stack>

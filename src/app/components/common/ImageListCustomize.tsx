@@ -209,11 +209,11 @@ export function ImageListView({
                 alt={item.title}
                 loading="lazy"
                 onLoad={() => {
-                  URL.revokeObjectURL(
-                    item.url
-                      ? item.url
-                      : 'https://batdongsantoanquoc.net/no-image.png',
-                  )
+                  // URL.revokeObjectURL(
+                  //   item.url
+                  //     ? item.url
+                  //     : 'https://batdongsantoanquoc.net/no-image.png',
+                  // )
                 }}
               />
               {imgSize.images.length > 5 && index === 4 && (

@@ -11,7 +11,7 @@ import {
   Stack,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { IMediaOverall } from 'app/models'
+import { Image, IMediaOverall } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -19,6 +19,7 @@ import { useFormContext } from 'react-hook-form'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import { CircularProgressWithLabel, ImageListView } from './ImageListCustomize'
 import MediaPlayer from './MediaPlayer'
+import { ModalFullScreen } from './ModalFullScreen'
 import { MuiButton } from './MuiButton'
 import { MuiTypography } from './MuiTypography'
 
@@ -33,6 +34,7 @@ interface Props {
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
   uploadFiles: (files: any, mediaFormat?: 1 | 2) => void
+  removeSelectedFiles?: (index?: number) => void
   uploading?: boolean
   progressInfos: any
   mediasSrcPreviewer: IMediaOverall[]
@@ -49,6 +51,7 @@ export function UploadPreviewer({
   },
   mode = 'append',
   uploadFiles,
+  removeSelectedFiles,
   uploading,
   progressInfos,
   mediasSrcPreviewer,
@@ -57,10 +60,9 @@ export function UploadPreviewer({
   const { mediaFormat, mediaType, multiple } = mediaConfigs
   const [duration, setDuration] = useState(0)
   const _mediasSrcRef = useRef<{ val: IMediaOverall[] }>({ val: [] })
-  // const [videoSrcPreviewer, setVideoSrcPreviewer] = useState('')
-  // const [imagesSrcPreviewer, setImagesSrcPreviewer] = useState<
-  //   { name: string; url: string }[]
-  // >([])
+  const [openSlider, setOpenSlider] = useState(false)
+  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+
   const {
     register,
     unregister,
@@ -99,25 +101,32 @@ export function UploadPreviewer({
     }
   }, [register, unregister, name])
 
-  // const removeDuplicateFiles = (files: any) => {
-  //   const newFiles = files.reduce((prev: File[], file: File) => {
-  //     const fo = Object.entries(file)
-  //     if (
-  //       prev.find((e: File) => {
-  //         const eo = Object.entries(e)
-  //         return eo.every(
-  //           ([key, value], index) =>
-  //             key === fo[index][0] && value === fo[index][1],
-  //         )
-  //       })
-  //     ) {
-  //       return prev
-  //     } else {
-  //       return [...prev, file]
-  //     }
-  //   }, [])
-  //   return newFiles
-  // }
+  const handleCloseSlider = () => {
+    setOpenSlider(false)
+  }
+  const onClickMedia = (imgIndex?: number) => {
+    if (imgIndex === 4) setInitialIndexSlider(0)
+    else setInitialIndexSlider(imgIndex ?? 0)
+    setOpenSlider(true)
+  }
+  const handleRemoveMedia = (mediaIndex?: number) => {
+    mediasSrcPreviewer.splice(mediaIndex ?? 0, 1)
+    setMediasSrcPreviewer([...mediasSrcPreviewer])
+
+    files.splice(mediaIndex ?? 0, 1)
+    if (!!files.length) setValue('files', files)
+    else setValue('files', null)
+
+    removeSelectedFiles && removeSelectedFiles(mediaIndex)
+  }
+
+  const handleResetMedia = () => {
+    setMediasSrcPreviewer([])
+    setValue('files', null)
+    clearErrors('files')
+
+    removeSelectedFiles && removeSelectedFiles()
+  }
 
   const extractDroppedFiles = (old: File[], dropped: File[]): File[] => {
     const newFiles = dropped.reduce((prev: File[], file: File) => {
@@ -288,6 +297,15 @@ export function UploadPreviewer({
                 medias={[...mediasSrcPreviewer] as any}
                 oldMedias={_mediasSrcRef.current.val}
                 progressInfos={progressInfos}
+                onClickMedia={onClickMedia}
+              />
+              <ModalFullScreen
+                mode="edit"
+                data={mediasSrcPreviewer as Image[]}
+                open={openSlider}
+                onCloseModal={handleCloseSlider}
+                onSubmit={handleRemoveMedia}
+                initialIndexSlider={initialIndexSlider}
               />
               {!uploading && (
                 <MuiButton

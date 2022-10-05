@@ -2,10 +2,10 @@ import { Icon, IconButton, LinearProgress, Slider, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import * as React from 'react'
 import { findDOMNode } from 'react-dom'
-import { hot } from 'react-hot-loader'
+// import { hot } from 'react-hot-loader'
 import ReactPlayer from 'react-player'
 import { Waypoint } from 'react-waypoint'
-// import screenfull from 'screenfull'
+import screenfull from 'screenfull'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import Duration from './Duration'
 import LoadingItem from './LoadingItem'
@@ -70,7 +70,7 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
   }
 
   const handleClickFullscreen = () => {
-    // screenfull.request(findDOMNode(playerRef) as any)
+    ;(screenfull as any).request(findDOMNode(playerRef.current) as any)
   }
 
   const handlePlayPause = () => {
@@ -135,6 +135,14 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             height="100%"
             url={url}
             controls={state.controls}
+            config={{
+              file: {
+                attributes: {
+                  onContextMenu: (e: any) => e.preventDefault(),
+                  controlsList: 'nodownload',
+                },
+              },
+            }}
             playing={state.playing}
             muted={state.muted}
             onReady={() => setLoading(false)}
@@ -143,7 +151,7 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             onProgress={handleProgress}
             onDuration={handleDuration}
           />
-          <Box
+          {/* <Box
             sx={{
               position: 'absolute',
               top: '4px',
@@ -169,7 +177,7 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             <IconButton onClick={handleClickFullscreen}>
               <Icon color="primary">crop_free</Icon>
             </IconButton>
-          </Box>
+          </Box> */}
 
           {Math.ceil(state.duration * (1 - state.played)) === 0 ? (
             <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.5)">
@@ -181,7 +189,7 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
             </AbsoluteFillObject>
           ) : null}
 
-          <Box
+          {/* <Box
             sx={{
               position: 'absolute',
               bottom: '0',
@@ -255,7 +263,7 @@ function MediaPlayer({ url, setDuration }: IMediaPlayerProps) {
                 }}
               />
             </Box>
-          </Box>
+          </Box> */}
 
           <LoadingItem loading={loading} className="video__loading" />
         </div>

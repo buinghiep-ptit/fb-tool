@@ -10,6 +10,16 @@ export const LabelFormatter = (value?: number, key?: string) => {
       }
       break
 
+    case 'rentalType':
+      if (value === 1) {
+        formatter = 'Gói dịch vụ'
+      } else if (value === 2) {
+        formatter = 'Gói lưu trú'
+      } else if (value === 3) {
+        formatter = 'Khác'
+      }
+      break
+
     case 'role':
       if (value === 1) {
         formatter = 'Admin'

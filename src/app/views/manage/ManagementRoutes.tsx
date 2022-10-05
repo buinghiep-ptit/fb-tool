@@ -40,7 +40,7 @@ const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 
 const ManagerServices = Loadable(
-  lazy(() => import('./managerServices/ServiceSetiing')),
+  lazy(() => import('./managerServices/ServiceSetting')),
 )
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
@@ -164,7 +164,14 @@ const ManagementRoutes = [
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
-  { path: '/chi-tiet-dich-vu', element: <ManagerServiceDetail /> },
+  {
+    path: '/quan-ly-dich-vu/chi-tiet-dich-vu',
+    element: <ManagerServiceDetail />,
+  },
+  {
+    path: '/quan-ly-dich-vu/:serviceId/*',
+    element: <ManagerServiceDetail />,
+  },
   { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },
 ]
 export default ManagementRoutes

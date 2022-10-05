@@ -37,6 +37,7 @@ interface Props {
   removeSelectedFiles?: (index?: number) => void
   uploading?: boolean
   progressInfos: any
+  initialMedias?: IMediaOverall[]
   mediasSrcPreviewer: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
 }
@@ -54,6 +55,7 @@ export function UploadPreviewer({
   removeSelectedFiles,
   uploading,
   progressInfos,
+  initialMedias = [],
   mediasSrcPreviewer,
   setMediasSrcPreviewer,
 }: Props) {
@@ -77,7 +79,7 @@ export function UploadPreviewer({
 
   useEffect(() => {
     if (mediaType === EMediaType.AVATAR) return
-    setMediasSrcPreviewer([])
+    setMediasSrcPreviewer([...initialMedias]) // should be set initial medias
     setValue('files', null)
     clearErrors('files')
   }, [mediaFormat])

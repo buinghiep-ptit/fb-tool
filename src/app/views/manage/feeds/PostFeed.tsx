@@ -185,8 +185,6 @@ export default function PostFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log('files:', values.files)
-
     const files = fileInfos.map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
@@ -209,7 +207,7 @@ export default function PostFeed(props: Props) {
       viewScope: 1,
       isAllowComment: 1,
     }
-    // add(payload)
+    add(payload)
   }
 
   const onRowUpdateSuccess = (data: any) => {

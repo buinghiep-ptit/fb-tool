@@ -113,7 +113,11 @@ export function UploadPreviewer({
     mediasSrcPreviewer.splice(mediaIndex ?? 0, 1)
     setMediasSrcPreviewer([...mediasSrcPreviewer])
 
-    files.splice(mediaIndex ?? 0, 1)
+    if (!files) return
+
+    if (mediaIndex ?? 0 <= files.length ?? 0 - 1) {
+      files.splice(mediaIndex ?? 0, 1)
+    }
     if (!!files.length) setValue('files', files)
     else setValue('files', null)
 

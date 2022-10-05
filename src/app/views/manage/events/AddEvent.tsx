@@ -154,6 +154,7 @@ export default function AddEvent(props: Props) {
   }, [event])
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    console.log(values)
     const files = fileInfos.map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,

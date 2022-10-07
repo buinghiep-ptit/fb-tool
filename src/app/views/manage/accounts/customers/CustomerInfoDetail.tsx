@@ -124,23 +124,25 @@ export default function CustomerDetail(props: Props) {
   const validationSchema = Yup.object().shape(
     {
       email: Yup.string()
-        .email()
+        .email(messages.MSG12)
         .when('mobilePhone', {
           is: (phone: string) => !phone || phone.length === 0,
           then: Yup.string().required(messages.MSG1).email(messages.MSG12),
           otherwise: Yup.string(),
         }),
-      mobilePhone: Yup.string().when('email', {
-        is: (email: string) => !email || email.length === 0,
-        then: Yup.string()
-          .required(messages.MSG1)
-          .test('', '', value => true)
-          .matches(
-            /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
-            'Số điện thoại không hợp lệ',
-          ),
-        otherwise: Yup.string(),
-      }),
+      mobilePhone: Yup.string()
+        .test('check valid', 'invalid', phone => {
+          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+          if (!phone) {
+            return true
+          }
+          return regex.test(phone as string)
+        })
+        .when('email', {
+          is: (email: string) => !email || email.length === 0,
+          then: Yup.string().required(messages.MSG1),
+          otherwise: Yup.string(),
+        }),
       displayName: Yup.string()
         .min(0, 'email must be at least 0 characters')
         .max(256, 'email must be at almost 256 characters'),

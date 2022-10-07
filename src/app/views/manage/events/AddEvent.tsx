@@ -35,7 +35,7 @@ export interface Props {}
 
 type SchemaType = {
   name?: string
-  typeFile?: number
+  type?: number
   files?: any
   isEveryYear?: boolean
   startDate?: string
@@ -68,7 +68,7 @@ export default function AddEvent(props: Props) {
   )
 
   const [defaultValues] = useState<SchemaType>({
-    typeFile: EMediaFormat.IMAGE,
+    type: EMediaFormat.IMAGE,
     isEveryYear: false,
     hashtag: [{ value: 'hashtag' }],
     status: 1,
@@ -146,6 +146,26 @@ export default function AddEvent(props: Props) {
       defaultValues.startDate = event.startDate
       defaultValues.endDate = event.endDate
       defaultValues.editor_content = event.content
+      defaultValues.type = event.medias && event.medias[0].mediaFormat
+
+      if (
+        event?.medias &&
+        event?.medias[0].mediaFormat === EMediaFormat.IMAGE
+      ) {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.IMAGE,
+          multiple: true,
+          accept: 'image/*',
+        }))
+      } else {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.VIDEO,
+          accept: 'video/*',
+          multiple: false,
+        }))
+      }
 
       setMediasSrcPreviewer(event.medias ?? [])
 
@@ -183,7 +203,7 @@ export default function AddEvent(props: Props) {
     useCreateEvent(onRowUpdateSuccess)
 
   useEffect(() => {
-    if (Number(methods.watch('typeFile') ?? 0) === EMediaFormat.IMAGE) {
+    if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
         ...prev,
         mediaFormat: EMediaFormat.IMAGE,
@@ -199,7 +219,7 @@ export default function AddEvent(props: Props) {
       }))
     }
     methods.setValue('files', null)
-  }, [methods.watch('typeFile')])
+  }, [methods.watch('type')])
 
   if (isLoading && fetchStatus === 'fetching') return <MuiLoading />
 
@@ -303,7 +323,7 @@ export default function AddEvent(props: Props) {
                     </Stack>
                   </Stack>
                   <Stack>
-                    <SelectDropDown name="typeFile" label="Loại file tải lên">
+                    <SelectDropDown name="type" label="Loại file tải lên">
                       <MenuItem value={1}>Video</MenuItem>
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
@@ -358,6 +378,7 @@ export default function AddEvent(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
+                      initialMedias={event?.medias ?? []}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}

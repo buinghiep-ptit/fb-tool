@@ -1,11 +1,21 @@
-import { Chip, Typography } from '@mui/material'
+import { Chip, Icon, IconButton, Typography } from '@mui/material'
+import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn, TitleFeeds } from 'app/models'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
-  { id: 'account', label: 'Tài khoản', minWidth: 170 },
+  {
+    id: 'account',
+    label: 'Tài khoản',
+    minWidth: 170,
+    action: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'content',
     label: 'Nội dung',
@@ -60,18 +70,42 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     align: 'center',
   },
   {
-    id: 'action',
-    label: 'Hành động',
-    minWidth: 170,
+    id: 'edit',
+    label: '',
+    minWidth: 50,
     align: 'right',
     action: () => (
-      <Typography
-        variant="subtitle2"
-        color="primary"
-        sx={{ textAlign: 'center' }}
-      >
-        Chi tiết | Duyệt | Vi phạm
-      </Typography>
+      <IconButton size="small">
+        <Icon color="primary">east</Icon>
+      </IconButton>
     ),
+  },
+  {
+    id: 'approve',
+    label: 'Thao tác',
+    minWidth: 80,
+    align: 'center',
+    action: (status?: number) =>
+      [-2, -1, 0].includes(status ?? 0) ? (
+        <IconButton size="small">
+          <Icon color="primary">checklist</Icon>
+        </IconButton>
+      ) : (
+        <></>
+      ),
+  },
+  {
+    id: 'violate',
+    label: '',
+    minWidth: 50,
+    align: 'left',
+    action: (status?: number) =>
+      [-2, 0, 1].includes(status ?? 0) ? (
+        <IconButton size="small">
+          <Icon color="error">report</Icon>
+        </IconButton>
+      ) : (
+        <></>
+      ),
   },
 ]

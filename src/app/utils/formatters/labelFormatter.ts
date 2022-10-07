@@ -24,11 +24,13 @@ export const LabelFormatter = (value?: number, key?: string) => {
       if (value === 0) {
         formatter = 'Chờ hậu kiểm'
       } else if (value === 1) {
-        formatter = 'Đã duyệt'
+        formatter = 'Hợp lệ'
       } else if (value === -1) {
         formatter = 'Vi phạm'
       } else if (value === -2) {
-        formatter = 'Đã xóa'
+        formatter = 'Bị báo cáo'
+      } else if (value === -3) {
+        formatter = 'Xóa'
       }
 
       break

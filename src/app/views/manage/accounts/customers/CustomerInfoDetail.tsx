@@ -202,6 +202,18 @@ export default function CustomerDetail(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
+  const email = methods.watch('email')
+  const phone = methods.watch('mobilePhone')
+
+  useEffect(() => {
+    if (!!email?.length) {
+      methods.clearErrors('mobilePhone')
+    }
+    if (!!phone?.length) {
+      methods.clearErrors('email')
+    }
+  }, [email, phone])
+
   const [
     selectFiles,
     uploadFiles,
@@ -274,7 +286,7 @@ export default function CustomerDetail(props: Props) {
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
-              title="Lưu thông tin"
+              title="Lưu thay đổi"
               loading={updateLoading}
               variant="contained"
               color="primary"

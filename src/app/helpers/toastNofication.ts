@@ -18,18 +18,18 @@ export const toastError = (error: {
     message = error.data.errorDescription ?? ''
   } else if (error.code) {
     if (error.code === 'ECONNABORTED')
-      message = '[Lỗi Server] Không có phản hồi phía máy chủ'
+      message = 'Không có phản hồi phía máy chủ'
   } else if (error.response) {
     const { status } = error.response
     switch (status) {
       case StatusCode.Unauthorized:
-        message = '[Response Error] Phiên đăng nhập đã hết hạn'
+        message = 'Phiên đăng nhập đã hết hạn'
         break
       case StatusCode.BadRequest:
-        message = '[Response Error] Yêu cầu không hợp lệ'
+        message = 'Yêu cầu không hợp lệ'
         break
       case StatusCode.InternalServerError:
-        message = '[Response Error] Có lỗi xảy ra phía máy chủ'
+        message = 'Có lỗi xảy ra phía máy chủ'
         break
       default:
         message =
@@ -39,14 +39,14 @@ export const toastError = (error: {
   } else if (error.message) {
     ;({ message: message } = error)
     if (message === 'Network Error') {
-      message = '[Response Error] Không có kết nối Internet'
+      message = 'Không có kết nối Internet'
     }
   } else {
     // error.request
-    message = `[Response Error] ${error.request}` as string
+    message = `${error.request}` as string
   }
 
-  toast.error(message)
+  toast.error(message, { toastId: 'custom-error-id' })
 }
 export const toastSuccess = (success: { message: string }) => {
   let message = null

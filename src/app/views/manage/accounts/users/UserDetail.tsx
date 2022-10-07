@@ -46,6 +46,7 @@ export default function UserDetail({ title }: Props) {
         title={title}
         open={isModal}
         isLoading={isLoading}
+        submitText="Lưu thay đổi"
         onCloseModal={handleClose}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >

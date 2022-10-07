@@ -1,4 +1,5 @@
 import { Card, Grid, styled, useTheme } from '@mui/material'
+import Index from 'app/components/common/Models'
 import { Fragment } from 'react'
 import Campaigns from './shared/Campaigns'
 import DoughnutChart from './shared/Doughnut'
@@ -38,8 +39,8 @@ const Analytics = () => {
 
   return (
     <Fragment>
-      <ContentBox className="analytics">
-        {/* <Grid container spacing={3}>
+      <Index />
+      {/* <Grid container spacing={3}>
           <Grid item lg={8} md={8} sm={12} xs={12}>
             <StatCards />
             <TopSellingTable />
@@ -68,7 +69,6 @@ const Analytics = () => {
             <Campaigns />
           </Grid>
         </Grid> */}
-      </ContentBox>
     </Fragment>
   )
 }

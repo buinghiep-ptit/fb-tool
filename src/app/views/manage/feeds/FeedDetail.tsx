@@ -16,7 +16,7 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import { useApproveFeed, useDeleteFeed } from 'app/hooks/queries/useFeedsData'
 import {
   IActionHistory,
   Image,
@@ -29,6 +29,7 @@ import {
 } from 'app/utils/columns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -65,6 +66,9 @@ export default function FeedDetail(props: Props) {
     page: pageActions,
     size: sizeActions,
   })
+
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
 
   const queryResults = useQueries({
     queries: [
@@ -168,14 +172,28 @@ export default function FeedDetail(props: Props) {
     setOpen(false)
   }
 
-  const onSuccess = (data: any) => {
-    toastSuccess({ message: 'Duyệt bài đăng thành công' })
+  const onSuccess = (data: any, message: string) => {
+    toastSuccess({ message: message })
+    setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } =
-    useApproveFeed(onSuccess)
+  const { mutate: approve, isLoading: approveLoading } = useApproveFeed(
+    onSuccess,
+    'Duyệt bài thành công',
+  )
+  const { mutate: deletedFeed, isLoading: deleteLoading } = useDeleteFeed(
+    onSuccess,
+    'Xoá bài thành công',
+  )
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
+  }
+  const openDialogDelete = () => {
+    setTitleDialog('Xoá bài đăng')
+    setOpenDialog(true)
+  }
+  const OnDeleteFeed = () => {
+    deletedFeed(Number(feedId ?? 0))
   }
 
   const getColorByCusStatus = (status: number) => {
@@ -197,7 +215,7 @@ export default function FeedDetail(props: Props) {
   const getLabelByCusStatus = (status: number) => {
     switch (status) {
       case 1:
-        return 'Đã duyệt'
+        return 'Hợp lệ'
       case -2:
         return 'Xoá'
 
@@ -253,6 +271,15 @@ export default function FeedDetail(props: Props) {
               state: { modal: true },
             })
           }
+          startIcon={<Icon>report</Icon>}
+        />
+
+        <MuiButton
+          title="Xoá bài"
+          variant="contained"
+          color="error"
+          onClick={openDialogDelete}
+          loading={deleteLoading}
           startIcon={<Icon>clear</Icon>}
         />
       </Stack>
@@ -376,6 +403,19 @@ export default function FeedDetail(props: Props) {
           />
         </SimpleCard>
       </Stack>
+
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={OnDeleteFeed}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            Bạn có chắc chắn muốn xoá bài?
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

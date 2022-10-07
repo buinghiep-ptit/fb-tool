@@ -175,9 +175,12 @@ export default function ManagerFeed(props: Props) {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      navigate(`${row.feedId}`, {})
+      if (['edit', 'account'].includes(cell.id)) {
+        navigate(`${row.feedId}`, {})
+      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
+      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
+      }
     }
-    navigate(`${row.feedId}`, {})
   }
 
   return (
@@ -241,10 +244,11 @@ export default function ManagerFeed(props: Props) {
                 <Grid item sm={3} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Đã duyệt</MenuItem>
+                    <MenuItem value="1">Hợp lệ</MenuItem>
                     <MenuItem value="0">Chờ hậu kiểm</MenuItem>
                     <MenuItem value="-1">Vi phạm</MenuItem>
-                    <MenuItem value="-2">Xoá</MenuItem>
+                    <MenuItem value="-2">Bị báo cáo</MenuItem>
+                    <MenuItem value="-3">Xoá</MenuItem>
                   </SelectDropDown>
                 </Grid>
                 <Grid item sm={3} xs={12}>

@@ -65,6 +65,11 @@ export const fetchPostsCheck = async (): Promise<IFeedDetail[]> => {
   return data
 }
 
+export const fetchPostsReported = async (): Promise<IFeedDetail[]> => {
+  const { data } = await http.get<IFeedDetail[]>(`/api/feed/reported`)
+  return data
+}
+
 export const approveFeed = async (feedId: number): Promise<any> => {
   const { data } = await http.post<any>(`/api/feed/${feedId}/approve`)
   return data

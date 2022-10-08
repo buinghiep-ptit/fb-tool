@@ -66,7 +66,7 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export default function PostFeed(props: Props) {
+export default function CreateFeed(props: Props) {
   const navigate = useNavigate()
   const [accountList, setAccountList] = useState<ICustomer[]>([])
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(

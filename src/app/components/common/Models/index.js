@@ -5,6 +5,7 @@ import { OrbitControls } from '@react-three/drei/core/OrbitControls'
 import { CubeCamera } from '@react-three/drei/core/CubeCamera'
 
 import { Campground } from './Campground'
+import MuiLoading from '../MuiLoadingApp'
 
 function CarShow() {
   return (
@@ -150,7 +151,7 @@ function CarShow() {
 
 function Index() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<MuiLoading />}>
       <Canvas shadows>
         <CarShow />
       </Canvas>

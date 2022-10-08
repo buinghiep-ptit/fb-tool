@@ -1,5 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PersonAddAltSharp, SearchSharp } from '@mui/icons-material'
+import {
+  ChangeCircleSharp,
+  PersonAddAltSharp,
+  SearchSharp,
+} from '@mui/icons-material'
 import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
@@ -49,8 +53,12 @@ export default function AdminAccounts(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
@@ -133,6 +141,7 @@ export default function AdminAccounts(props: Props) {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: parseInt(event.target.value, 10),
     } as any)
   }
@@ -169,6 +178,30 @@ export default function AdminAccounts(props: Props) {
         setRow(row)
       }
     }
+  }
+
+  const onResetFilters = () => {
+    methods.reset({
+      account: '',
+      email: '',
+      role: 'all',
+      status: 'all',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
   }
 
   return (
@@ -220,9 +253,9 @@ export default function AdminAccounts(props: Props) {
                 </Grid>
               </Grid>
 
-              <Box mt={3}>
+              <Box mt={2}>
                 <Grid container spacing={2}>
-                  <Grid item sm={3} xs={12}>
+                  <Grid item sm={3} xs={6}>
                     <MuiButton
                       loading={isFetching}
                       title="Tìm kiếm"
@@ -233,8 +266,18 @@ export default function AdminAccounts(props: Props) {
                       startIcon={<SearchSharp />}
                     />
                   </Grid>
-                  <Grid item sm={6} xs={12}></Grid>
-                  <Grid item sm={3} xs={12}>
+                  <Grid item sm={3} xs={6}>
+                    <MuiButton
+                      title="Tạo lại"
+                      variant="outlined"
+                      color="primary"
+                      onClick={onResetFilters}
+                      sx={{ width: '100%' }}
+                      startIcon={<ChangeCircleSharp />}
+                    />
+                  </Grid>
+                  <Grid item sm={3} xs={6}></Grid>
+                  <Grid item sm={3} xs={6}>
                     <MuiButton
                       onClick={() =>
                         navigation(`them-moi`, {

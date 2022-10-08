@@ -25,16 +25,16 @@ const LockCustomer = Loadable(
 const UnlockCustomer = Loadable(
   lazy(() => import('./accounts/customers/details/UnlockCustomer')),
 )
-const CustomerHistory = Loadable(
-  lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
+const OrdersHistoryTab = Loadable(
+  lazy(() => import('./accounts/customers/OrdersHistoryTab')),
 )
 
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
-const PostCheck = Loadable(lazy(() => import('./feeds/PostCheck')))
-const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
+const PostsCheck = Loadable(lazy(() => import('./feeds/PostsCheck')))
+const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
-const PostFeed = Loadable(lazy(() => import('./feeds/PostFeed')))
+const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
@@ -111,12 +111,23 @@ const ManagementRoutes = [
           },
         ],
       },
-      { path: 'lich-su-dat-cho', element: <CustomerHistory /> },
+      { path: 'lich-su-dat-cho', element: <OrdersHistoryTab /> },
     ],
   },
   {
     path: '/quan-ly-feeds',
-    element: <ManagerFeed />,
+    element: (
+      <>
+        <ManagerFeed />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: 'ds/:feedId/vi-pham',
+        element: <ReportDialog title="Báo cáo vi phạm" />,
+      },
+    ],
   },
   {
     path: '/quan-ly-feeds/:feedId',
@@ -129,27 +140,27 @@ const ManagementRoutes = [
     children: [
       {
         path: 'vi-pham',
-        element: <ReportInfringe title="Vi phạm" />,
+        element: <ReportDialog title="Vi phạm" />,
       },
     ],
   },
-  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> }, // ?? unused
+  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportDialog /> }, // ?? unused
   {
     path: '/quan-ly-feeds/hau-kiem',
     element: (
       <>
-        <PostCheck />
+        <PostsCheck />
         <Outlet />
       </>
     ),
     children: [
       {
         path: ':feedId/vi-pham',
-        element: <ReportInfringe title="Vi phạm" />,
+        element: <ReportDialog title="Báo cáo vi phạm" />,
       },
     ],
   },
-  { path: '/them-moi-feed', element: <PostFeed /> },
+  { path: '/them-moi-feed', element: <CreateFeed /> },
   { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
   { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
   { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },

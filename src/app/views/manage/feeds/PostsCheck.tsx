@@ -1,18 +1,22 @@
-import { Avatar, Chip, Divider, Grid, Stack, styled } from '@mui/material'
+import { Avatar, Chip, Divider, Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchPostsCheck } from 'app/apis/feed/feed.service'
+import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
+import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  useApproveFeed,
+  usePostsCheckData,
+} from 'app/hooks/queries/useFeedsData'
 import { IFeedDetail, Image } from 'app/models'
-import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { messages } from 'app/utils/messages'
+import React, { useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export interface Props {}
 
@@ -25,22 +29,20 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export default function PostCheck(props: Props) {
+export default function PostsCheck(props: Props) {
   const navigate = useNavigate()
+  const location = useLocation() as any
+  const [open, setOpen] = useState(false)
+  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const type = location.state?.type ?? 1
 
   const {
     data: posts,
     isLoading,
+    isFetching,
     isError,
     error,
-  }: UseQueryResult<IFeedDetail[], Error> = useQuery<IFeedDetail[], Error>(
-    ['posts-check'],
-    fetchPostsCheck,
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-    },
-  )
+  }: UseQueryResult<IFeedDetail[], Error> = usePostsCheckData(type)
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Duyệt bài đăng thành công' })
@@ -50,6 +52,15 @@ export default function PostCheck(props: Props) {
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
+  }
+
+  const onClickMedia = (imgIndex?: number) => {
+    setInitialIndexSlider(imgIndex ?? 0)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
   }
 
   const renderRowItem = (post: IFeedDetail, index: number) => {
@@ -101,6 +112,7 @@ export default function PostCheck(props: Props) {
                       title="Duyệt"
                       variant="contained"
                       color="primary"
+                      sx={{ minWidth: 100 }}
                       onClick={() => approveFeed(post.id ?? 0)}
                       loading={approveLoading}
                     />
@@ -108,6 +120,7 @@ export default function PostCheck(props: Props) {
                       title="Vi phạm"
                       variant="outlined"
                       color="error"
+                      sx={{ minWidth: 100 }}
                       onClick={() =>
                         navigate(`${post.id ?? 0}/vi-pham`, {
                           state: { modal: true },
@@ -125,17 +138,31 @@ export default function PostCheck(props: Props) {
                   </Box>
                 ) : (
                   <Box width={'75%'} mt={-2}>
-                    <ImageListView medias={post.images as Image[]} />
+                    <>
+                      <ImageListView
+                        medias={post.images as Image[]}
+                        onClickMedia={onClickMedia}
+                      />
+                      <ModalFullScreen
+                        mode="view"
+                        data={post.images as Image[]}
+                        open={open}
+                        onCloseModal={handleClose}
+                        initialIndexSlider={initialIndexSlider}
+                      />
+                    </>
                   </Box>
                 )}
               </Stack>
             </Stack>
 
-            <Divider
-              orientation="horizontal"
-              sx={{ backgroundColor: '#D9D9D9', mt: 3 }}
-              flexItem
-            />
+            {posts && index < posts?.length - 1 && (
+              <Divider
+                orientation="horizontal"
+                sx={{ backgroundColor: '#D9D9D9', mt: 3 }}
+                flexItem
+              />
+            )}
           </Grid>
         </Grid>
       </>
@@ -163,13 +190,39 @@ export default function PostCheck(props: Props) {
           ]}
         />
       </Box>
-      <SimpleCard title="Xét duyệt">
+      <Stack
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
+      >
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
+      </Stack>
+      <SimpleCard title={type === 1 ? 'Xét duyệt' : 'Vi phạm'}>
         <Stack gap={4} justifyContent="center" alignItems={'center'}>
-          {posts.map((post, index) => (
-            <React.Fragment key={post.id}>
-              {renderRowItem(post, index)}
-            </React.Fragment>
-          ))}
+          {posts.length ? (
+            posts.map((post, index) => (
+              <React.Fragment key={post.id}>
+                {renderRowItem(post, index)}
+              </React.Fragment>
+            ))
+          ) : (
+            <Box
+              minHeight={200}
+              display="flex"
+              alignItems="center"
+              justifyContent={'center'}
+              textAlign="center"
+            >
+              <Stack flexDirection={'row'} gap={1} alignItems="center">
+                <Icon>find_in_page</Icon>
+                <MuiTypography>{messages.MSG24}</MuiTypography>
+              </Stack>
+            </Box>
+          )}
         </Stack>
       </SimpleCard>
     </Container>

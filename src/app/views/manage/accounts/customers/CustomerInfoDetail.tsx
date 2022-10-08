@@ -131,7 +131,7 @@ export default function CustomerDetail(props: Props) {
           otherwise: Yup.string(),
         }),
       mobilePhone: Yup.string()
-        .test('check valid', 'invalid', phone => {
+        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
           const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
           if (!phone) {
             return true
@@ -282,7 +282,7 @@ export default function CustomerDetail(props: Props) {
       <Stack
         flexDirection={'row'}
         gap={2}
-        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
         {customer.data?.status !== -1 && (
           <>
@@ -296,14 +296,21 @@ export default function CustomerDetail(props: Props) {
               startIcon={<Icon>done</Icon>}
             />
             <MuiButton
-              title="Huỷ bỏ"
+              title="Huỷ thay đổi"
               variant="contained"
-              color="secondary"
+              color="warning"
               onClick={() => methods.reset()}
               startIcon={<Icon>clear</Icon>}
             />
           </>
         )}
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigation(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
       </Stack>
       <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
         <FormProvider {...methods}>

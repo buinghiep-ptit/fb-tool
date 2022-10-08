@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { SearchSharp } from '@mui/icons-material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
 import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -43,8 +43,12 @@ export default function CustomerAccounts(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
 
   const [defaultValues] = useState<ISearchFilters>({
     search: queryParams.search ?? '',
@@ -116,6 +120,7 @@ export default function CustomerAccounts(props: Props) {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: parseInt(event.target.value, 10),
     } as any)
   }
@@ -148,6 +153,29 @@ export default function CustomerAccounts(props: Props) {
     }
   }
 
+  const onResetFilters = () => {
+    methods.reset({
+      search: '',
+      cusType: 'all',
+      status: 'all',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
@@ -158,7 +186,7 @@ export default function CustomerAccounts(props: Props) {
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Email, SĐT, Tên hiển thị'}
                     type="text"
@@ -169,14 +197,14 @@ export default function CustomerAccounts(props: Props) {
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="cusType" label="Loại tài khoản">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Thường</MenuItem>
                     <MenuItem value={2}>KOL</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Hoạt động</MenuItem>
@@ -185,7 +213,7 @@ export default function CustomerAccounts(props: Props) {
                     <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={3} xs={6}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -193,6 +221,16 @@ export default function CustomerAccounts(props: Props) {
                     type="submit"
                     sx={{ width: '100%' }}
                     startIcon={<SearchSharp />}
+                  />
+                </Grid>
+                <Grid item sm={3} xs={6}>
+                  <MuiButton
+                    title="Tạo lại"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<ChangeCircleSharp />}
                   />
                 </Grid>
               </Grid>

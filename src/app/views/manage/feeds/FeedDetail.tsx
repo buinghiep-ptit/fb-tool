@@ -1,4 +1,4 @@
-import { Chip, Grid, Icon, styled } from '@mui/material'
+import { Avatar, Chip, Grid, Icon, styled } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
 import {
@@ -69,6 +69,7 @@ export default function FeedDetail(props: Props) {
 
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState(1)
 
   const queryResults = useQueries({
     queries: [
@@ -158,8 +159,7 @@ export default function FeedDetail(props: Props) {
   }
 
   const onClickMedia = (imgIndex?: number) => {
-    if (imgIndex === 4) setInitialIndexSlider(0)
-    else setInitialIndexSlider(imgIndex ?? 0)
+    setInitialIndexSlider(imgIndex ?? 0)
     setOpen(true)
   }
 
@@ -172,24 +172,23 @@ export default function FeedDetail(props: Props) {
     setOpen(false)
   }
 
-  const onSuccess = (data: any, message: string) => {
-    toastSuccess({ message: message })
+  const onSuccess = (data: any) => {
+    toastSuccess({
+      message: dialogType === 1 ? 'Duyệt bài thành công' : 'Xoá bài thành công',
+    })
     setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } = useApproveFeed(
-    onSuccess,
-    'Duyệt bài thành công',
-  )
-  const { mutate: deletedFeed, isLoading: deleteLoading } = useDeleteFeed(
-    onSuccess,
-    'Xoá bài thành công',
-  )
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+  const { mutate: deletedFeed, isLoading: deleteLoading } =
+    useDeleteFeed(onSuccess)
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
   }
   const openDialogDelete = () => {
     setTitleDialog('Xoá bài đăng')
+    setDialogType(-1)
     setOpenDialog(true)
   }
   const OnDeleteFeed = () => {
@@ -252,9 +251,10 @@ export default function FeedDetail(props: Props) {
       <Stack
         flexDirection={'row'}
         gap={2}
-        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
         <MuiButton
+          disabled={feed?.data && feed?.data.status === 1}
           title="Duyệt bài"
           variant="contained"
           color="primary"
@@ -263,9 +263,10 @@ export default function FeedDetail(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
+          disabled={feed?.data && feed?.data.status === -1}
           title="Vi phạm"
           variant="contained"
-          color="secondary"
+          color="warning"
           onClick={() =>
             navigate(`vi-pham`, {
               state: { modal: true },
@@ -275,6 +276,7 @@ export default function FeedDetail(props: Props) {
         />
 
         <MuiButton
+          disabled={feed?.data && feed?.data.status === -3}
           title="Xoá bài"
           variant="contained"
           color="error"
@@ -282,35 +284,54 @@ export default function FeedDetail(props: Props) {
           loading={deleteLoading}
           startIcon={<Icon>clear</Icon>}
         />
+
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
       </Stack>
       <Stack gap={3}>
         <SimpleCard title="Chi tiết Feed">
           <Box>
             <Grid container spacing={2}>
               <Grid item sm={8} xs={12}>
-                <Box>
-                  <MuiTypography variant="subtitle2">[Nội dung]</MuiTypography>
-                  <MuiTypography variant="body2">
-                    {feed.data?.content}
-                  </MuiTypography>
-                </Box>
-                <Box mt={1}>
-                  <MuiTypography variant="subtitle2">[Hashtag]</MuiTypography>
-                  <Stack flexDirection={'row'} gap={1} my={1}>
-                    {feed.data?.tags?.map(tag => (
-                      <Chip
-                        key={tag.id}
-                        label={`#${tag.value}`}
-                        size="small"
-                        // color={true ? 'primary' : 'default'}
-                        sx={{
-                          px: 1,
-                          backgroundColor: '#DDD',
-                        }}
-                      />
-                    ))}
+                <Stack flexDirection={'row'} gap={2} alignItems="center">
+                  <Avatar
+                    alt="avatar"
+                    src={
+                      feed.data?.customerInfo?.avatar
+                        ? feed.data?.customerInfo?.avatar
+                        : '/assets/images/app/avatar-default.svg'
+                    }
+                    sx={{ width: 56, height: 56 }}
+                  />
+                  <Stack flexDirection={'column'}>
+                    <MuiTypography variant="subtitle2">
+                      {feed.data?.customerInfo?.fullName}
+                    </MuiTypography>
+                    <MuiTypography variant="body2">
+                      {feed.data?.content}
+                    </MuiTypography>
                   </Stack>
-                </Box>
+                </Stack>
+
+                <Stack flexDirection={'row'} gap={1} my={2}>
+                  {feed.data?.tags?.map(tag => (
+                    <Chip
+                      key={tag.id}
+                      label={`#${tag.value}`}
+                      size="small"
+                      // color={true ? 'primary' : 'default'}
+                      sx={{
+                        px: 1,
+                        backgroundColor: '#DDD',
+                      }}
+                    />
+                  ))}
+                </Stack>
               </Grid>
 
               <Grid

@@ -1,12 +1,25 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   approveFeed,
   createFeed,
   deleteFeed,
+  fetchPostsCheck,
+  fetchPostsReported,
   violateFeed,
 } from 'app/apis/feed/feed.service'
 import { IFeedDetail } from 'app/models'
 import { extractFromObject } from './useUsersData'
+
+export const usePostsCheckData = (type?: number) => {
+  return useQuery<IFeedDetail[], Error>(
+    ['posts-check', type],
+    () => (type === 1 ? fetchPostsCheck() : fetchPostsReported()),
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+    },
+  )
+}
 
 export const useCreateFeed = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()

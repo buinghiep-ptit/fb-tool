@@ -264,7 +264,8 @@ export default function OrdersHistory() {
             currentTab={currentTab}
             setCurrentTab={setCurrentTab}
             data={data ?? []}
-          >
+          />
+          <SimpleCard title="Danh sách đơn hàng">
             <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
               <FormProvider {...methods}>
                 <Grid container spacing={2}>
@@ -325,7 +326,7 @@ export default function OrdersHistory() {
                 </Box>
               </FormProvider>
             </form>
-          </MuiNavTabs>
+          </SimpleCard>
 
           <SimpleCard>
             <MuiStyledTable

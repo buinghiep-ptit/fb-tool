@@ -29,7 +29,7 @@ export function Campground({ ...props }) {
     vec.set(0, 0, 6)
 
     state.camera.fov = THREE.MathUtils.lerp(state.camera.fov, 47, 0.05)
-    state.camera.position.lerp(vec, 0.1)
+    state.camera.position.lerp(vec, 0.2)
     state.camera.lookAt(0, 0.75, 0)
     state.camera.updateProjectionMatrix()
   })

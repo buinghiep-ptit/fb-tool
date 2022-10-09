@@ -148,7 +148,7 @@ export default function CreateFeed(props: Props) {
   >(['customers', filters], () => fetchCustomers(filters), {
     refetchOnWindowFocus: false,
     keepPreviousData: true,
-    enabled: !!filters && filters.cusType !== 0,
+    enabled: !!filters,
   })
 
   const { data: customerCampdi }: UseQueryResult<ICustomerTiny, Error> =

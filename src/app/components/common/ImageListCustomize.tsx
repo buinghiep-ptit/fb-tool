@@ -219,7 +219,9 @@ export function ImageListView({
               {imgSize.images.length > 5 && index === 4 && (
                 <AbsoluteFillObject
                   bgcolor="rgba(0, 0, 0, 0.7)"
-                  onMouseDown={() => console.log('show modal last pos:', index)}
+                  onMouseDown={() => {
+                    onClickMedia && onClickMedia(index)
+                  }}
                 >
                   <MuiTypography color={'primary'} variant="h4">
                     +{imgSize.images.length - 5}

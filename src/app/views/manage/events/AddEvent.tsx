@@ -1,6 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { ApprovalRounded, CancelSharp } from '@mui/icons-material'
-import { Grid, LinearProgress, MenuItem, Stack, styled } from '@mui/material'
+import {
+  Grid,
+  Icon,
+  LinearProgress,
+  MenuItem,
+  Stack,
+  styled,
+} from '@mui/material'
 import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -20,15 +26,15 @@ import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateEvent } from 'app/hooks/queries/useEventsData'
+import { useCreateEvent, useUpdateEvent } from 'app/hooks/queries/useEventsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
-import moment from 'moment'
+import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {}
@@ -56,6 +62,7 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function AddEvent(props: Props) {
+  const navigate = useNavigate()
   const { eventId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: EMediaFormat.IMAGE,
@@ -95,7 +102,13 @@ export default function AddEvent(props: Props) {
       .required('Chọn ngày kết thúc.'),
     amount: Yup.string().nullable(),
     files: Yup.mixed()
-      .required('Vui lòng chọn file')
+      .test('empty', messages.MSG1, files => {
+        if (!!Number(eventId ?? 0)) {
+          return !!mediasSrcPreviewer.length
+        }
+        const isError = files && !!files.length
+        return isError
+      })
       .test(
         'fileSize',
         fileConfigs.mediaFormat === EMediaFormat.VIDEO
@@ -128,7 +141,7 @@ export default function AddEvent(props: Props) {
     isError,
     error,
   }: UseQueryResult<IEventDetail, Error> = useQuery<IEventDetail, Error>(
-    ['feed', eventId],
+    ['event', eventId],
     () => getEventDetail(Number(eventId ?? 0)),
     {
       enabled: !!eventId,
@@ -167,7 +180,7 @@ export default function AddEvent(props: Props) {
         }))
       }
 
-      setMediasSrcPreviewer(event.medias ?? [])
+      setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
 
       methods.reset({ ...defaultValues })
     }
@@ -175,10 +188,11 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     console.log(values)
-    const files = fileInfos.map(file => ({
+    const files = [...mediasSrcPreviewer].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
       url: file.url,
+      detail: null,
     }))
 
     const payload: IEventDetail = {
@@ -192,15 +206,24 @@ export default function AddEvent(props: Props) {
       status: Number(values.status ?? -1),
       tags: values.hashtag ?? [],
     }
-    add(payload)
+    if (eventId) {
+      edit({ ...payload, id: Number(eventId) })
+    } else {
+      add(payload)
+    }
   }
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Thêm mới thành công' })
-    setMediasSrcPreviewer([])
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
+    // setMediasSrcPreviewer([])
     methods.reset()
   }
-  const { mutate: add, isLoading: createLoading } =
-    useCreateEvent(onRowUpdateSuccess)
+  const { mutate: add, isLoading: createLoading } = useCreateEvent(() =>
+    onRowUpdateSuccess(null, 'Thêm mới thành công'),
+  )
+
+  const { mutate: edit, isLoading: editLoading } = useUpdateEvent(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
 
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
@@ -241,6 +264,38 @@ export default function AddEvent(props: Props) {
           ]}
         />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
+      >
+        <MuiButton
+          title="Lưu lại"
+          variant="contained"
+          color="primary"
+          onClick={methods.handleSubmit(onSubmitHandler)}
+          loading={createLoading || editLoading}
+          startIcon={<Icon>done</Icon>}
+        />
+        <MuiButton
+          title="Huỷ bỏ"
+          variant="contained"
+          color="warning"
+          onClick={() => {
+            setMediasSrcPreviewer([...(event?.medias ?? [])])
+            methods.reset()
+          }}
+          startIcon={<Icon>cached</Icon>}
+        />
+
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
+      </Stack>
       <SimpleCard title="Thêm mới">
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -251,31 +306,9 @@ export default function AddEvent(props: Props) {
             <Grid container spacing={3}>
               <Grid item sm={5} xs={12}>
                 <Stack gap={3}>
-                  <Grid container spacing={2}>
-                    <Grid item sm={6} xs={6}>
-                      <MuiButton
-                        title="Lưu"
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        sx={{ width: '100%' }}
-                        loading={createLoading}
-                        startIcon={<ApprovalRounded />}
-                      />
-                    </Grid>
-                    <Grid item sm={6} xs={6}>
-                      <MuiButton
-                        onClick={() => methods.reset()}
-                        title="Huỷ"
-                        variant="outlined"
-                        color="secondary"
-                        sx={{ width: '100%' }}
-                        startIcon={<CancelSharp />}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
+                  {(createLoading || editLoading) && (
+                    <LinearProgress sx={{ mt: 0.5 }} />
+                  )}
 
                   <Stack>
                     <FormInputText
@@ -379,6 +412,7 @@ export default function AddEvent(props: Props) {
                     <UploadPreviewer
                       name="files"
                       initialMedias={event?.medias ?? []}
+                      fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}

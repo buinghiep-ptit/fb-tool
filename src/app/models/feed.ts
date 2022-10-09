@@ -61,7 +61,7 @@ export interface IMediaOverall {
   mediaFormat?: number // 1:Video 2:Ảnh 3:Khác
   url?: string
   status?: number
-  detail?: IMediaDetail
+  detail?: IMediaDetail | null
 }
 
 export interface IMediaDetail {

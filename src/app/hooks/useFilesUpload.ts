@@ -58,7 +58,7 @@ export const useUploadFiles = () => {
 
   const removeSelectedFiles = (index?: number) => {
     if (index) {
-      fileInfos.slice(index, 1)
+      fileInfos.splice(index, 1)
       setFileInfos([...fileInfos])
     } else setFileInfos([])
   }

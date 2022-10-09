@@ -299,7 +299,19 @@ export default function CustomerDetail(props: Props) {
               title="Huỷ thay đổi"
               variant="contained"
               color="warning"
-              onClick={() => methods.reset()}
+              onClick={() => {
+                removeSelectedFiles()
+                setMediasSrcPreviewer([
+                  {
+                    mediaType: EMediaType.AVATAR,
+                    mediaFormat: EMediaFormat.IMAGE,
+                    url:
+                      customer?.data?.avatar ??
+                      '/assets/images/avatars/avatar-duck.jpeg',
+                  },
+                ])
+                methods.reset()
+              }}
               startIcon={<Icon>clear</Icon>}
             />
           </>

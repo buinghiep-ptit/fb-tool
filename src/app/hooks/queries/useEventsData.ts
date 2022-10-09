@@ -20,7 +20,7 @@ export const useCreateEvent = (onSuccess?: any, onError?: any) => {
 export const useUpdateEvent = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
-    (event: Record<string, any>) => updateEvent(event.eventId, event),
+    (event: Record<string, any>) => updateEvent(event.id, event),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['events'])

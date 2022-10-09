@@ -1,8 +1,4 @@
-import {
-  AddCircleSharp,
-  ChangeCircleSharp,
-  UploadFile,
-} from '@mui/icons-material'
+import { ChangeCircleSharp, UploadFile } from '@mui/icons-material'
 import {
   FormHelperText,
   Icon,
@@ -39,6 +35,7 @@ interface Props {
   progressInfos: any
   initialMedias?: IMediaOverall[]
   mediasSrcPreviewer: IMediaOverall[]
+  fileInfos?: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
 }
 
@@ -57,6 +54,7 @@ export function UploadPreviewer({
   progressInfos,
   initialMedias = [],
   mediasSrcPreviewer,
+  fileInfos,
   setMediasSrcPreviewer,
 }: Props) {
   const { mediaFormat, mediaType, multiple } = mediaConfigs
@@ -85,6 +83,11 @@ export function UploadPreviewer({
   }, [mediaFormat])
 
   useEffect(() => {
+    if (fileInfos && fileInfos.length)
+      setMediasSrcPreviewer([...initialMedias, ...fileInfos])
+  }, [fileInfos])
+
+  useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
     if (duration && mediaFormat === 1 && fileVideo) {
       const newFiles = Object.assign(fileVideo, {
@@ -107,8 +110,7 @@ export function UploadPreviewer({
     setOpenSlider(false)
   }
   const onClickMedia = (imgIndex?: number) => {
-    if (imgIndex === 4) setInitialIndexSlider(0)
-    else setInitialIndexSlider(imgIndex ?? 0)
+    setInitialIndexSlider(imgIndex ?? 0)
     setOpenSlider(true)
   }
   const handleRemoveMedia = (mediaIndex?: number) => {
@@ -127,7 +129,7 @@ export function UploadPreviewer({
   }
 
   const handleResetMedia = () => {
-    setMediasSrcPreviewer([])
+    setMediasSrcPreviewer([]) // ??? ...initialMedias
     setValue('files', null)
     clearErrors('files')
 
@@ -314,14 +316,20 @@ export function UploadPreviewer({
                 initialIndexSlider={initialIndexSlider}
               />
               {!uploading && (
-                <MuiButton
-                  title="Thêm ảnh"
-                  variant="contained"
-                  color="primary"
-                  sx={{ position: 'absolute', top: 16, left: 16 }}
-                  onClick={open}
-                  startIcon={<AddCircleSharp fontSize="small" />}
-                />
+                <>
+                  <CustomButton
+                    handleClick={open}
+                    iconName={'add_circle_outlined'}
+                    title={'Thêm ảnh'}
+                    position={{ top: '16px', left: '16px' }}
+                  />
+                  <CustomButton
+                    handleClick={handleResetMedia}
+                    iconName={'delete'}
+                    title={'Xoá tất cả'}
+                    position={{ top: '16px', right: '16px' }}
+                  />
+                </>
               )}
             </Box>
           )}
@@ -345,14 +353,20 @@ export function UploadPreviewer({
                     setDuration={setDuration}
                   />
                   {!uploading && (
-                    <MuiButton
-                      title="Thay đổi video"
-                      variant="contained"
-                      color="primary"
-                      sx={{ position: 'absolute', top: 16, left: 16 }}
-                      onClick={open}
-                      startIcon={<ChangeCircleSharp fontSize="small" />}
-                    />
+                    <>
+                      <CustomButton
+                        handleClick={open}
+                        iconName={'cached'}
+                        title={'Chọn lại'}
+                        position={{ top: '16px', left: '16px' }}
+                      />
+                      <CustomButton
+                        handleClick={handleResetMedia}
+                        iconName={'delete'}
+                        title={'Xoá'}
+                        position={{ top: '16px', right: '16px' }}
+                      />
+                    </>
                   )}
                 </>
                 {progressInfos?.val &&
@@ -379,5 +393,36 @@ export function UploadPreviewer({
         )}
       </Box>
     </Box>
+  )
+}
+
+type ButtonProps = {
+  handleClick: () => void
+  iconName: string
+  title: string
+  position?: any
+}
+
+const CustomButton = ({
+  iconName,
+  title,
+  position,
+  handleClick,
+}: ButtonProps) => {
+  return (
+    <IconButton
+      sx={{
+        ...position,
+        position: 'absolute',
+        bgcolor: '#303030',
+        borderRadius: 1,
+      }}
+      onClick={() => handleClick && handleClick()}
+    >
+      <Icon sx={{ color: 'white' }}>{iconName}</Icon>
+      <MuiTypography sx={{ fontWeight: 500, color: 'white', px: 0.5 }}>
+        {title}
+      </MuiTypography>
+    </IconButton>
   )
 }

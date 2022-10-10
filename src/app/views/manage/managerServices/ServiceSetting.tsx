@@ -12,7 +12,7 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { ServiceResponse, ServicesFilters, TitleService } from 'app/models'
+import { ServicesFilters } from 'app/models'
 import { getListServices } from 'app/apis/services/services.service'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -29,6 +29,7 @@ import {
   useDeleteService,
   useUpdateService,
 } from 'app/hooks/queries/useServicesData'
+import { ServiceResponse, TitleService } from 'app/models/service'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',

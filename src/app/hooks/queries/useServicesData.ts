@@ -4,7 +4,7 @@ import {
   deleteService,
   updateService,
 } from 'app/apis/services/services.service'
-import { DetailService } from 'app/models'
+import { DetailService } from 'app/models/service'
 
 export const useCreateService = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()

@@ -7,6 +7,7 @@ import {
   TextField,
   MenuItem,
   Stack,
+  LinearProgress,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { ICampAreaResponse } from 'app/models/camp'
@@ -27,6 +28,10 @@ import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import { DetailService } from 'app/models/service'
+import { getServiceDetail } from 'app/apis/services/services.service'
+import { useParams } from 'react-router-dom'
+import MuiLoading from 'app/components/common/MuiLoadingApp'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -37,17 +42,11 @@ const Container = styled('div')(({ theme }) => ({
 }))
 export interface Props {}
 export default function ServiceDetail(props: Props) {
+  const { serviceId } = useParams()
+  const [loading, setLoading] = useState(false)
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
-  const [
-    selectFiles,
-    uploadFiles,
-    uploading,
-    progressInfos,
-    message,
-    fileInfos,
-  ] = useUploadFiles()
 
   const calendar = [
     'Thứ 2:',
@@ -73,14 +72,26 @@ export default function ServiceDetail(props: Props) {
     camp?: string[]
     files?: any
     content?: string
+    rentalType?: number
+    capacity?: number
+    nameService?: string
+    description?: string
+    status?: number
+    amount?: number
   }
   const [defaultValues] = useState<TypeElement>({
     camp: [],
+    status: 1,
+    rentalType: 2,
+    amount: 10000,
+    capacity: 20,
+    nameService: 'test Service',
   })
 
   const validationSchema = Yup.object().shape({
-    camp: Yup.object().required('Không được để trống'),
+    nameService: Yup.string().required('Tên dịch vụ không được bỏ trống'),
     content: Yup.string().required('Nội dung không được bỏ trống'),
+    amount: Yup.string().nullable(),
     files: Yup.mixed()
       .required('Vui lòng chọn file')
       .test('fileSize', 'Dung lượng file quá lớn (10MB/ảnh )', files =>
@@ -96,6 +107,39 @@ export default function ServiceDetail(props: Props) {
   const onSubmitHandler: SubmitHandler<TypeElement> = (values: TypeElement) => {
     console.log(values)
   }
+
+  const [
+    selectFiles,
+    uploadFiles,
+    uploading,
+    progressInfos,
+    message,
+    fileInfos,
+  ] = useUploadFiles()
+
+  const {
+    data: campService,
+    isLoading,
+    fetchStatus,
+    isError,
+    error,
+  }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
+    ['camp-service', serviceId],
+    () => getServiceDetail(Number(serviceId ?? 0)),
+    {
+      enabled: !!serviceId,
+    },
+  )
+
+  if (isError)
+    return (
+      <Box my={2} textAlign="center">
+        <MuiTypography variant="h5">
+          Have an errors: {error.message}
+        </MuiTypography>
+      </Box>
+    )
+
   return (
     <Container>
       <Box className="breadcrumb">
@@ -108,7 +152,6 @@ export default function ServiceDetail(props: Props) {
               <Grid item sm={3} xs={3}>
                 <MuiButton
                   title="Lưu"
-                  loading={false}
                   variant="contained"
                   color="primary"
                   type="submit"
@@ -128,6 +171,7 @@ export default function ServiceDetail(props: Props) {
                 />
               </Grid>
             </Grid>
+            {loading && <LinearProgress sx={{ mt: 0.5 }} />}
             <Grid
               container
               sx={{ marginLeft: '8px', marginTop: '10px ' }}
@@ -189,7 +233,6 @@ export default function ServiceDetail(props: Props) {
                   name="capacity"
                   label=""
                   placeholder=""
-                  defaultValue=""
                   iconEnd={
                     <MuiTypography variant="subtitle2">Người</MuiTypography>
                   }
@@ -210,7 +253,7 @@ export default function ServiceDetail(props: Props) {
               <Grid item xs={9} sx={{ display: 'flex', alignItems: 'center' }}>
                 <FormInputText
                   type="text"
-                  name="name"
+                  name="nameService"
                   label={''}
                   defaultValue=""
                   placeholder=""
@@ -318,7 +361,6 @@ export default function ServiceDetail(props: Props) {
                       name="amount"
                       label=""
                       placeholder=""
-                      defaultValue=""
                       iconEnd={
                         <MuiTypography variant="subtitle2">
                           VND/Ngày

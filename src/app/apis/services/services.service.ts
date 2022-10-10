@@ -1,5 +1,5 @@
 import { http } from 'app/helpers/http-config'
-import { DetailService, ServiceResponse } from 'app/models'
+import { DetailService, ServiceResponse } from 'app/models/service'
 
 export const getListServices = async (
   params: any,

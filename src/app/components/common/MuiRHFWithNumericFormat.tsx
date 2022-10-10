@@ -39,7 +39,6 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
       render={({ field }) => (
         <NumericFormat
           label={label}
-          defaultValue={0}
           onValueChange={({ value: v }) => field.onChange(v)}
           InputProps={{
             ...inputProps,

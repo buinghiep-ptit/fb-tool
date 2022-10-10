@@ -23,6 +23,15 @@ export default function GeneralInformation({
     }
   }
 
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
+  ]
+
   return (
     <div>
       <Grid container>
@@ -154,7 +163,7 @@ export default function GeneralInformation({
                 error={errors.address}
                 helperText={errors.address?.message}
                 {...field}
-                label="Địa danh"
+                label="Địa chỉ"
                 variant="outlined"
                 margin="normal"
               />
@@ -163,16 +172,29 @@ export default function GeneralInformation({
         </Grid>
         <Grid item xs={12} md={12}>
           <Controller
-            name="type"
+            name="campTypes"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Autocomplete
+                multiple
                 {...field}
-                label="Loại hình"
-                variant="outlined"
-                margin="normal"
-                // error={errors.namePlace}
-                // helperText={errors.namePlace?.message}
+                options={[...typeCamp]}
+                getOptionLabel={option => option.label}
+                filterSelectedOptions
+                onChange={(_, data) => field.onChange(data)}
+                sx={{ width: 400, marginRight: 5 }}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    // error={errors.namePlace}
+                    // helperText={errors.namePlace?.message}
+                    variant="outlined"
+                    label="Loại hình"
+                    placeholder="Loại hình"
+                    fullWidth
+                    margin="normal"
+                  />
+                )}
               />
             )}
           />

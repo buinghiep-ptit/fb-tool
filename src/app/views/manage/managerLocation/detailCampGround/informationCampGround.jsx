@@ -6,10 +6,9 @@ import Typography from '@mui/material/Typography'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import GeneralInformation from './generalInformation'
 import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { Button } from '@mui/material'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import {
   getDistricts,
@@ -21,6 +20,7 @@ import {
   updateCampGround,
   getListCampArea,
   createCampGround,
+  getListMerchant,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -41,6 +41,7 @@ export default function InformationCampGround({ action }) {
   const [idMerchant, setIdMerchant] = React.useState()
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState()
+  const [listMerchant, setListMerchant] = React.useState([])
   const params = useParams()
 
   const introductionRef = React.useRef()
@@ -94,6 +95,9 @@ export default function InformationCampGround({ action }) {
       car: false,
       motobike: false,
       campAreas: [],
+      campTypes: [],
+      isSupportBooking: 1,
+      idMerchant: null,
     },
   })
 
@@ -111,7 +115,7 @@ export default function InformationCampGround({ action }) {
         const token = window.localStorage.getItem('accessToken')
         const res = axios({
           method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -130,7 +134,7 @@ export default function InformationCampGround({ action }) {
 
   const onSubmit = async data => {
     const listUrlImage = await handleDataImageUpload()
-    console.log(listUrlImage)
+
     const mediasUpdate = listUrlImage.map(url => {
       const media = new Object()
       media.srcType = 2
@@ -161,9 +165,9 @@ export default function InformationCampGround({ action }) {
 
     dataUpdate.id = params.id
     dataUpdate.name = data.nameCampground
-
+    dataUpdate.campTypes = data.campTypes.map(type => type.id)
     dataUpdate.policy = ''
-    dataUpdate.idMerchant = idMerchant
+    dataUpdate.idMerchant = data.idMerchant.id
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
@@ -201,10 +205,16 @@ export default function InformationCampGround({ action }) {
 
     if (action === 'create') {
       const res = await createCampGround(dataUpdate)
-      if (res) toastSuccess({ message: 'Điểm camp đã được tạo' })
+      if (res) {
+        toastSuccess({ message: 'Điểm camp đã được tạo' })
+        navigate('/quan-ly-thong-tin-diem-cam')
+      }
     } else {
       const res = await updateCampGround(params.id, dataUpdate)
-      if (res) toastSuccess({ message: 'Thông tin đã được cập nhật' })
+      if (res) {
+        toastSuccess({ message: 'Thông tin đã được cập nhật' })
+        navigate('/quan-ly-thong-tin-diem-cam')
+      }
     }
   }
 
@@ -216,11 +226,26 @@ export default function InformationCampGround({ action }) {
   const fetchInforCampGround = async () => {
     const res = await getProvinces()
     setProvinces(res)
-
-    if (res) {
+    const merchants = await getListMerchant()
+    setListMerchant(merchants)
+    if (res && merchants) {
       if (action === 'edit') {
         getDetailCampGround(params.id)
           .then(data => {
+            console.log(
+              merchants.filter(merchant => (merchant.id = data.idMerchant))[0],
+            )
+            setValue(
+              'idMerchant',
+              // merchants.filter(merchant => merchant.id == data.idMerchant),
+
+              {
+                name: 'Giang đẹp trai không sợ ai',
+                id: 11,
+                mobilePhone: '0396901542',
+                email: 'kienpnh01@fpt.com.vn',
+              },
+            )
             setMedias(data.medias)
             setIdMerchant(data.idMerchant)
             setHashtag(data.tags)
@@ -232,6 +257,7 @@ export default function InformationCampGround({ action }) {
               'province',
               res.find(province => province.id === data.idProvince),
             )
+
             setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
@@ -275,6 +301,8 @@ export default function InformationCampGround({ action }) {
             }
           })
           .catch(err => console.log(err))
+      } else {
+        setFeature({ utility: [] })
       }
     }
   }
@@ -313,7 +341,7 @@ export default function InformationCampGround({ action }) {
     fetchListCampArea()
     fetchInforCampGround()
   }, [])
-  console.log('re render')
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Accordion>
@@ -352,13 +380,9 @@ export default function InformationCampGround({ action }) {
           <InformationBooking
             control={control}
             errors={errors}
-            provinces={provinces}
-            districts={districts}
-            wards={wards}
-            setProvinceId={setProvinceId}
-            setDistrictId={setDistrictId}
             getValues={getValues}
             setValue={setValue}
+            listMerchant={listMerchant}
           />
         </AccordionDetails>
       </Accordion>

@@ -15,7 +15,7 @@ import {
 } from 'app/apis/campGround/ground.service'
 import { useParams } from 'react-router-dom'
 import FormGroup from '@mui/material/FormGroup'
-import { cloneDeep, remove } from 'lodash'
+import { cloneDeep, remove, set } from 'lodash'
 
 export default function Feature({
   control,
@@ -35,9 +35,15 @@ export default function Feature({
   }
 
   const fetchListUnlinkedUtility = async () => {
-    const res = await getListUnlinkedUtility(params.id)
-    setUnlinkedUtilitys(res)
+    if (action === 'edit') {
+      const res = await getListUnlinkedUtility(params.id)
+      setUnlinkedUtilitys(res)
+    }
+
     const response = await getListUtility()
+    if (action !== 'edit') {
+      setUnlinkedUtilitys(response)
+    }
     const convertRes = {}
     response.forEach(item => {
       convertRes[item.idUtility] = item
@@ -47,7 +53,7 @@ export default function Feature({
   }
 
   React.useEffect(() => {
-    if (action === 'edit') fetchListUnlinkedUtility()
+    fetchListUnlinkedUtility()
   }, [])
 
   return (

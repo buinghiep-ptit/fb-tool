@@ -46,7 +46,7 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
           }}
         />
 
-        {[...medias].map((file, index) => {
+        {(medias || []).map((file, index) => {
           return (
             <Grid item xs={3} md={3} key={index}>
               <div className="uploader" id="fileSelect">

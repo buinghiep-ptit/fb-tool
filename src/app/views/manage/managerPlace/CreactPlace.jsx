@@ -11,17 +11,18 @@ import * as React from 'react'
 import UploadImage from 'app/components/common/uploadImage'
 import Typography from '@mui/material/Typography'
 import { createPlace } from 'app/apis/place/place.service'
-import { useParams } from 'react-router-dom'
 import {
   getDistricts,
   getProvinces,
   getWards,
 } from 'app/apis/common/common.service'
-
+import axios from 'axios'
 import { useForm, Controller } from 'react-hook-form'
-import { object, string } from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useNavigate } from 'react-router-dom'
+import MapCustom from 'app/components/common/MapCustom/MapCustom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -34,27 +35,24 @@ const Container = styled('div')(({ theme }) => ({
 
 export default function CreatePlace(props) {
   const [hashtag, setHashtag] = React.useState([])
-
   const [provinceId, setProvinceId] = React.useState(null)
   const [districtId, setDistrictId] = React.useState('')
-
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
 
-  const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: 'Pulp Fiction', year: 1994 },
-    {
-      label: 'The Lord of the Rings: The Return of the King',
-      year: 2003,
-    },
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
   ]
+
+  const uploadImageRef = React.useRef()
+  const mapRef = React.useRef()
+  const navigate = useNavigate()
 
   const schema = yup
     .object({
@@ -97,24 +95,68 @@ export default function CreatePlace(props) {
     return
   }
 
+  const handleDataImageUpload = async () => {
+    const introData = uploadImageRef.current.getFiles()
+    const fileUpload = [...introData].map(file => {
+      console.log(file)
+      const formData = new FormData()
+      formData.append('file', file)
+      try {
+        const token = window.localStorage.getItem('accessToken')
+        const res = axios({
+          method: 'post',
+          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        return res
+      } catch (e) {
+        console.log(e)
+      }
+    })
+
+    const response = await Promise.all(fileUpload)
+    if (response) return response.map(item => item.data.url)
+  }
+
   const onSubmit = async data => {
+    console.log(data)
+
+    const listUrlImage = await handleDataImageUpload()
+    const mediasUpdate = listUrlImage.map((url, index) => {
+      const media = new Object()
+      media.srcType = 2
+      media.mediaType = index === 0 ? 2 : 1
+      media.mediaFormat = 2
+      media.url = url
+      return media
+    })
+
+    const { lat, lng } = mapRef.current.getCreateDegrees()
     const paramDetail = {
+      medias: mediasUpdate,
       name: data.namePlace.trim(),
       description: data.description.trim(),
       idProvince: data?.province.id || null,
       idWard: data?.ward?.id || null,
       idDistrict: data?.district.id || null,
-      longitude: 0,
-      latitude: 0,
+      longitude: lng,
+      latitude: lat,
       address: data.address.trim(),
       tags: data.hashtag,
       imgUrl: '',
       status: 1,
+      campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
 
     const res = await createPlace(paramDetail)
     if (res) {
+      toastSuccess({ message: 'Tạo địa danh thành công' })
       fetchGetProvinces()
+      navigate('/quan-ly-thong-tin-dia-danh')
     }
   }
 
@@ -268,26 +310,39 @@ export default function CreatePlace(props) {
               />
             </Grid>
             <Grid item xs={12}>
-              Vị trí trên bản đồ
+              <MapCustom
+                ref={mapRef}
+                center={{
+                  lat: 21.027161210811197,
+                  lng: 105.78872657468659,
+                }}
+              />
             </Grid>
             <Grid item xs={12} md={12}>
-              <Autocomplete
-                multiple
-                options={top100Films}
-                getOptionLabel={option => option.label}
-                defaultValue={[top100Films[1]]}
-                filterSelectedOptions
-                sx={{ width: 400, marginRight: 5 }}
-                renderInput={params => (
-                  <TextField
-                    {...params}
-                    // error={errors.namePlace}
-                    // helperText={errors.namePlace?.message}
-                    variant="outlined"
-                    label="Loại hình"
-                    placeholder="Loại hình"
-                    fullWidth
-                    margin="normal"
+              <Controller
+                name="campAreaTypes"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    multiple
+                    {...field}
+                    options={typeCamp}
+                    getOptionLabel={option => option.label}
+                    filterSelectedOptions
+                    onChange={(_, data) => field.onChange(data)}
+                    sx={{ width: 400, marginRight: 5 }}
+                    renderInput={params => (
+                      <TextField
+                        {...params}
+                        // error={errors.namePlace}
+                        // helperText={errors.namePlace?.message}
+                        variant="outlined"
+                        label="Loại hình"
+                        placeholder="Loại hình"
+                        fullWidth
+                        margin="normal"
+                      />
+                    )}
                   />
                 )}
               />
@@ -344,7 +399,7 @@ export default function CreatePlace(props) {
           </Grid>
 
           <Typography>Ảnh:</Typography>
-          <UploadImage></UploadImage>
+          <UploadImage ref={uploadImageRef}></UploadImage>
           <Button color="primary" type="submit" variant="contained">
             Lưu
           </Button>

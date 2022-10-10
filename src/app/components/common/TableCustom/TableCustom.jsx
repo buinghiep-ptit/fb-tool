@@ -10,11 +10,15 @@ import {
   IconButton,
   TablePagination,
   Switch,
+  Button,
+  Typography,
 } from '@mui/material'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { SimpleCard } from 'app/components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { cloneDeep } from 'lodash'
+import DialogCustom from '../DialogCustom'
+import { toastSuccess } from 'app/helpers/toastNofication'
 
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: 'pre',
@@ -48,9 +52,12 @@ const TableCustom = ({
   filter,
   updateStatus,
 }) => {
+  const dialogConfirm = React.useRef()
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [filterTable, setFilterTable] = useState({ name: '', size: 5, page: 0 })
+  const idDelete = React.useRef()
+  const navigate = useNavigate()
   const handleChangePage = (_, newPage) => {
     setPage(newPage)
     filter.page = newPage
@@ -70,12 +77,18 @@ const TableCustom = ({
 
   const handleDeleteAction = async id => {
     const res = await onDeleteData(id)
-    if (res) fetchDataTable({ ...filterTable })
+    if (res) {
+      toastSuccess({ message: 'Đã được xóa' })
+      fetchDataTable({ ...filterTable })
+    }
   }
 
   const handleAddAction = async id => {
     const res = await onAddData(id)
-    if (res) fetchDataTable({ ...filterTable })
+    if (res) {
+      toastSuccess({ message: 'Liên kết thành công' })
+      fetchDataTable({ ...filterTable })
+    }
   }
 
   return (
@@ -113,7 +126,17 @@ const TableCustom = ({
                     case 'image':
                       return (
                         <TableCell align="center" key={`${element}${id}`}>
-                          <img src={data[element]} />
+                          {data[element] && (
+                            <img
+                              src={data[element]}
+                              style={{
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                padding: '5px',
+                                width: '150px',
+                              }}
+                            />
+                          )}
                         </TableCell>
                       )
                     case 'index':
@@ -146,7 +169,8 @@ const TableCustom = ({
                                 <IconButton
                                   key={indexType}
                                   onClick={() => {
-                                    handleDeleteAction(data.id)
+                                    dialogConfirm.current.handleClickOpen()
+                                    idDelete.current = data.id
                                   }}
                                 >
                                   <Icon color="error">{type}</Icon>
@@ -160,6 +184,22 @@ const TableCustom = ({
                                   key={indexType}
                                   onClick={() => {
                                     handleAddAction(data.id)
+                                  }}
+                                >
+                                  <Icon color="error">{type}</Icon>
+                                </IconButton>
+                              )
+                            }
+
+                            if (type === 'edit') {
+                              return (
+                                <IconButton
+                                  key={indexType}
+                                  onClick={() => {
+                                    console.log(data.linkDetail.path)
+                                    navigate(
+                                      `${data.linkDetail.path}${data.id}`,
+                                    )
                                   }}
                                 >
                                   <Icon color="error">{type}</Icon>
@@ -210,6 +250,32 @@ const TableCustom = ({
           />
         )}
       </Box>
+      <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="sm">
+        <Typography variant="h5" component="h6" align="center" mt={5} mb={5}>
+          Bạn chắc chắn muốn xóa?
+        </Typography>
+        <div style={{ textAlign: 'center' }}>
+          <Button
+            style={{ marginRight: '10px' }}
+            color="primary"
+            variant="contained"
+            type="button"
+            onClick={() => {
+              dialogConfirm.current.handleClose()
+              handleDeleteAction(idDelete.current)
+            }}
+          >
+            Đồng ý
+          </Button>
+          <Button
+            style={{ backgroundColor: '#cccccc' }}
+            variant="contained"
+            type="button"
+          >
+            Hủy
+          </Button>
+        </div>
+      </DialogCustom>
     </SimpleCard>
   )
 }

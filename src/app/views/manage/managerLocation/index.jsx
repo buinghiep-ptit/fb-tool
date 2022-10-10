@@ -120,7 +120,6 @@ export default function ManagerLocation(props) {
               variant="contained"
               type="submit"
               onClick={() => {
-                console.log(inputFilter, statusFilter)
                 fetchListCampGround({
                   name: inputFilter,
                   status: statusFilter,

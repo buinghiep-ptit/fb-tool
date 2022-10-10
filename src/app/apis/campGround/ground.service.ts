@@ -82,3 +82,9 @@ export const getListCampArea = async (): Promise<any> => {
   const { data } = await http.get<any>(`/api/camp-areas/select-list`)
   return data
 }
+
+// list merchant
+export const getListMerchant = async (): Promise<any> => {
+  const { data } = await http.get<any>(`/api/camp-grounds/merchant-list`)
+  return data
+}

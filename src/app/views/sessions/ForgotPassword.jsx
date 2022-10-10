@@ -97,7 +97,7 @@ const ForgotPassword = () => {
         return regexStr.test(value)
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20)
+      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20)
       .required(messages.MSG1),
     passwordConfirmation: Yup.string()
       .oneOf([Yup.ref('password'), null], messages.MSG11)
@@ -121,12 +121,12 @@ const ForgotPassword = () => {
       let response = null
       if (step === 1) {
         response = await resetPasswordInit(values)
-        response = await resetPasswordCheck({ key: 'test_' + postfixKey })
+        response = await resetPasswordCheck({ key: postfixKey })
         if (response.isValid) setStep(step + 1)
         setLoading(false)
       } else if (step === 2) {
         response = await resetPasswordFinish({
-          key: 'test_' + postfixKey,
+          key: postfixKey,
           newPassword: values.password,
         })
         setStep(step + 1)

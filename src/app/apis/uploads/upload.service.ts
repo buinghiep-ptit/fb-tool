@@ -11,7 +11,7 @@ export const uploadFile = async (
   formData.append('file', file)
 
   const { data }: any = await http.post(path, formData, {
-    baseURL: process.env.REACT_APP_UPLOAD_API_URL,
+    baseURL: 'https://dev09-api.campdi.vn/upload',
     headers: {
       'Content-Type': 'multipart/form-data',
     },

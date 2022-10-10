@@ -40,17 +40,14 @@ const Footer = () => {
       <AppBar color="primary" position="static" sx={{ zIndex: 96 }}>
         <AppFooter>
           <FooterContent>
-            <a href="https://www.facebook.com/vannghiephd.ptit">
+            <a href="">
               <Button variant="contained" color="secondary">
                 Campdi
               </Button>
             </a>
             <Span sx={{ m: 'auto' }}></Span>
             <Paragraph sx={{ m: 0 }}>
-              Design and Developed by{' '}
-              <a href="https://www.facebook.com/vannghiephd.ptithttps://www.facebook.com/vannghiephd.ptit">
-                DSC
-              </a>
+              Design and Developed by <a href="">DSC</a>
             </Paragraph>
           </FooterContent>
         </AppFooter>

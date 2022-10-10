@@ -37,7 +37,6 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 type ISearchFilters = {
-  account?: string
   email?: string
   role?: string
   status?: string
@@ -65,7 +64,6 @@ export default function AdminAccounts(props: Props) {
   const [defaultValues] = useState<ISearchFilters>({
     role: queryParams.role ?? 'all',
     status: queryParams.status ?? 'all',
-    account: queryParams.account ?? '',
     email: queryParams.email ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
@@ -182,7 +180,6 @@ export default function AdminAccounts(props: Props) {
 
   const onResetFilters = () => {
     methods.reset({
-      account: '',
       email: '',
       role: 'all',
       status: 'all',
@@ -214,18 +211,7 @@ export default function AdminAccounts(props: Props) {
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
-                  <FormInputText
-                    label={'Tài khoản'}
-                    type="text"
-                    name="account"
-                    defaultValue=""
-                    size="small"
-                    placeholder="Nhập tên tài khoản"
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Email'}
                     type="email"
@@ -236,15 +222,16 @@ export default function AdminAccounts(props: Props) {
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="role" label="Quyền">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Admin</MenuItem>
                     <MenuItem value="2">CS</MenuItem>
                     <MenuItem value="3">Sale</MenuItem>
+                    <MenuItem value="4">MKT</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hoạt động</MenuItem>
@@ -268,7 +255,7 @@ export default function AdminAccounts(props: Props) {
                   </Grid>
                   <Grid item sm={3} xs={6}>
                     <MuiButton
-                      title="Tạo lại"
+                      title="Làm mới"
                       variant="outlined"
                       color="primary"
                       onClick={onResetFilters}

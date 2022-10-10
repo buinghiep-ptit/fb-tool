@@ -32,7 +32,7 @@ export function MuiRHFDatePicker({
       name={name}
       defaultValue={defaultValue ?? null}
       render={({ field: { onChange, value, ...rest } }) => (
-        <DateTimePicker
+        <DatePicker
           {...rest}
           label={label}
           disableFuture={false}

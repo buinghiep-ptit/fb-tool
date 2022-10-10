@@ -51,7 +51,7 @@ export default function ChangePassword({ title }: Props) {
         } else return false
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20),
+      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
     note: Yup.string().max(256, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

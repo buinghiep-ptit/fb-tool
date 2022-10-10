@@ -338,7 +338,7 @@ export default function ManagerFeed(props: Props) {
                 <Grid item sm={2} xs={12}>
                   <MuiButton
                     loading={isReset && isFetching}
-                    title="Tạo lại"
+                    title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}

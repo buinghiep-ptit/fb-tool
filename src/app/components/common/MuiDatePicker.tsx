@@ -2,7 +2,11 @@ import * as React from 'react'
 import TextField from '@mui/material/TextField'
 import Stack from '@mui/material/Stack'
 import { Controller, useFormContext } from 'react-hook-form'
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import {
+  DatePicker,
+  DateTimePicker,
+  LocalizationProvider,
+} from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const CalPicker = ({ name, label }: any) => {
@@ -20,7 +24,7 @@ const CalPicker = ({ name, label }: any) => {
           name={name}
           control={control}
           render={({ field }) => (
-            <DateTimePicker
+            <DatePicker
               {...field}
               renderInput={(params: any) => (
                 <TextField

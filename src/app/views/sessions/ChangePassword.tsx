@@ -45,7 +45,7 @@ export default function ChangePassword({ title }: Props) {
         } else return false
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20),
+      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
   })
 
   const methods = useForm<any>({

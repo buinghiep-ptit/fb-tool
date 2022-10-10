@@ -74,7 +74,7 @@ const validationSchema = Yup.object().shape({
       // Should contains at least one lower case alphabet\n
       // Should contaregexStr = /[A-z\u00C0-\u00ff]+/gins at least one special character which includes !@#$%&*()+=^\n
       // Should doesn't contain any white space`,
-      /^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g,
+      /^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g,
       messages.MSG20,
     ),
 })

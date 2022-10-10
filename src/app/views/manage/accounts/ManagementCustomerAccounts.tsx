@@ -208,7 +208,7 @@ export default function CustomerAccounts(props: Props) {
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Hoạt động</MenuItem>
-                    <MenuItem value={-1}>Không hoạt động</MenuItem>
+                    <MenuItem value={-1}>Xoá</MenuItem>
                     <MenuItem value={-2}>Khoá</MenuItem>
                     <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                   </SelectDropDown>
@@ -225,7 +225,7 @@ export default function CustomerAccounts(props: Props) {
                 </Grid>
                 <Grid item sm={3} xs={6}>
                   <MuiButton
-                    title="Tạo lại"
+                    title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}

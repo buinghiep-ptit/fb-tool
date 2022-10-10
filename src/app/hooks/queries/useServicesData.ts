@@ -4,11 +4,11 @@ import {
   deleteService,
   updateService,
 } from 'app/apis/services/services.service'
-import { ServiceDetail } from 'app/models'
+import { DetailService } from 'app/models'
 
 export const useCreateService = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
-  return useMutation((payload: ServiceDetail) => createService(payload), {
+  return useMutation((payload: DetailService) => createService(payload), {
     onSettled: () => {
       queryClient.invalidateQueries(['camp-service'])
     },

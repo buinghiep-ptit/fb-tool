@@ -1,5 +1,5 @@
 import { http } from 'app/helpers/http-config'
-import { ServiceDetail, ServiceResponse } from 'app/models'
+import { DetailService, ServiceResponse } from 'app/models'
 
 export const getListServices = async (
   params: any,
@@ -12,8 +12,8 @@ export const getListServices = async (
 
 export const getServiceDetail = async (
   serviceId: number,
-): Promise<ServiceDetail> => {
-  const { data } = await http.get<ServiceDetail>(
+): Promise<DetailService> => {
+  const { data } = await http.get<DetailService>(
     `/api/camp-service/${serviceId}`,
   )
   return data

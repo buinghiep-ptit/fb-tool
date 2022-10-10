@@ -10,7 +10,7 @@ export interface TitleService {
   status?: number
 }
 
-export interface ServiceDetail {
+export interface DetailService {
   id?: number
   campGroundId?: number
   name?: string
@@ -18,7 +18,9 @@ export interface ServiceDetail {
   capacity?: number
   description?: string
   status?: number
-  weekdayPrices?: string
+  weekdayPrices: {
+    amount: number
+  }
   images?: string
   dateCreated?: string
   dateUpdated?: string

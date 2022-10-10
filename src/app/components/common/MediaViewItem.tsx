@@ -1,8 +1,8 @@
 import { PlayArrowRounded } from '@mui/icons-material'
-import { Box, BoxProps, minWidth } from '@mui/system'
+import { Box, BoxProps } from '@mui/system'
 import { IMediaOverall } from 'app/models'
 import * as React from 'react'
-import { MediaPlayer } from './MediaPlayer'
+import MediaPlayer from './MediaPlayer'
 
 export interface IMediaViewItemProps extends BoxProps {
   media: IMediaOverall

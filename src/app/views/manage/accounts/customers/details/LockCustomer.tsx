@@ -8,10 +8,11 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useLockCustomer } from 'app/hooks/queries/useCustomersData'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { messages } from 'app/utils/messages'
 
 type Props = {
   title: string
@@ -24,20 +25,30 @@ type FormData = {
 }
 
 type RHFInputLockTimeProps = {
-  control: any
+  methods: any
   name: string
 }
 
-const RHFInputLockTime = ({ control, name }: RHFInputLockTimeProps) => {
-  const lockType = useWatch({ control, name })
+const RHFInputLockTime = ({ methods, name }: RHFInputLockTimeProps) => {
+  const lockType = useWatch({ control: methods.control, name })
+
+  useEffect(() => {
+    methods.clearErrors('lockDuration')
+  }, [lockType])
 
   return (
     <FormInputText
       disabled={parseInt(lockType, 10) !== 2}
       type="number"
+      label={'Thời gian'}
       name="lockDuration"
-      size="small"
       placeholder="Nhập thời gian"
+      inputProps={{
+        inputProps: {
+          // max: 100,
+          min: 1,
+        },
+      }}
       defaultValue={''}
     />
   )
@@ -60,12 +71,12 @@ export default function LockCustomer({ title }: Props) {
     lockDuration: Yup.string().when('lockType', {
       is: (lockType: string) => lockType && lockType === '2',
       then: Yup.string()
-        .required('Không được để trống')
+        .required(messages.MSG1)
         .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
     }),
 
     reason: Yup.string()
-      .required('Lý do không được bỏ trống')
+      .required(messages.MSG1)
       .max(256, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
@@ -115,10 +126,7 @@ export default function LockCustomer({ title }: Props) {
                   label="Khoá tạm thời"
                 />
                 <>
-                  <RHFInputLockTime
-                    control={methods.control}
-                    name={'lockType'}
-                  />
+                  <RHFInputLockTime methods={methods} name={'lockType'} />
                   <MuiTypography px={1} fontWeight={500}>
                     (giờ)
                   </MuiTypography>

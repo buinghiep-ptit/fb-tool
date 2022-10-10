@@ -7,14 +7,12 @@ import {
 import { LoadingButton } from '@mui/lab'
 import {
   Box,
-  Button,
   Card,
   Grid,
   IconButton,
   Stack,
   styled,
   TextField,
-  Typography,
 } from '@mui/material'
 import {
   resetPasswordCheck,
@@ -26,6 +24,8 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
+import { toastError } from 'app/helpers/toastNofication'
+import { messages } from 'app/utils/messages'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -87,18 +87,21 @@ const ForgotPassword = () => {
     visibility: false,
   })
   const validationSchema1 = Yup.object().shape({
-    email: Yup.string()
-      .email('Email không hợp lệ')
-      .required('Email là bắt buộc'),
+    email: Yup.string().email(messages.MSG12).required(messages.MSG1),
   })
 
   const validationSchema2 = Yup.object().shape({
     password: Yup.string()
-      .required('Mật khẩu là bắt buộc')
-      .matches('^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$', 'Mật khẩu không hợp lệ'),
+      .test('latinChars', messages.MSG21, value => {
+        const regexStr = /^[\x20-\x7E]+$/
+        return regexStr.test(value)
+      })
+      .matches(/^\S*$/, messages.MSG21)
+      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20)
+      .required(messages.MSG1),
     passwordConfirmation: Yup.string()
-      .oneOf([Yup.ref('password'), null], 'Mật khẩu xác nhận không khớp')
-      .required('Mật khẩu xác nhận là bắt buộc'),
+      .oneOf([Yup.ref('password'), null], messages.MSG11)
+      .required(messages.MSG1),
   })
 
   const methods = useForm({
@@ -108,6 +111,7 @@ const ForgotPassword = () => {
   })
 
   const onSubmitHandler = async values => {
+    const postfixKey = values.email.split('@')[0]
     if (step === 3) {
       navigate(-1)
       return
@@ -117,35 +121,20 @@ const ForgotPassword = () => {
       let response = null
       if (step === 1) {
         response = await resetPasswordInit(values)
-        if (response.status === '200') {
-          response = await resetPasswordCheck({ key: 'test_giangcm' })
-          if (response.isValid) setStep(step + 1)
-        }
+        response = await resetPasswordCheck({ key: 'test_' + postfixKey })
+        if (response.isValid) setStep(step + 1)
         setLoading(false)
       } else if (step === 2) {
         response = await resetPasswordFinish({
-          key: 'test_giangcm',
+          key: 'test_' + postfixKey,
           newPassword: values.password,
         })
-        if (response.status === '200') {
-          handleSnackBar({
-            open: true,
-            status: 'success',
-            message: 'Đặt lại mật khẩu thành công',
-          })
-          setStep(step + 1)
-        }
+        setStep(step + 1)
         setLoading(false)
       }
-      if (response?.error) {
-        handleSnackBar({
-          open: true,
-          status: 'error',
-          message: response.errorDescription,
-        })
-      }
-      console.log('response:', response)
     } catch (error) {
+      if (error.data)
+        methods.setError('email', { message: error.data.errorDescription })
       setLoading(false)
     }
   }
@@ -198,6 +187,7 @@ const ForgotPassword = () => {
                           name="email"
                           size="small"
                           placeholder="Nhập email"
+                          defaultValue=""
                           fullWidth
                         />
                       </>
@@ -214,6 +204,7 @@ const ForgotPassword = () => {
                             placeholder="Nhập mật khẩu"
                             size="small"
                             fullWidth
+                            defaultValue=""
                             iconEnd={
                               <IconButton
                                 onClick={handleClickShowPassword}
@@ -237,6 +228,7 @@ const ForgotPassword = () => {
                             name="passwordConfirmation"
                             placeholder="Nhập mật khẩu xác nhận"
                             size="small"
+                            defaultValue=""
                             fullWidth
                             iconEnd={
                               <IconButton

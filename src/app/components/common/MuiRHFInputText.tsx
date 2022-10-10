@@ -91,13 +91,17 @@ const FormInputText: FC<IFormInputTextProps> = ({
             // endAdornment: iconEnd ? (
             //   <InputAdornment position="end">{iconEnd}</InputAdornment>
             // ) : null,
-            endAdornment: !!val ? (
+            endAdornment: (
               <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
-                <IconButton sx={{ p: 0, m: 0 }} onClick={clearInput}>
-                  <Icon fontSize="small">clear</Icon>
-                </IconButton>
+                {iconEnd ? (
+                  iconEnd
+                ) : !!val ? (
+                  <IconButton sx={{ p: 0, m: 0 }} onClick={clearInput}>
+                    <Icon fontSize="small">clear</Icon>
+                  </IconButton>
+                ) : null}
               </InputAdornment>
-            ) : null,
+            ),
           }}
         />
       )}

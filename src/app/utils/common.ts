@@ -15,3 +15,6 @@ export const getColorByCusStatus = (status: number) => {
       return '#AAAAAA'
   }
 }
+
+export const regexImgUrl =
+  /^http[^ \!@\$\^&\(\)\+\=]+(\.png|\.jpeg|\.gif|\.jpg)$/

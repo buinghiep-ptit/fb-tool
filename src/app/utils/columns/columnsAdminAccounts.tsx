@@ -17,7 +17,6 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
       </Typography>
     ),
   },
-  { id: 'email', label: 'Email', minWidth: 200, align: 'center' },
   {
     id: 'role',
     label: 'Quyền',

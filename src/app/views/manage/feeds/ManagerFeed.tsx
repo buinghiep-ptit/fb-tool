@@ -24,19 +24,21 @@ import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
 import { columnFeeds } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { NavLink, useSearchParams } from 'react-router-dom'
+import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -51,10 +53,15 @@ export interface Props {}
 
 export default function ManagerFeed(props: Props) {
   const navigate = useNavigateParams()
+  const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
   const [isReset, setIsReset] = useState<boolean>(false)
 
   const [defaultValues] = useState<IFeedsFilters>({
@@ -70,6 +77,11 @@ export default function ManagerFeed(props: Props) {
   const [filters, setFilters] = useState<IFeedsFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
+
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState(1)
+  const [feedId, setFeedId] = useState(0)
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
@@ -130,6 +142,7 @@ export default function ManagerFeed(props: Props) {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: +event.target.value,
     } as any)
   }
@@ -164,22 +177,48 @@ export default function ManagerFeed(props: Props) {
       page: 0,
       size: 20,
     })
+
+    setPage(0)
+    setSize(20)
+
     setFilters({
-      page,
-      size,
+      page: 0,
+      size: 20,
     })
 
     navigate('', {
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
+  }
+
+  const onSuccess = (data: any) => {
+    toastSuccess({
+      message: dialogType === 1 ? 'Duyệt bài thành công' : '',
+    })
+    setOpenDialog(false)
+  }
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+
+  const approveConfirm = () => {
+    approve(feedId)
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      navigate(`${14 ?? row.feedId}`, {})
+      if (['edit', 'account'].includes(cell.id)) {
+        navigation(`${row.feedId}`, {})
+      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
+        setTitleDialog('Duyệt bài đăng')
+        setFeedId(row.feedId)
+        setOpenDialog(true)
+      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
+        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
+          state: { modal: true },
+        })
+      }
     }
-    console.log('cell:', cell, 'row:', row)
   }
 
   return (
@@ -243,10 +282,11 @@ export default function ManagerFeed(props: Props) {
                 <Grid item sm={3} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Đã duyệt</MenuItem>
+                    <MenuItem value="1">Hợp lệ</MenuItem>
                     <MenuItem value="0">Chờ hậu kiểm</MenuItem>
                     <MenuItem value="-1">Vi phạm</MenuItem>
-                    <MenuItem value="-2">Xoá</MenuItem>
+                    <MenuItem value="-2">Bị báo cáo</MenuItem>
+                    <MenuItem value="-3">Xoá</MenuItem>
                   </SelectDropDown>
                 </Grid>
                 <Grid item sm={3} xs={12}>
@@ -258,9 +298,9 @@ export default function ManagerFeed(props: Props) {
                       },
                     }}
                   >
-                    <InputLabel id="demo-simple-select-helper-label">
+                    {/* <InputLabel id="demo-simple-select-helper-label">
                       {'Phạm vi'}
-                    </InputLabel>
+                    </InputLabel> */}
 
                     <Select defaultValue={'all'} name="range" disabled>
                       <MenuItem value="all">Công khai</MenuItem>
@@ -312,7 +352,9 @@ export default function ManagerFeed(props: Props) {
                       title="Hậu kiểm"
                       variant="text"
                       color="secondary"
-                      onClick={() => navigate(`hau-kiem`, {})}
+                      onClick={() =>
+                        navigation(`hau-kiem`, { state: { type: 1 } })
+                      }
                       startIcon={<ArticleSharp />}
                     />
                     <Divider
@@ -320,16 +362,17 @@ export default function ManagerFeed(props: Props) {
                       sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
                       flexItem
                     />
-                    <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
-                      <MuiButton
-                        title="Báo cáo vi phạm"
-                        variant="text"
-                        color="error"
-                        type="submit"
-                        sx={{ flex: 1 }}
-                        startIcon={<ReportSharp />}
-                      />
-                    </NavLink>
+                    {/* <NavLink to={'/quan-ly-feeds/hau-kiem'}> */}
+                    <MuiButton
+                      title="Báo cáo vi phạm"
+                      variant="text"
+                      color="error"
+                      onClick={() =>
+                        navigation(`hau-kiem`, { state: { type: 2 } })
+                      }
+                      startIcon={<ReportSharp />}
+                    />
+                    {/* </NavLink> */}
                   </Stack>
                 </Grid>
               </Grid>
@@ -356,6 +399,19 @@ export default function ManagerFeed(props: Props) {
           />
         </SimpleCard>
       </Stack>
+
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={approveConfirm}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            Đồng ý duyệt bài đăng?
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

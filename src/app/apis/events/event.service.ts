@@ -19,6 +19,13 @@ export const createEvent = async (payload: any): Promise<any> => {
   const { data } = await http.post<any>(`/api/events`, payload)
   return data
 }
+export const updateEvent = async (
+  eventId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.put<any>(`/api/events/${eventId}`, payload)
+  return data
+}
 
 export const updateEventStatus = async (
   eventId: number,

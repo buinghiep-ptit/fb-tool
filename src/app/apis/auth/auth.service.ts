@@ -52,3 +52,11 @@ export const resetPasswordFinish = async (payload: {
   >('/api/account/reset-password/finish', payload)
   return data
 }
+
+export const changePassword = async (payload: {
+  currentPassword?: string
+  newPassword?: string
+}): Promise<any> => {
+  const { data } = await http.post<any>(`/api/account/change-password`, payload)
+  return data
+}

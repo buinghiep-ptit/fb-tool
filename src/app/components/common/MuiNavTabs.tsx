@@ -78,7 +78,6 @@ interface CustomizedNavTabsProps {
   currentTab: number
   data?: any
   setCurrentTab: (tabIdx: number) => void
-  children?: ReactElement
 }
 
 export function MuiNavTabs({
@@ -86,7 +85,6 @@ export function MuiNavTabs({
   currentTab,
   setCurrentTab,
   data,
-  children,
   ...props
 }: CustomizedNavTabsProps) {
   const navigate = useNavigate()
@@ -116,14 +114,14 @@ export function MuiNavTabs({
           <StyledTab key={item.tab} label={item.label} {...a11yProps(index)} />
         ))}
       </StyledTabs>
-      {navInfo.items.map((element: any, index: number) => (
+      {/* {navInfo.items.map((element: any, index: number) => (
         <TabPanel key={element.tab} value={currentTab} index={index}>
           <SimpleCard title="">
             {children}
-            {/* {element.element(data)} */}
+            {element.element(data)}
           </SimpleCard>
         </TabPanel>
-      ))}
+      ))} */}
     </Box>
   )
 }

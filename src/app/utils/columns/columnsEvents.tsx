@@ -1,5 +1,5 @@
 import { DeleteSharp, EditOutlined } from '@mui/icons-material'
-import { Chip, Typography } from '@mui/material'
+import { Chip, Icon, IconButton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
@@ -99,13 +99,13 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     label: '',
     minWidth: 50,
     align: 'right',
-    action: (value: any) => <EditOutlined />,
+    action: (value: any) => <Icon color="secondary">edit_calendar</Icon>,
   },
   {
     id: 'delete',
     label: '',
     minWidth: 50,
     align: 'right',
-    action: (value: any) => <DeleteSharp />,
+    action: (value: any) => <Icon color="error">delete</Icon>,
   },
 ]

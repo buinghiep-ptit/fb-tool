@@ -1,13 +1,15 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PersonAddAltSharp, SearchSharp } from '@mui/icons-material'
-import { LoadingButton } from '@mui/lab'
+import {
+  ChangeCircleSharp,
+  PersonAddAltSharp,
+  SearchSharp,
+} from '@mui/icons-material'
 import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
@@ -17,10 +19,13 @@ import { useUpdateUserData, useUsersData } from 'app/hooks/queries/useUsersData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IUser, IUserResponse } from 'app/models/account'
 import { columnsAdminAccounts } from 'app/utils/columns/columnsAdminAccounts'
-import { useEffect, useState } from 'react'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { messages } from 'app/utils/messages'
+import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -47,22 +52,43 @@ export default function AdminAccounts(props: Props) {
   const navigation = useNavigate()
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const queryParams = Object.fromEntries([...searchParams])
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [row, setRow] = useState<any>({})
   const [defaultValues] = useState<ISearchFilters>({
-    role: 'all',
-    status: 'all',
-  })
-  const [filters, setFilters] = useState<ISearchFilters>({
-    page,
-    size,
-    sort: 'email,asc',
+    role: queryParams.role ?? 'all',
+    status: queryParams.status ?? 'all',
+    account: queryParams.account ?? '',
+    email: queryParams.email ?? '',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
   })
 
+  const [filters, setFilters] = useState<ISearchFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
+
   const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Cập nhật tài khoản thành công' })
+    toastSuccess({
+      message: row.status === 1 ? messages.MSG31 : messages.MSG32,
+    })
+    setOpenDialog(false)
   }
   const { mutate: editUser } = useUpdateUserData(onRowUpdateSuccess)
+
+  const changeStatusUser = () => {
+    editUser({
+      ...row,
+      status: row.status * -1,
+    })
+  }
 
   const validationSchema = Yup.object().shape({
     account: Yup.string()
@@ -78,23 +104,6 @@ export default function AdminAccounts(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  useEffect(() => {
-    if (searchParams) {
-      const queryParams = Object.fromEntries([...searchParams])
-      if (!!Object.keys(queryParams).length) {
-        setPage(parseInt(queryParams.page) || 0)
-        setSize(parseInt(queryParams.size) || 20)
-
-        setFilters(prevFilters => {
-          return {
-            ...prevFilters,
-            ...queryParams,
-          }
-        })
-      }
-    }
-  }, [searchParams])
 
   const {
     data,
@@ -132,6 +141,7 @@ export default function AdminAccounts(props: Props) {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: parseInt(event.target.value, 10),
     } as any)
   }
@@ -139,23 +149,19 @@ export default function AdminAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    removeParamsHasDefaultValue(values)
     setFilters(prevFilters => {
       return {
-        ...prevFilters,
-        ...values,
+        ...extractMergeFiltersObject(prevFilters, values),
+        page,
+        size,
       }
     })
-    navigate('', {
-      ...filters,
-      ...values,
-    } as any)
-  }
 
-  const removeParamsHasDefaultValue = (objParams: Record<string, any>) => {
-    Object.keys(objParams).forEach(key => {
-      if (objParams[key] === 'all') objParams[key] = ''
-    })
+    navigate('', {
+      ...extractMergeFiltersObject(filters, values),
+      page,
+      size,
+    } as any)
   }
 
   const onClickRow = (cell: any, row: any) => {
@@ -165,12 +171,37 @@ export default function AdminAccounts(props: Props) {
           state: { modal: true, data: row },
         })
       } else if (cell.id === 'action') {
-        editUser({
-          ...row,
-          status: row.status * -1,
-        })
+        setTitleDialog(
+          row.status === 1 ? 'Khoá tài khoản' : 'Mở khoá tài khoản',
+        )
+        setOpenDialog(true)
+        setRow(row)
       }
     }
+  }
+
+  const onResetFilters = () => {
+    methods.reset({
+      account: '',
+      email: '',
+      role: 'all',
+      status: 'all',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
   }
 
   return (
@@ -222,9 +253,9 @@ export default function AdminAccounts(props: Props) {
                 </Grid>
               </Grid>
 
-              <Box mt={3}>
+              <Box mt={2}>
                 <Grid container spacing={2}>
-                  <Grid item sm={3} xs={12}>
+                  <Grid item sm={3} xs={6}>
                     <MuiButton
                       loading={isFetching}
                       title="Tìm kiếm"
@@ -235,8 +266,18 @@ export default function AdminAccounts(props: Props) {
                       startIcon={<SearchSharp />}
                     />
                   </Grid>
-                  <Grid item sm={6} xs={12}></Grid>
-                  <Grid item sm={3} xs={12}>
+                  <Grid item sm={3} xs={6}>
+                    <MuiButton
+                      title="Tạo lại"
+                      variant="outlined"
+                      color="primary"
+                      onClick={onResetFilters}
+                      sx={{ width: '100%' }}
+                      startIcon={<ChangeCircleSharp />}
+                    />
+                  </Grid>
+                  <Grid item sm={3} xs={6}></Grid>
+                  <Grid item sm={3} xs={6}>
                     <MuiButton
                       onClick={() =>
                         navigation(`them-moi`, {
@@ -274,6 +315,24 @@ export default function AdminAccounts(props: Props) {
           />
         </SimpleCard>
       </Stack>
+
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={changeStatusUser}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {row.status === 1
+              ? 'Bạn có chắc chắn muốn khoá tài khoản'
+              : 'Bạn có đồng ý mở khoá cho tài khoản'}
+          </MuiTypography>
+          <MuiTypography variant="subtitle1" color="primary">
+            {row.email}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

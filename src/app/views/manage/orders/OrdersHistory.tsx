@@ -7,21 +7,16 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
+import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiNavTabs } from 'app/components/common/MuiNavTabs'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
-import { useOrdersData } from 'app/hooks/queries/useOrdersData'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import React, { useEffect, useState } from 'react'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import * as Yup from 'yup'
-import OrdersAll from './tabs/OrdersAll'
-import OrdersCancelRequest from './tabs/OrdersCancelRequest'
-import OrdersProcess from './tabs/OrdersProcess'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import { useOrdersData } from 'app/hooks/queries/useOrdersData'
+import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IOrderOverall } from 'app/models/order'
 import {
   columnOrdersCancel,
@@ -30,8 +25,10 @@ import {
 } from 'app/utils/columns/columnsOrders'
 import { getOrderStatusSpec, OrderStatusEnum } from 'app/utils/enums/order'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { MuiTypography } from 'app/components/common/MuiTypography'
+import React, { useEffect, useState } from 'react'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import * as Yup from 'yup'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -49,17 +46,14 @@ export const navOrdersHistory = {
     {
       tab: 'xu-ly',
       label: 'Cần xử lý',
-      element: (orders: any) => <OrdersProcess orders={orders} />,
     },
     {
       tab: 'tat-ca',
       label: 'Tất cả',
-      element: (orders: any) => <OrdersAll orders={orders} />,
     },
     {
       tab: 'yeu-cau-huy',
       label: 'Yêu cầu huỷ',
-      element: (orders: any) => <OrdersCancelRequest orders={orders} />,
     },
   ],
 }
@@ -270,7 +264,8 @@ export default function OrdersHistory() {
             currentTab={currentTab}
             setCurrentTab={setCurrentTab}
             data={data ?? []}
-          >
+          />
+          <SimpleCard title="Danh sách đơn hàng">
             <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
               <FormProvider {...methods}>
                 <Grid container spacing={2}>
@@ -331,7 +326,7 @@ export default function OrdersHistory() {
                 </Box>
               </FormProvider>
             </form>
-          </MuiNavTabs>
+          </SimpleCard>
 
           <SimpleCard>
             <MuiStyledTable

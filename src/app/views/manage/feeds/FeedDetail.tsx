@@ -1,5 +1,4 @@
-import { ApprovalSharp, ReportSharp } from '@mui/icons-material'
-import { Chip, Grid, styled } from '@mui/material'
+import { Avatar, Chip, Grid, Icon, styled } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
 import {
@@ -8,19 +7,29 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
+import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { IActionHistory, IMediaOverall, IReportDecline } from 'app/models'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useApproveFeed, useDeleteFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  IActionHistory,
+  Image,
+  IMediaOverall,
+  IReportDecline,
+} from 'app/models'
 import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
-import { useState } from 'react'
-import { NavLink, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -34,17 +43,13 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 export default function FeedDetail(props: Props) {
-  const mediaDefault: IMediaOverall = {
-    id: 1,
-    mediaFormat: 1,
-    url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/big_buck_bunny_1080p.mp4',
-    detail: {
-      id: 1,
-      coverImgUrl:
-        'https://img.meta.com.vn/Data/image/2021/07/27/good-girl-nghia-la-gi-2.jpg',
-    },
-  }
+  const navigate = useNavigate()
   const { feedId } = useParams()
+  const [open, setOpen] = useState(false)
+  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
+    [],
+  )
 
   const [pageReports, setPageReports] = useState<number>(0)
   const [sizeReports, setSizeReports] = useState<number>(5)
@@ -61,6 +66,10 @@ export default function FeedDetail(props: Props) {
     page: pageActions,
     size: sizeActions,
   })
+
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState(1)
 
   const queryResults = useQueries({
     queries: [
@@ -96,6 +105,10 @@ export default function FeedDetail(props: Props) {
   const isFetching = queryResults.some(
     (query: UseQueryResult) => query.isFetching,
   )
+
+  useEffect(() => {
+    setMediasSrcPreviewer(feed.data?.images ?? [])
+  }, [JSON.stringify(feed)])
 
   const handleChangePageReports = (event: unknown, newPage: number) => {
     setPageReports(newPage)
@@ -145,6 +158,43 @@ export default function FeedDetail(props: Props) {
     })
   }
 
+  const onClickMedia = (imgIndex?: number) => {
+    setInitialIndexSlider(imgIndex ?? 0)
+    setOpen(true)
+  }
+
+  const onRemoveMedia = (imgIndex?: number) => {
+    mediasSrcPreviewer.splice(imgIndex ?? 0, 1)
+    setMediasSrcPreviewer([...mediasSrcPreviewer])
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const onSuccess = (data: any) => {
+    toastSuccess({
+      message: dialogType === 1 ? 'Duyệt bài thành công' : 'Xoá bài thành công',
+    })
+    setOpenDialog(false)
+  }
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+  const { mutate: deletedFeed, isLoading: deleteLoading } =
+    useDeleteFeed(onSuccess)
+
+  const approveFeed = (feedId: number) => {
+    approve(feedId)
+  }
+  const openDialogDelete = () => {
+    setTitleDialog('Xoá bài đăng')
+    setDialogType(-1)
+    setOpenDialog(true)
+  }
+  const OnDeleteFeed = () => {
+    deletedFeed(Number(feedId ?? 0))
+  }
+
   const getColorByCusStatus = (status: number) => {
     switch (status) {
       case -2:
@@ -164,7 +214,7 @@ export default function FeedDetail(props: Props) {
   const getLabelByCusStatus = (status: number) => {
     switch (status) {
       case 1:
-        return 'Đã duyệt'
+        return 'Hợp lệ'
       case -2:
         return 'Xoá'
 
@@ -198,35 +248,95 @@ export default function FeedDetail(props: Props) {
           ]}
         />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
+      >
+        <MuiButton
+          disabled={feed?.data && feed?.data.status === 1}
+          title="Duyệt bài"
+          variant="contained"
+          color="primary"
+          onClick={() => approveFeed(Number(feedId ?? 0))}
+          loading={approveLoading}
+          startIcon={<Icon>done</Icon>}
+        />
+        <MuiButton
+          disabled={feed?.data && feed?.data.status === -1}
+          title="Vi phạm"
+          variant="contained"
+          color="warning"
+          onClick={() =>
+            navigate(`vi-pham`, {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>report</Icon>}
+        />
+
+        <MuiButton
+          disabled={feed?.data && feed?.data.status === -3}
+          title="Xoá bài"
+          variant="contained"
+          color="error"
+          onClick={openDialogDelete}
+          loading={deleteLoading}
+          startIcon={<Icon>clear</Icon>}
+        />
+
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard title="Chi tiết Feed">
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item sm={2} xs={12}>
-                <MuiButton
-                  title="Duyệt"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<ApprovalSharp />}
-                />
-              </Grid>
-              <Grid item sm={2} xs={12}>
-                <NavLink to={'/quan-ly-feeds/bao-cao-vi-pham'}>
-                  <MuiButton
-                    title="Vi phạm"
-                    variant="outlined"
-                    color="error"
-                    type="submit"
-                    sx={{ width: '100%' }}
-                    startIcon={<ReportSharp />}
+            <Grid container spacing={2}>
+              <Grid item sm={8} xs={12}>
+                <Stack flexDirection={'row'} gap={2} alignItems="center">
+                  <Avatar
+                    alt="avatar"
+                    src={
+                      feed.data?.customerInfo?.avatar
+                        ? feed.data?.customerInfo?.avatar
+                        : '/assets/images/app/avatar-default.svg'
+                    }
+                    sx={{ width: 56, height: 56 }}
                   />
-                </NavLink>
+                  <Stack flexDirection={'column'}>
+                    <MuiTypography variant="subtitle2">
+                      {feed.data?.customerInfo?.fullName}
+                    </MuiTypography>
+                    <MuiTypography variant="body2">
+                      {feed.data?.content}
+                    </MuiTypography>
+                  </Stack>
+                </Stack>
+
+                <Stack flexDirection={'row'} gap={1} my={2}>
+                  {feed.data?.tags?.map(tag => (
+                    <Chip
+                      key={tag.id}
+                      label={`#${tag.value}`}
+                      size="small"
+                      // color={true ? 'primary' : 'default'}
+                      sx={{
+                        px: 1,
+                        backgroundColor: '#DDD',
+                      }}
+                    />
+                  ))}
+                </Stack>
               </Grid>
+
               <Grid
                 item
-                sm={8}
+                sm={4}
                 xs={12}
                 display="flex"
                 justifyContent="flex-end"
@@ -246,47 +356,35 @@ export default function FeedDetail(props: Props) {
               </Grid>
             </Grid>
 
-            <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
-                <Box>
-                  <MuiTypography variant="subtitle2">[Nội dung]</MuiTypography>
-                  <MuiTypography variant="body2">
-                    {feed.data?.content}
-                  </MuiTypography>
+            <Stack flexDirection={'row'} justifyContent={'center'}>
+              {feed.data?.type === 1 ? (
+                <Box width={'50%'} maxWidth={320}>
+                  <MediaViewItem
+                    media={feed.data.video as any}
+                    orientation="vertical"
+                  />
                 </Box>
-                <Box mt={1}>
-                  <MuiTypography variant="subtitle2">[Hashtag]</MuiTypography>
-                  <Stack flexDirection={'row'} gap={1} my={1}>
-                    {feed.data?.tags?.map(tag => (
-                      <Chip
-                        key={tag.id}
-                        label={`#${tag.value}`}
-                        size="small"
-                        // color={true ? 'primary' : 'default'}
-                        sx={{
-                          px: 1,
-                          backgroundColor: '#DDD',
-                        }}
+              ) : (
+                <Box width={'75%'} maxWidth={{ md: '568px', xs: '568px' }}>
+                  {!!mediasSrcPreviewer.length && (
+                    <>
+                      <ImageListView
+                        medias={mediasSrcPreviewer as Image[]}
+                        onClickMedia={onClickMedia}
                       />
-                    ))}
-                  </Stack>
+                      <ModalFullScreen
+                        mode="view"
+                        data={mediasSrcPreviewer as Image[]}
+                        open={open}
+                        onCloseModal={handleClose}
+                        // onSubmit={onRemoveMedia}
+                        initialIndexSlider={initialIndexSlider}
+                      />
+                    </>
+                  )}
                 </Box>
-              </Grid>
-            </Grid>
-
-            {/* <Box
-              width={300}
-              sx={{ position: 'relative', cursor: 'pointer', py: 2 }}
-            >
-              {medias.map(media => ( */}
-            {/* <MediaItem game={medias[0] as any} /> */}
-            <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
-                <MediaViewItem orientation="horizontal" media={mediaDefault} />
-              </Grid>
-            </Grid>
-            {/* ))}
-            </Box> */}
+              )}
+            </Stack>
           </Box>
         </SimpleCard>
 
@@ -326,6 +424,19 @@ export default function FeedDetail(props: Props) {
           />
         </SimpleCard>
       </Stack>
+
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={OnDeleteFeed}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            Bạn có chắc chắn muốn xoá bài?
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

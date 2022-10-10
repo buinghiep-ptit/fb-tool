@@ -14,12 +14,13 @@ export const useOrdersData = (
   onSuccess?: any,
   onError?: any,
 ) => {
+  const isPending = type === 0 ? 1 : 0
   return useQuery<IOrderResponse, Error>(
     ['orders', filters, type],
     () =>
       type === 2
         ? fetchOrdersCancelRequests(filters)
-        : fetchOrdersOverall(filters),
+        : fetchOrdersOverall({ ...filters, isPending }),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,

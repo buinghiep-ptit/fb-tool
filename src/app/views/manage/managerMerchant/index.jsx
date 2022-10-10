@@ -5,15 +5,16 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import { tableModel } from './const'
+import { tableModel, TYPEMERCHANT } from './const'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
+
 import {
-  deleteCampGround,
-  getListCampGround,
-  updateCampGroundStatus,
-} from 'app/apis/campGround/ground.service'
+  getListMerchant,
+  deleteMerchant,
+  updateMerchantStatus,
+} from 'app/apis/merchant/merchant.service'
 import { cloneDeep } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 
@@ -26,56 +27,53 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-export default function ManagerLocation(props) {
-  const [inputFilter, setInputFilter] = useState('')
+export default function ManagerMerchant(props) {
+  const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState(null)
-  const [listCampGround, setListCampGround] = useState([])
-  const [totalListCampGround, setTotalListCampground] = useState()
+  const [merchantType, setMerchantType] = useState()
+  const [listMerchant, setListMerchant] = useState([])
+  const [totalListMerchant, setTotalListMerchant] = useState()
   const navigate = useNavigate()
 
-  const fetchListCampGround = async param => {
-    await getListCampGround(param)
+  const fetchListMerchant = async param => {
+    await getListMerchant(param)
       .then(data => {
-        const newList = cloneDeep(data.content).map(campGround => {
-          const convertCampGround = {}
-          convertCampGround.id = campGround.id
-          convertCampGround.imageGround = campGround.imgUrl
-          convertCampGround.linkDetail = {
-            link: campGround.name,
-            path: '/chi-tiet-diem-camp/',
+        const newList = cloneDeep(data.content).map(merchant => {
+          const convertMerchant = {}
+          convertMerchant.id = merchant.id
+          convertMerchant.email = merchant.email
+          convertMerchant.mobilePhone = merchant.mobilePhone
+          convertMerchant.represent = merchant.represent
+          convertMerchant.merchantType = TYPEMERCHANT[merchant.merchantType]
+          convertMerchant.linkDetail = {
+            link: merchant.name,
+            path: '/cap-nhat-thong-tin-doi-tac/',
           }
-          convertCampGround.place = campGround.campAreaName
-          convertCampGround.contact =
-            campGround.merchantEmail + campGround.merchantMobilePhone
-          convertCampGround.address = campGround.address
-          convertCampGround.type = campGround.campType
-          if (convertCampGround.status !== 0) {
-            convertCampGround.status = campGround.status === 1 ? true : false
+          if (convertMerchant.status !== 0) {
+            convertMerchant.status = merchant.status === 1 ? true : false
           }
-          convertCampGround.action = ['edit', 'delete']
-          return convertCampGround
+          convertMerchant.action = ['edit', 'delete']
+          return convertMerchant
         })
 
-        setListCampGround(newList)
-        setTotalListCampground(data.totalElements)
+        setListMerchant(newList)
+        setTotalListMerchant(data.totalElements)
       })
       .catch(err => console.log(err))
   }
 
   React.useEffect(() => {
     const param = {
-      name: inputFilter,
-      status: statusFilter,
       page: 0,
       size: 5,
     }
-    fetchListCampGround(param)
+    fetchListMerchant(param)
   }, [])
 
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý địa điểm Camp' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý đối tác' }]} />
       </Box>
       <SimpleCard>
         <Grid container>
@@ -83,18 +81,35 @@ export default function ManagerLocation(props) {
             <div style={{ display: 'flex' }}>
               <TextField
                 style={{ marginRight: '50px' }}
-                id="namePlace"
+                id="search"
                 fullWidth
                 size="medium"
                 type="text"
-                name="namePlace"
-                label="Tên địa danh/địa chỉ"
+                name="search"
+                label="Tên, email, SDT, Người đại diện"
                 variant="outlined"
                 sx={{ mb: 3 }}
                 onChange={e => {
-                  setInputFilter(e.target.value)
+                  setSearch(e.target.value)
                 }}
               />
+              <FormControl fullWidth style={{ marginRight: '50px' }}>
+                <InputLabel id="demo-simple-select-label">
+                  Loại đối tác
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Trạng thái"
+                  onChange={e => {
+                    setMerchantType(e.target.value)
+                  }}
+                >
+                  <MenuItem value={0}>Tất cả</MenuItem>
+                  <MenuItem value={1}>Điểm camp</MenuItem>
+                  <MenuItem value={2}>Nhà cung cấp</MenuItem>
+                </Select>
+              </FormControl>
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
@@ -104,13 +119,12 @@ export default function ManagerLocation(props) {
                   id="demo-simple-select"
                   label="Trạng thái"
                   onChange={e => {
-                    console.log(e.target.value)
                     setStatusFilter(e.target.value)
                   }}
                 >
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
-                  <MenuItem value={0}>Lưu nháp</MenuItem>
+                  <MenuItem value={''}>Tất cả</MenuItem>
+                  <MenuItem value={1}>Hoạt dộng</MenuItem>
+                  <MenuItem value={-2}>Khóa</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -120,9 +134,10 @@ export default function ManagerLocation(props) {
               variant="contained"
               type="submit"
               onClick={() => {
-                fetchListCampGround({
-                  name: inputFilter,
+                fetchListMerchant({
+                  search: search,
                   status: statusFilter,
+                  merchantType: merchantType,
                   page: 0,
                   size: 5,
                 })
@@ -144,7 +159,7 @@ export default function ManagerLocation(props) {
               color="primary"
               sx={{ marginRight: '5px' }}
               onClick={() => {
-                navigate('/them-diem-camp')
+                navigate('/them-doi-tac')
               }}
             >
               add_circle
@@ -156,20 +171,24 @@ export default function ManagerLocation(props) {
               className={undefined}
               ellipsis={undefined}
             >
-              Thêm địa điểm
+              Thêm đối tác
             </Paragraph>
           </Grid>
         </Grid>
         <TableCustom
-          title="Danh sách địa điểm Camp"
-          dataTable={listCampGround || []}
+          title="Danh sách đối tác"
+          dataTable={listMerchant || []}
           tableModel={tableModel}
           pagination={true}
-          updateStatus={updateCampGroundStatus}
-          totalData={parseInt(totalListCampGround, 0)}
-          fetchDataTable={fetchListCampGround}
-          filter={{ name: inputFilter, status: statusFilter }}
-          onDeleteData={deleteCampGround}
+          updateStatus={updateMerchantStatus}
+          totalData={parseInt(totalListMerchant, 0)}
+          fetchDataTable={fetchListMerchant}
+          filter={{
+            search: search,
+            status: statusFilter,
+            merchantType: merchantType,
+          }}
+          onDeleteData={deleteMerchant}
         />
       </SimpleCard>
     </Container>

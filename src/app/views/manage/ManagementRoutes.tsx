@@ -1,6 +1,8 @@
 import Loadable from 'app/components/Loadable'
 import { navCustomerDetail } from 'app/utils/navbars'
 import { lazy } from 'react'
+// import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
+import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 
@@ -34,6 +36,7 @@ const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const PostsCheck = Loadable(lazy(() => import('./feeds/PostsCheck')))
 const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
+const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
@@ -57,6 +60,9 @@ const DetailCampGround = Loadable(
 )
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
+const UpdateMerchant = Loadable(
+  lazy(() => import('./managerMerchant/updateMerchant')),
+)
 
 const ManagementRoutes = [
   {
@@ -207,8 +213,20 @@ const ManagementRoutes = [
     element: <ManagerPlace />,
   },
   {
+    path: '/quan-ly-thong-tin-doi-tac',
+    element: <ManagerMerchant />,
+  },
+  {
     path: '/them-dia-danh',
     element: <CreatePlace />,
+  },
+  {
+    path: '/them-doi-tac',
+    element: <CreateMerchant />,
+  },
+  {
+    path: '/cap-nhat-thong-tin-doi-tac/:id',
+    element: <UpdateMerchant />,
   },
   {
     path: '/chi-tiet-dia-danh/:id',
@@ -216,7 +234,11 @@ const ManagementRoutes = [
   },
   {
     path: '/chi-tiet-diem-camp/:id',
-    element: <DetailCampGround />,
+    element: <DetailCampGround action="edit" />,
+  },
+  {
+    path: '/them-diem-camp',
+    element: <DetailCampGround action="create" />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
   { path: '/quan-ly-dich-vu', element: <ManagerServices /> },

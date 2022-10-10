@@ -46,6 +46,11 @@ export const navigations = [
     icon: 'event',
   },
   {
+    name: 'Quản lý đối tác',
+    path: '/quan-ly-thong-tin-doi-tac',
+    icon: 'store_front',
+  },
+  {
     name: 'Quản lý từ cấm',
     path: '/quan-ly-tu-cam',
     icon: 'comments_disabled',

@@ -4,14 +4,29 @@ import * as React from 'react'
 
 import './upload.css'
 
-export default function UploadImage(props) {
+const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
   const [files, setFiles] = React.useState([])
+
+  React.useImperativeHandle(ref, () => ({
+    getFiles: () => {
+      const data = document.getElementById('inputFile').files
+      console.log(data, 'data')
+      return data
+    },
+  }))
 
   const deleteItemImage = index => {
     const filesCoppy = [...files]
     filesCoppy.splice(index, 1)
     setFiles([...filesCoppy])
   }
+
+  const deleteItemImageMedias = index => {
+    const mediasCopy = [...medias]
+    mediasCopy.splice(index, 1)
+    setMedias(mediasCopy)
+  }
+
   return (
     <>
       <Grid container>
@@ -22,8 +37,6 @@ export default function UploadImage(props) {
           multiple
           onChange={event => {
             const newFiles = [...files, ...event.target.files]
-
-            console.log(uniqueFiles, 'xxx')
             const uniqueFiles = Array.from(
               new Set(newFiles.map(a => a.name)),
             ).map(name => {
@@ -33,6 +46,22 @@ export default function UploadImage(props) {
           }}
         />
 
+        {(medias || []).map((file, index) => {
+          return (
+            <Grid item xs={3} md={3} key={index}>
+              <div className="uploader" id="fileSelect">
+                <Icon
+                  style={{ color: 'red' }}
+                  className="uploader__icon-delete"
+                  onClick={() => deleteItemImageMedias(index)}
+                >
+                  clear
+                </Icon>
+                <img src={file.url}></img>
+              </div>
+            </Grid>
+          )
+        })}
         {(files || []).map((file, index) => {
           return (
             <Grid item xs={3} md={3} key={index}>
@@ -69,4 +98,6 @@ export default function UploadImage(props) {
       </Grid>
     </>
   )
-}
+})
+
+export default UploadImage

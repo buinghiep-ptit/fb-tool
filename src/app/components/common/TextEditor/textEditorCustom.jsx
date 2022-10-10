@@ -14,6 +14,12 @@ class EditorConvertToHTML extends Component {
     this.setState({
       editorState,
     })
+    console.log(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
+    this.props.setDescription(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
   }
 
   render() {
@@ -26,10 +32,10 @@ class EditorConvertToHTML extends Component {
           editorClassName="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
         />
-        {/* <textarea
+        <textarea
           disabled
           value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
-        /> */}
+        />
       </div>
     )
   }

@@ -213,7 +213,6 @@ export default function ListCampPlace(props) {
           >
             Tìm
           </Button>
-
           <TableCustom
             title="Danh sách điểm camp"
             tableModel={tableModelCampUnlinked}

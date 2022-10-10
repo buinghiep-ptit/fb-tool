@@ -5,12 +5,16 @@ import { cloneDeep } from 'lodash'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import {
   deletePlace,
   getListPlace,
   updatePlaceStatus,
 } from 'app/apis/place/place.service'
-import { tableModel } from './const'
+import { tableModel, typeAreas } from './const'
 import { useNavigate } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
@@ -26,6 +30,7 @@ export default function ManagerPlace(props) {
   const [listPlace, setListPlace] = useState()
   const [totalPlace, setTotalPlace] = useState()
   const [inputNamePlace, setInputNamePlace] = useState('')
+  const [statusFilter, setStatusFilter] = useState(0)
   const navigate = useNavigate()
 
   const fetchListPlace = async param => {
@@ -42,7 +47,7 @@ export default function ManagerPlace(props) {
           convertPlace.quantity = place.campGroundAmount
           convertPlace.event = place.eventName
           convertPlace.address = place.address
-          convertPlace.type = place.campType
+          convertPlace.type = typeAreas[place.campType]
           convertPlace.status = place.status === 1 ? true : false
           convertPlace.action = ['edit', 'delete']
           return convertPlace
@@ -71,25 +76,52 @@ export default function ManagerPlace(props) {
       <SimpleCard>
         <Grid container>
           <Grid item sm={6} xs={6}>
-            <TextField
-              id="namePlace"
-              fullWidth
-              size="medium"
-              type="text"
-              name="namePlace"
-              label="Tên địa danh/địa chỉ"
-              variant="outlined"
-              sx={{ mb: 3 }}
-              onChange={e => {
-                setInputNamePlace(e.target.value)
-              }}
-            />
+            <div style={{ display: 'flex' }}>
+              <TextField
+                style={{ marginRight: '50px' }}
+                id="namePlace"
+                fullWidth
+                size="medium"
+                type="text"
+                name="namePlace"
+                label="Tên địa danh/địa chỉ"
+                variant="outlined"
+                sx={{ mb: 3 }}
+                onChange={e => {
+                  setInputNamePlace(e.target.value)
+                }}
+              />
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">
+                  Trạng thái
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Trạng thái"
+                  defaultValue={0}
+                  onChange={e => {
+                    setStatusFilter(e.target.value)
+                  }}
+                >
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
+                  <MenuItem value={0}>Tất cả</MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+
             <Button
               color="primary"
               variant="contained"
               type="button"
               onClick={() => {
-                fetchListPlace({ name: inputNamePlace, page: 0, size: 5 })
+                fetchListPlace({
+                  name: inputNamePlace,
+                  page: 0,
+                  size: 5,
+                  status: statusFilter === 0 ? null : statusFilter,
+                })
               }}
             >
               <Icon>search</Icon>
@@ -125,7 +157,7 @@ export default function ManagerPlace(props) {
           </Grid>
         </Grid>
         <TableCustom
-          title="Danh sách địa điểm Camp"
+          title="Danh sách địa danh Camp"
           dataTable={listPlace || []}
           tableModel={tableModel}
           totalData={parseInt(totalPlace, 0)}
@@ -133,7 +165,10 @@ export default function ManagerPlace(props) {
           fetchDataTable={fetchListPlace}
           onDeleteData={deletePlace}
           updateStatus={updatePlaceStatus}
-          filter={{ name: inputNamePlace }}
+          filter={{
+            name: inputNamePlace,
+            status: statusFilter === 0 ? null : statusFilter,
+          }}
         />
       </SimpleCard>
     </Container>

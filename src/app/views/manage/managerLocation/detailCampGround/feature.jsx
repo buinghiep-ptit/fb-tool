@@ -9,9 +9,53 @@ import Select from '@mui/material/Select'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import DialogCustom from 'app/components/common/DialogCustom'
+import {
+  getListUnlinkedUtility,
+  getListUtility,
+} from 'app/apis/campGround/ground.service'
+import { useParams } from 'react-router-dom'
+import FormGroup from '@mui/material/FormGroup'
+import { cloneDeep, remove, set } from 'lodash'
 
-export default function Feature({ control, errors }) {
+export default function Feature({
+  control,
+  errors,
+  feature,
+  action,
+  updateFeature,
+  getValues,
+}) {
   const dialogCustomRef = React.useRef(null)
+  const params = useParams()
+  const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
+  const [listUtility, setListUtility] = React.useState([])
+
+  const handleClickAddUtility = async () => {
+    dialogCustomRef.current.handleClickOpen()
+  }
+
+  const fetchListUnlinkedUtility = async () => {
+    if (action === 'edit') {
+      const res = await getListUnlinkedUtility(params.id)
+      setUnlinkedUtilitys(res)
+    }
+
+    const response = await getListUtility()
+    if (action !== 'edit') {
+      setUnlinkedUtilitys(response)
+    }
+    const convertRes = {}
+    response.forEach(item => {
+      convertRes[item.idUtility] = item
+    })
+    setListUtility(convertRes)
+    console.log(convertRes)
+  }
+
+  React.useEffect(() => {
+    fetchListUnlinkedUtility()
+  }, [])
+
   return (
     <>
       <Grid container>
@@ -25,11 +69,12 @@ export default function Feature({ control, errors }) {
         </Grid>
         <Grid item xs={10} md={10}>
           <Controller
-            name="vehicle"
+            name="bus"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={<Checkbox defaultChecked />}
+                {...field}
+                control={<Checkbox checked={getValues('bus')} />}
                 label={
                   <span style={{ color: 'black', display: 'flex' }}>
                     Xe bus
@@ -42,11 +87,12 @@ export default function Feature({ control, errors }) {
             )}
           />
           <Controller
-            name="vehicle"
+            name="car"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={<Checkbox defaultChecked />}
+                {...field}
+                control={<Checkbox checked={getValues('car')} />}
                 label={
                   <span style={{ color: 'black', display: 'flex' }}>
                     Xe cá nhân
@@ -57,11 +103,12 @@ export default function Feature({ control, errors }) {
             )}
           />
           <Controller
-            name="vehicle"
+            name="motobike"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={<Checkbox defaultChecked />}
+                {...field}
+                control={<Checkbox checked={getValues('motobike')} />}
                 label={
                   <span style={{ color: 'black', display: 'flex' }}>
                     Xe máy
@@ -85,30 +132,35 @@ export default function Feature({ control, errors }) {
               }}
             >
               <Controller
-                name="vehicle"
+                name="viettel"
                 control={control}
                 render={({ field }) => (
                   <FormControlLabel
-                    control={<Checkbox defaultChecked />}
+                    control={
+                      <Checkbox checked={getValues('viettel')} {...field} />
+                    }
                     label="Viettel"
                   />
                 )}
               />
-              <FormControl style={{ width: '150px' }}>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  onChange={e => {
-                    console.log(e.target.value)
-                    setStatusFilter(e.target.value)
-                  }}
-                >
-                  <MenuItem value={0}>Không có sóng</MenuItem>
-                  <MenuItem value={1}>Sóng yếu </MenuItem>
-                  <MenuItem value={2}>Sóng trung bình</MenuItem>
-                  <MenuItem value={3}>Sóng mạnh</MenuItem>
-                </Select>
-              </FormControl>
+              <Controller
+                name="speedViettel"
+                control={control}
+                render={({ field }) => (
+                  <FormControl style={{ width: '150px' }}>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                    >
+                      <MenuItem value={0}>Không có sóng</MenuItem>
+                      <MenuItem value={1}>Sóng yếu </MenuItem>
+                      <MenuItem value={2}>Sóng trung bình</MenuItem>
+                      <MenuItem value={3}>Sóng mạnh</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </Box>
             <Box
               style={{
@@ -118,30 +170,34 @@ export default function Feature({ control, errors }) {
               }}
             >
               <Controller
-                name="vehicle"
+                name="mobiphone"
                 control={control}
                 render={({ field }) => (
                   <FormControlLabel
-                    control={<Checkbox defaultChecked />}
+                    {...field}
+                    control={<Checkbox checked={getValues('mobiphone')} />}
                     label="Mobiphone"
                   />
                 )}
               />
-              <FormControl style={{ width: '150px' }}>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  onChange={e => {
-                    console.log(e.target.value)
-                    setStatusFilter(e.target.value)
-                  }}
-                >
-                  <MenuItem value={0}>Không có sóng</MenuItem>
-                  <MenuItem value={1}>Sóng yếu </MenuItem>
-                  <MenuItem value={2}>Sóng trung bình</MenuItem>
-                  <MenuItem value={3}>Sóng mạnh</MenuItem>
-                </Select>
-              </FormControl>
+              <Controller
+                name="speedMobiphone"
+                control={control}
+                render={({ field }) => (
+                  <FormControl style={{ width: '150px' }}>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                    >
+                      <MenuItem value={0}>Không có sóng</MenuItem>
+                      <MenuItem value={1}>Sóng yếu </MenuItem>
+                      <MenuItem value={2}>Sóng trung bình</MenuItem>
+                      <MenuItem value={3}>Sóng mạnh</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </Box>
           </Stack>
         </Grid>
@@ -155,30 +211,34 @@ export default function Feature({ control, errors }) {
               }}
             >
               <Controller
-                name="vehicle"
+                name="vinaphone"
                 control={control}
                 render={({ field }) => (
                   <FormControlLabel
-                    control={<Checkbox defaultChecked />}
+                    {...field}
+                    control={<Checkbox checked={getValues('vinaphone')} />}
                     label="Vinaphone"
                   />
                 )}
               />
-              <FormControl style={{ width: '150px' }}>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  onChange={e => {
-                    console.log(e.target.value)
-                    setStatusFilter(e.target.value)
-                  }}
-                >
-                  <MenuItem value={0}>Không có sóng</MenuItem>
-                  <MenuItem value={1}>Sóng yếu </MenuItem>
-                  <MenuItem value={2}>Sóng trung bình</MenuItem>
-                  <MenuItem value={3}>Sóng mạnh</MenuItem>
-                </Select>
-              </FormControl>
+              <Controller
+                name="speedVinaphone"
+                control={control}
+                render={({ field }) => (
+                  <FormControl style={{ width: '150px' }}>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                    >
+                      <MenuItem value={0}>Không có sóng</MenuItem>
+                      <MenuItem value={1}>Sóng yếu </MenuItem>
+                      <MenuItem value={2}>Sóng trung bình</MenuItem>
+                      <MenuItem value={3}>Sóng mạnh</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </Box>
             <Box
               style={{
@@ -188,30 +248,34 @@ export default function Feature({ control, errors }) {
               }}
             >
               <Controller
-                name="vehicle"
+                name="vietnamMobile"
                 control={control}
                 render={({ field }) => (
                   <FormControlLabel
-                    control={<Checkbox defaultChecked />}
+                    {...field}
+                    control={<Checkbox checked={getValues('vietnamMobile')} />}
                     label="VietnamMobile"
                   />
                 )}
               />
-              <FormControl style={{ width: '150px' }}>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  onChange={e => {
-                    console.log(e.target.value)
-                    setStatusFilter(e.target.value)
-                  }}
-                >
-                  <MenuItem value={0}>Không có sóng</MenuItem>
-                  <MenuItem value={1}>Sóng yếu </MenuItem>
-                  <MenuItem value={2}>Sóng trung bình</MenuItem>
-                  <MenuItem value={3}>Sóng mạnh</MenuItem>
-                </Select>
-              </FormControl>
+              <Controller
+                name="speedVietnamMobile"
+                control={control}
+                render={({ field }) => (
+                  <FormControl style={{ width: '150px' }}>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                    >
+                      <MenuItem value={0}>Không có sóng</MenuItem>
+                      <MenuItem value={1}>Sóng yếu </MenuItem>
+                      <MenuItem value={2}>Sóng trung bình</MenuItem>
+                      <MenuItem value={3}>Sóng mạnh</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </Box>
           </Stack>
         </Grid>
@@ -224,30 +288,37 @@ export default function Feature({ control, errors }) {
           Loại địa hình:
         </Grid>
         <Grid item xs={10} md={10} style={{ marginTop: '15px' }}>
-          <FormControl>
-            <RadioGroup
-              row
-              aria-labelledby="demo-controlled-radio-buttons-group"
-              name="controlled-radio-buttons-group"
-              style={{ display: 'flex' }}
-            >
-              <FormControlLabel
-                value={1}
-                control={<Radio />}
-                label="Dễ di chuyển"
-              />
-              <FormControlLabel
-                value={2}
-                control={<Radio />}
-                label="Khó di chuyển"
-              />
-              <FormControlLabel
-                value={3}
-                control={<Radio />}
-                label="Rất khó di chuyển"
-              />
-            </RadioGroup>
-          </FormControl>
+          <Controller
+            name="topographic"
+            control={control}
+            render={({ field }) => (
+              <FormControl>
+                <RadioGroup
+                  row
+                  {...field}
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  style={{ display: 'flex' }}
+                >
+                  <FormControlLabel
+                    value={1}
+                    control={<Radio />}
+                    label="Dễ di chuyển"
+                  />
+                  <FormControlLabel
+                    value={2}
+                    control={<Radio />}
+                    label="Khó di chuyển"
+                  />
+                  <FormControlLabel
+                    value={3}
+                    control={<Radio />}
+                    label="Rất khó di chuyển"
+                  />
+                </RadioGroup>
+              </FormControl>
+            )}
+          />
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>
           Tiện ích:
@@ -267,29 +338,25 @@ export default function Feature({ control, errors }) {
               marginRight: '20px',
             }}
           >
-            <Stack direction="row" spacing={1}>
+            {feature?.utility?.map(utility => (
               <Chip
-                label="Deletable"
+                style={{ margin: '5px' }}
+                key={utility}
+                label={listUtility[utility]?.value}
                 onDelete={() => {
-                  console.log('x')
+                  const newFeatureUtility = remove(
+                    cloneDeep(feature).utility,
+                    item => item !== utility,
+                  )
+                  const newFeature = cloneDeep(feature)
+                  newFeature.utility = newFeatureUtility
+                  updateFeature(newFeature)
                 }}
               />
-              <Chip
-                label="Deletable"
-                onDelete={() => {
-                  console.log('x')
-                }}
-              />
-              <Chip
-                label="Deletable"
-                onDelete={() => {
-                  console.log('x')
-                }}
-              />
-            </Stack>
+            ))}
           </Box>
           <Box>
-            <Button onClick={() => dialogCustomRef.current.handleClickOpen()}>
+            <Button onClick={() => handleClickAddUtility()}>
               Thêm tiện ích
             </Button>
           </Box>
@@ -298,35 +365,71 @@ export default function Feature({ control, errors }) {
           Số lượng người:
         </Grid>
         <Grid item xs={10} md={10} style={{ marginTop: '15px' }}>
-          <TextField variant="outlined" />
+          <Controller
+            control={control}
+            name="capacity"
+            render={({ field }) => <TextField variant="outlined" {...field} />}
+          ></Controller>
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>
           Trang thái*:
         </Grid>
         <Grid item xs={10} md={10} style={{ marginTop: '15px' }}>
-          <FormControl style={{ width: '150px' }}>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              onChange={e => {
-                console.log(e.target.value)
-                setStatusFilter(e.target.value)
-              }}
-            >
-              <MenuItem value={0}>Không có sóng</MenuItem>
-              <MenuItem value={1}>Sóng yếu </MenuItem>
-              <MenuItem value={2}>Sóng trung bình</MenuItem>
-            </Select>
-          </FormControl>
+          <Controller
+            control={control}
+            name="status"
+            render={({ field }) => (
+              <FormControl style={{ width: '150px' }}>
+                <Select {...field} labelId="status-label" id="status">
+                  <MenuItem value={-1}>Không hoạt động</MenuItem>
+                  <MenuItem value={0}>Lưu nháp </MenuItem>
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
         </Grid>
       </Grid>
       <DialogCustom ref={dialogCustomRef} title="Tiện ích" maxWidth="sm">
-        <Grid container>
-          <Grid item xs={6} md={6}>
-            <Radio value="a" name="radio-buttons" id="r1" />
-            <label for="r1">abc</label>
-          </Grid>
-        </Grid>
+        <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+          <FormGroup>
+            {unlinkedUtilitys.map((utility, index) => (
+              <FormControlLabel
+                key={utility.idUtility}
+                control={
+                  <Checkbox
+                    onChange={e => {
+                      if (e.target.checked) {
+                        const newFeature = cloneDeep(feature)
+                        newFeature.utility.push(e.target.id)
+                        updateFeature(newFeature)
+                        const newUnlinked = cloneDeep(unlinkedUtilitys)
+                        newUnlinked[index].checked = e.target.checked
+                        setUnlinkedUtilitys(newUnlinked)
+                        console.log(e.target.id)
+                      } else {
+                        const newFeatureUtility = remove(
+                          cloneDeep(feature).utility,
+                          item => item !== e.target.id,
+                        )
+                        const newFeature = cloneDeep(feature)
+                        newFeature.utility = newFeatureUtility
+                        const newUnlinked = cloneDeep(unlinkedUtilitys)
+                        newUnlinked[index].checked = e.target.checked
+                        setUnlinkedUtilitys(newUnlinked)
+                        updateFeature(newFeature)
+                      }
+                    }}
+                    checked={utility.checked}
+                    name={utility.value}
+                    id={utility.idUtility.toString()}
+                  />
+                }
+                label={utility.value}
+              />
+            ))}
+          </FormGroup>
+        </FormControl>
       </DialogCustom>
     </>
   )

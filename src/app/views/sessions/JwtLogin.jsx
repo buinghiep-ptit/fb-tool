@@ -60,6 +60,7 @@ const defaultValues = {
 const validationSchema = Yup.object().shape({
   email: Yup.string().email(messages.MSG12).required(messages.MSG1),
   password: Yup.string()
+    .required(messages.MSG1)
     .test('latinChars', messages.MSG21, value => {
       const regexStr = /^[\x20-\x7E]+$/
       return regexStr.test(value)
@@ -75,8 +76,7 @@ const validationSchema = Yup.object().shape({
       // Should doesn't contain any white space`,
       /^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g,
       messages.MSG20,
-    )
-    .required(messages.MSG1),
+    ),
 })
 
 const JwtLogin = () => {

@@ -1,5 +1,5 @@
 export const messages = {
-  MSG1: 'Gía trị bắt buộc',
+  MSG1: 'Giá trị bắt buộc',
   MSG2: 'Đã hết số lượt OTP trong ngày',
   MSG3: 'Mật khẩu xác nhận chưa chính xác',
   MSG4: 'Mã OTP chưa chính xác',
@@ -10,7 +10,7 @@ export const messages = {
   MSG9: 'Tài khoản hoặc mật khẩu chưa chính xác',
   MSG10: 'Đăng nhập thành công',
   MSG11: 'Mật khẩu xác nhận chưa chính xác',
-  MSG12: 'Định đạng email chưa chính xác ',
+  MSG12: 'Định dạng email chưa chính xác ',
   MSG13: 'Đã có phiên bản cập nhật mới, quý khách vui lòng cập nhật!',
   MSG14: 'Bạn cần chia sẻ/cập nhật thông tin email trên Facebook để đăng nhập',
   MSG15: 'Mật khẩu cũ chưa chính xác',

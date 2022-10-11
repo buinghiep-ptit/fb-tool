@@ -1,3 +1,4 @@
+import { FormHelperText } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 import WYSIWYGEditor from './WYSIWYGEditor'
 // import { stripHtml } from 'string-strip-html'
@@ -15,21 +16,26 @@ const RHFWYSIWYGEditor = ({ name, resetEditor, ...props }: Props) => {
   } = useFormContext()
 
   return (
-    <Controller
-      render={({ field }) => <WYSIWYGEditor {...field} />}
-      name={name}
-      control={control}
-      defaultValue=""
-      // rules={{
-      //   validate: {
-      //     required: v =>
-      //       (v && stripHtml(v).result.length > 0) || 'Description is required',
-      //     maxLength: v =>
-      //       (v && stripHtml(v).result.length <= 2000) ||
-      //       'Maximum character limit is 2000',
-      //   },
-      // }}
-    />
+    <>
+      <Controller
+        render={({ field }) => <WYSIWYGEditor {...field} />}
+        name={name}
+        control={control}
+        defaultValue=""
+        // rules={{
+        //   validate: {
+        //     required: v =>
+        //       (v && stripHtml(v).result.length > 0) || 'Description is required',
+        //     maxLength: v =>
+        //       (v && stripHtml(v).result.length <= 2000) ||
+        //       'Maximum character limit is 2000',
+        //   },
+        // }}
+      />
+      {errors[name] && (
+        <FormHelperText error>{errors[name]?.message as string}</FormHelperText>
+      )}
+    </>
   )
 }
 

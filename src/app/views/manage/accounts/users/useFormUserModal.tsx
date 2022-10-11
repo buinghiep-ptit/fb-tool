@@ -4,9 +4,11 @@ import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const useFormUserModal = (data?: any) => {
+  const { id } = useParams()
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Email không hợp lệ')
@@ -35,6 +37,7 @@ const useFormUserModal = (data?: any) => {
         <FormProvider {...methods}>
           <Stack gap={3} py={3}>
             <FormInputText
+              disabled={!!id}
               label={'Email *'}
               type="email"
               name="email"
@@ -60,6 +63,7 @@ const useFormUserModal = (data?: any) => {
               <MenuItem value={1}>Admin</MenuItem>
               <MenuItem value={2}>CS</MenuItem>
               <MenuItem value={3}>Sale</MenuItem>
+              <MenuItem value={4}>MKT</MenuItem>
             </SelectDropDown>
           </Stack>
         </FormProvider>

@@ -93,7 +93,7 @@ class Http {
         const responseData = response.data
         if (responseData.code && parseInt(responseData.code) !== 200) {
           const error = response
-          toastError(error)
+          if (responseData.error !== 'PASSWORD_INCORRECT') toastError(error)
 
           return Promise.reject(response)
         }

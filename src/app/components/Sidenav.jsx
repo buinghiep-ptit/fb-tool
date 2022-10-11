@@ -1,9 +1,9 @@
 import { styled } from '@mui/system'
 import { MatxVerticalNav } from 'app/components'
 import useSettings from 'app/hooks/useSettings'
-import { navigations } from 'app/navigations'
 import { Fragment } from 'react'
 import Scrollbar from 'react-perfect-scrollbar'
+import { useSelector } from 'react-redux'
 
 const StyledScrollBar = styled(Scrollbar)(() => ({
   paddingLeft: '1rem',
@@ -25,6 +25,7 @@ const SideNavMobile = styled('div')(({ theme }) => ({
 
 const Sidenav = ({ children }) => {
   const { settings, updateSettings } = useSettings()
+  const navigations = useSelector(state => state.navigations)
 
   const updateSidebarMode = sidebarSettings => {
     let activeLayoutSettingsName = settings.activeLayout + 'Settings'

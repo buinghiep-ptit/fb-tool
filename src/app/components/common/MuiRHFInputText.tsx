@@ -78,6 +78,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
           helperText={
             errors[name] ? (errors[name]?.message as unknown as string) : ''
           }
+          InputLabelProps={{ shrink: true }}
           InputProps={{
             ...inputProps,
             sx: {

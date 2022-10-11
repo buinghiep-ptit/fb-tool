@@ -147,18 +147,21 @@ export default function AdminAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setPage(0)
+    setSize(20)
+
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -207,7 +210,7 @@ export default function AdminAccounts(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý TK Admin">
+        <SimpleCard title="">
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
@@ -271,7 +274,7 @@ export default function AdminAccounts(props: Props) {
                           state: { modal: true },
                         })
                       }
-                      title="Thêm tài koản"
+                      title="Thêm người dùng"
                       variant="contained"
                       color="primary"
                       sx={{ width: '100%' }}
@@ -287,6 +290,8 @@ export default function AdminAccounts(props: Props) {
           <MuiStyledTable
             rows={data ? (data?.content as IUser[]) : []}
             columns={columnsAdminAccounts}
+            rowsPerPage={size}
+            page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}

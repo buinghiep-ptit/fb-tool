@@ -182,7 +182,7 @@ export default function CustomerAccounts(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản KH' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý TK KH">
+        <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>

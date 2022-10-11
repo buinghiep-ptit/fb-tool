@@ -80,6 +80,7 @@ export function UploadPreviewer({
     setMediasSrcPreviewer([...initialMedias]) // should be set initial medias
     setValue('files', null)
     clearErrors('files')
+    removeSelectedFiles && removeSelectedFiles()
   }, [mediaFormat])
 
   useEffect(() => {

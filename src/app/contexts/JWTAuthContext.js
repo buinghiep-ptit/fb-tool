@@ -65,6 +65,7 @@ const AuthContext = createContext({
   ...initialState,
   method: 'JWT',
   login: () => Promise.resolve(),
+  updateUser: () => Promise.resolve(),
   logout: () => {},
   register: () => Promise.resolve(),
 })
@@ -86,6 +87,16 @@ export const AuthProvider = ({ children }) => {
         },
       })
     }
+  }
+
+  const updateUser = async () => {
+    const user = await getProfile()
+    dispatch({
+      type: 'LOGIN',
+      payload: {
+        user,
+      },
+    })
   }
 
   const register = async (email, username, password) => {
@@ -160,6 +171,7 @@ export const AuthProvider = ({ children }) => {
         ...state,
         method: 'JWT',
         login,
+        updateUser,
         logout,
         register,
       }}

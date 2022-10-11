@@ -77,7 +77,7 @@ export default function AddEvent(props: Props) {
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
     isEveryYear: false,
-    hashtag: [{ value: 'hashtag' }],
+    hashtag: [],
     status: 1,
     amount: 0,
   })
@@ -116,6 +116,7 @@ export default function AddEvent(props: Props) {
           : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
+    editor_content: Yup.string().required(messages.MSG1),
   })
 
   const methods = useForm<SchemaType>({
@@ -123,6 +124,8 @@ export default function AddEvent(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const isEveryYear = methods.watch('isEveryYear')
 
   const [
     selectFiles,
@@ -340,12 +343,14 @@ export default function AddEvent(props: Props) {
                           <MuiRHFDatePicker
                             name="startDate"
                             label="Ngày bắt đầu"
+                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
                           />
                         </Stack>
                         <Stack flexDirection={'row'} gap={1}>
                           <MuiRHFDatePicker
                             name="endDate"
                             label="Ngày kết thúc"
+                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
                           />
                         </Stack>
                       </LocalizationProvider>

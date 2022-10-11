@@ -4,31 +4,37 @@ export const navigations = [
     name: 'Quản lý tài khoản Admin',
     path: '/quan-ly-tai-khoan-admin',
     icon: 'admin_panel_settings',
+    auth: [1],
   },
   {
     name: 'Quản lý tài khoản KH',
     path: '/quan-ly-tai-khoan-khach-hang',
     icon: 'account_box',
+    auth: [1],
   },
   {
     name: 'Quản lý Feed',
     path: '/quan-ly-feeds',
     icon: 'feed',
+    auth: [1],
   },
   {
     name: 'Thêm mới Feed',
     path: '/them-moi-feed',
     icon: 'event_note',
+    auth: [1, 2],
   },
   {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
+    auth: [1],
   },
   {
     name: 'Quản lý đơn hàng',
     path: '/quan-ly-don-hang',
     icon: 'fact_check',
+    auth: [1, 2],
   },
   {
     name: 'Quản lý địa danh',

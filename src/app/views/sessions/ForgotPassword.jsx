@@ -66,7 +66,7 @@ const ForgotPasswordRoot = styled(JustifyBox)(() => ({
   background: '#2F9B42', //'#1A2038',
   minHeight: '100vh !important',
   '& .card': {
-    maxWidth: 800,
+    maxWidth: 500,
     margin: '1rem',
     borderRadius: 12,
   },
@@ -179,10 +179,17 @@ const ForgotPassword = () => {
                   <Stack mb={3}>
                     {step === 1 && (
                       <>
-                        <MuiTypography variant="subtitle2" pb={1}>
-                          Email
-                        </MuiTypography>
+                        <Stack mb={4}>
+                          <MuiTypography variant="h5">
+                            Quên mật khẩu
+                          </MuiTypography>
+                          <MuiTypography variant="body2">
+                            Nhập email của bạn bên dưới, chúng tôi sẽ gửi cho
+                            bạn liên kết để đặt lại mật khẩu
+                          </MuiTypography>
+                        </Stack>
                         <FormInputText
+                          label={'Email'}
                           type="text"
                           name="email"
                           size="small"
@@ -194,11 +201,9 @@ const ForgotPassword = () => {
                     )}
                     {step === 2 && (
                       <>
-                        <Stack mb={2}>
-                          <MuiTypography variant="subtitle2" pb={1}>
-                            Mật khẩu
-                          </MuiTypography>
+                        <Stack mb={2} gap={3}>
                           <FormInputText
+                            label={'Mật khẩu'}
                             type={showPassword.visibility ? 'text' : 'password'}
                             name="password"
                             placeholder="Nhập mật khẩu"
@@ -218,12 +223,8 @@ const ForgotPassword = () => {
                               </IconButton>
                             }
                           />
-                        </Stack>
-                        <Stack>
-                          <MuiTypography variant="subtitle2" pb={1}>
-                            Xác nhận mật khẩu
-                          </MuiTypography>
                           <FormInputText
+                            label={' Xác nhận mật khẩu'}
                             type={showPassword.visibility ? 'text' : 'password'}
                             name="passwordConfirmation"
                             placeholder="Nhập mật khẩu xác nhận"

@@ -80,7 +80,7 @@ const ManagementRoutes = [
       },
       {
         path: 'them-moi',
-        element: <CreateUser title="Thêm mới tài khoản" />,
+        element: <CreateUser title="Thêm tài khoản" />,
       },
     ],
     auth: [1],
@@ -114,11 +114,11 @@ const ManagementRoutes = [
           },
           {
             path: 'mo-khoa-tai-khoan',
-            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+            element: <UnlockCustomer title="Mở khoá" />,
           },
           {
             path: 'khoa-tai-khoan',
-            element: <LockCustomer title="Khoá tài khoản" />,
+            element: <LockCustomer title="Khoá" />,
           },
         ],
       },

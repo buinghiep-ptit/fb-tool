@@ -152,6 +152,10 @@ export default function AddEvent(props: Props) {
   )
 
   useEffect(() => {
+    initDefaultValues(event)
+  }, [event])
+
+  const initDefaultValues = (event?: IEventDetail) => {
     if (event) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
@@ -182,15 +186,17 @@ export default function AddEvent(props: Props) {
           multiple: false,
         }))
       }
-
-      setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
-
-      methods.reset({ ...defaultValues })
+      // setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
+      setMediasSrcPreviewer([...(event.medias ?? [])])
+    } else {
+      setMediasSrcPreviewer([])
     }
-  }, [event])
+
+    removeSelectedFiles()
+    methods.reset({ ...defaultValues })
+  }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log(values)
     const files = [...mediasSrcPreviewer].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
@@ -285,8 +291,7 @@ export default function AddEvent(props: Props) {
           variant="contained"
           color="warning"
           onClick={() => {
-            setMediasSrcPreviewer([...(event?.medias ?? [])])
-            methods.reset()
+            initDefaultValues(event)
           }}
           startIcon={<Icon>cached</Icon>}
         />

@@ -91,12 +91,15 @@ export const AuthProvider = ({ children }) => {
 
   const updateUser = async () => {
     const user = await getProfile()
-    dispatch({
-      type: 'LOGIN',
-      payload: {
-        user,
-      },
-    })
+    if (user.status === -1) {
+      logout()
+    } else
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          user,
+        },
+      })
   }
 
   const register = async (email, username, password) => {

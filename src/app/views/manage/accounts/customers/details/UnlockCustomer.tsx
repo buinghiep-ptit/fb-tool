@@ -28,7 +28,7 @@ export default function LockCustomer({ title }: Props) {
   const { customerId } = useParams()
 
   const onSuccess = (data: any) => {
-    toastSuccess({ message: 'Cập nhật mật khẩu thành công' })
+    toastSuccess({ message: 'Mở khoá thành công' })
     navigate(-1)
   }
   const validationSchema = Yup.object().shape({
@@ -156,6 +156,8 @@ export default function LockCustomer({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={isLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText="Mở khoá"
+        cancelText="Huỷ"
       >
         {getContent()}
       </MuiStyledModal>

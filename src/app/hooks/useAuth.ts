@@ -13,6 +13,7 @@ export const useChangePassword = (onSuccess?: any, onError?: any) => {
       changePassword(payload),
     {
       onSuccess,
+      onError,
     },
   )
 }

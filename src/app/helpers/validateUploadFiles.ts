@@ -3,7 +3,7 @@ export function checkIfFilesAreTooBig(
   mediaFormat?: number,
 ): boolean {
   let valid = true
-  if (files) {
+  if (files && files.length) {
     files.map(file => {
       const size = file.size / 1024 / 1024
       const duration = file.duration
@@ -12,7 +12,7 @@ export function checkIfFilesAreTooBig(
           valid = false
           return
         }
-      } else {
+      } else if (mediaFormat === 2) {
         if (size > 10) {
           valid = false
           return
@@ -20,6 +20,7 @@ export function checkIfFilesAreTooBig(
       }
     })
   }
+  console.log('valid:', valid)
   return valid
 }
 

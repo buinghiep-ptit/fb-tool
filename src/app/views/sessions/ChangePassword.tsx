@@ -20,6 +20,7 @@ type Props = {
 type FormData = {
   currentPassword?: string
   newPassword?: string
+  passwordConfirmation?: string
 }
 
 export default function ChangePassword({ title }: Props) {
@@ -30,10 +31,6 @@ export default function ChangePassword({ title }: Props) {
     visibility: false,
   })
 
-  const onSuccess = (data: any) => {
-    toastSuccess({ message: messages.MSG23 })
-    navigate(-1)
-  }
   const validationSchema = Yup.object().shape({
     currentPassword: Yup.string().required(messages.MSG1),
     newPassword: Yup.string()
@@ -46,6 +43,9 @@ export default function ChangePassword({ title }: Props) {
       })
       .matches(/^\S*$/, messages.MSG21)
       .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
+    passwordConfirmation: Yup.string()
+      .oneOf([Yup.ref('newPassword'), null], messages.MSG11)
+      .required(messages.MSG1),
   })
 
   const methods = useForm<any>({
@@ -53,10 +53,27 @@ export default function ChangePassword({ title }: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const { mutate: changePassword, isLoading } = useChangePassword(onSuccess)
+  const onSuccess = (data: any) => {
+    toastSuccess({ message: messages.MSG23 })
+    navigate(-1)
+  }
+  const onError = (error: any) => {
+    if (error.data && error.data.error === 'PASSWORD_INCORRECT')
+      methods.setError('currentPassword', {
+        message: 'Mật khẩu không chính xác',
+      })
+  }
+
+  const { mutate: changePassword, isLoading } = useChangePassword(
+    onSuccess,
+    onError,
+  )
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
-    changePassword(values)
+    changePassword({
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    })
   }
 
   const handleClose = () => {
@@ -107,6 +124,23 @@ export default function ChangePassword({ title }: Props) {
               name="newPassword"
               placeholder="Nhập mật khẩu mới"
               label={'Mật khẩu mới'}
+              iconEnd={
+                <IconButton onClick={handleClickShowPassword} edge="end">
+                  {!showPassword.visibility ? (
+                    <VisibilityOff />
+                  ) : (
+                    <Visibility />
+                  )}
+                </IconButton>
+              }
+              defaultValue=""
+            />
+
+            <FormInputText
+              type={showPassword.visibility ? 'text' : 'password'}
+              name="passwordConfirmation"
+              placeholder="Nhập mật khẩu xác nhận"
+              label={'Xác nhận mật khẩu'}
               iconEnd={
                 <IconButton onClick={handleClickShowPassword} edge="end">
                   {!showPassword.visibility ? (

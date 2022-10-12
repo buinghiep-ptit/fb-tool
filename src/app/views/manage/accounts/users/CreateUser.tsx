@@ -37,6 +37,8 @@ export default function CreateUser({ title }: Props) {
       open={isModal}
       onCloseModal={handleClose}
       onSubmit={methods.handleSubmit(onSubmitHandler)}
+      submitText="Lưu"
+      cancelText="Huỷ"
     >
       {getContent()}
     </MuiStyledModal>

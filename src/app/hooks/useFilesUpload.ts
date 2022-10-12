@@ -43,7 +43,7 @@ export const useUploadFiles = () => {
           ...prevMessage,
           'Uploaded the file successfully: ' + file.name,
         ])
-        return result
+        return { ...result, mediaFormat }
       })
       .catch(() => {
         _progressInfos[idx].percentage = 0

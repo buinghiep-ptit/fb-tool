@@ -206,6 +206,7 @@ export default function CreateFeed(props: Props) {
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
+      status: Number(values.cusType ?? 0) === 2 ? 0 : 1,
     }
     add(payload)
   }
@@ -420,6 +421,7 @@ export default function CreateFeed(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
+                      fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}
@@ -427,6 +429,7 @@ export default function CreateFeed(props: Props) {
                       uploadFiles={uploadFiles}
                       removeSelectedFiles={removeSelectedFiles}
                       uploading={uploading}
+                      initialMedias={[]}
                       progressInfos={progressInfos}
                     />
                   </Box>

@@ -7,7 +7,7 @@ export const columnLogsCustomer: readonly TableColumn<ILogsActionCustomer>[] = [
   { id: 'processName', label: 'Hành động', minWidth: 170 },
   {
     id: 'email',
-    label: 'Người xử lý',
+    label: 'Người thực hiện',
     minWidth: 150,
     align: 'center',
   },

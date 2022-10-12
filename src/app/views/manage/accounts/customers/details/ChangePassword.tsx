@@ -105,14 +105,12 @@ export default function ChangePassword({ title }: Props) {
       >
         <FormProvider {...methods}>
           <Stack>
-            <MuiTypography variant="subtitle2" pb={1}>
-              Mật khẩu mới:*
-            </MuiTypography>
-            <Stack flexDirection={'row'} alignItems="center" gap={1.5}>
+            <Stack flexDirection={'row'} alignItems="center" gap={1.5} mt={3}>
               <FormInputText
                 type={showPassword.visibility ? 'text' : 'password'}
                 name="password"
                 size="small"
+                label={'Mật khẩu mới:*'}
                 placeholder="Nhập mật khẩu"
                 defaultValue={customer?.email ? customer?.email : ''}
                 iconEnd={
@@ -160,6 +158,8 @@ export default function ChangePassword({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={isLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText="Lưu"
+        cancelText="Huỷ"
       >
         {getContent()}
       </MuiStyledModal>

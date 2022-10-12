@@ -35,12 +35,27 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
       </Typography>
     ),
   },
-  { id: 'email', label: 'Email', minWidth: 200, align: 'center' },
+  {
+    id: 'email',
+    label: 'Email',
+    minWidth: 200,
+    align: 'center',
+    action: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'fullName',
     label: 'Tên hiển thị',
     minWidth: 150,
     align: 'center',
+    action: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
   },
   {
     id: 'customerType',

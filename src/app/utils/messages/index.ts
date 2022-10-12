@@ -19,7 +19,7 @@ export const messages = {
   MSG18: 'Đổi mật khẩu thành công',
   MSG19: 'Cập nhật thành công',
   MSG20: 'Mật khẩu bao gồm tối thiểu 8-32 ký tự số và chữ',
-  MSG21: 'Mật khẩu không thể chưa khoảng trống, dấu tiếng Việt',
+  MSG21: 'Mật khẩu không thể chứa khoảng trống, dấu tiếng Việt',
   MSG22: 'Đã gửi mail làm mới mật khẩu tới email của bạn',
   MSG23: 'Đổi mật khẩu thành công',
   MSG24: 'Không tồn tại bản ghi thỏa mãn điều kiện tìm kiếm',

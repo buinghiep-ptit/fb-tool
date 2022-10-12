@@ -72,7 +72,6 @@ export const convertOtpToLabel = (type: number) => {
 }
 
 export const getLabelByCusStatus = (status: number) => {
-  console.log('status:', status)
   switch (status) {
     case 1:
       return 'Hoạt động'

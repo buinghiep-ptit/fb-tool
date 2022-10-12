@@ -1,4 +1,4 @@
-import { ChangeCircleSharp, UploadFile } from '@mui/icons-material'
+import { UploadFile } from '@mui/icons-material'
 import {
   FormHelperText,
   Icon,
@@ -18,7 +18,6 @@ import MediaPlayer from './MediaPlayer'
 import { ModalFullScreen } from './ModalFullScreen'
 import { MuiButton } from './MuiButton'
 import { MuiTypography } from './MuiTypography'
-
 interface Props {
   name: string
   mediaConfigs: {
@@ -37,6 +36,23 @@ interface Props {
   mediasSrcPreviewer: IMediaOverall[]
   fileInfos?: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
+}
+
+const checkIsMatchMediaFormat = (
+  files?: File[],
+  mediaFormat?: number,
+): boolean => {
+  if (mediaFormat && mediaFormat === 1) {
+    if (files && files[0].type.includes('video')) {
+      return true
+    } else return false
+  } else if (mediaFormat && mediaFormat === 2) {
+    if (files && files[0].type.includes('image')) {
+      return true
+    } else return false
+  }
+
+  return false
 }
 
 export function UploadPreviewer({
@@ -203,12 +219,14 @@ export function UploadPreviewer({
     accept:
       mediaFormat === EMediaFormat.VIDEO
         ? {
-            'video/*': [],
+            'video/*': ['.mp4', '.webm', '.ogg'],
           }
         : {
-            'image/*': [],
+            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
           },
     onDrop,
+    maxFiles: 15,
+    maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 10 * 1024 * 1024,
   })
 
   useEffect(() => {
@@ -228,7 +246,12 @@ export function UploadPreviewer({
               mediaFormat === EMediaFormat.VIDEO ? 'auto 9 / 16' : 'auto 1 / 1',
             background: 'rgba(22, 24, 35, 0.03)',
             borderRadius: 1.5,
-            display: !!mediasSrcPreviewer.length ? 'none' : 'flex',
+            display: !!mediasSrcPreviewer.length
+              ? mediasSrcPreviewer[0].mediaFormat !== mediaFormat &&
+                !checkIsMatchMediaFormat(files, mediaFormat)
+                ? 'flex'
+                : 'none'
+              : 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'pointer',
@@ -300,42 +323,47 @@ export function UploadPreviewer({
 
       {mediaType !== EMediaType.AVATAR && (
         <>
-          {!!mediasSrcPreviewer.length && mediaFormat === EMediaFormat.IMAGE && (
-            <Box mt={-2} position="relative">
-              <ImageListView
-                medias={[...mediasSrcPreviewer] as any}
-                oldMedias={_mediasSrcRef.current.val}
-                progressInfos={progressInfos}
-                onClickMedia={onClickMedia}
-              />
-              <ModalFullScreen
-                mode="edit"
-                data={mediasSrcPreviewer as Image[]}
-                open={openSlider}
-                onCloseModal={handleCloseSlider}
-                onSubmit={handleRemoveMedia}
-                initialIndexSlider={initialIndexSlider}
-              />
-              {!uploading && (
-                <>
-                  <CustomButton
-                    handleClick={open}
-                    iconName={'add_circle_outlined'}
-                    title={'Thêm ảnh'}
-                    position={{ top: '16px', left: '16px' }}
-                  />
-                  <CustomButton
-                    handleClick={handleResetMedia}
-                    iconName={'delete'}
-                    title={'Xoá tất cả'}
-                    position={{ top: '16px', right: '16px' }}
-                  />
-                </>
-              )}
-            </Box>
-          )}
+          {!!mediasSrcPreviewer.length &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
+              (files && files[0].type.includes('image'))) &&
+            mediaFormat === EMediaFormat.IMAGE && (
+              <Box mt={-2} position="relative">
+                <ImageListView
+                  medias={[...mediasSrcPreviewer] as any}
+                  oldMedias={_mediasSrcRef.current.val}
+                  progressInfos={progressInfos}
+                  onClickMedia={onClickMedia}
+                />
+                <ModalFullScreen
+                  mode="edit"
+                  data={mediasSrcPreviewer as Image[]}
+                  open={openSlider}
+                  onCloseModal={handleCloseSlider}
+                  onSubmit={handleRemoveMedia}
+                  initialIndexSlider={initialIndexSlider}
+                />
+                {!uploading && (
+                  <>
+                    <CustomButton
+                      handleClick={open}
+                      iconName={'add_circle_outlined'}
+                      title={'Thêm ảnh'}
+                      position={{ top: '16px', left: '16px' }}
+                    />
+                    <CustomButton
+                      handleClick={handleResetMedia}
+                      iconName={'delete'}
+                      title={'Xoá tất cả'}
+                      position={{ top: '16px', right: '16px' }}
+                    />
+                  </>
+                )}
+              </Box>
+            )}
           {!!mediasSrcPreviewer.length &&
             mediasSrcPreviewer[0].url &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
+              (files && files[0].type.includes('video'))) &&
             mediaFormat === EMediaFormat.VIDEO && (
               <Box
                 sx={{

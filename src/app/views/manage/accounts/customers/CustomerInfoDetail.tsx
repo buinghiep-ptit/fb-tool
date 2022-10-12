@@ -220,6 +220,7 @@ export default function CustomerDetail(props: Props) {
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,

@@ -4,6 +4,7 @@ export const uploadFile = async (
   mediaFormat?: 1 | 2,
   file?: any,
   onUploadProgress?: any,
+  controller?: any,
 ): Promise<any> => {
   const path = mediaFormat === 1 ? '/api/video/upload' : '/api/image/upload'
 
@@ -16,6 +17,7 @@ export const uploadFile = async (
       'Content-Type': 'multipart/form-data',
     },
     onUploadProgress,
+    signal: controller.signal,
   })
   return data
 }

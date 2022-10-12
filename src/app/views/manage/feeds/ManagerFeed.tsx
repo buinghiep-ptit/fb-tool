@@ -150,19 +150,21 @@ export default function ManagerFeed(props: Props) {
   const onSubmitHandler: SubmitHandler<IFeedsFilters> = (
     values: IFeedsFilters,
   ) => {
+    setPage(0)
+    setSize(20)
     setIsReset(false)
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 

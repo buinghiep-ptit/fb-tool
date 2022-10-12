@@ -120,10 +120,13 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                             minWidth: column.minWidth,
                             px: 1.5,
                             cursor: column.action ? 'pointer' : 'default',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            overflow: 'hidden',
-                            maxWidth: '300px',
+                            // whiteSpace: 'nowrap',
+                            // textOverflow: 'ellipsis',
+                            // overflow: 'hidden',
+                            // maxWidth: '300px',
+
+                            // whiteSpace: 'normal',
+                            // wordWrap: 'break-word',
                           }}
                         >
                           {cellFormatter(column, row, value)}

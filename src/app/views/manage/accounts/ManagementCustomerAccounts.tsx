@@ -132,19 +132,21 @@ export default function CustomerAccounts(props: Props) {
     values: ISearchFilters,
   ) => {
     setIsSubmitted(true)
+    setPage(0)
+    setSize(20)
 
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 

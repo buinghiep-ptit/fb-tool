@@ -14,6 +14,8 @@ export type FileInfoProgress = {
 }
 
 export const useUploadFiles = () => {
+  const abortController = useRef(null) as any
+
   const [uploading, setUploading] = useState<boolean>(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [progressInfos, setProgressInfos] = useState<{
@@ -29,15 +31,22 @@ export const useUploadFiles = () => {
   }
 
   const upload = (file: any, idx: number, mediaFormat?: 1 | 2) => {
+    abortController.current = new AbortController()
+
     if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
 
-    return uploadFile(mediaFormat, file, (event: any) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total,
-      )
-      setProgressInfos({ val: _progressInfos as any })
-    })
+    return uploadFile(
+      mediaFormat,
+      file,
+      (event: any) => {
+        _progressInfos[idx].percentage = Math.round(
+          (100 * event.loaded) / event.total,
+        )
+        setProgressInfos({ val: _progressInfos as any })
+      },
+      abortController.current,
+    )
       .then(result => {
         setMessage(prevMessage => [
           ...prevMessage,
@@ -54,6 +63,11 @@ export const useUploadFiles = () => {
           'Could not upload the file: ' + file.name,
         ])
       })
+  }
+
+  const cancelUpload = () => {
+    abortController.current && abortController.current.abort()
+    setUploading(false)
   }
 
   const removeSelectedFiles = (index?: number) => {
@@ -89,6 +103,7 @@ export const useUploadFiles = () => {
     (files?: File[]) => selectFiles(files),
     (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
     (index?: number) => removeSelectedFiles(index),
+    cancelUpload,
     uploading,
     progressInfos,
     message,

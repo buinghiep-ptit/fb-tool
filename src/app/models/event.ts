@@ -12,6 +12,7 @@ export interface IEventOverall {
   startDate?: string
   endDate?: string
   status?: number
+  dateActive?: string
 }
 
 export interface IEventDetail {

@@ -13,6 +13,7 @@ import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { messages } from 'app/utils/messages'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 
 type Props = {
   title: string
@@ -34,23 +35,35 @@ const RHFInputLockTime = ({ methods, name }: RHFInputLockTimeProps) => {
 
   useEffect(() => {
     methods.clearErrors('lockDuration')
+    if (parseInt(lockType, 10) === 2) {
+      methods.setValue('lockDuration', 12)
+    }
   }, [lockType])
 
   return (
-    <FormInputText
+    <MuiRHFNumericFormatInput
       disabled={parseInt(lockType, 10) !== 2}
-      type="number"
-      label={'Thời gian'}
+      type="text"
       name="lockDuration"
-      placeholder="Nhập thời gian"
-      inputProps={{
-        inputProps: {
-          // max: 100,
-          min: 1,
-        },
-      }}
-      defaultValue={''}
+      label="Thời gian"
+      placeholder="Nhập giá"
+      // iconEnd={<MuiTypography variant="subtitle2">VNĐ</MuiTypography>}
+      fullWidth
     />
+    // <FormInputText
+    //   disabled={parseInt(lockType, 10) !== 2}
+    //   type="number"
+    //   label={'Thời gian'}
+    //   name="lockDuration"
+    //   placeholder="Nhập thời gian"
+    //   inputProps={{
+    //     inputProps: {
+    //       // max: 100,
+    //       min: 1,
+    //     },
+    //   }}
+    //   defaultValue={''}
+    // />
   )
 }
 
@@ -72,6 +85,7 @@ export default function LockCustomer({ title }: Props) {
       is: (lockType: string) => lockType && lockType === '2',
       then: Yup.string()
         .required(messages.MSG1)
+        .max(10, 'Thời gian không hợp lệ (<= 10 số)')
         .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
     }),
 
@@ -81,6 +95,9 @@ export default function LockCustomer({ title }: Props) {
   })
 
   const methods = useForm<any>({
+    defaultValues: {
+      lockDuration: 12,
+    },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
@@ -88,11 +105,13 @@ export default function LockCustomer({ title }: Props) {
   const { mutate: lockCustomer, isLoading } = useLockCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
+    const duration =
+      values?.lockDuration?.toString().replace(/,(?=\d{3})/g, '') ?? 0
+
     lockCustomer({
       customerId,
       ...values,
-      lockDuration:
-        Number(values.lockType) === 2 ? Number(values.lockDuration) : 0,
+      lockDuration: Number(values.lockType) === 2 ? Number(duration) : 0,
       lockType: Number(values.lockType),
     })
   }
@@ -118,15 +137,21 @@ export default function LockCustomer({ title }: Props) {
         <FormProvider {...methods}>
           <Stack>
             <MuiRadioGroup name="lockType" defaultValue={1}>
-              <FormControlLabel value={1} control={<Radio />} label="Khoá" />
+              <FormControlLabel
+                value={1}
+                control={<Radio />}
+                label="Khoá tài khoản"
+              />
               <Stack flexDirection={'row'} alignItems={'center'}>
                 <FormControlLabel
                   value={2}
                   control={<Radio />}
                   label="Khoá tạm thời"
+                  sx={{ flex: 1, minWidth: '160px' }}
                 />
                 <>
                   <RHFInputLockTime methods={methods} name={'lockType'} />
+
                   <MuiTypography px={1} fontWeight={500}>
                     (giờ)
                   </MuiTypography>

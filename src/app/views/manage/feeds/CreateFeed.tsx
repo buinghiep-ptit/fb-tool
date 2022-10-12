@@ -83,7 +83,7 @@ export default function CreateFeed(props: Props) {
     cusType: 0,
     idSrcType: 1,
     customer: null,
-    hashtag: [{ value: 'hashtag' }],
+    hashtag: [],
   })
   const [filters, setFilters] = useState({ cusType: 0 })
 
@@ -178,6 +178,7 @@ export default function CreateFeed(props: Props) {
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,
@@ -428,6 +429,7 @@ export default function CreateFeed(props: Props) {
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
                       removeSelectedFiles={removeSelectedFiles}
+                      cancelUpload={cancelUpload}
                       uploading={uploading}
                       initialMedias={[]}
                       progressInfos={progressInfos}

@@ -79,7 +79,6 @@ export default function AddEvent(props: Props) {
     isEveryYear: false,
     hashtag: [],
     status: 1,
-    amount: 0,
   })
 
   const validationSchema = Yup.object().shape({
@@ -131,6 +130,7 @@ export default function AddEvent(props: Props) {
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,
@@ -197,6 +197,7 @@ export default function AddEvent(props: Props) {
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
     const files = [...mediasSrcPreviewer].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
@@ -211,7 +212,7 @@ export default function AddEvent(props: Props) {
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),
-      amount: Number(values.amount ?? 0),
+      amount: Number(amount),
       status: Number(values.status ?? -1),
       tags: values.hashtag ?? [],
     }
@@ -224,6 +225,7 @@ export default function AddEvent(props: Props) {
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
     // setMediasSrcPreviewer([])
+    navigate(-1)
     methods.reset()
   }
   const { mutate: add, isLoading: createLoading } = useCreateEvent(() =>
@@ -380,7 +382,6 @@ export default function AddEvent(props: Props) {
                     name="amount"
                     label="Giá tham gia"
                     placeholder="Nhập giá"
-                    defaultValue=""
                     iconEnd={
                       <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
                     }
@@ -429,6 +430,7 @@ export default function AddEvent(props: Props) {
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
                       removeSelectedFiles={removeSelectedFiles}
+                      cancelUpload={cancelUpload}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

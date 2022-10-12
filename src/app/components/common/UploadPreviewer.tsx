@@ -28,8 +28,9 @@ interface Props {
   }
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
-  uploadFiles: (files: any, mediaFormat?: 1 | 2) => void
+  uploadFiles: (files: any, mediaFormat?: 1 | 2, controller?: any) => void
   removeSelectedFiles?: (index?: number) => void
+  cancelUpload?: () => void
   uploading?: boolean
   progressInfos: any
   initialMedias?: IMediaOverall[]
@@ -66,6 +67,7 @@ export function UploadPreviewer({
   mode = 'append',
   uploadFiles,
   removeSelectedFiles,
+  cancelUpload,
   uploading,
   progressInfos,
   initialMedias = [],
@@ -95,14 +97,15 @@ export function UploadPreviewer({
     if (mediaType === EMediaType.AVATAR) return
     setMediasSrcPreviewer([...initialMedias]) // should be set initial medias
     setValue('files', null)
-    clearErrors('files')
+    clearErrors()
+    cancelUpload && cancelUpload()
     removeSelectedFiles && removeSelectedFiles()
   }, [mediaFormat])
 
-  useEffect(() => {
-    if (fileInfos && fileInfos.length)
-      setMediasSrcPreviewer([...initialMedias, ...fileInfos])
-  }, [fileInfos])
+  // useEffect(() => {
+  //   if (files && files.length && fileInfos && fileInfos.length)
+  //     setMediasSrcPreviewer([...initialMedias, ...fileInfos])
+  // }, [fileInfos])
 
   useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
@@ -110,11 +113,19 @@ export function UploadPreviewer({
       const newFiles = Object.assign(fileVideo, {
         duration,
       })
-      setValue(name, [newFiles], {
-        shouldValidate: true,
-      })
+      if (duration > 180) {
+        setValue(name, null, {
+          shouldValidate: true,
+        })
+        cancelUpload && cancelUpload()
+        setDuration(0)
+      }
+
+      // setValue(name, [newFiles], {
+      //   shouldValidate: true,
+      // })
     }
-  }, [duration])
+  }, [duration, files])
 
   useEffect(() => {
     register(name)
@@ -325,7 +336,7 @@ export function UploadPreviewer({
         <>
           {!!mediasSrcPreviewer.length &&
             (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
-              (files && files[0].type.includes('image'))) &&
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
             mediaFormat === EMediaFormat.IMAGE && (
               <Box mt={-2} position="relative">
                 <ImageListView
@@ -363,7 +374,7 @@ export function UploadPreviewer({
           {!!mediasSrcPreviewer.length &&
             mediasSrcPreviewer[0].url &&
             (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
-              (files && files[0].type.includes('video'))) &&
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
             mediaFormat === EMediaFormat.VIDEO && (
               <Box
                 sx={{
@@ -398,7 +409,8 @@ export function UploadPreviewer({
                     </>
                   )}
                 </>
-                {progressInfos?.val &&
+                {uploading &&
+                  progressInfos?.val &&
                   progressInfos.val[0] &&
                   (progressInfos.val[0].percentage ?? 0) < 100 && (
                     <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
@@ -413,7 +425,34 @@ export function UploadPreviewer({
       )}
 
       <Box px={1.5} my={1.5}>
-        {uploading && <LinearProgress />}
+        {files && files.length && uploading && (
+          <Stack direction={'row'} gap={1.5} alignItems="center">
+            {mediaFormat === EMediaFormat.VIDEO && (
+              <IconButton
+                sx={{
+                  bgcolor: '#303030',
+                  borderRadius: 1,
+                }}
+                onClick={() => {
+                  setDuration(0)
+                  setValue(name, null, {
+                    shouldValidate: true,
+                  })
+                  cancelUpload && cancelUpload()
+                }}
+              >
+                <Icon sx={{ color: 'white' }}>clear</Icon>
+                <MuiTypography
+                  sx={{ fontWeight: 500, color: 'white', px: 0.5 }}
+                >
+                  Huỷ
+                </MuiTypography>
+              </IconButton>
+            )}
+
+            <LinearProgress sx={{ flex: 1 }} />
+          </Stack>
+        )}
 
         {errors[name] && (
           <FormHelperText error>

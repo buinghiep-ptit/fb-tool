@@ -1,4 +1,4 @@
-import { ChangeCircleSharp, UploadFile } from '@mui/icons-material'
+import { UploadFile } from '@mui/icons-material'
 import {
   FormHelperText,
   Icon,
@@ -18,7 +18,6 @@ import MediaPlayer from './MediaPlayer'
 import { ModalFullScreen } from './ModalFullScreen'
 import { MuiButton } from './MuiButton'
 import { MuiTypography } from './MuiTypography'
-
 interface Props {
   name: string
   mediaConfigs: {
@@ -29,14 +28,32 @@ interface Props {
   }
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
-  uploadFiles: (files: any, mediaFormat?: 1 | 2) => void
+  uploadFiles: (files: any, mediaFormat?: 1 | 2, controller?: any) => void
   removeSelectedFiles?: (index?: number) => void
+  cancelUpload?: () => void
   uploading?: boolean
   progressInfos: any
   initialMedias?: IMediaOverall[]
   mediasSrcPreviewer: IMediaOverall[]
   fileInfos?: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
+}
+
+const checkIsMatchMediaFormat = (
+  files?: File[],
+  mediaFormat?: number,
+): boolean => {
+  if (mediaFormat && mediaFormat === 1) {
+    if (files && files[0].type.includes('video')) {
+      return true
+    } else return false
+  } else if (mediaFormat && mediaFormat === 2) {
+    if (files && files[0].type.includes('image')) {
+      return true
+    } else return false
+  }
+
+  return false
 }
 
 export function UploadPreviewer({
@@ -50,6 +67,7 @@ export function UploadPreviewer({
   mode = 'append',
   uploadFiles,
   removeSelectedFiles,
+  cancelUpload,
   uploading,
   progressInfos,
   initialMedias = [],
@@ -79,13 +97,15 @@ export function UploadPreviewer({
     if (mediaType === EMediaType.AVATAR) return
     setMediasSrcPreviewer([...initialMedias]) // should be set initial medias
     setValue('files', null)
-    clearErrors('files')
+    clearErrors()
+    cancelUpload && cancelUpload()
+    removeSelectedFiles && removeSelectedFiles()
   }, [mediaFormat])
 
-  useEffect(() => {
-    if (fileInfos && fileInfos.length)
-      setMediasSrcPreviewer([...initialMedias, ...fileInfos])
-  }, [fileInfos])
+  // useEffect(() => {
+  //   if (files && files.length && fileInfos && fileInfos.length)
+  //     setMediasSrcPreviewer([...initialMedias, ...fileInfos])
+  // }, [fileInfos])
 
   useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
@@ -93,11 +113,19 @@ export function UploadPreviewer({
       const newFiles = Object.assign(fileVideo, {
         duration,
       })
-      setValue(name, [newFiles], {
-        shouldValidate: true,
-      })
+      if (duration > 180) {
+        setValue(name, null, {
+          shouldValidate: true,
+        })
+        cancelUpload && cancelUpload()
+        setDuration(0)
+      }
+
+      // setValue(name, [newFiles], {
+      //   shouldValidate: true,
+      // })
     }
-  }, [duration])
+  }, [duration, files])
 
   useEffect(() => {
     register(name)
@@ -202,12 +230,14 @@ export function UploadPreviewer({
     accept:
       mediaFormat === EMediaFormat.VIDEO
         ? {
-            'video/*': [],
+            'video/*': ['.mp4', '.webm', '.ogg'],
           }
         : {
-            'image/*': [],
+            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
           },
     onDrop,
+    maxFiles: 15,
+    maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 10 * 1024 * 1024,
   })
 
   useEffect(() => {
@@ -227,7 +257,12 @@ export function UploadPreviewer({
               mediaFormat === EMediaFormat.VIDEO ? 'auto 9 / 16' : 'auto 1 / 1',
             background: 'rgba(22, 24, 35, 0.03)',
             borderRadius: 1.5,
-            display: !!mediasSrcPreviewer.length ? 'none' : 'flex',
+            display: !!mediasSrcPreviewer.length
+              ? mediasSrcPreviewer[0].mediaFormat !== mediaFormat &&
+                !checkIsMatchMediaFormat(files, mediaFormat)
+                ? 'flex'
+                : 'none'
+              : 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'pointer',
@@ -299,42 +334,47 @@ export function UploadPreviewer({
 
       {mediaType !== EMediaType.AVATAR && (
         <>
-          {!!mediasSrcPreviewer.length && mediaFormat === EMediaFormat.IMAGE && (
-            <Box mt={-2} position="relative">
-              <ImageListView
-                medias={[...mediasSrcPreviewer] as any}
-                oldMedias={_mediasSrcRef.current.val}
-                progressInfos={progressInfos}
-                onClickMedia={onClickMedia}
-              />
-              <ModalFullScreen
-                mode="edit"
-                data={mediasSrcPreviewer as Image[]}
-                open={openSlider}
-                onCloseModal={handleCloseSlider}
-                onSubmit={handleRemoveMedia}
-                initialIndexSlider={initialIndexSlider}
-              />
-              {!uploading && (
-                <>
-                  <CustomButton
-                    handleClick={open}
-                    iconName={'add_circle_outlined'}
-                    title={'Thêm ảnh'}
-                    position={{ top: '16px', left: '16px' }}
-                  />
-                  <CustomButton
-                    handleClick={handleResetMedia}
-                    iconName={'delete'}
-                    title={'Xoá tất cả'}
-                    position={{ top: '16px', right: '16px' }}
-                  />
-                </>
-              )}
-            </Box>
-          )}
+          {!!mediasSrcPreviewer.length &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
+            mediaFormat === EMediaFormat.IMAGE && (
+              <Box mt={-2} position="relative">
+                <ImageListView
+                  medias={[...mediasSrcPreviewer] as any}
+                  oldMedias={_mediasSrcRef.current.val}
+                  progressInfos={progressInfos}
+                  onClickMedia={onClickMedia}
+                />
+                <ModalFullScreen
+                  mode="edit"
+                  data={mediasSrcPreviewer as Image[]}
+                  open={openSlider}
+                  onCloseModal={handleCloseSlider}
+                  onSubmit={handleRemoveMedia}
+                  initialIndexSlider={initialIndexSlider}
+                />
+                {!uploading && (
+                  <>
+                    <CustomButton
+                      handleClick={open}
+                      iconName={'add_circle_outlined'}
+                      title={'Thêm ảnh'}
+                      position={{ top: '16px', left: '16px' }}
+                    />
+                    <CustomButton
+                      handleClick={handleResetMedia}
+                      iconName={'delete'}
+                      title={'Xoá tất cả'}
+                      position={{ top: '16px', right: '16px' }}
+                    />
+                  </>
+                )}
+              </Box>
+            )}
           {!!mediasSrcPreviewer.length &&
             mediasSrcPreviewer[0].url &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
             mediaFormat === EMediaFormat.VIDEO && (
               <Box
                 sx={{
@@ -369,7 +409,8 @@ export function UploadPreviewer({
                     </>
                   )}
                 </>
-                {progressInfos?.val &&
+                {uploading &&
+                  progressInfos?.val &&
                   progressInfos.val[0] &&
                   (progressInfos.val[0].percentage ?? 0) < 100 && (
                     <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
@@ -384,7 +425,34 @@ export function UploadPreviewer({
       )}
 
       <Box px={1.5} my={1.5}>
-        {uploading && <LinearProgress />}
+        {files && files.length && uploading && (
+          <Stack direction={'row'} gap={1.5} alignItems="center">
+            {mediaFormat === EMediaFormat.VIDEO && (
+              <IconButton
+                sx={{
+                  bgcolor: '#303030',
+                  borderRadius: 1,
+                }}
+                onClick={() => {
+                  setDuration(0)
+                  setValue(name, null, {
+                    shouldValidate: true,
+                  })
+                  cancelUpload && cancelUpload()
+                }}
+              >
+                <Icon sx={{ color: 'white' }}>clear</Icon>
+                <MuiTypography
+                  sx={{ fontWeight: 500, color: 'white', px: 0.5 }}
+                >
+                  Huỷ
+                </MuiTypography>
+              </IconButton>
+            )}
+
+            <LinearProgress sx={{ flex: 1 }} />
+          </Stack>
+        )}
 
         {errors[name] && (
           <FormHelperText error>

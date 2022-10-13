@@ -31,6 +31,8 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
   onClickRow?: (cell: any, row: any) => void
   isFetching: boolean
   error?: { message?: string } | undefined | null
+  rowsPerPage?: number
+  page?: number
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -39,6 +41,8 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   onClickRow,
   isFetching,
   error,
+  rowsPerPage = 20,
+  page = 0,
 }: MuiPagingTableProps<T>) {
   const [rowHeight, setRowHeight] = React.useState(0)
   const memoizedData = React.useMemo(() => rows, [rows])
@@ -103,7 +107,10 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     }}
                   >
                     {memoizedColumns.map((column, idx) => {
-                      const value = idx === 0 ? index + 1 : row[column.id]
+                      const value =
+                        idx === 0
+                          ? page * rowsPerPage + index + 1
+                          : row[column.id]
                       return (
                         <TableCell
                           key={idx}
@@ -113,10 +120,13 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                             minWidth: column.minWidth,
                             px: 1.5,
                             cursor: column.action ? 'pointer' : 'default',
-                            whiteSpace: 'nowrap',
-                            textOverflow: 'ellipsis',
-                            overflow: 'hidden',
-                            maxWidth: '300px',
+                            // whiteSpace: 'nowrap',
+                            // textOverflow: 'ellipsis',
+                            // overflow: 'hidden',
+                            // maxWidth: '300px',
+
+                            // whiteSpace: 'normal',
+                            // wordWrap: 'break-word',
                           }}
                         >
                           {cellFormatter(column, row, value)}

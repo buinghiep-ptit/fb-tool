@@ -38,6 +38,7 @@ const FormTextArea: FC<IFormTextAreaProps> = ({
               border: '1px solid #cccccc',
               borderRadius: 8,
               padding: '8px 16px',
+              whiteSpace: 'pre-wrap',
             }}
           />
 

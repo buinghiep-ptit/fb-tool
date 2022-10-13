@@ -1,10 +1,14 @@
 import { EditOutlined } from '@mui/icons-material'
-import { Avatar, styled, Typography } from '@mui/material'
+import { Avatar, Chip, styled, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
+import { getColorByCusStatus } from '../common'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
-import { LabelFormatter } from '../formatters/labelFormatter'
+import {
+  getLabelByCusStatus,
+  LabelFormatter,
+} from '../formatters/labelFormatter'
 
 const StyledAvatar = styled(Avatar)(() => ({
   height: '32px',
@@ -31,12 +35,27 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
       </Typography>
     ),
   },
-  { id: 'email', label: 'Email', minWidth: 200, align: 'center' },
+  {
+    id: 'email',
+    label: 'Email',
+    minWidth: 200,
+    align: 'center',
+    action: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'fullName',
     label: 'Tên hiển thị',
     minWidth: 150,
     align: 'center',
+    action: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
   },
   {
     id: 'customerType',
@@ -66,9 +85,15 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     minWidth: 100,
     align: 'center',
     status: (value: any) => (
-      <MuiSwitch
-        checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'center' }}
+      <Chip
+        label={getLabelByCusStatus(value as number)}
+        size="small"
+        sx={{
+          mx: 1,
+          px: 1,
+          backgroundColor: getColorByCusStatus(value as number),
+          color: '#FFFFFF',
+        }}
       />
     ),
   },

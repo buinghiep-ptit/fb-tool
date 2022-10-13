@@ -83,7 +83,7 @@ export default function CreateFeed(props: Props) {
     cusType: 0,
     idSrcType: 1,
     customer: null,
-    hashtag: [{ value: 'hashtag' }],
+    hashtag: [],
   })
   const [filters, setFilters] = useState({ cusType: 0 })
 
@@ -178,6 +178,7 @@ export default function CreateFeed(props: Props) {
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,
@@ -206,6 +207,7 @@ export default function CreateFeed(props: Props) {
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
+      status: Number(values.cusType ?? 0) === 2 ? 0 : 1,
     }
     add(payload)
   }
@@ -420,13 +422,16 @@ export default function CreateFeed(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
+                      fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
                       removeSelectedFiles={removeSelectedFiles}
+                      cancelUpload={cancelUpload}
                       uploading={uploading}
+                      initialMedias={[]}
                       progressInfos={progressInfos}
                     />
                   </Box>

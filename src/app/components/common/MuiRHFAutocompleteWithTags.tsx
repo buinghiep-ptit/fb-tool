@@ -32,9 +32,7 @@ export function MuiAutocompleteWithTags({
 
   const handleKeyDown = (event: any) => {
     switch (event.key) {
-      case 'Enter':
-      case ',':
-      case ' ': {
+      case 'Enter': {
         event.preventDefault()
         event.stopPropagation()
         if (event.target.value.length > 0) {
@@ -57,6 +55,8 @@ export function MuiAutocompleteWithTags({
       render={({ field }) => (
         <Autocomplete
           {...field}
+          freeSolo={false}
+          popupIcon={''}
           multiple
           open={false}
           limitTags={2}
@@ -97,6 +97,7 @@ export function MuiAutocompleteWithTags({
                 error={errors.hashtag as any}
                 helperText={errors.hashtag?.message as any}
                 {...params}
+                InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 fullWidth
                 margin="normal"

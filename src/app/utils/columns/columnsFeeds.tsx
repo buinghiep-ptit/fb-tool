@@ -19,8 +19,21 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'content',
     label: 'Nội dung',
-    minWidth: 170,
+    minWidth: 200,
     align: 'left',
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '3',
+          WebkitBoxOrient: 'vertical',
+        }}
+      >
+        {value}
+      </Typography>
+    ),
   },
   {
     id: 'customerType',

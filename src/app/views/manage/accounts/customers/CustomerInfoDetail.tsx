@@ -220,6 +220,7 @@ export default function CustomerDetail(props: Props) {
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,
@@ -288,7 +289,7 @@ export default function CustomerDetail(props: Props) {
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
-              title="Lưu thay đổi"
+              title="Lưu"
               loading={updateLoading}
               variant="contained"
               color="primary"
@@ -296,7 +297,7 @@ export default function CustomerDetail(props: Props) {
               startIcon={<Icon>done</Icon>}
             />
             <MuiButton
-              title="Huỷ thay đổi"
+              title="Huỷ"
               variant="contained"
               color="warning"
               onClick={() => {
@@ -560,7 +561,7 @@ export default function CustomerDetail(props: Props) {
                       {customer.data?.status !== -2 && (
                         <>
                           <MuiButton
-                            title={'Khoá TK'}
+                            title={'Khoá'}
                             variant="text"
                             color="error"
                             onClick={() =>
@@ -604,7 +605,7 @@ export default function CustomerDetail(props: Props) {
                             state: { modal: true },
                           })
                         }
-                        title="Đổi MK"
+                        title="Đổi mật khẩu"
                         variant="text"
                         color="secondary"
                         sx={{ flex: 1 }}
@@ -619,7 +620,7 @@ export default function CustomerDetail(props: Props) {
         </FormProvider>
       </form>
 
-      <SimpleCard title=" Logs hành động">
+      <SimpleCard title="Log hành động">
         <MuiStyledTable
           rows={logs?.data?.content as ILogsActionCustomer[]}
           columns={columnLogsCustomer as any}

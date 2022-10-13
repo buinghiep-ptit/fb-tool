@@ -14,12 +14,14 @@ export interface IMuiRHFDatePickerProps {
   name: string
   defaultValue?: string
   label?: string
+  inputFormat?: 'DD/MM/YYYY' | 'DD/MM'
 }
 
 export function MuiRHFDatePicker({
   name,
   defaultValue,
   label = '',
+  inputFormat = 'DD/MM/YYYY',
 }: IMuiRHFDatePickerProps) {
   const {
     control,
@@ -32,12 +34,12 @@ export function MuiRHFDatePicker({
       name={name}
       defaultValue={defaultValue ?? null}
       render={({ field: { onChange, value, ...rest } }) => (
-        <DateTimePicker
+        <DatePicker
           {...rest}
           label={label}
           disableFuture={false}
           value={value}
-          inputFormat="DD/MM/YYYY"
+          inputFormat={inputFormat}
           onChange={(value: any) => onChange(value)}
           renderInput={(params: any) => (
             <TextField

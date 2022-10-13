@@ -37,7 +37,6 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 type ISearchFilters = {
-  account?: string
   email?: string
   role?: string
   status?: string
@@ -65,7 +64,6 @@ export default function AdminAccounts(props: Props) {
   const [defaultValues] = useState<ISearchFilters>({
     role: queryParams.role ?? 'all',
     status: queryParams.status ?? 'all',
-    account: queryParams.account ?? '',
     email: queryParams.email ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
@@ -149,18 +147,21 @@ export default function AdminAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setPage(0)
+    setSize(20)
+
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -182,7 +183,6 @@ export default function AdminAccounts(props: Props) {
 
   const onResetFilters = () => {
     methods.reset({
-      account: '',
       email: '',
       role: 'all',
       status: 'all',
@@ -210,22 +210,11 @@ export default function AdminAccounts(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý TK Admin">
+        <SimpleCard title="">
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
-                  <FormInputText
-                    label={'Tài khoản'}
-                    type="text"
-                    name="account"
-                    defaultValue=""
-                    size="small"
-                    placeholder="Nhập tên tài khoản"
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Email'}
                     type="email"
@@ -236,15 +225,16 @@ export default function AdminAccounts(props: Props) {
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="role" label="Quyền">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Admin</MenuItem>
                     <MenuItem value="2">CS</MenuItem>
                     <MenuItem value="3">Sale</MenuItem>
+                    <MenuItem value="4">MKT</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hoạt động</MenuItem>
@@ -268,7 +258,7 @@ export default function AdminAccounts(props: Props) {
                   </Grid>
                   <Grid item sm={3} xs={6}>
                     <MuiButton
-                      title="Tạo lại"
+                      title="Làm mới"
                       variant="outlined"
                       color="primary"
                       onClick={onResetFilters}
@@ -284,7 +274,7 @@ export default function AdminAccounts(props: Props) {
                           state: { modal: true },
                         })
                       }
-                      title="Thêm tài koản"
+                      title="Thêm người dùng"
                       variant="contained"
                       color="primary"
                       sx={{ width: '100%' }}
@@ -300,6 +290,8 @@ export default function AdminAccounts(props: Props) {
           <MuiStyledTable
             rows={data ? (data?.content as IUser[]) : []}
             columns={columnsAdminAccounts}
+            rowsPerPage={size}
+            page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}

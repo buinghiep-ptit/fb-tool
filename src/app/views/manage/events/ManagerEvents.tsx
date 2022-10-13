@@ -19,6 +19,7 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IEventOverall, IEventResponse } from 'app/models'
 import { columnsEvents } from 'app/utils/columns/columnsEvents'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { DDMMYYYYFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
@@ -41,6 +42,15 @@ type ISearchFilters = {
   page?: number
   size?: number
   sort?: string[]
+}
+
+const newEvents = (events: IEventOverall[]) => {
+  return events.map(event => ({
+    ...event,
+    dateActive: `${DDMMYYYYFormatter(
+      event.startDate ?? '',
+    )} - ${DDMMYYYYFormatter(event.endDate ?? '')}`,
+  }))
 }
 
 export default function ManagerEvents(props: Props) {
@@ -148,18 +158,20 @@ export default function ManagerEvents(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setPage(0)
+    setSize(20)
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -246,7 +258,9 @@ export default function ManagerEvents(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as IEventOverall[]) : []}
+            rows={
+              data ? (newEvents(data?.content ?? []) as IEventOverall[]) : []
+            }
             columns={columnsEvents}
             onClickRow={onClickRow}
             isFetching={isFetching}

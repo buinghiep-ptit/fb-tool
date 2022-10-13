@@ -80,11 +80,16 @@ const ManagementRoutes = [
       },
       {
         path: 'them-moi',
-        element: <CreateUser title="Thêm mới tài khoản" />,
+        element: <CreateUser title="Thêm tài khoản" />,
       },
     ],
+    auth: [1],
   },
-  { path: '/quan-ly-tai-khoan-khach-hang', element: <CustomerAccounts /> },
+  {
+    path: '/quan-ly-tai-khoan-khach-hang',
+    element: <CustomerAccounts />,
+    auth: [1],
+  },
   {
     path: '/quan-ly-tai-khoan-khach-hang/:customerId',
     element: (
@@ -109,11 +114,11 @@ const ManagementRoutes = [
           },
           {
             path: 'mo-khoa-tai-khoan',
-            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+            element: <UnlockCustomer title="Mở khoá" />,
           },
           {
             path: 'khoa-tai-khoan',
-            element: <LockCustomer title="Khoá tài khoản" />,
+            element: <LockCustomer title="Khoá" />,
           },
         ],
       },
@@ -134,6 +139,7 @@ const ManagementRoutes = [
         element: <ReportDialog title="Báo cáo vi phạm" />,
       },
     ],
+    auth: [1],
   },
   {
     path: '/quan-ly-feeds/:feedId',
@@ -166,9 +172,12 @@ const ManagementRoutes = [
       },
     ],
   },
-  { path: '/them-moi-feed', element: <CreateFeed /> },
-  { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
-  { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
+  { path: '/them-moi-feed', element: <CreateFeed />, auth: [1, 2] },
+  { path: '/quan-ly-su-kien', element: <ManagerEvents />, auth: [1] },
+  {
+    path: '/quan-ly-su-kien/them-moi-su-kien',
+    element: <AddEvent />,
+  },
   { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },
   {
     path: '/quan-ly-don-hang',
@@ -206,6 +215,7 @@ const ManagementRoutes = [
         ],
       },
     ],
+    auth: [1, 2],
   },
 
   {

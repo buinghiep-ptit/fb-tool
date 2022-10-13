@@ -9,7 +9,7 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
   {
     id: 'email',
-    label: 'Tài khoản',
+    label: 'Email',
     minWidth: 120,
     action: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
@@ -44,7 +44,7 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 1 ? 'Hoạt động' : 'Khoá'}
+        label={value === 1 ? 'Hoạt động' : 'Không hoạt động'}
         size="small"
         color={value === 1 ? 'primary' : 'default'}
       />

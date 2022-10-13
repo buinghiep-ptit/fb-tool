@@ -51,8 +51,12 @@ export default function ChangePassword({ title }: Props) {
         } else return false
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20),
-    note: Yup.string().max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .min(8, messages.MSG20)
+      .max(32, messages.MSG20),
+    // .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
+    note: Yup.string()
+      .required(messages.MSG1)
+      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({
@@ -84,7 +88,7 @@ export default function ChangePassword({ title }: Props) {
   const generatePasswordCustomer = () => {
     setRandLoading(true)
     setTimeout(() => {
-      methods.setValue('password', generatePassword(8))
+      methods.setValue('password', generatePassword(2, 4, 2))
       setRandLoading(false)
     }, 1500)
   }
@@ -105,14 +109,12 @@ export default function ChangePassword({ title }: Props) {
       >
         <FormProvider {...methods}>
           <Stack>
-            <MuiTypography variant="subtitle2" pb={1}>
-              Mật khẩu mới:*
-            </MuiTypography>
-            <Stack flexDirection={'row'} alignItems="center" gap={1.5}>
+            <Stack flexDirection={'row'} alignItems="center" gap={1.5} mt={3}>
               <FormInputText
                 type={showPassword.visibility ? 'text' : 'password'}
                 name="password"
                 size="small"
+                label={'Mật khẩu mới:*'}
                 placeholder="Nhập mật khẩu"
                 defaultValue={customer?.email ? customer?.email : ''}
                 iconEnd={
@@ -131,8 +133,11 @@ export default function ChangePassword({ title }: Props) {
                 color="primary"
                 loadingColor="primary"
                 type="submit"
-                sx={{ width: '100%', flex: 1 }}
-                startIcon={<RefreshSharp />}
+                sx={{
+                  minWidth: '180px',
+                  flex: 1,
+                }}
+                // startIcon={<RefreshSharp />}
                 onClick={generatePasswordCustomer}
                 loading={randLoading}
               />
@@ -141,7 +146,7 @@ export default function ChangePassword({ title }: Props) {
 
           <Stack my={1.5}>
             <MuiTypography variant="subtitle2" pb={1}>
-              Ghi chú:
+              Ghi chú*:
             </MuiTypography>
             <FormTextArea name="note" defaultValue={''} placeholder="Ghi chú" />
           </Stack>
@@ -160,6 +165,8 @@ export default function ChangePassword({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={isLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText="Lưu"
+        cancelText="Huỷ"
       >
         {getContent()}
       </MuiStyledModal>

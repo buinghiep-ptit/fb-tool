@@ -150,19 +150,21 @@ export default function ManagerFeed(props: Props) {
   const onSubmitHandler: SubmitHandler<IFeedsFilters> = (
     values: IFeedsFilters,
   ) => {
+    setPage(0)
+    setSize(20)
     setIsReset(false)
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -338,7 +340,7 @@ export default function ManagerFeed(props: Props) {
                 <Grid item sm={2} xs={12}>
                   <MuiButton
                     loading={isReset && isFetching}
-                    title="Tạo lại"
+                    title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}

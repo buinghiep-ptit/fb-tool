@@ -67,6 +67,7 @@ type ISearchFilters = {
   page?: number
   size?: number
   sort?: string
+  isPending?: 1 | 0
 }
 
 export interface Props {}
@@ -77,8 +78,12 @@ export default function OrdersHistory() {
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
 
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
 
   const [defaultValues] = useState<ISearchFilters>({
     search: queryParams.search ?? '',
@@ -180,6 +185,7 @@ export default function OrdersHistory() {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: +event.target.value,
     } as any)
   }
@@ -217,6 +223,9 @@ export default function OrdersHistory() {
       page: 0,
       size: 20,
     })
+
+    setPage(0)
+    setSize(20)
     setFilters({
       page,
       size,

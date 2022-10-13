@@ -39,7 +39,7 @@ export const toastError = (error: {
   } else if (error.message) {
     ;({ message: message } = error)
     if (message === 'Network Error') {
-      message = 'Không có kết nối Internet'
+      message = 'Không thể kết nối tới máy chủ'
     }
   } else {
     // error.request

@@ -17,6 +17,8 @@ export const LabelFormatter = (value?: number, key?: string) => {
         formatter = 'CS'
       } else if (value === 3) {
         formatter = 'Sale'
+      } else if (value === 4) {
+        formatter = 'MKT'
       }
       break
 

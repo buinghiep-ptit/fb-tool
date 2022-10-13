@@ -59,24 +59,24 @@ const defaultValues = {
 // form field validation schema
 const validationSchema = Yup.object().shape({
   email: Yup.string().email(messages.MSG12).required(messages.MSG1),
-  password: Yup.string()
-    .test('latinChars', messages.MSG21, value => {
-      const regexStr = /^[\x20-\x7E]+$/
-      return regexStr.test(value)
-    })
-    .matches(/^\S*$/, messages.MSG21)
-    .matches(
-      // '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#!@$%^&*()+=]).{8,20}$',
-      // `Should contains at least 8 characters and at most 20 characters\n
-      // Should contains at least one digit\n
-      // Should contains at least one upper case alphabet\n
-      // Should contains at least one lower case alphabet\n
-      // Should contaregexStr = /[A-z\u00C0-\u00ff]+/gins at least one special character which includes !@#$%&*()+=^\n
-      // Should doesn't contain any white space`,
-      /^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g,
-      messages.MSG20,
-    )
-    .required(messages.MSG1),
+  password: Yup.string(),
+  // .required(messages.MSG1)
+  // .test('latinChars', messages.MSG21, value => {
+  //   const regexStr = /^[\x20-\x7E]+$/
+  //   return regexStr.test(value)
+  // })
+  // .matches(/^\S*$/, messages.MSG21)
+  // .matches(
+  //   // '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#!@$%^&*()+=]).{8,20}$',
+  //   // `Should contains at least 8 characters and at most 20 characters\n
+  //   // Should contains at least one digit\n
+  //   // Should contains at least one upper case alphabet\n
+  //   // Should contains at least one lower case alphabet\n
+  //   // Should contaregexStr = /[A-z\u00C0-\u00ff]+/gins at least one special character which includes !@#$%&*()+=^\n
+  //   // Should doesn't contain any white space`,
+  //   /^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g,
+  //   messages.MSG20,
+  // ),
 })
 
 const JwtLogin = () => {
@@ -103,7 +103,8 @@ const JwtLogin = () => {
       await login(values)
       navigate(from, { replace: true })
     } catch (error) {
-      if (error.data) methods.setError('password', { message: messages.MSG9 })
+      if (error.data && error.data.error !== 'ACCOUNT_NOT_ACTIVE')
+        methods.setError('password', { message: messages.MSG9 })
       setLoading(false)
     }
   }

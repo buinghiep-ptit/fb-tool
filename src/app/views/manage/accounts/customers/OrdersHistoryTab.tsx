@@ -266,7 +266,7 @@ export default function OrdersHistory() {
                 <Grid item sm={3} xs={6} mt={2}>
                   <MuiButton
                     // loading={isReset && isFetching}
-                    title="Tạo lại"
+                    title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}

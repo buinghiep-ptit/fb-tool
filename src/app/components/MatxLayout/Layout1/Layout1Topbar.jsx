@@ -160,10 +160,10 @@ const Layout1Topbar = () => {
               </Link>
             </StyledItem> */}
 
-            <StyledItem onClick={() => navigate(`session/forgot-password`, {})}>
+            {/* <StyledItem onClick={() => navigate(`session/forgot-password`, {})}>
               <Icon> password </Icon>
               <Span> Quên mật khẩu </Span>
-            </StyledItem>
+            </StyledItem> */}
 
             <StyledItem
               onClick={() =>

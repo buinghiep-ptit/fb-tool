@@ -77,9 +77,8 @@ export default function AddEvent(props: Props) {
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
     isEveryYear: false,
-    hashtag: [{ value: 'hashtag' }],
+    hashtag: [],
     status: 1,
-    amount: 0,
   })
 
   const validationSchema = Yup.object().shape({
@@ -116,6 +115,7 @@ export default function AddEvent(props: Props) {
           : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
+    editor_content: Yup.string().required(messages.MSG1),
   })
 
   const methods = useForm<SchemaType>({
@@ -124,10 +124,13 @@ export default function AddEvent(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
+  const isEveryYear = methods.watch('isEveryYear')
+
   const [
     selectFiles,
     uploadFiles,
     removeSelectedFiles,
+    cancelUpload,
     uploading,
     progressInfos,
     message,
@@ -149,6 +152,10 @@ export default function AddEvent(props: Props) {
   )
 
   useEffect(() => {
+    initDefaultValues(event)
+  }, [event])
+
+  const initDefaultValues = (event?: IEventDetail) => {
     if (event) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
@@ -179,15 +186,18 @@ export default function AddEvent(props: Props) {
           multiple: false,
         }))
       }
-
-      setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
-
-      methods.reset({ ...defaultValues })
+      // setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
+      setMediasSrcPreviewer([...(event.medias ?? [])])
+    } else {
+      setMediasSrcPreviewer([])
     }
-  }, [event])
+
+    removeSelectedFiles()
+    methods.reset({ ...defaultValues })
+  }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log(values)
+    const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
     const files = [...mediasSrcPreviewer].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
@@ -202,7 +212,7 @@ export default function AddEvent(props: Props) {
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),
-      amount: Number(values.amount ?? 0),
+      amount: Number(amount),
       status: Number(values.status ?? -1),
       tags: values.hashtag ?? [],
     }
@@ -215,6 +225,7 @@ export default function AddEvent(props: Props) {
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
     // setMediasSrcPreviewer([])
+    navigate(-1)
     methods.reset()
   }
   const { mutate: add, isLoading: createLoading } = useCreateEvent(() =>
@@ -282,8 +293,7 @@ export default function AddEvent(props: Props) {
           variant="contained"
           color="warning"
           onClick={() => {
-            setMediasSrcPreviewer([...(event?.medias ?? [])])
-            methods.reset()
+            initDefaultValues(event)
           }}
           startIcon={<Icon>cached</Icon>}
         />
@@ -340,12 +350,14 @@ export default function AddEvent(props: Props) {
                           <MuiRHFDatePicker
                             name="startDate"
                             label="Ngày bắt đầu"
+                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
                           />
                         </Stack>
                         <Stack flexDirection={'row'} gap={1}>
                           <MuiRHFDatePicker
                             name="endDate"
                             label="Ngày kết thúc"
+                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
                           />
                         </Stack>
                       </LocalizationProvider>
@@ -370,7 +382,6 @@ export default function AddEvent(props: Props) {
                     name="amount"
                     label="Giá tham gia"
                     placeholder="Nhập giá"
-                    defaultValue=""
                     iconEnd={
                       <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
                     }
@@ -419,6 +430,7 @@ export default function AddEvent(props: Props) {
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
                       removeSelectedFiles={removeSelectedFiles}
+                      cancelUpload={cancelUpload}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

@@ -50,12 +50,15 @@ export default function CustomerAccounts(props: Props) {
     queryParams.size ? +queryParams.size : 20,
   )
 
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
   const [defaultValues] = useState<ISearchFilters>({
     search: queryParams.search ?? '',
     cusType: queryParams.cusType ?? 'all',
     status: queryParams.status ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
+    sort: 'fullName,asc',
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(
@@ -89,7 +92,7 @@ export default function CustomerAccounts(props: Props) {
   >(['customers', filters], () => fetchCustomers(filters), {
     refetchOnWindowFocus: false,
     keepPreviousData: true,
-    enabled: !!filters,
+    enabled: !!filters && isSubmitted,
   })
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -128,32 +131,38 @@ export default function CustomerAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setIsSubmitted(true)
+    setPage(0)
+    setSize(20)
+
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
-      if (cell.id === 'mobilePhone') {
-        navigate(`${row.customerId}/thong-tin`, {})
-      } else if (cell.id === 'action') {
-        navigate(`${row.customerId}/thong-tin`, {})
-      }
+      // if (cell.id === 'mobilePhone') {
+      navigate(`${row.customerId}/thong-tin`, {})
+      // } else if (cell.id === 'action') {
+      //   navigate(`${row.customerId}/thong-tin`, {})
+      // }
     }
   }
 
   const onResetFilters = () => {
+    setIsSubmitted(false)
+
     methods.reset({
       search: '',
       cusType: 'all',
@@ -179,10 +188,10 @@ export default function CustomerAccounts(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản KH' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản end-user' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý TK KH">
+        <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
@@ -208,7 +217,7 @@ export default function CustomerAccounts(props: Props) {
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Hoạt động</MenuItem>
-                    <MenuItem value={-1}>Không hoạt động</MenuItem>
+                    <MenuItem value={-1}>Xoá</MenuItem>
                     <MenuItem value={-2}>Khoá</MenuItem>
                     <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                   </SelectDropDown>
@@ -225,7 +234,7 @@ export default function CustomerAccounts(props: Props) {
                 </Grid>
                 <Grid item sm={3} xs={6}>
                   <MuiButton
-                    title="Tạo lại"
+                    title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}

@@ -14,9 +14,7 @@ const App = () => {
     <Provider store={Store}>
       <SettingsProvider>
         <MatxTheme>
-          <AuthProvider>
-            <NavigationScroll>{content}</NavigationScroll>
-          </AuthProvider>
+          <AuthProvider>{content}</AuthProvider>
         </MatxTheme>
       </SettingsProvider>
     </Provider>

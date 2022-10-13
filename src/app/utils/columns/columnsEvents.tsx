@@ -3,7 +3,10 @@ import { Chip, Icon, IconButton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import {
+  DDMMYYYYFormatter,
+  ISODateTimeFormatter,
+} from '../formatters/dateTimeFormatters'
 
 export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
@@ -48,18 +51,10 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     ),
   },
   {
-    id: 'startDate',
-    label: 'Ngày diễn ra',
-    minWidth: 170,
+    id: 'dateActive',
+    label: 'Thời gian diễn ra',
+    minWidth: 200,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
-  },
-  {
-    id: 'endDate',
-    label: 'Ngày kết thúc',
-    minWidth: 170,
-    align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
   },
   {
     id: 'tags',
@@ -68,7 +63,15 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     align: 'center',
     format: (values: any) => {
       return (
-        <>
+        <Box
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '3',
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
           {values.map((val: any) => (
             <Chip
               key={val.id}
@@ -78,7 +81,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
               sx={{ m: 0.5 }}
             />
           ))}
-        </>
+        </Box>
       )
     },
   },

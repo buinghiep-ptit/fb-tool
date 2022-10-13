@@ -1,4 +1,12 @@
-import { Breadcrumbs, Hidden, Icon, styled, useTheme } from '@mui/material'
+import {
+  Breadcrumbs,
+  Hidden,
+  Icon,
+  Stack,
+  styled,
+  Typography,
+  useTheme,
+} from '@mui/material'
 import { NavLink } from 'react-router-dom'
 
 const BreadcrumbRoot = styled('div')(() => ({
@@ -53,7 +61,10 @@ const Breadcrumb = ({ routeSegments }) => {
         sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
       >
         <NavLink to="/">
-          <StyledIcon color="primary">home</StyledIcon>
+          <Stack flexDirection={'row'} alignItems="center" gap={0.5}>
+            <StyledIcon color="primary">home</StyledIcon>
+            <SubName>Trang chủ</SubName>
+          </Stack>
         </NavLink>
 
         {routeSegments

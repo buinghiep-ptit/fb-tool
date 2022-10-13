@@ -91,7 +91,7 @@ export default function AddEvent(props: Props) {
     endDate: Yup.date()
       .when('startDate', (startDate, yup) => {
         if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 86400000)
+          const dayAfter = new Date(startDate.getTime() + 0)
           return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
         }
         return yup

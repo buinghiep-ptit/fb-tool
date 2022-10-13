@@ -51,7 +51,7 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   },
   {
     id: 'type',
-    label: 'Loại media',
+    label: 'Thể loại',
     minWidth: 100,
     align: 'center',
     format: (value: any) => (

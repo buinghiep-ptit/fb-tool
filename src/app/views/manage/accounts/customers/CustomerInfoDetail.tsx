@@ -143,7 +143,8 @@ export default function CustomerDetail(props: Props) {
           then: Yup.string().required(messages.MSG1),
           otherwise: Yup.string(),
         }),
-      displayName: Yup.string()
+      fullName: Yup.string()
+        .required(messages.MSG1)
         .min(0, 'email must be at least 0 characters')
         .max(256, 'email must be at almost 256 characters'),
     },

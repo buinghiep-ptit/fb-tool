@@ -233,7 +233,7 @@ export default function ManagerFeed(props: Props) {
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Email, SĐT, Tên hiển thị'}
                     type="text"
@@ -258,7 +258,7 @@ export default function ManagerFeed(props: Props) {
                     // required
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Hashtag'}
                     type="text"
@@ -281,7 +281,7 @@ export default function ManagerFeed(props: Props) {
                     }
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hợp lệ</MenuItem>
@@ -291,32 +291,13 @@ export default function ManagerFeed(props: Props) {
                     <MenuItem value="-3">Xoá</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={12}>
-                  <FormControl
-                    sx={{
-                      width: '100%',
-                      '& .MuiInputBase-root': {
-                        // height: 40,
-                      },
-                    }}
-                  >
-                    {/* <InputLabel id="demo-simple-select-helper-label">
-                      {'Phạm vi'}
-                    </InputLabel> */}
-
-                    <Select defaultValue={'all'} name="range" disabled>
-                      <MenuItem value="all">Công khai</MenuItem>
-                      <MenuItem value="friends">Bạn bè</MenuItem>
-                      <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  {/* <SelectDropDown name="range" disabled defaultValue={'all'}>
-                  <MenuItem value="all">Công khai</MenuItem>
-                  <MenuItem value="friends">Bạn bè</MenuItem>
-                  <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                </SelectDropDown> */}
-                </Grid>
+                {/* <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="range" disabled defaultValue={'all'}>
+                    <MenuItem value="all">Công khai</MenuItem>
+                    <MenuItem value="friends">Bạn bè</MenuItem>
+                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
+                  </SelectDropDown>
+                </Grid> */}
               </Grid>
               <Grid item sm={4} xs={12} pt={2}>
                 <MuiCheckBox name="isCampdi" label="Feed Campdi" />

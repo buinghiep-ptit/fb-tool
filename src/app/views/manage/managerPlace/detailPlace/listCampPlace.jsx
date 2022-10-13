@@ -211,7 +211,7 @@ export default function ListCampPlace(props) {
               })
             }}
           >
-            Tìm
+            Tìm kiếm
           </Button>
           <TableCustom
             title="Danh sách điểm camp"

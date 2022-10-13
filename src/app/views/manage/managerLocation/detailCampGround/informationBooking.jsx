@@ -59,7 +59,7 @@ export default function InformationBooking({ control, errors, listMerchant }) {
           </Grid>
         )}
         {isBooking === '1' && (
-          <Grid item xs={4} md={4}>
+          <Grid item xs={4} md={4} style={{ paddingRight: '15px' }}>
             <Controller
               name="idMerchant"
               control={control}
@@ -67,38 +67,7 @@ export default function InformationBooking({ control, errors, listMerchant }) {
                 <Autocomplete
                   disablePortal
                   {...field}
-                  options={[
-                    {
-                      name: 'Giang đẹp trai không sợ ai',
-                      id: 11,
-                      mobilePhone: '0396901542',
-                      email: 'kienpnh01@fpt.com.vn',
-                    },
-                    {
-                      name: 'Mama house',
-                      id: 12,
-                      mobilePhone: '0396901542',
-                      email: 'kienpnh13@fpt.com.com',
-                    },
-                    {
-                      name: 'Sông Hồng',
-                      id: 14,
-                      mobilePhone: '0396901542',
-                      email: 'kienpnh123@fpt.com.vn',
-                    },
-                    {
-                      name: 'Sông Hồng 2',
-                      id: 3,
-                      mobilePhone: '0396901542',
-                      email: 'kienpnh@fpt.com.vn',
-                    },
-                    {
-                      name: 'Swagger Dev',
-                      id: 2,
-                      mobilePhone: '123456',
-                      email: 'giangcm@fpt.com.vn',
-                    },
-                  ]}
+                  options={listMerchant}
                   getOptionLabel={option => option.name}
                   onChange={(_, data) => {
                     field.onChange(data)

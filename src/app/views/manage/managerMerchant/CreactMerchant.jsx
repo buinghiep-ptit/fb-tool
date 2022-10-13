@@ -58,8 +58,6 @@ export default function CreateMerchant(props) {
         .min(1)
         .max(20),
       website: yup.string().url(),
-      taxCode: yup.string().required('Vui lòng nhập mã số thuế'),
-      address: yup.string().required('Vui lòng nhập địa chỉ'),
       representative: yup.string().required('Vui lòng nhập người đại diện'),
     })
     .required()
@@ -123,11 +121,11 @@ export default function CreateMerchant(props) {
     newData.email = data.email
     newData.password = data.password
     newData.mobilePhone = data.mobilePhone
-    newData.website = data.website
-    newData.contractNo = data.taxCode
-    newData.businessCode = data.businessModel
+    newData.website = data.website || null
+    newData.contractNo = data.taxCode || null
+    newData.businessCode = data.businessModel || null
     newData.represent = data.representative
-    newData.address = data.address
+    newData.address = data.address || null
     newData.contracts = contracts.map(contract => {
       return {
         mediaType: 4,
@@ -322,7 +320,7 @@ export default function CreateMerchant(props) {
                     error={errors.businessModel}
                     helperText={errors.businessModel?.message}
                     {...field}
-                    label="Mô hình kinh doanh*"
+                    label="Mô hình kinh doanh"
                     margin="normal"
                     multiline
                     rows={10}
@@ -356,7 +354,7 @@ export default function CreateMerchant(props) {
                     error={errors.representative}
                     helperText={errors.representative?.message}
                     {...field}
-                    label="Người đại diện"
+                    label="Người đại diện*"
                     variant="outlined"
                     margin="normal"
                   />

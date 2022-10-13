@@ -363,10 +363,15 @@ export default function InformationPlace(props) {
                 <Autocomplete
                   {...field}
                   multiple
+                  open={false}
+                  popupIcon={''}
+                  sx={{
+                    width: 500,
+                    marginRight: 5,
+                  }}
                   options={[...hashtag]}
                   getOptionLabel={option => option.value}
                   filterSelectedOptions
-                  sx={{ width: 400, marginRight: 5 }}
                   onChange={(_, data) => field.onChange(data)}
                   renderInput={params => (
                     <TextField

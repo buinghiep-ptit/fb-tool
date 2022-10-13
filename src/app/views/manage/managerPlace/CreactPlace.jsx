@@ -355,6 +355,8 @@ export default function CreatePlace(props) {
                   <Autocomplete
                     {...field}
                     multiple
+                    open={false}
+                    popupIcon={''}
                     options={[...hashtag]}
                     getOptionLabel={option => option.value}
                     filterSelectedOptions

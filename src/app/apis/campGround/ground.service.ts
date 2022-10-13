@@ -53,7 +53,7 @@ export const createCampGround = async (params: any): Promise<any> => {
 // Service
 
 export const updateCampGroundServiceStatus = async (id: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/camp-service/${id}/activate`)
+  const { data } = await http.put<any>(`/api/camp-service/${id}/toggle-status`)
   return data
 }
 
@@ -83,8 +83,39 @@ export const getListCampArea = async (): Promise<any> => {
   return data
 }
 
+export const getListCampAreaWithoutProvince = async (): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-areas/select-list-without-province`,
+  )
+  return data
+}
+
 // list merchant
 export const getListMerchant = async (): Promise<any> => {
   const { data } = await http.get<any>(`/api/camp-grounds/merchant-list`)
+  return data
+}
+
+// handbook
+export const getListHandBookLinked = async (
+  id: any,
+  params: any,
+): Promise<any> => {
+  const { data } = await http.get<any>(`/api/camp-grounds/${id}/handbook`, {
+    params,
+  })
+  return data
+}
+
+export const getListHandBookUnLinked = async (
+  id: any,
+  params: any,
+): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-grounds/${id}/unlinked-handbook`,
+    {
+      params,
+    },
+  )
   return data
 }

@@ -45,7 +45,10 @@ export default function ManagerPlace(props) {
             path: '/chi-tiet-dia-danh/',
           }
           convertPlace.quantity = place.campGroundAmount
-          convertPlace.event = place.eventName
+          convertPlace.eventPlace = {
+            active: place.eventActiveAmount,
+            inactive: place.eventInactiveAmount,
+          }
           convertPlace.address = place.address
           convertPlace.type = typeAreas[place.campType]
           convertPlace.status = place.status === 1 ? true : false
@@ -124,7 +127,8 @@ export default function ManagerPlace(props) {
                 })
               }}
             >
-              <Icon>search</Icon>
+              <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}
+              <span>Tìm kiếm</span>
             </Button>
           </Grid>
         </Grid>
@@ -133,7 +137,12 @@ export default function ManagerPlace(props) {
             item
             sm={6}
             xs={6}
-            sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '20px 0',
+              cursor: 'pointer',
+            }}
           >
             <Icon
               fontSize="large"

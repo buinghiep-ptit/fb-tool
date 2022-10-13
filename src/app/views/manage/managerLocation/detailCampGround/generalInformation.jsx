@@ -1,7 +1,17 @@
 import * as React from 'react'
-import { Grid, TextField, Autocomplete } from '@mui/material'
+import {
+  Grid,
+  TextField,
+  Autocomplete,
+  Typography,
+  Button,
+  Stack,
+  Icon,
+} from '@mui/material'
 import { Controller } from 'react-hook-form'
 import { seasons } from '../const'
+import DialogCustom from 'app/components/common/DialogCustom'
+import MapCustom from 'app/components/common/MapCustom/MapCustom'
 
 export default function GeneralInformation({
   control,
@@ -31,6 +41,10 @@ export default function GeneralInformation({
     { label: 'Trekking', id: 5 },
     { label: 'Leo núi', id: 6 },
   ]
+
+  const dialogCustomRef = React.useRef(null)
+  const mapRef = React.useRef()
+  const [createDegrees, setCreateDegrees] = React.useState()
 
   return (
     <div>
@@ -171,6 +185,51 @@ export default function GeneralInformation({
           />
         </Grid>
         <Grid item xs={12} md={12}>
+          <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Button
+              variant="text"
+              onClick={() => {
+                dialogCustomRef.current.handleClickOpen()
+              }}
+            >
+              Chọn vị trí trên bản đồ <Icon>map</Icon>
+            </Button>
+          </Stack>
+          <Stack
+            mt={2}
+            mb={4}
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Typography>Kinh độ:</Typography>
+            <Typography>Vĩ độ:</Typography>
+          </Stack>
+          <Controller
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <TextField
+                error={errors.address}
+                helperText={errors.address?.message}
+                {...field}
+                placeholder="Nhập mô tả lưu ý về địa hình nếu có"
+                label="Lưu ý địa hình"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
           <Controller
             name="campTypes"
             control={control}
@@ -235,6 +294,8 @@ export default function GeneralInformation({
               <Autocomplete
                 {...field}
                 multiple
+                open={false}
+                popupIcon={''}
                 options={[...hashtag]}
                 getOptionLabel={option => option.value}
                 filterSelectedOptions
@@ -256,6 +317,23 @@ export default function GeneralInformation({
           />
         </Grid>
       </Grid>
+      <DialogCustom
+        ref={dialogCustomRef}
+        title="Chọn vị trí trên map"
+        maxWidth="md"
+      >
+        <MapCustom
+          ref={mapRef}
+          center={{
+            lat: 21.027161210811197,
+            lng: 105.78872657468659,
+          }}
+        ></MapCustom>
+        <Stack spacing={2} direction="row" justifyContent="center">
+          <Button variant="contained">Xác nhận</Button>
+          <Button variant="outlined">Hủy</Button>
+        </Stack>
+      </DialogCustom>
     </div>
   )
 }

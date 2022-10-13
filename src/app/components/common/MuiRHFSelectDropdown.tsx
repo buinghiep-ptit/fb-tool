@@ -41,6 +41,7 @@ export function SelectDropDown({
       <Controller
         name={name}
         control={control}
+        defaultValue={defaultValue}
         render={({ field }) => (
           <Select
             {...field}

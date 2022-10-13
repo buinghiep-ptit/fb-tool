@@ -19,7 +19,7 @@ export default function CreateUser({ title }: Props) {
     toastSuccess({ message: 'Thêm mới tài khoản thành công' })
     navigate(-1)
   }
-  const { mutate: createUser } = useCreateUserData(onSuccess)
+  const { mutate: createUser, isLoading } = useCreateUserData(onSuccess)
 
   const onSubmitHandler: SubmitHandler<any> = (values: any) => {
     createUser({
@@ -37,6 +37,7 @@ export default function CreateUser({ title }: Props) {
       open={isModal}
       onCloseModal={handleClose}
       onSubmit={methods.handleSubmit(onSubmitHandler)}
+      isLoading={isLoading}
       submitText="Lưu"
       cancelText="Huỷ"
     >

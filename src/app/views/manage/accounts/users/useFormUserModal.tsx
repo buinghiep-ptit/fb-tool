@@ -15,6 +15,8 @@ const useFormUserModal = (data?: any) => {
       .required('Email là bắt buộc'),
   })
 
+  console.log('data:', data)
+
   const methods = useForm<any>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),

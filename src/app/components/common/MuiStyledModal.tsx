@@ -112,6 +112,7 @@ export default function MuiStyledModal({
         >
           {onSubmit && (
             <MuiButton
+              disabled={isLoading}
               title={submitText}
               variant="contained"
               color="primary"

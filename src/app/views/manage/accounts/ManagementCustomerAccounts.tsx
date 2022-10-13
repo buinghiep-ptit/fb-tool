@@ -151,7 +151,7 @@ export default function CustomerAccounts(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
+    if (cell.action || cell.link) {
       // if (cell.id === 'mobilePhone') {
       navigate(`${row.customerId}/thong-tin`, {})
       // } else if (cell.id === 'action') {

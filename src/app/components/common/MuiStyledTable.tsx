@@ -61,6 +61,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     if (cell.action) {
       return cell.action(value ? value : row.status)
     }
+    if (cell.link) {
+      return cell.link(value)
+    }
     return cell.format ? cell.format(value) : value
   }
 
@@ -119,7 +122,10 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           sx={{
                             minWidth: column.minWidth,
                             px: 1.5,
-                            cursor: column.action ? 'pointer' : 'default',
+                            cursor:
+                              column.action || column.link
+                                ? 'pointer'
+                                : 'default',
                             // whiteSpace: 'nowrap',
                             // textOverflow: 'ellipsis',
                             // overflow: 'hidden',

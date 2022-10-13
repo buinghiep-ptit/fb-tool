@@ -19,7 +19,7 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'content',
     label: 'Nội dung',
-    minWidth: 200,
+    minWidth: 250,
     align: 'left',
     format: (value: number) => (
       <Typography
@@ -66,7 +66,7 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'status',
     label: 'Trạng thái',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     status: (value: any) => LabelFormatter(value, 'feed'),
   },

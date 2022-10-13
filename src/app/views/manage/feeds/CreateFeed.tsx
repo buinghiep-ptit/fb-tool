@@ -30,6 +30,7 @@ import { useCreateFeed } from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
+  ICustomerDetail,
   ICustomerResponse,
   ICustomerTiny,
   IFeedDetail,
@@ -38,6 +39,7 @@ import {
 } from 'app/models'
 import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -47,9 +49,9 @@ export interface Props {}
 
 type SchemaType = {
   type?: 1 | 2
-  cusType?: number
+  cusType?: number | string
   customer?: any // idCustomer
-  idSrcType?: number
+  idSrcType?: number | string
   camp?: any // idSrc
   webUrl?: string
   content?: string
@@ -80,29 +82,36 @@ export default function CreateFeed(props: Props) {
   })
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
-    cusType: 0,
-    idSrcType: 1,
-    customer: null,
+    cusType: '',
+    idSrcType: '',
     hashtag: [],
   })
   const [filters, setFilters] = useState({ cusType: 0 })
 
   const validationSchema = Yup.object().shape({
-    customer: Yup.object().required('Thông tin bắt buốc').nullable(),
-    idSrcType: Yup.string().required(),
+    cusType: Yup.string().required(messages.MSG1),
+    customer: Yup.object()
+      .nullable()
+      .when(['cusType'], {
+        is: (cusType: string) => !!cusType && Number(cusType) !== 0,
+        then: Yup.object().required(messages.MSG1).nullable(),
+      }),
+    idSrcType: Yup.string().required(messages.MSG1),
     camp: Yup.object()
+      .nullable()
       .when(['idSrcType'], {
-        is: (idSrcType: any) => Number(idSrcType) !== 4,
-        then: Yup.object().required('Thông tin bắt buốc').nullable(), // when camp selected empty
+        is: (idSrcType: any) => !!idSrcType && Number(idSrcType) !== 4,
+        then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
       })
       .nullable(),
-    webUrl: Yup.string().when(['idSrcType'], {
-      is: (idSrcType: any) => Number(idSrcType) === 4,
-      then: Yup.string().required('Thông tin bắt buốc'),
-    }),
-    content: Yup.string().required('Nội dung không được bỏ trống'),
+    webUrl: Yup.string()
+      .nullable()
+      .when(['idSrcType'], {
+        is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 4,
+        then: Yup.string().required(messages.MSG1).nullable(),
+      }),
     files: Yup.mixed()
-      .required('Vui lòng chọn file')
+      .required(messages.MSG1)
       .test(
         'fileSize',
         fileConfigs.mediaFormat === EMediaFormat.VIDEO
@@ -110,6 +119,7 @@ export default function CreateFeed(props: Props) {
           : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
+    hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
   })
 
   const methods = useForm<SchemaType>({
@@ -170,7 +180,19 @@ export default function CreateFeed(props: Props) {
     } else {
       accounts = [customerCampdi] ?? []
     }
-    setAccountList([...accounts])
+    const newAccounts = accounts.map((acc: ICustomerDetail) => {
+      const labelText =
+        (acc?.fullName ?? '') +
+        '_' +
+        (acc?.email ?? '') +
+        '_' +
+        (acc?.mobilePhone ?? '')
+      return {
+        ...acc,
+        labelText,
+      }
+    })
+    setAccountList([...newAccounts])
     // methods.setValue('customer', accounts.length && accounts[0])
   }, [methods.setValue, methods.watch('cusType'), customers, customerCampdi])
 
@@ -199,7 +221,7 @@ export default function CreateFeed(props: Props) {
       webUrl: values.webUrl,
       idCustomer:
         Number(values.cusType) === 0
-          ? (values.customer as any)?.id
+          ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
       video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
@@ -214,6 +236,7 @@ export default function CreateFeed(props: Props) {
 
   const onRowUpdateSuccess = (data: any) => {
     toastSuccess({ message: 'Thêm mới thành công' })
+    navigate('/quan-ly-feeds', {})
     setMediasSrcPreviewer([])
     methods.reset()
   }
@@ -282,7 +305,8 @@ export default function CreateFeed(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
       >
         <MuiButton
-          title="Xác nhận tạo bài"
+          title="Lưu"
+          disabled={uploading}
           variant="contained"
           color="primary"
           type="submit"
@@ -290,9 +314,10 @@ export default function CreateFeed(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
-          title="Huỷ tạo"
+          title="Xoá"
+          disabled={uploading}
           variant="contained"
-          color="secondary"
+          color="warning"
           onClick={() => {
             setMediasSrcPreviewer([])
             removeSelectedFiles()
@@ -300,90 +325,104 @@ export default function CreateFeed(props: Props) {
           }}
           startIcon={<Icon>clear</Icon>}
         />
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate('/quan-ly-feeds', {})}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
       </Stack>
-      <SimpleCard title="Post bài">
+      <SimpleCard>
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
           <FormProvider {...methods}>
             <Grid container spacing={3}>
-              <Grid item sm={5} xs={12}>
+              <Grid item sm={6} xs={12}>
                 <Stack gap={3}>
                   <Stack>
-                    <SelectDropDown name="type" label="Loại file">
+                    <SelectDropDown name="type" label="Loại post*">
                       <MenuItem value={1}>Video</MenuItem>
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
                   </Stack>
                   <Stack>
-                    <SelectDropDown name="cusType" label="Loại tài khoản">
+                    <SelectDropDown name="cusType" label="Loại tài khoản*">
                       <MenuItem value="0">Campdi</MenuItem>
                       <MenuItem value="1">Campdi (food)</MenuItem>
                       <MenuItem value="2">KOL</MenuItem>
                     </SelectDropDown>
                   </Stack>
-                  <Stack
-                    flexDirection={'row'}
-                    gap={1.5}
-                    justifyContent="center"
-                  >
-                    <MuiTypography fontSize="12px" fontStyle="italic">
-                      Tài khoản post *
-                    </MuiTypography>
-                    <Box sx={{ flex: 1 }}>
-                      {/* <MuiAutoComplete
+
+                  {Number(methods.watch('cusType') ?? 0) !== 0 && (
+                    <Stack
+                      flexDirection={'row'}
+                      gap={1.5}
+                      justifyContent="center"
+                    >
+                      <MuiTypography fontSize="12px" fontStyle="italic">
+                        Tài khoản post*
+                      </MuiTypography>
+                      <Box sx={{ flex: 1 }}>
+                        {/* <MuiAutoComplete
                         itemList={accountList}
                         name="customer"
                         disabled={Number(methods.getValues('cusType')) === 0}
                       /> */}
-                      <MuiRHFAutoComplete
-                        name="customer"
-                        label="Tài khoản post"
-                        options={accountList}
-                        optionProperty="fullName"
-                        getOptionLabel={option => option.fullName ?? ''}
-                        defaultValue=""
-                      />
-                    </Box>
-                  </Stack>
+                        <MuiRHFAutoComplete
+                          name="customer"
+                          label="Tài khoản post"
+                          options={accountList ?? []}
+                          optionProperty="labelText"
+                          getOptionLabel={option => option.labelText ?? ''}
+                          defaultValue=""
+                        />
+                      </Box>
+                    </Stack>
+                  )}
+
                   <Stack>
-                    <SelectDropDown name="idSrcType" label="Liên kết">
+                    <SelectDropDown name="idSrcType" label="Liên kết với">
                       <MenuItem value="1">Địa danh</MenuItem>
                       <MenuItem value="2">Điểm Camp</MenuItem>
                       <MenuItem value="4">Sản phẩm</MenuItem>
                     </SelectDropDown>
                   </Stack>
-                  <Stack
-                    flexDirection={'row'}
-                    gap={1.5}
-                    justifyContent="center"
-                  >
-                    <MuiTypography fontSize="12px" fontStyle="italic">
-                      {getTitleLinked(Number(methods.watch('idSrcType')))} *
-                    </MuiTypography>
-                    <Box sx={{ flex: 1 }}>
-                      {Number(methods.watch('idSrcType')) !== 4 ? (
-                        <MuiRHFAutoComplete
-                          name="camp"
-                          options={
-                            Number(methods.watch('idSrcType')) === 1
-                              ? campAreas?.content ?? []
-                              : campGrounds?.content ?? []
-                          }
-                          optionProperty="name"
-                          getOptionLabel={option => option.name ?? ''}
-                          defaultValue=""
-                        />
-                      ) : (
-                        <FormInputText
-                          type="text"
-                          name="webUrl"
-                          placeholder="Chèn link"
-                          size="small"
-                          fullWidth
-                          defaultValue={'https://shopee.vn/'}
-                        />
-                      )}
-                    </Box>
-                  </Stack>
+                  {!!methods.watch('idSrcType') && (
+                    <Stack
+                      flexDirection={'row'}
+                      gap={1.5}
+                      justifyContent="center"
+                    >
+                      <MuiTypography fontSize="12px" fontStyle="italic">
+                        {getTitleLinked(Number(methods.watch('idSrcType')))} *
+                      </MuiTypography>
+
+                      <Box sx={{ flex: 1 }}>
+                        {Number(methods.watch('idSrcType')) !== 4 ? (
+                          <MuiRHFAutoComplete
+                            name="camp"
+                            options={
+                              Number(methods.watch('idSrcType')) === 1
+                                ? campAreas?.content ?? []
+                                : campGrounds?.content ?? []
+                            }
+                            optionProperty="name"
+                            getOptionLabel={option => option.name ?? ''}
+                            defaultValue=""
+                          />
+                        ) : (
+                          <FormInputText
+                            type="text"
+                            name="webUrl"
+                            placeholder="Chèn link"
+                            size="small"
+                            fullWidth
+                            defaultValue=""
+                          />
+                        )}
+                      </Box>
+                    </Stack>
+                  )}
 
                   <Stack>
                     <FormTextArea
@@ -402,7 +441,7 @@ export default function CreateFeed(props: Props) {
 
               <Grid
                 item
-                sm={7}
+                sm={6}
                 xs={12}
                 justifyContent="center"
                 alignItems={'center'}
@@ -416,7 +455,7 @@ export default function CreateFeed(props: Props) {
                   <Box
                     width={{
                       sx: '100%',
-                      md: fileConfigs.mediaFormat === 1 ? 300 : 500,
+                      md: fileConfigs.mediaFormat === 1 ? 300 : 450,
                     }}
                     position="relative"
                   >
@@ -440,18 +479,6 @@ export default function CreateFeed(props: Props) {
             </Grid>
           </FormProvider>
         </form>
-
-        <Stack flexDirection={'row'} justifyContent={'flex-end'} mt={2}>
-          <MuiButton
-            title="Xem danh sách bài feed"
-            loading={false}
-            variant="text"
-            color="primary"
-            onClick={() => navigate('/quan-ly-feeds', {})}
-            sx={{ fontSize: '1rem' }}
-            endIcon={<Icon>arrow_forward</Icon>}
-          />
-        </Stack>
       </SimpleCard>
     </Container>
   )

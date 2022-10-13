@@ -63,7 +63,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     id: 'tags',
     label: 'Hashtag',
     minWidth: 170,
-    align: 'center',
+    align: 'left',
     format: (values: any) => {
       return (
         <Box

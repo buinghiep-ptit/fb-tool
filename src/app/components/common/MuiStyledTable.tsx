@@ -69,7 +69,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
 
   return (
     <>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer sx={{ maxHeight: 720 }}>
         <Table stickyHeader aria-label="sticky table">
           {!isFetching && (
             <TableHead>

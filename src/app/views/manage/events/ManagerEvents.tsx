@@ -212,7 +212,7 @@ export default function ManagerEvents(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý sự kiện">
+        <SimpleCard>
           <form
             onSubmit={methods.handleSubmit(onSubmitHandler)}
             noValidate
@@ -222,11 +222,11 @@ export default function ManagerEvents(props: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Tên sự kiện/Địa chỉ'}
+                    label={'Tên sự kiện'}
                     type="text"
                     name="areaNameOrAddress"
                     defaultValue=""
-                    placeholder="Nhập tên sự kiện, địa chỉ"
+                    placeholder="Nhập tên sự kiện"
                     fullWidth
                   />
                 </Grid>

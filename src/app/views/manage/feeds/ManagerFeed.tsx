@@ -229,7 +229,7 @@ export default function ManagerFeed(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý Feed">
+        <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>

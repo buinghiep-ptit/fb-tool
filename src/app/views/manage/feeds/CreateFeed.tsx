@@ -348,7 +348,7 @@ export default function CreateFeed(props: Props) {
                   <Stack>
                     <SelectDropDown name="cusType" label="Loại tài khoản*">
                       <MenuItem value="0">Campdi</MenuItem>
-                      <MenuItem value="1">Campdi (food)</MenuItem>
+                      <MenuItem value="3">Campdi (food)</MenuItem>
                       <MenuItem value="2">KOL</MenuItem>
                     </SelectDropDown>
                   </Stack>

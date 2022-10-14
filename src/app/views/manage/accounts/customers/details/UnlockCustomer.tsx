@@ -11,6 +11,8 @@ import React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { lockDetail } from 'app/apis/accounts/customer.service'
 
 type Props = {
   title: string
@@ -34,13 +36,23 @@ export default function LockCustomer({ title }: Props) {
   const validationSchema = Yup.object().shape({
     reason: Yup.string()
       .required('Lý do không được bỏ trống')
-      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const { data: lock }: UseQueryResult<any, Error> = useQuery<any, Error>(
+    ['lock', customerId],
+    () => lockDetail(Number(customerId ?? 0)),
+    {
+      enabled: !!customerId,
+    },
+  )
+
+  console.log(lock)
 
   const { mutate: unlockCustomer, isLoading } = useUnLockCustomer(onSuccess)
 
@@ -125,9 +137,13 @@ export default function LockCustomer({ title }: Props) {
 
             <Stack flexDirection={'row'} gap={2}>
               <MuiTypography variant="subtitle2">Lý do khoá:</MuiTypography>
-              <MuiTypography variant="body2" pb={1} flex={1}>
-                Tuyên truyền văn hoá phẩm đồi bại. Ảnh hưởng đến thuần phong mỹ
-                tục của con người
+              <MuiTypography
+                variant="body2"
+                pb={1}
+                flex={1}
+                sx={{ whiteSpace: 'pre-line' }}
+              >
+                {lock && lock.reason}
               </MuiTypography>
             </Stack>
 

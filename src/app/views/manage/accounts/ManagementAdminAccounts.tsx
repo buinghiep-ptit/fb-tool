@@ -91,10 +91,10 @@ export default function AdminAccounts(props: Props) {
   const validationSchema = Yup.object().shape({
     account: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
     email: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
+      .max(255, 'email must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({

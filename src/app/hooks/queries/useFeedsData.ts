@@ -37,6 +37,7 @@ export const useApproveFeed = (onSuccess?: any, onError?: any) => {
     onSettled: () => {
       queryClient.invalidateQueries(['posts-check'])
       queryClient.invalidateQueries(['feed'])
+      queryClient.invalidateQueries(['feeds'])
     },
     onSuccess,
   })
@@ -47,6 +48,7 @@ export const useDeleteFeed = (onSuccess?: any, onError?: any) => {
   return useMutation((feedId: number) => deleteFeed(feedId), {
     onSettled: () => {
       queryClient.invalidateQueries(['feed'])
+      queryClient.invalidateQueries(['feeds'])
     },
     onSuccess,
   })
@@ -65,6 +67,7 @@ export const useViolateFeed = (onSuccess?: any, onError?: any) => {
       onSettled: () => {
         queryClient.invalidateQueries(['posts-check'])
         queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['feeds'])
       },
       onSuccess,
     },

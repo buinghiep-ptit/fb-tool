@@ -80,7 +80,7 @@ export default function ManagerEvents(props: Props) {
   const validationSchema = Yup.object().shape({
     areaNameOrAddress: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -240,7 +240,6 @@ export default function ManagerEvents(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}></Grid>
                 <Grid item sm={3} xs={12}>
                   <MuiButton
                     onClick={() => navigate(`them-moi-su-kien`, {})}

@@ -58,7 +58,7 @@ export default function CustomerAccounts(props: Props) {
     status: queryParams.status ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
-    sort: 'fullName,asc',
+    sort: 'dateCreated,desc',
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(

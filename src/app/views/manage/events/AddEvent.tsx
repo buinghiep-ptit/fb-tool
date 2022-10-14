@@ -148,6 +148,7 @@ export default function AddEvent(props: Props) {
     () => getEventDetail(Number(eventId ?? 0)),
     {
       enabled: !!eventId,
+      staleTime: 5 * 60 * 1000,
     },
   )
 
@@ -198,7 +199,7 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    const files = [...mediasSrcPreviewer].map(file => ({
+    const files = fileInfos.map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
       url: file.url,

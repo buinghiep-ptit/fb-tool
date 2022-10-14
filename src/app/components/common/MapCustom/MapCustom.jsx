@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import GoogleMapReact from 'google-map-react'
 import { Icon, Typography } from '@mui/material'
 import SearchBox from './SearchBox'
-import { cloneDeep } from 'lodash'
+
 const cssMarker = {
   color: 'red',
   fontSize: '40px',

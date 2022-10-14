@@ -43,7 +43,10 @@ export default function InformationCampGround({ action }) {
   const [description, setDescription] = React.useState()
   const [listMerchant, setListMerchant] = React.useState([])
   const params = useParams()
-
+  const [createDegrees, setCreateDegrees] = React.useState({
+    lat: 21.027161210811197,
+    lng: 105.78872657468659,
+  })
   const introductionRef = React.useRef()
 
   const navigate = useNavigate()
@@ -98,8 +101,9 @@ export default function InformationCampGround({ action }) {
       campTypes: [],
       isSupportBooking: 1,
       idMerchant: null,
-      latitude: 0,
-      longitude: 0,
+      latitude: 21.027161210811197,
+      longitude: 105.78872657468659,
+      note: '',
     },
   })
 
@@ -184,9 +188,10 @@ export default function InformationCampGround({ action }) {
     dataUpdate.closeTime = data.closeTime
     dataUpdate.address = data.address
     dataUpdate.capacity = data.capacity
-    dataUpdate.latitude = 0
-    dataUpdate.longitude = 0
+    dataUpdate.latitude = data.latitude
+    dataUpdate.longitude = data.longitude
     dataUpdate.isPopular = 0
+    dataUpdate.noteTopography = data.note
     dataUpdate.status = data.status
     dataUpdate.campAreas = data.campAreas.map(areas => areas.id)
     dataUpdate.tags = data.hashtag.map(tag => {
@@ -242,6 +247,11 @@ export default function InformationCampGround({ action }) {
               'idMerchant',
               merchants.filter(merchant => merchant.id == data.idMerchant)[0],
             )
+            setCreateDegrees({
+              lat: data.latitude,
+              lng: data.longitude,
+            })
+            setValue('note', data.noteTopography)
             setMedias(data.medias)
             setIdMerchant(data.idMerchant)
             setHashtag(data.tags)
@@ -361,6 +371,8 @@ export default function InformationCampGround({ action }) {
             setValue={setValue}
             hashtag={hashtag}
             campAreas={campAreas}
+            createDegrees={createDegrees}
+            setCreateDegrees={setCreateDegrees}
           />
         </AccordionDetails>
       </Accordion>

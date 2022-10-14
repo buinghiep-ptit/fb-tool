@@ -119,3 +119,11 @@ export const getListHandBookUnLinked = async (
   )
   return data
 }
+
+export const removeHandBookWithCamp = async (params: any): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/camp-grounds/remove-handbook`,
+    params,
+  )
+  return data
+}

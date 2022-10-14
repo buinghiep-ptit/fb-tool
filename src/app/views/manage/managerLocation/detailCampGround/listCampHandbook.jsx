@@ -7,8 +7,7 @@ import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
 import {
-  deleteCampGroundService,
-  updateCampGroundServiceStatus,
+  removeHandBookWithCamp,
   getListHandBookLinked,
   getListHandBookUnLinked,
 } from 'app/apis/campGround/ground.service'
@@ -16,6 +15,7 @@ import { cloneDeep } from 'lodash'
 import { useParams } from 'react-router-dom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import { Stack } from '@mui/system'
+import ListHandBookUnlinked from './listHandBookUnlinked'
 
 export default function ListCampHandBook(props) {
   const [listHandBookLinked, setListHandBookLinked] = useState([])
@@ -28,23 +28,17 @@ export default function ListCampHandBook(props) {
   const fetchListHandBookLinked = async param => {
     await getListHandBookLinked(params.id, param)
       .then(data => {
-        // const newList = cloneDeep(data.content).map(campGroundService => {
-        //   const convertCampGroundService = {}
-        //   convertCampGroundService.id = campGroundService.id
-        //   convertCampGroundService.image = campGroundService.imgUrl
-        //   convertCampGroundService.linkDetail = {
-        //     link: campGroundService.name,
-        //     path: '/chi-tiet-diem-camp/',
-        //   }
-        //   convertCampGroundService.type = campGroundService.type
-        //   convertCampGroundService.quantity = campGroundService.capacity
-        //   convertCampGroundService.status =
-        //     campGroundService.status === 1 ? true : false
-        //   convertCampGroundService.action = ['edit', 'delete']
-        //   return convertCampGroundService
-        // })
-        // setListCampGroundService(newList)
-        // setTotalListCampgroundService(data.totalElements)
+        const newList = cloneDeep(data.content).map(handbook => {
+          const convertHandBook = {}
+          convertHandBook.id = handbook.id
+          convertHandBook.nameHandBook = handbook.title
+          convertHandBook.creator = handbook.userName
+          convertHandBook.status = handbook.status == 1 ? true : false
+          convertHandBook.action = ['delete']
+          return convertHandBook
+        })
+        setListHandBookLinked(newList)
+        setTotalListHandBookLinked(data.totalElements)
       })
       .catch(err => console.log(err))
   }
@@ -55,14 +49,21 @@ export default function ListCampHandBook(props) {
         const newList = cloneDeep(data.content).map(handbook => {
           const convertHandBook = {}
           convertHandBook.id = handbook.id
-          convertHandBook.nameHandBook = handbook.title
-          convertHandBook.action = ['edit']
+          convertHandBook.title = handbook.title
           return convertHandBook
         })
         setListHandBookUnLinked(newList)
         setTotalListHandBookUnLinked(data.totalElements)
       })
       .catch(err => console.log(err))
+  }
+
+  const onRemoveHandBookWithCamp = async id => {
+    const res = await removeHandBookWithCamp({
+      idCampGround: params.id,
+      idHandBook: id,
+    })
+    return res
   }
 
   React.useEffect(() => {
@@ -118,10 +119,10 @@ export default function ListCampHandBook(props) {
         dataTable={listHandBookLinked || []}
         tableModel={tableModelHandBook}
         pagination={true}
-        // onDeleteData={deleteCampGroundService}
+        onDeleteData={onRemoveHandBookWithCamp}
         // updateStatus={updateCampGroundServiceStatus}
-        // totalData={parseInt(totalListCampGroundService, 0)}
-        // fetchDataTable={fetchListHandBookLinked}
+        totalData={parseInt(totalListHandBookLinked, 0)}
+        fetchDataTable={fetchListHandBookLinked}
         filter={{}}
       />
 
@@ -155,7 +156,7 @@ export default function ListCampHandBook(props) {
               Tìm kiếm
             </Button>
           </Stack>
-
+          {/* 
           <TableCustom
             title="Danh sách cẩm nang"
             tableModel={tableModelHandBookUnLinked}
@@ -167,7 +168,10 @@ export default function ListCampHandBook(props) {
             }}
             // onAddData={linkCampOnArea}
             // filter={{ name: filterCamp }}
-          />
+          /> */}
+          <ListHandBookUnlinked
+            tableData={listHandBookUnLinked}
+          ></ListHandBookUnlinked>
           <Stack spacing={2} direction="row" mt={2}>
             <Button
               variant="outlined"

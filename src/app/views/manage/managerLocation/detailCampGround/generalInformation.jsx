@@ -25,6 +25,8 @@ export default function GeneralInformation({
   setValue,
   hashtag,
   campAreas,
+  createDegrees,
+  setCreateDegrees,
 }) {
   const addHashTag = e => {
     if (e.keyCode === 13) {
@@ -44,7 +46,6 @@ export default function GeneralInformation({
 
   const dialogCustomRef = React.useRef(null)
   const mapRef = React.useRef()
-  const [createDegrees, setCreateDegrees] = React.useState()
 
   return (
     <div>
@@ -209,8 +210,8 @@ export default function GeneralInformation({
             alignItems="center"
             justifyContent="center"
           >
-            <Typography>Kinh độ:</Typography>
-            <Typography>Vĩ độ:</Typography>
+            <Typography>Kinh độ: {createDegrees.lat}</Typography>
+            <Typography>Vĩ độ: {createDegrees.lng}</Typography>
           </Stack>
           <Controller
             control={control}
@@ -322,16 +323,28 @@ export default function GeneralInformation({
         title="Chọn vị trí trên map"
         maxWidth="md"
       >
-        <MapCustom
-          ref={mapRef}
-          center={{
-            lat: 21.027161210811197,
-            lng: 105.78872657468659,
-          }}
-        ></MapCustom>
+        <MapCustom ref={mapRef} center={createDegrees}></MapCustom>
         <Stack spacing={2} direction="row" justifyContent="center">
-          <Button variant="contained">Xác nhận</Button>
-          <Button variant="outlined">Hủy</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              const value = mapRef.current.getCreateDegrees()
+              setCreateDegrees(value)
+              setValue('latitude', value.lat)
+              setValue('longitude', value.lng)
+              dialogCustomRef.current.handleClose()
+            }}
+          >
+            Xác nhận
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              dialogCustomRef.current.handleClose()
+            }}
+          >
+            Hủy
+          </Button>
         </Stack>
       </DialogCustom>
     </div>

@@ -1,7 +1,11 @@
 import Loadable from 'app/components/Loadable'
+import { navCustomerDetail } from 'app/utils/navbars'
 import { lazy } from 'react'
-import { Outlet } from 'react-router-dom'
-import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
+// import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
+import CreateMerchant from './managerMerchant/CreactMerchant'
+import { Navigate, Outlet } from 'react-router-dom'
+import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
+import { ROLES } from 'app/utils/enums/roles'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -24,18 +28,17 @@ const LockCustomer = Loadable(
 const UnlockCustomer = Loadable(
   lazy(() => import('./accounts/customers/details/UnlockCustomer')),
 )
-const CustomerHistory = Loadable(
-  lazy(() => import('./accounts/customers/CustomerOrderHistoryDetail')),
+const OrdersHistoryTab = Loadable(
+  lazy(() => import('./accounts/customers/OrdersHistoryTab')),
 )
 
 const ManagerFeed = Loadable(lazy(() => import('./feeds/ManagerFeed')))
 const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
-const PostCheck = Loadable(lazy(() => import('./feeds/PostCheck')))
-const ReportInfringe = Loadable(lazy(() => import('./feeds/ReportInfringe')))
+const PostsCheck = Loadable(lazy(() => import('./feeds/PostsCheck')))
+const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
-const ManagerToolPostFeed = Loadable(
-  lazy(() => import('./ManagerToolPostFeed')),
-)
+const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
+const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 
@@ -56,6 +59,10 @@ const DetailCampGround = Loadable(
 )
 const ManagerLocation = Loadable(lazy(() => import('./managerLocation')))
 const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
+const UpdateMerchant = Loadable(
+  lazy(() => import('./managerMerchant/updateMerchant')),
+)
+
 const ManagementRoutes = [
   {
     path: '/quan-ly-tai-khoan-admin',
@@ -72,24 +79,27 @@ const ManagementRoutes = [
       },
       {
         path: 'them-moi',
-        element: <CreateUser title="Thêm mới tài khoản" />,
+        element: <CreateUser title="Thêm tài khoản" />,
       },
     ],
+    auth: [ROLES.ADMIN],
   },
-  { path: '/quan-ly-tai-khoan-khach-hang', element: <CustomerAccounts /> },
+  {
+    path: '/quan-ly-tai-khoan-khach-hang',
+    element: <CustomerAccounts />,
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
   {
     path: '/quan-ly-tai-khoan-khach-hang/:customerId',
     element: (
-      <>
-        <LayoutCustomer>
-          <Outlet />
-        </LayoutCustomer>
-      </>
+      <LayoutWithNavTabs navInfo={navCustomerDetail as any}>
+        <Outlet />
+      </LayoutWithNavTabs>
     ),
     children: [
       {
         // index: true,
-        path: 'info',
+        path: 'thong-tin',
         element: (
           <>
             <CustomerDetail />
@@ -103,15 +113,15 @@ const ManagementRoutes = [
           },
           {
             path: 'mo-khoa-tai-khoan',
-            element: <UnlockCustomer title="Mở khoá tài khoản" />,
+            element: <UnlockCustomer title="Mở khoá" />,
           },
           {
             path: 'khoa-tai-khoan',
-            element: <LockCustomer title="Khoá tài khoản" />,
+            element: <LockCustomer title="Khoá" />,
           },
         ],
       },
-      { path: 'history', element: <CustomerHistory /> },
+      { path: 'lich-su-dat-cho', element: <OrdersHistoryTab /> },
     ],
   },
   {
@@ -119,39 +129,123 @@ const ManagementRoutes = [
     element: (
       <>
         <ManagerFeed />
-        {/* <Outlet /> */}
+        <Outlet />
       </>
     ),
-    // children: [{ path: 'report-infringe', element: <ReportInfringe /> }],
+    children: [
+      {
+        path: 'ds/:feedId/vi-pham',
+        element: <ReportDialog title="Báo cáo vi phạm" />,
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
-  { path: '/quan-ly-feeds/:feedId', element: <FeedDetail /> },
-  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportInfringe /> },
+  {
+    path: '/quan-ly-feeds/:feedId',
+    element: (
+      <>
+        <FeedDetail />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: 'vi-pham',
+        element: <ReportDialog title="Vi phạm" />,
+      },
+    ],
+  },
+  { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportDialog /> }, // ?? unused
   {
     path: '/quan-ly-feeds/hau-kiem',
     element: (
       <>
-        <PostCheck />
+        <PostsCheck />
         <Outlet />
       </>
     ),
     children: [
       {
         path: ':feedId/vi-pham',
-        element: <ReportInfringe title="Vi phạm" />,
+        element: <ReportDialog title="Báo cáo vi phạm" />,
       },
     ],
   },
-  { path: '/tool-post-bai-feed', element: <ManagerToolPostFeed /> },
-  { path: '/quan-ly-su-kien', element: <ManagerEvents /> },
-  { path: '/quan-ly-su-kien/them-moi-su-kien', element: <AddEvent /> },
+  {
+    path: '/them-moi-feed',
+    element: <CreateFeed />,
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-su-kien',
+    element: <ManagerEvents />,
+  },
+  {
+    path: '/quan-ly-su-kien/them-moi-su-kien',
+    element: <AddEvent />,
+  },
   { path: '/quan-ly-su-kien/:eventId/*', element: <AddEvent /> },
+  {
+    path: '/quan-ly-don-hang',
+    children: [
+      {
+        index: true,
+        element: <Navigate to="xu-ly" replace />,
+      },
+      {
+        path: ':source',
+        children: [
+          { index: true, element: <OrdersHistory /> },
+          // { path: ':orderId', element: <OrderDetail /> },
+        ],
+      },
+      {
+        path: ':source/:orderId',
+        element: (
+          <>
+            <OrderDetail />
+            <Outlet />
+          </>
+        ),
+        children: [
+          {
+            path: 'het-cho',
+            element: <UnAvailableOrder title="Chi tiết đơn hàng (Hết chỗ)" />,
+          },
+          {
+            path: 'con-cho',
+            element: (
+              <AvailablePayment title="Chi tiết đơn hàng (Còn chỗ, chờ thanh toán)" />
+            ),
+          },
+        ],
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,
   },
   {
+    path: '/quan-ly-thong-tin-doi-tac',
+    element: <ManagerMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
+  },
+  {
     path: '/them-dia-danh',
     element: <CreatePlace />,
+  },
+  {
+    path: '/them-doi-tac',
+    element: <CreateMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
+  },
+  {
+    path: '/cap-nhat-thong-tin-doi-tac/:id',
+    element: <UpdateMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     path: '/chi-tiet-dia-danh/:id',
@@ -159,10 +253,18 @@ const ManagementRoutes = [
   },
   {
     path: '/chi-tiet-diem-camp/:id',
-    element: <DetailCampGround />,
+    element: <DetailCampGround action="edit" />,
+  },
+  {
+    path: '/them-diem-camp',
+    element: <DetailCampGround action="create" />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
-  { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
+  {
+    path: '/quan-ly-dich-vu',
+    element: <ManagerServices />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
+  },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
   {
     path: '/quan-ly-dich-vu/chi-tiet-dich-vu',

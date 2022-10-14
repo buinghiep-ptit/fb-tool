@@ -1,4 +1,4 @@
-import { uploadImage } from 'app/apis/uploads/upload.service'
+import { uploadFile } from 'app/apis/uploads/upload.service'
 import { useRef, useState } from 'react'
 
 export type FileInfoResult = {
@@ -14,6 +14,8 @@ export type FileInfoProgress = {
 }
 
 export const useUploadFiles = () => {
+  const abortController = useRef(null) as any
+
   const [uploading, setUploading] = useState<boolean>(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [progressInfos, setProgressInfos] = useState<{
@@ -28,22 +30,29 @@ export const useUploadFiles = () => {
     setProgressInfos({ val: [] })
   }
 
-  const upload = (file: any, idx: number) => {
+  const upload = (file: any, idx: number, mediaFormat?: 1 | 2) => {
+    abortController.current = new AbortController()
+
     if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
 
-    return uploadImage(file, (event: any) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total,
-      )
-      setProgressInfos({ val: _progressInfos as any })
-    })
+    return uploadFile(
+      mediaFormat,
+      file,
+      (event: any) => {
+        _progressInfos[idx].percentage = Math.round(
+          (100 * event.loaded) / event.total,
+        )
+        setProgressInfos({ val: _progressInfos as any })
+      },
+      abortController.current,
+    )
       .then(result => {
         setMessage(prevMessage => [
           ...prevMessage,
           'Uploaded the file successfully: ' + file.name,
         ])
-        return result
+        return { ...result, mediaFormat }
       })
       .catch(() => {
         _progressInfos[idx].percentage = 0
@@ -56,7 +65,19 @@ export const useUploadFiles = () => {
       })
   }
 
-  const uploadFiles = async (files?: File[]) => {
+  const cancelUpload = () => {
+    abortController.current && abortController.current.abort()
+    setUploading(false)
+  }
+
+  const removeSelectedFiles = (index?: number) => {
+    if (index) {
+      fileInfos.splice(index, 1)
+      setFileInfos([...fileInfos])
+    } else setFileInfos([])
+  }
+
+  const uploadFiles = async (files?: File[], mediaFormat?: 1 | 2) => {
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
     const _progressInfos = selectedFilesToArr.map(file => ({
@@ -69,7 +90,7 @@ export const useUploadFiles = () => {
     }
 
     const uploadPromises = selectedFilesToArr.map((file, index) =>
-      upload(file, index),
+      upload(file, index, mediaFormat),
     )
 
     const filesResult = await Promise.all(uploadPromises)
@@ -80,7 +101,9 @@ export const useUploadFiles = () => {
 
   return [
     (files?: File[]) => selectFiles(files),
-    (files?: File[]) => uploadFiles(files),
+    (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
+    (index?: number) => removeSelectedFiles(index),
+    cancelUpload,
     uploading,
     progressInfos,
     message,

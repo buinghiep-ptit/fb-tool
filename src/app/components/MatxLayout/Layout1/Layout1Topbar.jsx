@@ -14,7 +14,7 @@ import useAuth from 'app/hooks/useAuth'
 import useSettings from 'app/hooks/useSettings'
 import { topBarHeight } from 'app/utils/constant'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Span } from '../../../components/Typography'
 import NotificationBar from '../../NotificationBar/NotificationBar'
 import ShoppingCart from '../../ShoppingCart'
@@ -83,6 +83,8 @@ const Layout1Topbar = () => {
   const { logout, user } = useAuth()
   const isMdScreen = useMediaQuery(theme.breakpoints.down('md'))
 
+  const navigate = useNavigate()
+
   const updateSidebarMode = sidebarSettings => {
     updateSettings({
       layout1Settings: { leftSidebar: { ...sidebarSettings } },
@@ -147,20 +149,31 @@ const Layout1Topbar = () => {
             <StyledItem>
               <Link to="/">
                 <Icon> home </Icon>
-                <Span> Home </Span>
+                <Span> Trang chủ </Span>
               </Link>
             </StyledItem>
 
-            <StyledItem>
+            {/* <StyledItem>
               <Link to="/page-layouts/user-profile">
                 <Icon> person </Icon>
                 <Span> Profile </Span>
               </Link>
-            </StyledItem>
+            </StyledItem> */}
 
-            <StyledItem>
+            {/* <StyledItem onClick={() => navigate(`session/forgot-password`, {})}>
+              <Icon> password </Icon>
+              <Span> Quên mật khẩu </Span>
+            </StyledItem> */}
+
+            <StyledItem
+              onClick={() =>
+                navigate(`session/change-password`, {
+                  state: { modal: true },
+                })
+              }
+            >
               <Icon> settings </Icon>
-              <Span> Settings </Span>
+              <Span> Đổi mật khẩu </Span>
             </StyledItem>
 
             <StyledItem onClick={logout}>

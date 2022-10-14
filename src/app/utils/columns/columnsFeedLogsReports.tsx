@@ -1,5 +1,5 @@
 import { TableColumn, TitleReportsDecline } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsFeedLogsReports: readonly TableColumn<TitleReportsDecline>[] =

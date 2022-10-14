@@ -1,4 +1,5 @@
 import { Autocomplete, Chip, styled, TextField } from '@mui/material'
+import { useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 const CssTextField = styled(TextField)({
@@ -26,15 +27,15 @@ export function MuiAutocompleteWithTags({
   const {
     control,
     getValues,
+    watch,
     setValue,
+    setError,
     formState: { errors },
   } = useFormContext()
 
   const handleKeyDown = (event: any) => {
     switch (event.key) {
-      case 'Enter':
-      case ',':
-      case ' ': {
+      case 'Enter': {
         event.preventDefault()
         event.stopPropagation()
         if (event.target.value.length > 0) {
@@ -57,6 +58,8 @@ export function MuiAutocompleteWithTags({
       render={({ field }) => (
         <Autocomplete
           {...field}
+          freeSolo={false}
+          popupIcon={''}
           multiple
           open={false}
           limitTags={2}
@@ -97,6 +100,7 @@ export function MuiAutocompleteWithTags({
                 error={errors.hashtag as any}
                 helperText={errors.hashtag?.message as any}
                 {...params}
+                InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 fullWidth
                 margin="normal"

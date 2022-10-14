@@ -1,20 +1,26 @@
 import useAuth from 'app/hooks/useAuth'
+import { navigations } from 'app/navigations'
+import { getNavigationByUser } from 'app/redux/actions/NavigationAction'
+import { flat } from 'app/utils/utils'
 import { isValidToken } from 'app/utils/validToken'
 import { ReactElement, useEffect, useRef, useState } from 'react'
-// import { flat } from 'app/utils/utils';
+import { useDispatch } from 'react-redux'
 import { Navigate, useLocation } from 'react-router-dom'
-// import AllPages from '../routes';
 
-// const userHasPermission = (pathname, user, routes) => {
-//   if (!user) {
-//     return false;
-//   }
-//   const matched = routes.find((r) => r.path === pathname);
+import AllPages from '../routes'
 
-//   const authenticated =
-//     matched && matched.auth && matched.auth.length ? matched.auth.includes(user.role) : true;
-//   return authenticated;
-// };
+export const userHasPermission = (pathname: string, user: any, routes: any) => {
+  if (!user || !user.authorities.length) {
+    return false
+  }
+  const matched = routes.find((r: any) => r.path === pathname)
+
+  const authenticated =
+    matched && matched.auth && matched.auth.length
+      ? matched.auth.includes(user.authorities[0])
+      : true
+  return authenticated
+}
 
 type Props = {
   children: ReactElement
@@ -43,14 +49,20 @@ const AuthGuard = ({ children }: Props) => {
   }, [])
 
   const { pathname } = useLocation()
-  //   const routes = flat(AllPages);
 
-  //   const hasPermission = userHasPermission(pathname, user, routes);
-  //   let authenticated = isAuthenticated && hasPermission;
+  const dispatch = useDispatch()
 
-  // // IF YOU NEED ROLE BASED AUTHENTICATION,
-  // // UNCOMMENT ABOVE LINES
-  // // AND COMMENT OUT BELOW authenticated VARIABLE
+  const routes = flat(AllPages)
+
+  const hasPermission = userHasPermission(pathname, user, routes)
+  const authenticated =
+    isAuthenticated && hasPermission && user && (user as any).status !== -1
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+    dispatch(getNavigationByUser(user, navigations))
+  }, [authenticated])
+
   const accessToken = window.localStorage.getItem('accessToken') as string
 
   // const initAuth = isAuthenticated
@@ -64,9 +76,12 @@ const AuthGuard = ({ children }: Props) => {
     }
   }, [pathname])
 
+  if (!hasPermission && isAuthenticated) {
+    return <Navigate replace to="/" />
+  }
   return (
     <>
-      {isAuthenticated ? (
+      {authenticated ? (
         children
       ) : (
         <Navigate replace to="/session/signin" state={{ from: pathname }} />

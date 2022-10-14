@@ -1,5 +1,5 @@
 import { TableColumn, TitleActionsHistory } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsFeedLogsActions: readonly TableColumn<TitleActionsHistory>[] =
   [

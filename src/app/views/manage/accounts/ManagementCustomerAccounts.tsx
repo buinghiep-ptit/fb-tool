@@ -1,21 +1,20 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCustomers } from 'app/apis/accounts/customer.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { MuiTypography } from 'app/components/common/MuiTypography'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { ICustomer, ICustomerResponse } from 'app/models/account'
 import { columnCustomerAccounts } from 'app/utils/columns/columnsCustomerAccounts'
-import { useEffect, useState } from 'react'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -43,25 +42,36 @@ type ISearchFilters = {
 export default function CustomerAccounts(props: Props) {
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
+  const queryParams = Object.fromEntries([...searchParams])
+  const [page, setPage] = useState<number>(
+    queryParams.page ? +queryParams.page : 0,
+  )
+  const [size, setSize] = useState<number>(
+    queryParams.size ? +queryParams.size : 20,
+  )
+
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
   const [defaultValues] = useState<ISearchFilters>({
-    cusType: 'all',
-    status: 'all',
+    search: queryParams.search ?? '',
+    cusType: queryParams.cusType ?? 'all',
+    status: queryParams.status ?? 'all',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
+    sort: 'fullName,asc',
   })
-  const [filters, setFilters] = useState<ISearchFilters>({
-    page,
-    size,
-    sort: 'email,asc',
-  })
+
+  const [filters, setFilters] = useState<ISearchFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
 
   const validationSchema = Yup.object().shape({
     account: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
     email: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
+      .max(255, 'email must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -69,23 +79,6 @@ export default function CustomerAccounts(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  useEffect(() => {
-    if (searchParams) {
-      const queryParams = Object.fromEntries([...searchParams])
-      if (!!Object.keys(queryParams).length) {
-        setPage(parseInt(queryParams.page) || 0)
-        setSize(parseInt(queryParams.size) || 20)
-
-        setFilters(prevFilters => {
-          return {
-            ...prevFilters,
-            ...queryParams,
-          }
-        })
-      }
-    }
-  }, [searchParams])
 
   const {
     data,
@@ -99,7 +92,7 @@ export default function CustomerAccounts(props: Props) {
   >(['customers', filters], () => fetchCustomers(filters), {
     refetchOnWindowFocus: false,
     keepPreviousData: true,
-    enabled: !!filters,
+    enabled: !!filters && isSubmitted,
   })
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -130,6 +123,7 @@ export default function CustomerAccounts(props: Props) {
     })
     navigate('', {
       ...filters,
+      page: 0,
       size: parseInt(event.target.value, 10),
     } as any)
   }
@@ -137,114 +131,146 @@ export default function CustomerAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    removeParamsHasDefaultValue(values)
+    setIsSubmitted(true)
+    setPage(0)
+    setSize(20)
+
     setFilters(prevFilters => {
       return {
-        ...prevFilters,
-        ...values,
+        ...extractMergeFiltersObject(prevFilters, {
+          ...values,
+          search: values.search ? values.search?.trim() : '',
+        }),
+        page: 0,
+        size: 20,
       }
     })
+
     navigate('', {
-      ...filters,
-      ...values,
+      ...extractMergeFiltersObject(filters, {
+        ...values,
+        search: values.search ? values.search?.trim() : '',
+      }),
+      page: 0,
+      size: 20,
     } as any)
   }
 
-  const removeParamsHasDefaultValue = (objParams: Record<string, any>) => {
-    Object.keys(objParams).forEach(key => {
-      if (objParams[key] === 'all') objParams[key] = ''
-    })
-  }
-
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (cell.id === 'mobilePhone') {
-        navigate(`${row.customerId}/info`, {})
-      } else if (cell.id === 'action') {
-        console.log('Toggle active user')
-      }
+    if (cell.action || cell.link) {
+      // if (cell.id === 'mobilePhone') {
+      navigate(`${row.customerId}/thong-tin`, {})
+      // } else if (cell.id === 'action') {
+      //   navigate(`${row.customerId}/thong-tin`, {})
+      // }
     }
   }
 
-  if (isLoading) return <MuiLoading />
+  const onResetFilters = () => {
+    setIsSubmitted(false)
 
-  if (isError)
-    return (
-      <Box my={2} textAlign="center">
-        <MuiTypography variant="h5">
-          Have an errors: {error.message}
-        </MuiTypography>
-      </Box>
-    )
+    methods.reset({
+      search: '',
+      cusType: 'all',
+      status: 'all',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
+  }
 
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản KH' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản end-user' }]} />
       </Box>
-      <SimpleCard title="Quản lý TK KH">
-        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={12}>
-                <FormInputText
-                  label={'Email, SĐT, Tên hiển thị'}
-                  type="text"
-                  name="search"
-                  size="small"
-                  defaultValue=""
-                  placeholder="Nhập Email, SĐT, Tên hiển thị"
-                  fullWidth
-                />
+      <Stack gap={3}>
+        <SimpleCard>
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={4} xs={12}>
+                  <FormInputText
+                    label={'Email, SĐT, Tên hiển thị'}
+                    type="text"
+                    name="search"
+                    size="small"
+                    defaultValue=""
+                    placeholder="Nhập Email, SĐT, Tên hiển thị"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="cusType" label="Loại tài khoản">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Thường</MenuItem>
+                    <MenuItem value={2}>KOL</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value={1}>Hoạt động</MenuItem>
+                    <MenuItem value={-1}>Xoá</MenuItem>
+                    <MenuItem value={-2}>Khoá</MenuItem>
+                    <MenuItem value={-3}>Khoá tạm thời</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={3} xs={6}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
+                <Grid item sm={3} xs={6}>
+                  <MuiButton
+                    title="Làm mới"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<ChangeCircleSharp />}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="cusType" label="Loại tài khoản">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Thường</MenuItem>
-                  <MenuItem value={2}>KOL</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <SelectDropDown name="status" label="Trạng thái">
-                  <MenuItem value="all">Tất cả</MenuItem>
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={-2}>Khoá</MenuItem>
-                  <MenuItem value={-3}>Khoá tạm thời</MenuItem>
-                </SelectDropDown>
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
-
-        <Box mt={3}>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+        <SimpleCard>
           <MuiStyledTable
-            rows={data?.content as ICustomer[]}
+            rows={data ? (data?.content as ICustomer[]) : []}
             columns={columnCustomerAccounts}
             onClickRow={onClickRow}
             isFetching={isFetching}
+            error={isError ? error : null}
           />
           <MuiStyledPagination
             component="div"
             rowsPerPageOptions={[20, 50, 100]}
-            count={data?.totalElements as number}
+            count={data ? (data?.totalElements as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        </Box>
-      </SimpleCard>
+        </SimpleCard>
+      </Stack>
     </Container>
   )
 }

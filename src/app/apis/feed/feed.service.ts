@@ -14,6 +14,7 @@ type Props = {
 }
 
 export const fetchFeeds = async (params: any): Promise<IFeedResponse> => {
+  console.log('params:', params)
   const { data } = await http.get<IFeedResponse>('/api/feed', {
     params,
   })
@@ -64,6 +65,11 @@ export const fetchPostsCheck = async (): Promise<IFeedDetail[]> => {
   return data
 }
 
+export const fetchPostsReported = async (): Promise<IFeedDetail[]> => {
+  const { data } = await http.get<IFeedDetail[]>(`/api/feed/reported`)
+  return data
+}
+
 export const approveFeed = async (feedId: number): Promise<any> => {
   const { data } = await http.post<any>(`/api/feed/${feedId}/approve`)
   return data
@@ -111,7 +117,12 @@ export const fetchCampGrounds = async (params: {
   return data
 }
 
-export const createFeed = async (payload: any): Promise<any> => {
-  const { data } = await http.post<any>(`/api/feed`, payload)
+export const createFeed = async (payload: IFeedDetail): Promise<any> => {
+  const { data } = await http.post<IFeedDetail>(`/api/feed`, payload)
+  return data
+}
+
+export const deleteFeed = async (feedId: number): Promise<any> => {
+  const { data } = await http.delete<IFeedDetail>(`/api/feed/${feedId}`)
   return data
 }

@@ -1,7 +1,8 @@
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateUserData } from 'app/hooks/queries/useUsersData'
-import React from 'react'
+import useAuth from 'app/hooks/useAuth'
+import React, { useEffect, useRef } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useFormUserModal from './useFormUserModal'
@@ -17,15 +18,28 @@ type FormData = {
 }
 
 export default function UserDetail({ title }: Props) {
+  const { user, updateUser } = useAuth() as any
   const navigate = useNavigate()
+
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
   const data = location.state?.data ?? {}
+
   const [getContent, methods] = useFormUserModal(data)
 
-  const onSuccess = (data: any) => {
+  const unmounted = useRef(false)
+  useEffect(() => {
+    return () => {
+      unmounted.current = true
+    }
+  }, [])
+
+  const onSuccess = async (u: any) => {
     toastSuccess({ message: 'Cập nhật tài khoản thành công' })
     navigate(-1)
+    if (user && user.id && u && u.id && user.id === u.id) {
+      await updateUser()
+    }
   }
   const { mutate: editUser, isLoading } = useUpdateUserData(onSuccess)
 
@@ -46,6 +60,8 @@ export default function UserDetail({ title }: Props) {
         title={title}
         open={isModal}
         isLoading={isLoading}
+        submitText="Lưu"
+        cancelText="Huỷ"
         onCloseModal={handleClose}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >

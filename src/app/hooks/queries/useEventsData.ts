@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createEvent,
   deleteEvent,
+  updateEvent,
   updateEventStatus,
 } from 'app/apis/events/event.service'
 import { IEventDetail } from 'app/models'
@@ -14,6 +15,20 @@ export const useCreateEvent = (onSuccess?: any, onError?: any) => {
     },
     onSuccess,
   })
+}
+
+export const useUpdateEvent = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (event: Record<string, any>) => updateEvent(event.id, event),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['events'])
+        queryClient.invalidateQueries(['event'])
+      },
+      onSuccess,
+    },
+  )
 }
 
 export const useUpdateStatusEvent = (onSuccess?: any, onError?: any) => {

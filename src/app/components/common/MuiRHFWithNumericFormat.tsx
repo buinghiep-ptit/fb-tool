@@ -16,7 +16,11 @@ export type Props = {
   label?: string
   defaultValue?: string
   inputProps?: InputProps
+  disabled?: boolean
 } & TextFieldProps
+
+const MAX_LIMIT = 1000
+const MIN_LIMIT = 0
 
 const MuiRHFNumericFormatInput: FC<Props> = ({
   name,
@@ -25,6 +29,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
   iconStart,
   iconEnd,
   inputProps,
+  disabled = false,
   ...otherProps
 }) => {
   const {
@@ -35,12 +40,19 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
     <Controller
       control={control}
       name={name}
-      defaultValue={defaultValue}
-      render={({ field }) => (
+      render={({ field: { onChange, name, value } }) => (
         <NumericFormat
+          thousandSeparator=","
+          name={name}
+          value={value}
           label={label}
-          onValueChange={({ value: v }) => field.onChange(v)}
-          defaultValue={defaultValue}
+          isAllowed={(values: any) => {
+            const { value } = values
+            return !value || (value && value > MIN_LIMIT)
+          }}
+          disabled={disabled}
+          onChange={onChange}
+          InputLabelProps={{ shrink: true }}
           InputProps={{
             ...inputProps,
             sx: {
@@ -59,10 +71,41 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
             errors[name] ? (errors[name]?.message as unknown as string) : ''
           }
           customInput={TextField}
-          thousandSeparator=","
         />
       )}
     />
+    // <Controller
+    //   control={control}
+    //   name={name}
+    //   defaultValue={defaultValue}
+    //   render={({ field }) => (
+    //     <NumericFormat
+    //       value={!field.value ? field.value : null}
+    //       label={label}
+    //       defaultValue={0}
+    //       onValueChange={({ value: v }) => field.onChange(v)}
+    //       // InputProps={{
+    //       //   ...inputProps,
+    //       //   sx: {
+    //       //     cursor: iconEnd ? 'pointer' : 'default',
+    //       //     caretColor: '#218332',
+    //       //   },
+    //       //   startAdornment: iconStart ? (
+    //       //     <InputAdornment position="start">{iconStart}</InputAdornment>
+    //       //   ) : null,
+    //       //   endAdornment: iconEnd ? (
+    //       //     <InputAdornment position="end">{iconEnd}</InputAdornment>
+    //       //   ) : null,
+    //       // }}
+    //       error={!!errors[name]}
+    //       helperText={
+    //         errors[name] ? (errors[name]?.message as unknown as string) : ''
+    //       }
+    //       customInput={TextField}
+    //       thousandSeparator=","
+    //     />
+    //   )}
+    // />
   )
 }
 export default MuiRHFNumericFormatInput

@@ -6,31 +6,31 @@ export const tableModel = {
     },
     {
       name: 'Ảnh',
-      width: null,
+      width: 200,
     },
     {
       name: 'Tên địa danh',
-      width: null,
+      width: 100,
     },
     {
       name: 'Số điểm camp',
-      width: null,
+      width: 80,
     },
     {
       name: 'Sự kiện',
-      width: null,
+      width: 150,
     },
     {
       name: 'Địa chỉ',
-      width: null,
+      width: 200,
     },
     {
       name: 'Loại hình',
-      width: null,
+      width: 80,
     },
     {
       name: 'Trạng thái',
-      width: null,
+      width: 100,
     },
 
     {
@@ -50,3 +50,13 @@ export const tableModel = {
     'action',
   ],
 }
+
+export const typeAreas = [
+  '',
+  'Cắm trại',
+  'Chạy bộ',
+  'Teambuiding',
+  'Lưu trú',
+  'Trekking',
+  'Leo núi',
+]

@@ -1,19 +1,21 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Grid, LinearProgress, MenuItem, Stack } from '@mui/material'
+import { LinearProgress, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
-import { MuiTypography } from 'app/components/common/MuiTypography'
-import * as React from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
+import { useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const useFormUserModal = (data?: any) => {
+  const { id } = useParams()
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Email không hợp lệ')
       .required('Email là bắt buộc'),
   })
+
+  console.log('data:', data)
 
   const methods = useForm<any>({
     mode: 'onChange',
@@ -37,30 +39,14 @@ const useFormUserModal = (data?: any) => {
         <FormProvider {...methods}>
           <Stack gap={3} py={3}>
             <FormInputText
-              label={'Tên đăng nhập *'}
-              type="email"
-              name="email"
-              size="small"
-              placeholder="Nhập tên tài khoản"
-              fullWidth
-              defaultValue={data?.email ? data?.email : ''}
-            />
-            <FormInputText
+              disabled={!!id}
               label={'Email *'}
               type="email"
               name="email"
               placeholder="Nhập Email"
               size="small"
               fullWidth
-            />
-            <FormInputText
-              label={'Họ và tên *'}
-              type="text"
-              name="name"
-              placeholder="Nhập họ và tên"
-              size="small"
-              fullWidth
-              defaultValue=""
+              defaultValue={(data && data.email) ?? ''}
             />
             <SelectDropDown
               label=" Trạng thái *"
@@ -79,6 +65,7 @@ const useFormUserModal = (data?: any) => {
               <MenuItem value={1}>Admin</MenuItem>
               <MenuItem value={2}>CS</MenuItem>
               <MenuItem value={3}>Sale</MenuItem>
+              <MenuItem value={4}>MKT</MenuItem>
             </SelectDropDown>
           </Stack>
         </FormProvider>

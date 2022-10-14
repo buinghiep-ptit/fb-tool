@@ -1,4 +1,6 @@
 import {
+  Icon,
+  IconButton,
   InputAdornment,
   InputBaseComponentProps,
   InputProps,
@@ -48,8 +50,17 @@ const FormInputText: FC<IFormInputTextProps> = ({
 }) => {
   const {
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useFormContext()
+
+  const val = watch(name)
+
+  const clearInput = () => {
+    setValue(name, '')
+  }
+
   return (
     <Controller
       control={control}
@@ -67,6 +78,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
           helperText={
             errors[name] ? (errors[name]?.message as unknown as string) : ''
           }
+          InputLabelProps={{ shrink: true }}
           InputProps={{
             ...inputProps,
             sx: {
@@ -77,9 +89,20 @@ const FormInputText: FC<IFormInputTextProps> = ({
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
             ) : null,
-            endAdornment: iconEnd ? (
-              <InputAdornment position="end">{iconEnd}</InputAdornment>
-            ) : null,
+            // endAdornment: iconEnd ? (
+            //   <InputAdornment position="end">{iconEnd}</InputAdornment>
+            // ) : null,
+            endAdornment: (
+              <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
+                {iconEnd ? (
+                  iconEnd
+                ) : !!val ? (
+                  <IconButton sx={{ p: 0, m: 0 }} onClick={clearInput}>
+                    <Icon fontSize="small">clear</Icon>
+                  </IconButton>
+                ) : null}
+              </InputAdornment>
+            ),
           }}
         />
       )}

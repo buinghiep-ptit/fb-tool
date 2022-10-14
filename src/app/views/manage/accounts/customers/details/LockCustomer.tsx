@@ -8,10 +8,12 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useLockCustomer } from 'app/hooks/queries/useCustomersData'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { messages } from 'app/utils/messages'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 
 type Props = {
   title: string
@@ -24,22 +26,44 @@ type FormData = {
 }
 
 type RHFInputLockTimeProps = {
-  control: any
+  methods: any
   name: string
 }
 
-const RHFInputLockTime = ({ control, name }: RHFInputLockTimeProps) => {
-  const lockType = useWatch({ control, name })
+const RHFInputLockTime = ({ methods, name }: RHFInputLockTimeProps) => {
+  const lockType = useWatch({ control: methods.control, name })
+
+  useEffect(() => {
+    methods.clearErrors('lockDuration')
+    if (parseInt(lockType, 10) === 2) {
+      methods.setValue('lockDuration', 12)
+    }
+  }, [lockType])
 
   return (
-    <FormInputText
+    <MuiRHFNumericFormatInput
       disabled={parseInt(lockType, 10) !== 2}
-      type="number"
+      type="text"
       name="lockDuration"
-      size="small"
-      placeholder="Nhập thời gian"
-      defaultValue={''}
+      label="Thời gian"
+      placeholder="Nhập giá"
+      // iconEnd={<MuiTypography variant="subtitle2">VNĐ</MuiTypography>}
+      fullWidth
     />
+    // <FormInputText
+    //   disabled={parseInt(lockType, 10) !== 2}
+    //   type="number"
+    //   label={'Thời gian'}
+    //   name="lockDuration"
+    //   placeholder="Nhập thời gian"
+    //   inputProps={{
+    //     inputProps: {
+    //       // max: 100,
+    //       min: 1,
+    //     },
+    //   }}
+    //   defaultValue={''}
+    // />
   )
 }
 
@@ -52,7 +76,7 @@ export default function LockCustomer({ title }: Props) {
   const { customerId } = useParams()
 
   const onSuccess = (data: any) => {
-    toastSuccess({ message: 'Cập nhật mật khẩu thành công' })
+    toastSuccess({ message: 'Khoá thành công' })
     navigate(-1)
   }
   const validationSchema = Yup.object().shape({
@@ -60,16 +84,20 @@ export default function LockCustomer({ title }: Props) {
     lockDuration: Yup.string().when('lockType', {
       is: (lockType: string) => lockType && lockType === '2',
       then: Yup.string()
-        .required('Không được để trống')
+        .required(messages.MSG1)
+        .max(10, 'Thời gian không hợp lệ (<= 10 số)')
         .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
     }),
 
     reason: Yup.string()
-      .required('Lý do không được bỏ trống')
-      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .required(messages.MSG1)
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({
+    defaultValues: {
+      lockDuration: 12,
+    },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
@@ -77,11 +105,13 @@ export default function LockCustomer({ title }: Props) {
   const { mutate: lockCustomer, isLoading } = useLockCustomer(onSuccess)
 
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
+    const duration =
+      values?.lockDuration?.toString().replace(/,(?=\d{3})/g, '') ?? 0
+
     lockCustomer({
       customerId,
       ...values,
-      lockDuration:
-        Number(values.lockType) === 2 ? Number(values.lockDuration) : 0,
+      lockDuration: Number(values.lockType) === 2 ? Number(duration) : 0,
       lockType: Number(values.lockType),
     })
   }
@@ -107,18 +137,21 @@ export default function LockCustomer({ title }: Props) {
         <FormProvider {...methods}>
           <Stack>
             <MuiRadioGroup name="lockType" defaultValue={1}>
-              <FormControlLabel value={1} control={<Radio />} label="Khoá" />
+              <FormControlLabel
+                value={1}
+                control={<Radio />}
+                label="Khoá tài khoản"
+              />
               <Stack flexDirection={'row'} alignItems={'center'}>
                 <FormControlLabel
                   value={2}
                   control={<Radio />}
                   label="Khoá tạm thời"
+                  sx={{ flex: 1, minWidth: '160px' }}
                 />
                 <>
-                  <RHFInputLockTime
-                    control={methods.control}
-                    name={'lockType'}
-                  />
+                  <RHFInputLockTime methods={methods} name={'lockType'} />
+
                   <MuiTypography px={1} fontWeight={500}>
                     (giờ)
                   </MuiTypography>
@@ -151,6 +184,8 @@ export default function LockCustomer({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={isLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText="Khoá"
+        cancelText="Huỷ"
       >
         {getContent()}
       </MuiStyledModal>

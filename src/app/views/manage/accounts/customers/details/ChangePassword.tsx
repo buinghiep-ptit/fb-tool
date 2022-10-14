@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { messages } from 'app/utils/messages'
 
 type Props = {
   title: string
@@ -22,7 +23,7 @@ type Props = {
 
 type FormData = {
   password?: string
-  note?: number
+  note?: string
 }
 
 export default function ChangePassword({ title }: Props) {
@@ -42,13 +43,20 @@ export default function ChangePassword({ title }: Props) {
   }
   const validationSchema = Yup.object().shape({
     password: Yup.string()
-      .matches(
-        // /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,32}$)/,
-        'Mật khẩu không hợp lệ',
-      )
-      .required('Mật khẩu là bắt buộc'),
-    note: Yup.string().max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .required(messages.MSG1)
+      .test('latinChars', messages.MSG21, value => {
+        const regexStr = /^[\x20-\x7E]+$/
+        if (value) {
+          return regexStr.test(value)
+        } else return false
+      })
+      .matches(/^\S*$/, messages.MSG21)
+      .min(8, messages.MSG20)
+      .max(32, messages.MSG20),
+    // .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
+    note: Yup.string()
+      .required(messages.MSG1)
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({
@@ -62,7 +70,10 @@ export default function ChangePassword({ title }: Props) {
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
     updatePassword({
       customerId: customerId as any,
-      payload: { newPassword: values.password as string },
+      payload: {
+        newPassword: values.password as string,
+        note: values.note as string,
+      },
     })
   }
 
@@ -80,7 +91,7 @@ export default function ChangePassword({ title }: Props) {
   const generatePasswordCustomer = () => {
     setRandLoading(true)
     setTimeout(() => {
-      methods.setValue('password', generatePassword(8))
+      methods.setValue('password', generatePassword(2, 4, 2))
       setRandLoading(false)
     }, 1500)
   }
@@ -101,14 +112,12 @@ export default function ChangePassword({ title }: Props) {
       >
         <FormProvider {...methods}>
           <Stack>
-            <MuiTypography variant="subtitle2" pb={1}>
-              Mật khẩu mới:*
-            </MuiTypography>
-            <Stack flexDirection={'row'} alignItems="center" gap={1.5}>
+            <Stack flexDirection={'row'} alignItems="center" gap={1.5} mt={3}>
               <FormInputText
                 type={showPassword.visibility ? 'text' : 'password'}
                 name="password"
                 size="small"
+                label={'Mật khẩu mới:*'}
                 placeholder="Nhập mật khẩu"
                 defaultValue={customer?.email ? customer?.email : ''}
                 iconEnd={
@@ -127,8 +136,11 @@ export default function ChangePassword({ title }: Props) {
                 color="primary"
                 loadingColor="primary"
                 type="submit"
-                sx={{ width: '100%', flex: 1 }}
-                startIcon={<RefreshSharp />}
+                sx={{
+                  minWidth: '180px',
+                  flex: 1,
+                }}
+                // startIcon={<RefreshSharp />}
                 onClick={generatePasswordCustomer}
                 loading={randLoading}
               />
@@ -137,7 +149,7 @@ export default function ChangePassword({ title }: Props) {
 
           <Stack my={1.5}>
             <MuiTypography variant="subtitle2" pb={1}>
-              Ghi chú:
+              Ghi chú*:
             </MuiTypography>
             <FormTextArea name="note" defaultValue={''} placeholder="Ghi chú" />
           </Stack>
@@ -156,6 +168,8 @@ export default function ChangePassword({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={isLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText="Lưu"
+        cancelText="Huỷ"
       >
         {getContent()}
       </MuiStyledModal>

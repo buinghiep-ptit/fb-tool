@@ -15,6 +15,7 @@ import {
   updateCampGroundStatus,
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -30,6 +31,7 @@ export default function ManagerLocation(props) {
   const [statusFilter, setStatusFilter] = useState(null)
   const [listCampGround, setListCampGround] = useState([])
   const [totalListCampGround, setTotalListCampground] = useState()
+  const navigate = useNavigate()
 
   const fetchListCampGround = async param => {
     await getListCampGround(param)
@@ -118,7 +120,6 @@ export default function ManagerLocation(props) {
               variant="contained"
               type="submit"
               onClick={() => {
-                console.log(inputFilter, statusFilter)
                 fetchListCampGround({
                   name: inputFilter,
                   status: statusFilter,
@@ -138,7 +139,14 @@ export default function ManagerLocation(props) {
             xs={6}
             sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
           >
-            <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
+            <Icon
+              fontSize="large"
+              color="primary"
+              sx={{ marginRight: '5px' }}
+              onClick={() => {
+                navigate('/them-diem-camp')
+              }}
+            >
               add_circle
             </Icon>
             <Paragraph

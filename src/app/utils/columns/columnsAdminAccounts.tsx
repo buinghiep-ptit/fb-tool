@@ -2,14 +2,14 @@ import { Chip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleUsers } from 'app/models/account'
-import { ISODateTimeFormatter } from '../formatters/dateTimeISOFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
   {
     id: 'email',
-    label: 'Tài khoản',
+    label: 'Email',
     minWidth: 120,
     action: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
@@ -17,7 +17,6 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
       </Typography>
     ),
   },
-  { id: 'email', label: 'Email', minWidth: 200, align: 'center' },
   {
     id: 'role',
     label: 'Quyền',
@@ -45,7 +44,7 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 1 ? 'Hoạt động' : 'Khoá'}
+        label={value === 1 ? 'Hoạt động' : 'Không hoạt động'}
         size="small"
         color={value === 1 ? 'primary' : 'default'}
       />

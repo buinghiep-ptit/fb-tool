@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Grid, TextField, Autocomplete } from '@mui/material'
 import { Controller } from 'react-hook-form'
+import { seasons } from '../const'
 
 export default function GeneralInformation({
   control,
@@ -13,6 +14,7 @@ export default function GeneralInformation({
   getValues,
   setValue,
   hashtag,
+  campAreas,
 }) {
   const addHashTag = e => {
     if (e.keyCode === 13) {
@@ -20,20 +22,59 @@ export default function GeneralInformation({
       e.preventDefault()
     }
   }
+
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
+  ]
+
   return (
     <div>
       <Grid container>
         <Grid item xs={12} md={12}>
           <Controller
-            name="namePlace"
+            name="nameCampground"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Tên địa danh"
+                label="Tên điểm camp*"
                 variant="outlined"
-                error={errors.namePlace}
-                helperText={errors.namePlace?.message}
+                error={errors.nameCampground}
+                helperText={errors.nameCampground?.message}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Controller
+            name="campAreas"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                multiple
+                disablePortal
+                {...field}
+                options={campAreas}
+                getOptionLabel={option => option.name}
+                renderOption={(props, option, index) => {
+                  const key = `listItem-${index}-${option.id}`
+                  return (
+                    <li {...props} key={key}>
+                      {option.name}
+                    </li>
+                  )
+                }}
+                onChange={(_, data) => {
+                  field.onChange(data)
+                }}
+                renderInput={params => (
+                  <TextField {...params} label="Địa danh" margin="normal" />
+                )}
               />
             )}
           />
@@ -122,7 +163,7 @@ export default function GeneralInformation({
                 error={errors.address}
                 helperText={errors.address?.message}
                 {...field}
-                label="Địa danh"
+                label="Địa chỉ"
                 variant="outlined"
                 margin="normal"
               />
@@ -131,32 +172,57 @@ export default function GeneralInformation({
         </Grid>
         <Grid item xs={12} md={12}>
           <Controller
-            name="type"
+            name="campTypes"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Autocomplete
+                multiple
                 {...field}
-                label="Loại hình"
-                variant="outlined"
-                margin="normal"
-                // error={errors.namePlace}
-                // helperText={errors.namePlace?.message}
+                options={[...typeCamp]}
+                getOptionLabel={option => option.label}
+                filterSelectedOptions
+                onChange={(_, data) => field.onChange(data)}
+                sx={{ width: 400, marginRight: 5 }}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    // error={errors.namePlace}
+                    // helperText={errors.namePlace?.message}
+                    variant="outlined"
+                    label="Loại hình"
+                    placeholder="Loại hình"
+                    fullWidth
+                    margin="normal"
+                  />
+                )}
               />
             )}
           />
         </Grid>
         <Grid item xs={12} md={12}>
           <Controller
-            name="season"
+            name="campGroundSeasons"
             control={control}
             render={({ field }) => (
-              <TextField
+              <Autocomplete
                 {...field}
-                label="Mùa thích hợp"
-                variant="outlined"
-                margin="normal"
-                // error={errors.namePlace}
-                // helperText={errors.namePlace?.message}
+                multiple
+                options={[...seasons]}
+                getOptionLabel={option => option.value}
+                defaultValue={[{ id: 0, value: 'Xuân' }]}
+                filterSelectedOptions
+                sx={{ width: 400, marginRight: 5 }}
+                onChange={(_, data) => field.onChange(data)}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Mùa thích hợp"
+                    placeholder="Chọn mùa thích hợp"
+                    fullWidth
+                    margin="normal"
+                  />
+                )}
               />
             )}
           />

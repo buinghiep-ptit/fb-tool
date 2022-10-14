@@ -1,4 +1,5 @@
-import { Skeleton, styled } from '@mui/material'
+import { FilterNone } from '@mui/icons-material'
+import { Skeleton, Stack, styled } from '@mui/material'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -7,7 +8,9 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { Box } from '@mui/system'
 import { TableColumn } from 'app/models'
+import { messages } from 'app/utils/messages'
 import * as React from 'react'
+import { MuiTypography } from './MuiTypography'
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
@@ -27,6 +30,9 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
   rows: T[]
   onClickRow?: (cell: any, row: any) => void
   isFetching: boolean
+  error?: { message?: string } | undefined | null
+  rowsPerPage?: number
+  page?: number
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -34,12 +40,16 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   rows,
   onClickRow,
   isFetching,
+  error,
+  rowsPerPage = 20,
+  page = 0,
 }: MuiPagingTableProps<T>) {
+  const [rowHeight, setRowHeight] = React.useState(0)
   const memoizedData = React.useMemo(() => rows, [rows])
   const memoizedColumns = React.useMemo(() => columns, [columns])
   const skeletons = Array.from({ length: 10 }, (x, i) => i)
   const noDataFound =
-    !isFetching && (!memoizedData || !(memoizedData as T[]).length)
+    !isFetching && (!memoizedData || !(memoizedData as T[]).length || error)
 
   const cellFormatter = (cell: any, row: any, value: any) => {
     if (cell.media) {
@@ -51,12 +61,15 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     if (cell.action) {
       return cell.action(value ? value : row.status)
     }
+    if (cell.link) {
+      return cell.link(value)
+    }
     return cell.format ? cell.format(value) : value
   }
 
   return (
     <>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer sx={{ maxHeight: 720 }}>
         <Table stickyHeader aria-label="sticky table">
           {!isFetching && (
             <TableHead>
@@ -97,7 +110,10 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     }}
                   >
                     {memoizedColumns.map((column, idx) => {
-                      const value = idx === 0 ? index + 1 : row[column.id]
+                      const value =
+                        idx === 0
+                          ? page * rowsPerPage + index + 1
+                          : row[column.id]
                       return (
                         <TableCell
                           key={idx}
@@ -106,10 +122,17 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           sx={{
                             minWidth: column.minWidth,
                             px: 1.5,
-                            cursor: column.action ? 'pointer' : 'default',
+                            cursor:
+                              column.action || column.link
+                                ? 'pointer'
+                                : 'default',
                             // whiteSpace: 'nowrap',
-                            // overflow: 'hidden',
                             // textOverflow: 'ellipsis',
+                            // overflow: 'hidden',
+                            // maxWidth: '300px',
+
+                            // whiteSpace: 'normal',
+                            // wordWrap: 'break-word',
                           }}
                         >
                           {cellFormatter(column, row, value)}
@@ -137,8 +160,20 @@ export default function MuiPagingTable<T extends Record<string, any>>({
           </TableBody>
         </Table>
         {noDataFound && (
-          <Box my={2} textAlign="center">
-            Không tìm thấy bản ghi
+          <Box
+            my={2}
+            minHeight={200}
+            display="flex"
+            alignItems="center"
+            justifyContent={'center'}
+            textAlign="center"
+          >
+            <Stack flexDirection={'row'} gap={1}>
+              <FilterNone />
+              <MuiTypography>
+                {error ? error.message : messages.MSG24}
+              </MuiTypography>
+            </Stack>
           </Box>
         )}
       </TableContainer>

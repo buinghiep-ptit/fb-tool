@@ -199,7 +199,7 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    const files = fileInfos.map(file => ({
+    const files = [...fileInfos, ...(event?.medias ?? [])].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
       url: file.url,

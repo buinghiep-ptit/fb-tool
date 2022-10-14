@@ -58,7 +58,7 @@ export default function CustomerAccounts(props: Props) {
     status: queryParams.status ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
-    sort: 'fullName,asc',
+    sort: 'dateCreated,desc',
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(
@@ -68,10 +68,10 @@ export default function CustomerAccounts(props: Props) {
   const validationSchema = Yup.object().shape({
     account: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
     email: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(256, 'email must be at almost 256 characters'),
+      .max(255, 'email must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -137,21 +137,27 @@ export default function CustomerAccounts(props: Props) {
 
     setFilters(prevFilters => {
       return {
-        ...extractMergeFiltersObject(prevFilters, values),
+        ...extractMergeFiltersObject(prevFilters, {
+          ...values,
+          search: values.search ? values.search?.trim() : '',
+        }),
         page: 0,
         size: 20,
       }
     })
 
     navigate('', {
-      ...extractMergeFiltersObject(filters, values),
+      ...extractMergeFiltersObject(filters, {
+        ...values,
+        search: values.search ? values.search?.trim() : '',
+      }),
       page: 0,
       size: 20,
     } as any)
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
+    if (cell.action || cell.link) {
       // if (cell.id === 'mobilePhone') {
       navigate(`${row.customerId}/thong-tin`, {})
       // } else if (cell.id === 'action') {

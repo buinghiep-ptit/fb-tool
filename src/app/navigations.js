@@ -1,40 +1,41 @@
+import { ROLES } from './utils/enums/roles'
+
 export const navigations = [
   { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
   {
     name: 'Quản lý tài khoản Admin',
     path: '/quan-ly-tai-khoan-admin',
     icon: 'admin_panel_settings',
-    auth: [1],
+    auth: [ROLES.ADMIN],
   },
   {
     name: 'Quản lý tài khoản KH',
     path: '/quan-ly-tai-khoan-khach-hang',
     icon: 'account_box',
-    auth: [1],
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý Feed',
     path: '/quan-ly-feeds',
     icon: 'feed',
-    auth: [1],
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {
     name: 'Thêm mới Feed',
     path: '/them-moi-feed',
     icon: 'event_note',
-    auth: [1, 2],
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
-    auth: [1],
   },
   {
     name: 'Quản lý đơn hàng',
     path: '/quan-ly-don-hang',
     icon: 'fact_check',
-    auth: [1, 2],
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý địa danh',
@@ -50,11 +51,13 @@ export const navigations = [
     name: 'Quản lý dịch vụ',
     path: '/quan-ly-dich-vu',
     icon: 'event',
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     name: 'Quản lý đối tác',
     path: '/quan-ly-thong-tin-doi-tac',
     icon: 'store_front',
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     name: 'Quản lý từ cấm',

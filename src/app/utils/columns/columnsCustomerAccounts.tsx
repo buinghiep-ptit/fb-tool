@@ -29,7 +29,7 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     id: 'mobilePhone',
     label: 'Số điện thoại',
     minWidth: 120,
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>
@@ -40,7 +40,7 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     label: 'Email',
     minWidth: 200,
     align: 'center',
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>
@@ -51,7 +51,7 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     label: 'Tên hiển thị',
     minWidth: 150,
     align: 'center',
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>

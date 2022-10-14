@@ -80,7 +80,7 @@ export default function ManagerEvents(props: Props) {
   const validationSchema = Yup.object().shape({
     areaNameOrAddress: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -212,7 +212,7 @@ export default function ManagerEvents(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
       </Box>
       <Stack gap={3}>
-        <SimpleCard title="Quản lý sự kiện">
+        <SimpleCard>
           <form
             onSubmit={methods.handleSubmit(onSubmitHandler)}
             noValidate
@@ -222,11 +222,11 @@ export default function ManagerEvents(props: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Tên sự kiện/Địa chỉ'}
+                    label={'Tên sự kiện'}
                     type="text"
                     name="areaNameOrAddress"
                     defaultValue=""
-                    placeholder="Nhập tên sự kiện, địa chỉ"
+                    placeholder="Nhập tên sự kiện"
                     fullWidth
                   />
                 </Grid>
@@ -240,7 +240,6 @@ export default function ManagerEvents(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}></Grid>
                 <Grid item sm={3} xs={12}>
                   <MuiButton
                     onClick={() => navigate(`them-moi-su-kien`, {})}

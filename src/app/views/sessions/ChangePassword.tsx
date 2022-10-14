@@ -106,8 +106,8 @@ export default function ChangePassword({ title }: Props) {
             <FormInputText
               type={showPassword.visibility ? 'text' : 'password'}
               name="currentPassword"
-              label={'Mật khẩu hiện tại'}
-              placeholder="Nhập mật khẩu hiện tại"
+              label={'Mật khẩu cũ'}
+              placeholder="Nhập mật khẩu cũ"
               iconEnd={
                 <IconButton onClick={handleClickShowPassword} edge="end">
                   {!showPassword.visibility ? (
@@ -139,8 +139,8 @@ export default function ChangePassword({ title }: Props) {
             <FormInputText
               type={showPassword.visibility ? 'text' : 'password'}
               name="passwordConfirmation"
-              placeholder="Nhập mật khẩu xác nhận"
-              label={'Xác nhận mật khẩu'}
+              placeholder="Nhập lại mật khẩu mới"
+              label={'Xác nhận mật khẩu mới'}
               iconEnd={
                 <IconButton onClick={handleClickShowPassword} edge="end">
                   {!showPassword.visibility ? (

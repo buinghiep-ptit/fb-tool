@@ -13,7 +13,7 @@ export const useUpdatePasswordCustomer = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
     (params: {
-      payload: { newPassword: string }
+      payload: { newPassword: string; note: string }
       customerId: number | string
     }) => changePasswordCustomer(params.customerId, params.payload),
     {

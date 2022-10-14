@@ -48,7 +48,7 @@ export const fetchLogsCustomer = async ({
 
 export const changePasswordCustomer = async (
   customerId: number | string,
-  payload: { newPassword: string },
+  payload: { newPassword?: string; note?: string },
 ): Promise<any> => {
   const { data } = await http.post<any>(
     `/api/customer/${customerId}/change-password`,
@@ -110,5 +110,10 @@ export const addOtpCountCustomer = async (
 
 export const customerSystemDefault = async (): Promise<ICustomerTiny> => {
   const { data } = await http.get<ICustomerTiny>(`/api/customer/campdi`)
+  return data
+}
+
+export const lockDetail = async (customerId: number): Promise<any> => {
+  const { data } = await http.get<any>(`/api/customer/${customerId}/lock-info`)
   return data
 }

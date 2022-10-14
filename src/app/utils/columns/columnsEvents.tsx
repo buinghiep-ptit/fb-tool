@@ -21,6 +21,9 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           overflow: 'hidden',
           aspectRatio: 'auto 16 / 9',
           borderRadius: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <img
@@ -31,7 +34,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: 'scale-down',
           }}
           loading="lazy"
           alt="bg"
@@ -60,7 +63,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     id: 'tags',
     label: 'Hashtag',
     minWidth: 170,
-    align: 'center',
+    align: 'left',
     format: (values: any) => {
       return (
         <Box

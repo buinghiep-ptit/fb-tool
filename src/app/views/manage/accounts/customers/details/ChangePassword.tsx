@@ -23,7 +23,7 @@ type Props = {
 
 type FormData = {
   password?: string
-  note?: number
+  note?: string
 }
 
 export default function ChangePassword({ title }: Props) {
@@ -56,7 +56,7 @@ export default function ChangePassword({ title }: Props) {
     // .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
     note: Yup.string()
       .required(messages.MSG1)
-      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({
@@ -70,7 +70,10 @@ export default function ChangePassword({ title }: Props) {
   const onSubmitHandler: SubmitHandler<FormData> = (values: FormData) => {
     updatePassword({
       customerId: customerId as any,
-      payload: { newPassword: values.password as string },
+      payload: {
+        newPassword: values.password as string,
+        note: values.note as string,
+      },
     })
   }
 

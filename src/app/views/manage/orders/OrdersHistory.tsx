@@ -131,10 +131,10 @@ export default function OrdersHistory() {
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
     searchHandler: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(256, 'hashtag must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 256 characters'),
     from: Yup.date()
       //   .min(new Date(), 'Tối thiều là hôm nay')
       .typeError('Sai dịnh dạng.')

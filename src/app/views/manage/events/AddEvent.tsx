@@ -91,7 +91,7 @@ export default function AddEvent(props: Props) {
     endDate: Yup.date()
       .when('startDate', (startDate, yup) => {
         if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 86400000)
+          const dayAfter = new Date(startDate.getTime() + 0)
           return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
         }
         return yup
@@ -148,6 +148,7 @@ export default function AddEvent(props: Props) {
     () => getEventDetail(Number(eventId ?? 0)),
     {
       enabled: !!eventId,
+      staleTime: 5 * 60 * 1000,
     },
   )
 
@@ -198,7 +199,7 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    const files = [...mediasSrcPreviewer].map(file => ({
+    const files = [...fileInfos, ...(event?.medias ?? [])].map(file => ({
       mediaType: EMediaType.POST,
       mediaFormat: fileConfigs.mediaFormat,
       url: file.url,

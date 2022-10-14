@@ -1,4 +1,5 @@
 import { Autocomplete, Chip, styled, TextField } from '@mui/material'
+import { useEffect } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 
 const CssTextField = styled(TextField)({
@@ -26,7 +27,9 @@ export function MuiAutocompleteWithTags({
   const {
     control,
     getValues,
+    watch,
     setValue,
+    setError,
     formState: { errors },
   } = useFormContext()
 

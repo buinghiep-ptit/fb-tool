@@ -32,7 +32,7 @@ export default function ReportInfringe({ title }: Props) {
   const validationSchema = Yup.object().shape({
     reason: Yup.string()
       .required('Lý do không được bỏ trống')
-      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({

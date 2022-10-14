@@ -91,7 +91,7 @@ export default function LockCustomer({ title }: Props) {
 
     reason: Yup.string()
       .required(messages.MSG1)
-      .max(256, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({

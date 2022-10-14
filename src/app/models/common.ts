@@ -50,6 +50,7 @@ export interface TableColumn<T> {
   action?: (param?: any) => ReactElement
   format?: (param: any) => string | null | ReactElement
   media?: (param: any) => string | null | ReactElement
+  link?: (param: any) => string | null | ReactElement
 }
 
 export interface IUserProfile {

@@ -5,6 +5,7 @@ import { lazy } from 'react'
 import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
+import { ROLES } from 'app/utils/enums/roles'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -83,12 +84,12 @@ const ManagementRoutes = [
         element: <CreateUser title="Thêm tài khoản" />,
       },
     ],
-    auth: [1],
+    auth: [ROLES.ADMIN],
   },
   {
     path: '/quan-ly-tai-khoan-khach-hang',
     element: <CustomerAccounts />,
-    auth: [1],
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     path: '/quan-ly-tai-khoan-khach-hang/:customerId',
@@ -139,7 +140,7 @@ const ManagementRoutes = [
         element: <ReportDialog title="Báo cáo vi phạm" />,
       },
     ],
-    auth: [1],
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {
     path: '/quan-ly-feeds/:feedId',
@@ -172,8 +173,15 @@ const ManagementRoutes = [
       },
     ],
   },
-  { path: '/them-moi-feed', element: <CreateFeed />, auth: [1, 2] },
-  { path: '/quan-ly-su-kien', element: <ManagerEvents />, auth: [1] },
+  {
+    path: '/them-moi-feed',
+    element: <CreateFeed />,
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-su-kien',
+    element: <ManagerEvents />,
+  },
   {
     path: '/quan-ly-su-kien/them-moi-su-kien',
     element: <AddEvent />,
@@ -215,7 +223,7 @@ const ManagementRoutes = [
         ],
       },
     ],
-    auth: [1, 2],
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
 
   {
@@ -225,6 +233,7 @@ const ManagementRoutes = [
   {
     path: '/quan-ly-thong-tin-doi-tac',
     element: <ManagerMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     path: '/them-dia-danh',
@@ -233,10 +242,12 @@ const ManagementRoutes = [
   {
     path: '/them-doi-tac',
     element: <CreateMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     path: '/cap-nhat-thong-tin-doi-tac/:id',
     element: <UpdateMerchant />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     path: '/chi-tiet-dia-danh/:id',
@@ -251,7 +262,11 @@ const ManagementRoutes = [
     element: <DetailCampGround action="create" />,
   },
   { path: '/quan-ly-thong-tin-diem-camp', element: <ManagerLocation /> },
-  { path: '/quan-ly-dich-vu', element: <ManagerServices /> },
+  {
+    path: '/quan-ly-dich-vu',
+    element: <ManagerServices />,
+    auth: [ROLES.ADMIN, ROLES.SALE],
+  },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
   { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },
 ]

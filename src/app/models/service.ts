@@ -1,4 +1,5 @@
 import { IPagingResponse } from './common'
+import { IMediaOverall } from './feed'
 
 export interface TitleService {
   name?: string
@@ -18,10 +19,8 @@ export interface DetailService {
   capacity?: number
   description?: string
   status?: number
-  weekdayPrices: {
-    amount: number
-  }
-  images?: string
+  weekdayPrices: WeekdayPrices[]
+  images?: IMediaOverall[]
   dateCreated?: string
   dateUpdated?: string
 }
@@ -29,4 +28,10 @@ export type TitleServices = keyof TitleService | 'order' | 'action'
 
 export interface ServiceResponse extends IPagingResponse {
   content?: TitleService[]
+}
+
+export interface WeekdayPrices {
+  id?: number
+  campRentalId?: number
+  amount?: number
 }

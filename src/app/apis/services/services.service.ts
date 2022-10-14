@@ -40,7 +40,7 @@ export const ToggleStatus = async (
   serviceId: number,
   params: { status: number },
 ): Promise<any> => {
-  const { data } = await http.get<any>(
+  const { data } = await http.put<any>(
     `/api/camp-service/${serviceId}/toggle-status?status=${params.status}`,
   )
   return data

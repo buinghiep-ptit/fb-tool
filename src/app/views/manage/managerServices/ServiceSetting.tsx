@@ -13,7 +13,10 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { ServicesFilters } from 'app/models'
-import { getListServices } from 'app/apis/services/services.service'
+import {
+  getListServices,
+  ToggleStatus,
+} from 'app/apis/services/services.service'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiButton } from 'app/components/common/MuiButton'
@@ -28,6 +31,7 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import {
   useDeleteService,
   useUpdateService,
+  useUpdateStatusService,
 } from 'app/hooks/queries/useServicesData'
 import { ServiceResponse, TitleService } from 'app/models/service'
 
@@ -119,6 +123,8 @@ export default function ServiceSetting(props: Props) {
   }
   const { mutate: updateService } = useUpdateService(onRowUpdateSuccess)
   const { mutate: deleteService } = useDeleteService(onRowUpdateSuccess)
+  const { mutate: updateStatusService } =
+    useUpdateStatusService(onRowUpdateSuccess)
 
   const onSubmitHandler: SubmitHandler<ServicesFilters> = (
     values: ServicesFilters,
@@ -148,7 +154,7 @@ export default function ServiceSetting(props: Props) {
         navigate(`${row.id}/chi-tiet`, {})
       } else if (cell.id === 'status') {
         console.log('status')
-        updateService({
+        updateStatusService({
           serviceId: row.id,
           status: row.status * -1,
         })

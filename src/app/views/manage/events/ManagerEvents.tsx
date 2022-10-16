@@ -22,7 +22,7 @@ import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { DDMMYYYYFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
@@ -55,6 +55,7 @@ const newEvents = (events: IEventOverall[]) => {
 
 export default function ManagerEvents(props: Props) {
   const navigate = useNavigateParams()
+  const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(
@@ -100,6 +101,7 @@ export default function ManagerEvents(props: Props) {
     () => fetchEvents(filters),
     {
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
       keepPreviousData: true,
       enabled: !!filters,
     },
@@ -178,7 +180,7 @@ export default function ManagerEvents(props: Props) {
   const onClickRow = (cell: any, row: any) => {
     if (cell.action) {
       if (cell.id === 'name') {
-        navigate(`${row.id}/chi-tiet`, {})
+        navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
       } else if (cell.id === 'status') {
         setDialogData(prev => ({
           ...prev,
@@ -192,7 +194,7 @@ export default function ManagerEvents(props: Props) {
         setOpenDialog(true)
         setRow(row)
       } else if (cell.id === 'edit') {
-        navigate(`${row.id}/chinh-sua`, {})
+        navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
       } else if (cell.id === 'delete') {
         setDialogData(prev => ({
           ...prev,
@@ -242,7 +244,9 @@ export default function ManagerEvents(props: Props) {
                 </Grid>
                 <Grid item sm={3} xs={12}>
                   <MuiButton
-                    onClick={() => navigate(`them-moi-su-kien`, {})}
+                    onClick={() =>
+                      navigation(`them-moi-su-kien`, { state: { mode: 'add' } })
+                    }
                     title="Tạo mới sự kiện"
                     variant="contained"
                     color="primary"

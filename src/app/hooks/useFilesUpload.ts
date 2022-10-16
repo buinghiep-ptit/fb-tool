@@ -1,4 +1,5 @@
 import { uploadFile } from 'app/apis/uploads/upload.service'
+import { IMediaOverall } from 'app/models'
 import { useRef, useState } from 'react'
 
 export type FileInfoResult = {
@@ -22,8 +23,14 @@ export const useUploadFiles = () => {
     val: FileInfoProgress[]
   }>({ val: [] })
   const [message, setMessage] = useState<string[]>([])
-  const [fileInfos, setFileInfos] = useState<FileInfoResult[]>([])
+  const [fileInfos, setFileInfos] = useState<
+    FileInfoResult[] | IMediaOverall[]
+  >([])
   const progressInfosRef = useRef<{ val: FileInfoProgress[] }>({ val: [] })
+
+  const setInitialFileInfos = (files: any) => {
+    setFileInfos(files)
+  }
 
   const selectFiles = (selectedFiles: any) => {
     setSelectedFiles(selectedFiles)
@@ -47,12 +54,12 @@ export const useUploadFiles = () => {
       },
       abortController.current,
     )
-      .then(result => {
+      .then(files => {
         setMessage(prevMessage => [
           ...prevMessage,
           'Uploaded the file successfully: ' + file.name,
         ])
-        return { ...result, mediaFormat }
+        return { ...files, mediaFormat }
       })
       .catch(() => {
         _progressInfos[idx].percentage = 0
@@ -63,18 +70,6 @@ export const useUploadFiles = () => {
           'Could not upload the file: ' + file.name,
         ])
       })
-  }
-
-  const cancelUpload = () => {
-    abortController.current && abortController.current.abort()
-    setUploading(false)
-  }
-
-  const removeSelectedFiles = (index?: number) => {
-    if (index) {
-      fileInfos.splice(index, 1)
-      setFileInfos([...fileInfos])
-    } else setFileInfos([])
   }
 
   const uploadFiles = async (files?: File[], mediaFormat?: 1 | 2) => {
@@ -99,14 +94,35 @@ export const useUploadFiles = () => {
     setMessage([])
   }
 
+  const cancelUploading = () => {
+    abortController.current && abortController.current.abort()
+    setProgressInfos({ val: [] })
+    setUploading(false)
+  }
+
+  const removeUploadedFiles = (index?: number, mediaFormat?: 1 | 2) => {
+    if (index !== undefined) {
+      fileInfos.splice(index, 1)
+      setFileInfos([...fileInfos])
+    } else {
+      setFileInfos(
+        ((fileInfos ?? []) as IMediaOverall[]).filter(
+          file => file.mediaFormat !== mediaFormat,
+        ) ?? [],
+      )
+    }
+  }
+
   return [
     (files?: File[]) => selectFiles(files),
     (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
-    (index?: number) => removeSelectedFiles(index),
-    cancelUpload,
+    (index?: number, mediaFormat?: 1 | 2) =>
+      removeUploadedFiles(index, mediaFormat),
+    cancelUploading,
     uploading,
     progressInfos,
     message,
+    (files: FileInfoResult[] | IMediaOverall[]) => setInitialFileInfos(files),
     fileInfos,
   ] as const
 }

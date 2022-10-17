@@ -7,6 +7,7 @@ import Tab from '@mui/material/Tab'
 import TabPanel from '@mui/lab/TabPanel'
 import InformationCampGround from './informationCampGround'
 import ListCampService from './listCampService'
+import ListCampHandBook from './listCampHandbook'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -17,7 +18,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const MENU_DETAL = ['Thông tin', 'Danh sách dịch vụ']
+const MENU_DETAL = ['Thông tin', 'Danh sách dịch vụ', 'Cẩm nang']
 
 export default function DetailCampGround({ action }) {
   const [value, setValue] = React.useState('1')
@@ -63,6 +64,9 @@ export default function DetailCampGround({ action }) {
               </TabPanel>
               <TabPanel value="2" sx={{ backgroundColor: '#fafafa' }}>
                 <ListCampService />
+              </TabPanel>
+              <TabPanel value="3" sx={{ backgroundColor: '#fafafa' }}>
+                <ListCampHandBook />
               </TabPanel>
             </TabContext>
           )}

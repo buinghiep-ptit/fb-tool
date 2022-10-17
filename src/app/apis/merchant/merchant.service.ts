@@ -29,6 +29,6 @@ export const deleteMerchant = async (id: any): Promise<any> => {
 }
 
 export const updateMerchantStatus = async (id: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/merchant/${id}/lock/toggle`)
+  const { data } = await http.put<any>(`/api/merchant/${id}/lock/toggle`)
   return data
 }

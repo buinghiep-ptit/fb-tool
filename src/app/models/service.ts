@@ -33,5 +33,6 @@ export interface ServiceResponse extends IPagingResponse {
 export interface WeekdayPrices {
   id?: number
   campRentalId?: number
+  day?: string
   amount?: number
 }

@@ -6,6 +6,10 @@ import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 import { ROLES } from 'app/utils/enums/roles'
+import AvailablePayment from './orders/details/ButtonsLink/AvailablePayment'
+import UnAvailableOrder from './orders/details/ButtonsLink/UnAvailableOrder'
+import OrderDetail from './orders/OrderDetail'
+import OrdersHistory from './orders/OrdersHistory'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),

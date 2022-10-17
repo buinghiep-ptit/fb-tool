@@ -31,8 +31,14 @@ export const deleteService = async (serviceId: number): Promise<any> => {
   return data
 }
 
-export const updateService = async (serviceId: number): Promise<any> => {
-  const { data } = await http.put<any>(`/api/camp-service/${serviceId}`)
+export const updateService = async (
+  serviceId: number,
+  payload?: any,
+): Promise<any> => {
+  const { data } = await http.put<any>(
+    `/api/camp-service/${serviceId}`,
+    payload,
+  )
   return data
 }
 

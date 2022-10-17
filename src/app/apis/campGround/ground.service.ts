@@ -127,3 +127,11 @@ export const removeHandBookWithCamp = async (params: any): Promise<any> => {
   )
   return data
 }
+
+export const addHandBookToCamp = async (params: any): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/camp-grounds/add-handbook`,
+    params,
+  )
+  return data
+}

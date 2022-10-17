@@ -23,7 +23,7 @@ const StyledTable = styled(Table)(() => ({
   },
 }))
 
-const ListHandBookUnlinked = ({ tableData }) => {
+const ListHandBookUnlinked = ({ tableData, handleLinkedHandbook }) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [arrCheck, setArrCheck] = useState([])
@@ -52,25 +52,41 @@ const ListHandBookUnlinked = ({ tableData }) => {
       <StyledTable>
         <TableHead>
           <TableRow>
-            <TableCell align="left">STT</TableCell>
-            <TableCell align="center">Tên cẩm nang</TableCell>
-            <TableCell align="center">Liên kết</TableCell>
+            <TableCell align="left" width="100px">
+              STT
+            </TableCell>
+            <TableCell align="center" width="400px">
+              Tên cẩm nang
+            </TableCell>
+            <TableCell align="center" width="200px">
+              Liên kết
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {tableData
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((subscriber, index) => (
-              <TableRow key={index}>
-                <TableCell align="left">{subscriber.id}</TableCell>
-                <TableCell align="center">{subscriber.title}</TableCell>
+            .map((handbook, index) => (
+              <TableRow key={handbook.id}>
+                <TableCell align="left">{index + 1}</TableCell>
+                <TableCell align="center">{handbook.title}</TableCell>
                 <TableCell align="center">
-                  <Button variant="text">
-                    Thêm <Icon>task_alt_icon</Icon>
-                  </Button>
-                  <Button variant="text" color="error">
-                    Bỏ thêm <Icon>highlight_off_icon</Icon>
-                  </Button>
+                  {!handbook.linked ? (
+                    <Button
+                      variant="text"
+                      onClick={() => handleLinkedHandbook(index, true)}
+                    >
+                      Thêm <Icon>task_alt_icon</Icon>
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="text"
+                      color="error"
+                      onClick={() => handleLinkedHandbook(index, false)}
+                    >
+                      Bỏ thêm <Icon>highlight_off_icon</Icon>
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

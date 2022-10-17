@@ -10,19 +10,19 @@ import {
   removeHandBookWithCamp,
   getListHandBookLinked,
   getListHandBookUnLinked,
+  addHandBookToCamp,
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
 import { useParams } from 'react-router-dom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import { Stack } from '@mui/system'
 import ListHandBookUnlinked from './listHandBookUnlinked'
+import { toastSuccess } from 'app/helpers/toastNofication'
 
 export default function ListCampHandBook(props) {
   const [listHandBookLinked, setListHandBookLinked] = useState([])
   const [totalListHandBookLinked, setTotalListHandBookLinked] = useState()
   const [listHandBookUnLinked, setListHandBookUnLinked] = useState([])
-  const [totalListHandBookUnLinked, setTotalListHandBookUnLinked] = useState()
-
   const params = useParams()
   const dialogCustomRef = React.useRef(null)
   const fetchListHandBookLinked = async param => {
@@ -50,10 +50,10 @@ export default function ListCampHandBook(props) {
           const convertHandBook = {}
           convertHandBook.id = handbook.id
           convertHandBook.title = handbook.title
+          convertHandBook.linked = false
           return convertHandBook
         })
         setListHandBookUnLinked(newList)
-        setTotalListHandBookUnLinked(data.totalElements)
       })
       .catch(err => console.log(err))
   }
@@ -64,6 +64,35 @@ export default function ListCampHandBook(props) {
       idHandBook: id,
     })
     return res
+  }
+
+  const handleLinkedHandbook = (id, status) => {
+    const newList = cloneDeep(listHandBookUnLinked)
+    newList[id].linked = status
+    setListHandBookUnLinked(newList)
+  }
+
+  const onAddHandBookToCamp = async () => {
+    const listHandBookWillLink = listHandBookUnLinked
+      .filter(handbook => handbook.linked)
+      .map(handbook => {
+        return {
+          idCampGround: parseInt(params.id),
+          idHandBook: handbook.id,
+        }
+      })
+
+    const res = await addHandBookToCamp({
+      handbooksToLink: listHandBookWillLink,
+    })
+    if (res) {
+      toastSuccess({ message: 'Liên kết thành công' })
+      dialogCustomRef.current.handleClose()
+      fetchListHandBookLinked({
+        page: 0,
+        size: 5,
+      })
+    }
   }
 
   React.useEffect(() => {
@@ -145,56 +174,25 @@ export default function ListCampHandBook(props) {
             <Button
               variant="contained"
               sx={{ height: '53px', marginLeft: '15px' }}
-              // onClick={() => {
-              //   fetchListCampUnlinked(params.id, {
-              //     name: filterCamp,
-              //     size: 5,
-              //     page: 0,
-              //   })
-              // }}
             >
               Tìm kiếm
             </Button>
           </Stack>
-          {/* 
-          <TableCustom
-            title="Danh sách cẩm nang"
-            tableModel={tableModelHandBookUnLinked}
-            pagination={true}
-            dataTable={listHandBookUnLinked || []}
-            totalData={parseInt(totalListHandBookUnLinked, 0)}
-            fetchDataTable={param => {
-              fetchListHandBookUnLinked(params.id, param)
-            }}
-            // onAddData={linkCampOnArea}
-            // filter={{ name: filterCamp }}
-          /> */}
+
           <ListHandBookUnlinked
             tableData={listHandBookUnLinked}
+            handleLinkedHandbook={handleLinkedHandbook}
           ></ListHandBookUnlinked>
           <Stack spacing={2} direction="row" mt={2}>
             <Button
               variant="outlined"
-              // onClick={() => {
-              //   fetchListCampUnlinked(params.id, {
-              //     name: filterCamp,
-              //     size: 5,
-              //     page: 0,
-              //   })
-              // }}
+              onClick={() => {
+                dialogCustomRef.current.handleClose()
+              }}
             >
               Hủy
             </Button>
-            <Button
-              variant="contained"
-              // onClick={() => {
-              //   fetchListCampUnlinked(params.id, {
-              //     name: filterCamp,
-              //     size: 5,
-              //     page: 0,
-              //   })
-              // }}
-            >
+            <Button variant="contained" onClick={() => onAddHandBookToCamp()}>
               Lưu
             </Button>
           </Stack>

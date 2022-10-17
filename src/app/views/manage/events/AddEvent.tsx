@@ -225,7 +225,10 @@ export default function AddEvent(props: Props) {
     const payload: IEventDetail = {
       name: values.name,
       content: values.editor_content,
-      medias: files,
+      medias:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? files
+          : [files[files.length - 1]],
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),

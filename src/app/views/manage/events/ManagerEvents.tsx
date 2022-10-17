@@ -41,7 +41,7 @@ type ISearchFilters = {
   areaNameOrAddress?: string
   page?: number
   size?: number
-  sort?: string[]
+  sort?: string
 }
 
 const newEvents = (events: IEventOverall[]) => {

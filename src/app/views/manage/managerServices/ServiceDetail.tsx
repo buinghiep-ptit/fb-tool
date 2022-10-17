@@ -175,11 +175,12 @@ export default function ServiceDetail(props: Props) {
   const [
     selectFiles,
     uploadFiles,
-    removeSelectedFiles,
-    cancelUpload,
+    removeUploadedFiles,
+    cancelUploading,
     uploading,
     progressInfos,
     message,
+    setFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -427,14 +428,14 @@ export default function ServiceDetail(props: Props) {
                     <UploadPreviewer
                       name="files"
                       initialMedias={campService?.images ?? []}
-                      fileInfos={fileInfos}
+                      fileInfos={fileInfos as any}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs as any}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
-                      removeSelectedFiles={removeSelectedFiles}
-                      cancelUpload={cancelUpload}
+                      removeUploadedFiles={removeUploadedFiles}
+                      cancelUploading={cancelUploading}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

@@ -20,7 +20,6 @@ export function checkIfFilesAreTooBig(
       }
     })
   }
-  console.log('valid:', valid)
   return valid
 }
 

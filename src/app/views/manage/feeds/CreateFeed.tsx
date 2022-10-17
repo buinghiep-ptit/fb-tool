@@ -88,39 +88,51 @@ export default function CreateFeed(props: Props) {
   })
   const [filters, setFilters] = useState({ cusType: 0 })
 
-  const validationSchema = Yup.object().shape({
-    cusType: Yup.string().required(messages.MSG1),
-    customer: Yup.object()
-      .nullable()
-      .when(['cusType'], {
-        is: (cusType: string) => !!cusType && Number(cusType) !== 0,
-        then: Yup.object().required(messages.MSG1).nullable(),
-      }),
-    idSrcType: Yup.string().required(messages.MSG1),
-    camp: Yup.object()
-      .nullable()
-      .when(['idSrcType'], {
-        is: (idSrcType: any) => !!idSrcType && Number(idSrcType) !== 4,
-        then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
-      })
-      .nullable(),
-    webUrl: Yup.string()
-      .nullable()
-      .when(['idSrcType'], {
-        is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 4,
-        then: Yup.string().required(messages.MSG1).nullable(),
-      }),
-    files: Yup.mixed()
-      .required(messages.MSG1)
-      .test(
-        'fileSize',
-        fileConfigs.mediaFormat === EMediaFormat.VIDEO
-          ? 'Dung lượng video tối đa 3phút'
-          : 'Dung lượng ảnh tối đa 10MB/ảnh',
-        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-      ),
-    hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      cusType: Yup.string().required(messages.MSG1),
+      customer: Yup.object()
+        .nullable()
+        .when(['cusType'], {
+          is: (cusType: string) => !!cusType && Number(cusType) !== 0,
+          then: Yup.object().required(messages.MSG1).nullable(),
+        }),
+      idSrcType: Yup.string().required(messages.MSG1),
+      camp: Yup.object()
+        .nullable()
+        .when(['idSrcType'], {
+          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) !== 4,
+          then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
+        })
+        .nullable(),
+      webUrl: Yup.string()
+        .nullable()
+        .when(['idSrcType'], {
+          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 4,
+          then: Yup.string().required(messages.MSG1).nullable(),
+        }),
+      files: Yup.mixed()
+        .test('empty', messages.MSG1, files => {
+          const media = ((fileInfos ?? []) as IMediaOverall[]).find(
+            media => media.mediaFormat === fileConfigs.mediaFormat,
+          )
+          if (files && files.length) {
+            return true
+          }
+
+          return !!media
+        })
+        .test(
+          'fileSize',
+          fileConfigs.mediaFormat === EMediaFormat.VIDEO
+            ? 'Dung lượng video tối đa 3 phút'
+            : 'Dung lượng ảnh tối đa 10MB/ảnh',
+          files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
+        ),
+      hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
+    },
+    [['files', 'files']],
+  )
 
   const methods = useForm<SchemaType>({
     defaultValues,
@@ -199,20 +211,23 @@ export default function CreateFeed(props: Props) {
   const [
     selectFiles,
     uploadFiles,
-    removeSelectedFiles,
-    cancelUpload,
+    removeUploadedFiles,
+    cancelUploading,
     uploading,
     progressInfos,
     message,
+    setFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    const files = fileInfos.map(file => ({
-      mediaType: EMediaType.POST,
-      mediaFormat: fileConfigs.mediaFormat,
-      url: file.url,
-    }))
+    const files = (fileInfos as IMediaOverall[])
+      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .map((file: IMediaOverall) => ({
+        mediaType: EMediaType.POST,
+        mediaFormat: fileConfigs.mediaFormat,
+        url: file.url,
+      }))
 
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
@@ -320,7 +335,7 @@ export default function CreateFeed(props: Props) {
           color="warning"
           onClick={() => {
             setMediasSrcPreviewer([])
-            removeSelectedFiles()
+            removeUploadedFiles()
             methods.reset()
           }}
           startIcon={<Icon>clear</Icon>}
@@ -340,7 +355,11 @@ export default function CreateFeed(props: Props) {
               <Grid item sm={6} xs={12}>
                 <Stack gap={3}>
                   <Stack>
-                    <SelectDropDown name="type" label="Loại post*">
+                    <SelectDropDown
+                      name="type"
+                      label="Loại post*"
+                      disabled={uploading}
+                    >
                       <MenuItem value={1}>Video</MenuItem>
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
@@ -461,16 +480,16 @@ export default function CreateFeed(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
+                      initialMedias={[]}
                       fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
-                      removeSelectedFiles={removeSelectedFiles}
-                      cancelUpload={cancelUpload}
+                      removeUploadedFiles={removeUploadedFiles}
+                      cancelUploading={cancelUploading}
                       uploading={uploading}
-                      initialMedias={[]}
                       progressInfos={progressInfos}
                     />
                   </Box>

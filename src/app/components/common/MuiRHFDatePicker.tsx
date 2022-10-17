@@ -48,6 +48,7 @@ export function MuiRHFDatePicker({
               helperText={
                 errors[name] ? (errors[name]?.message as unknown as string) : ''
               }
+              InputLabelProps={{ shrink: true }}
               size="medium"
               variant="outlined"
               margin="dense"

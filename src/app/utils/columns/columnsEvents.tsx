@@ -71,7 +71,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: '3',
+            WebkitLineClamp: '2',
             WebkitBoxOrient: 'vertical',
           }}
         >

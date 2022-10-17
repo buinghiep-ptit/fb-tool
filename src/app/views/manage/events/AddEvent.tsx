@@ -65,10 +65,10 @@ export default function AddEvent(props: Props) {
   const navigate = useNavigate()
   const { eventId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
+    mediaType: EMediaType.POST,
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
-    mediaType: EMediaType.POST,
   })
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
@@ -81,42 +81,53 @@ export default function AddEvent(props: Props) {
     status: 1,
   })
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required('Tên không được bỏ trống'),
-    startDate: Yup.date()
-      //   .min(new Date(), 'Tối thiều là hôm nay')
-      .typeError('Sai dịnh dạng.')
-      .nullable()
-      .required('Chọn ngày bắt đầu'),
-    endDate: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable()
-      .required('Chọn ngày kết thúc.'),
-    amount: Yup.string().nullable(),
-    files: Yup.mixed()
-      .test('empty', messages.MSG1, files => {
-        if (!!Number(eventId ?? 0)) {
-          return !!mediasSrcPreviewer.length
-        }
-        const isError = files && !!files.length
-        return isError
-      })
-      .test(
-        'fileSize',
-        fileConfigs.mediaFormat === EMediaFormat.VIDEO
-          ? 'Dung lượng video tối đa 3phút'
-          : 'Dung lượng ảnh tối đa 10MB/ảnh',
-        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-      ),
-    editor_content: Yup.string().required(messages.MSG1),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      name: Yup.string().required('Tên không được bỏ trống'),
+      startDate: Yup.date()
+        //   .min(new Date(), 'Tối thiều là hôm nay')
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required('Chọn ngày bắt đầu'),
+      endDate: Yup.date()
+        .when('startDate', (startDate, yup) => {
+          if (startDate && startDate != 'Invalid Date') {
+            const dayAfter = new Date(startDate.getTime() + 0)
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required('Chọn ngày kết thúc.'),
+      amount: Yup.string().nullable(),
+      files: Yup.mixed()
+        .test('empty', messages.MSG1, files => {
+          // if (!!Number(eventId ?? 0)) {
+          const media = ((fileInfos ?? []) as IMediaOverall[]).find(
+            media => media.mediaFormat === fileConfigs.mediaFormat,
+          )
+
+          if (files && files.length) {
+            return true
+          }
+
+          return !!media
+          // }
+          // const isError = files && !!files.length
+          // return isError
+        })
+        .test(
+          'fileSize',
+          fileConfigs.mediaFormat === EMediaFormat.VIDEO
+            ? 'Dung lượng video tối đa 3 phút'
+            : 'Dung lượng ảnh tối đa 10MB/ảnh',
+          files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
+        ),
+      editor_content: Yup.string().required(messages.MSG1),
+    },
+    [['files', 'files']],
+  )
 
   const methods = useForm<SchemaType>({
     defaultValues,
@@ -129,11 +140,12 @@ export default function AddEvent(props: Props) {
   const [
     selectFiles,
     uploadFiles,
-    removeSelectedFiles,
-    cancelUpload,
+    removeUploadedFiles,
+    cancelUploading,
     uploading,
     progressInfos,
     message,
+    setInitialFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -167,11 +179,13 @@ export default function AddEvent(props: Props) {
       defaultValues.startDate = event.startDate
       defaultValues.endDate = event.endDate
       defaultValues.editor_content = event.content
-      defaultValues.type = event.medias && event.medias[0].mediaFormat
+      defaultValues.type =
+        event.medias && event.medias.length && event.medias[0].mediaFormat
 
       if (
-        event?.medias &&
-        event?.medias[0].mediaFormat === EMediaFormat.IMAGE
+        event.medias &&
+        event.medias.length &&
+        event.medias[0].mediaFormat === EMediaFormat.IMAGE
       ) {
         setFileConfigs(prev => ({
           ...prev,
@@ -187,29 +201,34 @@ export default function AddEvent(props: Props) {
           multiple: false,
         }))
       }
-      // setMediasSrcPreviewer([...(event.medias ?? []), ...(fileInfos ?? [])])
       setMediasSrcPreviewer([...(event.medias ?? [])])
+      setInitialFileInfos([...(event.medias ?? [])])
     } else {
       setMediasSrcPreviewer([])
     }
 
-    removeSelectedFiles()
+    // removeUploadedFiles() // refactor here , remove this line ???
     methods.reset({ ...defaultValues })
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    const files = [...fileInfos, ...(event?.medias ?? [])].map(file => ({
-      mediaType: EMediaType.POST,
-      mediaFormat: fileConfigs.mediaFormat,
-      url: file.url,
-      detail: null,
-    }))
+    const files = (fileInfos as IMediaOverall[])
+      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .map((file: IMediaOverall) => ({
+        mediaType: EMediaType.POST,
+        mediaFormat: fileConfigs.mediaFormat,
+        url: file.url,
+        detail: null,
+      }))
 
     const payload: IEventDetail = {
       name: values.name,
       content: values.editor_content,
-      medias: files,
+      medias:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? files
+          : [files[files.length - 1]],
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),
@@ -225,7 +244,6 @@ export default function AddEvent(props: Props) {
   }
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
-    // setMediasSrcPreviewer([])
     navigate(-1)
     methods.reset()
   }
@@ -288,8 +306,10 @@ export default function AddEvent(props: Props) {
           onClick={methods.handleSubmit(onSubmitHandler)}
           loading={createLoading || editLoading}
           startIcon={<Icon>done</Icon>}
+          disabled={uploading}
         />
         <MuiButton
+          disabled={uploading}
           title="Huỷ bỏ"
           variant="contained"
           color="warning"
@@ -307,7 +327,7 @@ export default function AddEvent(props: Props) {
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
-      <SimpleCard title="Thêm mới">
+      <SimpleCard>
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
           noValidate
@@ -369,7 +389,11 @@ export default function AddEvent(props: Props) {
                     </Stack>
                   </Stack>
                   <Stack>
-                    <SelectDropDown name="type" label="Loại file tải lên">
+                    <SelectDropDown
+                      name="type"
+                      label="Loại file tải lên"
+                      disabled={uploading}
+                    >
                       <MenuItem value={1}>Video</MenuItem>
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
@@ -430,8 +454,8 @@ export default function AddEvent(props: Props) {
                       mediaConfigs={fileConfigs}
                       selectFiles={selectFiles}
                       uploadFiles={uploadFiles}
-                      removeSelectedFiles={removeSelectedFiles}
-                      cancelUpload={cancelUpload}
+                      removeUploadedFiles={removeUploadedFiles}
+                      cancelUploading={cancelUploading}
                       uploading={uploading}
                       progressInfos={progressInfos}
                     />

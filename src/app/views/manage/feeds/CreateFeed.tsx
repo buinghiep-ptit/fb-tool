@@ -321,7 +321,7 @@ export default function CreateFeed(props: Props) {
       >
         <MuiButton
           title="Lưu"
-          disabled={uploading}
+          disabled={uploading || createLoading}
           variant="contained"
           color="primary"
           type="submit"

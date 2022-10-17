@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import { tableModel } from '../const'
+import { tableModelSevrvice } from '../const'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
@@ -131,7 +131,7 @@ export default function ListCampService(props) {
               })
             }}
           >
-            <Icon>search</Icon>
+            <Icon style={{ fontSize: '20px' }}>search</Icon> Tìm kiếm
           </Button>
         </Grid>
       </Grid>
@@ -140,7 +140,12 @@ export default function ListCampService(props) {
           item
           sm={6}
           xs={6}
-          sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            margin: '20px 0',
+            cursor: 'pointer',
+          }}
         >
           <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
             add_circle
@@ -152,14 +157,14 @@ export default function ListCampService(props) {
             className={undefined}
             ellipsis={undefined}
           >
-            Thêm địa điểm
+            Thêm dịch vụ
           </Paragraph>
         </Grid>
       </Grid>
       <TableCustom
-        title="Danh sách địa điểm Camp"
+        title="Danh sách dịch vụ"
         dataTable={listCampGroundService || []}
-        tableModel={tableModel}
+        tableModel={tableModelSevrvice}
         pagination={true}
         onDeleteData={deleteCampGroundService}
         updateStatus={updateCampGroundServiceStatus}

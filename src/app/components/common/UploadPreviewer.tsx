@@ -29,31 +29,14 @@ interface Props {
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
   uploadFiles: (files: any, mediaFormat?: 1 | 2, controller?: any) => void
-  removeSelectedFiles?: (index?: number) => void
-  cancelUpload?: () => void
+  removeUploadedFiles?: (index?: number, mediaFormat?: 1 | 2) => void
+  cancelUploading?: () => void
   uploading?: boolean
   progressInfos: any
   initialMedias?: IMediaOverall[]
   mediasSrcPreviewer: IMediaOverall[]
   fileInfos?: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
-}
-
-const checkIsMatchMediaFormat = (
-  files?: File[],
-  mediaFormat?: number,
-): boolean => {
-  if (mediaFormat && mediaFormat === 1) {
-    if (files && files[0].type.includes('video')) {
-      return true
-    } else return false
-  } else if (mediaFormat && mediaFormat === 2) {
-    if (files && files[0].type.includes('image')) {
-      return true
-    } else return false
-  }
-
-  return false
 }
 
 export function UploadPreviewer({
@@ -66,8 +49,8 @@ export function UploadPreviewer({
   },
   mode = 'append',
   uploadFiles,
-  removeSelectedFiles,
-  cancelUpload,
+  removeUploadedFiles,
+  cancelUploading,
   uploading,
   progressInfos,
   initialMedias = [],
@@ -75,8 +58,8 @@ export function UploadPreviewer({
   fileInfos,
   setMediasSrcPreviewer,
 }: Props) {
-  const { mediaFormat, mediaType, multiple } = mediaConfigs
-  const [duration, setDuration] = useState(0)
+  const { mediaFormat, mediaType, multiple, accept } = mediaConfigs
+  const [durationVideo, setDurationVideo] = useState(0)
   const _mediasSrcRef = useRef<{ val: IMediaOverall[] }>({ val: [] })
   const [openSlider, setOpenSlider] = useState(false)
   const [initialIndexSlider, setInitialIndexSlider] = useState(0)
@@ -94,50 +77,43 @@ export function UploadPreviewer({
   const files: File[] = watch(name)
 
   useEffect(() => {
-    if (mediaType === EMediaType.AVATAR) return
-    setMediasSrcPreviewer([...initialMedias]) // should be set initial medias
-    setValue('files', null)
-    clearErrors()
-    cancelUpload && cancelUpload()
-    removeSelectedFiles && removeSelectedFiles()
-  }, [mediaFormat])
-
-  // useEffect(() => {
-  //   if (files && files.length && fileInfos && fileInfos.length)
-  //     setMediasSrcPreviewer([...initialMedias, ...fileInfos])
-  // }, [fileInfos])
-
-  useEffect(() => {
-    const fileVideo = getValues(name) && getValues(name)[0]
-    if (duration && mediaFormat === 1 && fileVideo) {
-      const newFiles = Object.assign(fileVideo, {
-        duration,
-      })
-      if (duration > 180) {
-        setValue(name, null, {
-          shouldValidate: true,
-        })
-        cancelUpload && cancelUpload()
-        setDuration(0)
-      }
-
-      // setValue(name, [newFiles], {
-      //   shouldValidate: true,
-      // })
-    }
-  }, [duration, files])
-
-  useEffect(() => {
     register(name)
     return () => {
       unregister(name)
     }
   }, [register, unregister, name])
 
+  useEffect(() => {
+    if (mediaType === EMediaType.AVATAR) return
+    setValue('files', null)
+    clearErrors('files')
+    cancelUploading && cancelUploading()
+    setMediasSrcPreviewer(
+      (fileInfos ?? []).filter(file => file.mediaFormat === mediaFormat),
+    )
+  }, [mediaFormat])
+
+  useEffect(() => {
+    const fileVideo = getValues(name) && getValues(name)[0]
+    if (durationVideo && mediaFormat === 1 && fileVideo) {
+      const newFiles = Object.assign(fileVideo, {
+        duration: durationVideo,
+        mediaFormat,
+      })
+      if (durationVideo > 180) {
+        setValue(name, [newFiles], {
+          shouldValidate: true,
+        })
+        cancelUploading && cancelUploading()
+        setDurationVideo(0)
+      }
+    }
+  }, [durationVideo, files])
+
   const handleCloseSlider = () => {
     setOpenSlider(false)
   }
-  const onClickMedia = (imgIndex?: number) => {
+  const onShowMediaDetail = (imgIndex?: number) => {
     setInitialIndexSlider(imgIndex ?? 0)
     setOpenSlider(true)
   }
@@ -145,23 +121,23 @@ export function UploadPreviewer({
     mediasSrcPreviewer.splice(mediaIndex ?? 0, 1)
     setMediasSrcPreviewer([...mediasSrcPreviewer])
 
-    if (!files) return
+    if (files) {
+      if (mediaIndex ?? 0 <= files.length ?? 0 - 1) {
+        files.splice(mediaIndex ?? 0, 1)
 
-    if (mediaIndex ?? 0 <= files.length ?? 0 - 1) {
-      files.splice(mediaIndex ?? 0, 1)
-    }
-    if (!!files.length) setValue('files', files)
-    else setValue('files', null)
+        setValue('files', [...files])
+      }
+    } else setValue('files', null)
 
-    removeSelectedFiles && removeSelectedFiles(mediaIndex)
+    removeUploadedFiles && removeUploadedFiles(mediaIndex)
   }
 
-  const handleResetMedia = () => {
-    setMediasSrcPreviewer([]) // ??? ...initialMedias
+  const handleRemoveAllMedias = () => {
+    setMediasSrcPreviewer([])
     setValue('files', null)
     clearErrors('files')
 
-    removeSelectedFiles && removeSelectedFiles()
+    removeUploadedFiles && removeUploadedFiles(undefined, mediaFormat)
   }
 
   const extractDroppedFiles = (old: File[], dropped: File[]): File[] => {
@@ -186,15 +162,16 @@ export function UploadPreviewer({
 
   const onDrop = useCallback(
     (droppedFiles: File[]) => {
-      if (mediaFormat === EMediaFormat.VIDEO && !!files)
-        delete (files[0] as any).duration
-      const extract = extractDroppedFiles([...(files || [])], [...droppedFiles])
-      if (!extract.length) return
+      const extractFiles = extractDroppedFiles(
+        [...(files || [])],
+        [...droppedFiles],
+      )
+      if (!extractFiles.length) return
 
       if (mediaFormat === EMediaFormat.VIDEO || mediaType === EMediaType.AVATAR)
-        setMediasSrcPreviewer([{ url: URL.createObjectURL(extract[0]) }])
-      else {
-        const newImages = [...extract].map((originalFile: File) =>
+        setMediasSrcPreviewer([{ url: URL.createObjectURL(extractFiles[0]) }])
+      else if (mediaFormat === EMediaFormat.IMAGE) {
+        const newImages = [...extractFiles].map((originalFile: File) =>
           // deep clone
           Object.assign(
             new File([originalFile], originalFile.name, {
@@ -211,16 +188,17 @@ export function UploadPreviewer({
         val: mediasSrcPreviewer,
       }
 
-      uploadFiles(extract, mediaFormat)
       const newSelectedFiles: File[] =
         mediaFormat === EMediaFormat.VIDEO
-          ? [...extract]
-          : [...(files || []), ...extract]
+          ? [...extractFiles]
+          : [...(files || []), ...extractFiles]
       setValue(name, newSelectedFiles, {
         shouldValidate: true,
       })
+
+      uploadFiles(extractFiles, mediaFormat)
     },
-    [setValue, name, mode, files, mediaFormat],
+    [setValue, name, mode, files, mediaFormat, mediasSrcPreviewer],
   )
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -233,7 +211,8 @@ export function UploadPreviewer({
             'video/*': ['.mp4', '.webm', '.ogg'],
           }
         : {
-            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+            'image/png': ['.png'],
+            'image/jpeg': ['.jpg', '.jpeg'],
           },
     onDrop,
     maxFiles: 15,
@@ -243,7 +222,7 @@ export function UploadPreviewer({
   useEffect(() => {
     return () =>
       mediasSrcPreviewer.forEach(
-        image => image.url && URL.revokeObjectURL(image.url),
+        media => media.url && URL.revokeObjectURL(media.url),
       )
   }, [])
 
@@ -294,6 +273,9 @@ export function UploadPreviewer({
                   PNG / JPEG hoặc JPG
                 </MuiTypography>
                 <MuiTypography variant="body2">nhỏ hơn 10MB/ảnh</MuiTypography>
+                <MuiTypography variant="body2">
+                  tối đa 15 ảnh/lần chọn
+                </MuiTypography>
               </>
             )}
 
@@ -306,34 +288,15 @@ export function UploadPreviewer({
           </Stack>
         </Box>
       ) : (
-        <Box
-          sx={{
-            width: 200,
-            height: 200,
-            borderRadius: 100,
-            position: 'relative',
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            boxShadow:
-              '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
-
-            backgroundImage: `url(${
-              mediasSrcPreviewer[0] && mediasSrcPreviewer[0].url
-            })`,
-          }}
-        >
-          <input {...getInputProps()} />
-          <IconButton
-            onClick={open}
-            sx={{ position: 'absolute', bottom: 0, left: 8 }}
-          >
-            <Icon sx={{ fontSize: '32px !important' }}>local_see</Icon>
-          </IconButton>
-        </Box>
+        <AvatarChoose
+          mediasSrcPreviewer={mediasSrcPreviewer}
+          getInputProps={getInputProps}
+          open={open}
+        />
       )}
-
       {mediaType !== EMediaType.AVATAR && (
         <>
+          {' '}
           {!!mediasSrcPreviewer.length &&
             (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
               checkIsMatchMediaFormat(files, mediaFormat)) &&
@@ -343,7 +306,7 @@ export function UploadPreviewer({
                   medias={[...mediasSrcPreviewer] as any}
                   oldMedias={_mediasSrcRef.current.val}
                   progressInfos={progressInfos}
-                  onClickMedia={onClickMedia}
+                  onClickMedia={onShowMediaDetail}
                 />
                 <ModalFullScreen
                   mode="edit"
@@ -355,14 +318,14 @@ export function UploadPreviewer({
                 />
                 {!uploading && (
                   <>
-                    <CustomButton
+                    <CustomIconButton
                       handleClick={open}
                       iconName={'add_circle_outlined'}
                       title={'Thêm ảnh'}
                       position={{ top: '16px', left: '16px' }}
                     />
-                    <CustomButton
-                      handleClick={handleResetMedia}
+                    <CustomIconButton
+                      handleClick={handleRemoveAllMedias}
                       iconName={'delete'}
                       title={'Xoá tất cả'}
                       position={{ top: '16px', right: '16px' }}
@@ -390,18 +353,18 @@ export function UploadPreviewer({
                 <>
                   <MediaPlayer
                     url={mediasSrcPreviewer[0].url}
-                    setDuration={setDuration}
+                    setDuration={setDurationVideo}
                   />
                   {!uploading && (
                     <>
-                      <CustomButton
+                      <CustomIconButton
                         handleClick={open}
                         iconName={'cached'}
                         title={'Chọn lại'}
                         position={{ top: '16px', left: '16px' }}
                       />
-                      <CustomButton
-                        handleClick={handleResetMedia}
+                      <CustomIconButton
+                        handleClick={handleRemoveAllMedias}
                         iconName={'delete'}
                         title={'Xoá'}
                         position={{ top: '16px', right: '16px' }}
@@ -434,11 +397,11 @@ export function UploadPreviewer({
                   borderRadius: 1,
                 }}
                 onClick={() => {
-                  setDuration(0)
+                  setDurationVideo(0)
                   setValue(name, null, {
                     shouldValidate: true,
                   })
-                  cancelUpload && cancelUpload()
+                  cancelUploading && cancelUploading()
                 }}
               >
                 <Icon sx={{ color: 'white' }}>clear</Icon>
@@ -464,6 +427,24 @@ export function UploadPreviewer({
   )
 }
 
+const checkIsMatchMediaFormat = (
+  files?: File[],
+  mediaFormat?: number,
+): boolean => {
+  if (!files || !files.length) return false
+  if (mediaFormat && mediaFormat === 1) {
+    if (files[0].type.includes('video')) {
+      return true
+    } else return false
+  } else if (mediaFormat && mediaFormat === 2) {
+    if (files[0].type.includes('image')) {
+      return true
+    } else return false
+  }
+
+  return false
+}
+
 type ButtonProps = {
   handleClick: () => void
   iconName: string
@@ -471,7 +452,7 @@ type ButtonProps = {
   position?: any
 }
 
-const CustomButton = ({
+const CustomIconButton = ({
   iconName,
   title,
   position,
@@ -492,5 +473,38 @@ const CustomButton = ({
         {title}
       </MuiTypography>
     </IconButton>
+  )
+}
+
+export const AvatarChoose = ({
+  mediasSrcPreviewer,
+  getInputProps,
+  open,
+}: any) => {
+  return (
+    <Box
+      sx={{
+        width: 200,
+        height: 200,
+        borderRadius: 100,
+        position: 'relative',
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        boxShadow:
+          '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
+
+        backgroundImage: `url(${
+          mediasSrcPreviewer[0] && mediasSrcPreviewer[0].url
+        })`,
+      }}
+    >
+      <input {...getInputProps()} />
+      <IconButton
+        onClick={open}
+        sx={{ position: 'absolute', bottom: 0, left: 8 }}
+      >
+        <Icon sx={{ fontSize: '32px !important' }}>local_see</Icon>
+      </IconButton>
+    </Box>
   )
 }

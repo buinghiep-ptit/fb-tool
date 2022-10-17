@@ -220,11 +220,12 @@ export default function CustomerDetail(props: Props) {
   const [
     selectFiles,
     uploadFiles,
-    removeSelectedFiles,
-    cancelUpload,
+    removeUploadedFiles,
+    cancelUploading,
     uploading,
     progressInfos,
     message,
+    setFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -302,7 +303,7 @@ export default function CustomerDetail(props: Props) {
               variant="contained"
               color="warning"
               onClick={() => {
-                removeSelectedFiles()
+                removeUploadedFiles()
                 setMediasSrcPreviewer([
                   {
                     mediaType: EMediaType.AVATAR,
@@ -486,7 +487,7 @@ export default function CustomerDetail(props: Props) {
                             onClick={() => {
                               methods.clearErrors('files')
                               methods.setValue('files', null)
-                              removeSelectedFiles()
+                              removeUploadedFiles()
                               setMediasSrcPreviewer([
                                 {
                                   mediaType: EMediaType.AVATAR,

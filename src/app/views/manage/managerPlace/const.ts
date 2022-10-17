@@ -10,15 +10,15 @@ export const tableModel = {
     },
     {
       name: 'Tên địa danh',
-      width: 100,
+      width: 200,
     },
     {
       name: 'Số điểm camp',
-      width: 80,
+      width: 100,
     },
     {
       name: 'Sự kiện',
-      width: 150,
+      width: 200,
     },
     {
       name: 'Địa chỉ',
@@ -26,16 +26,16 @@ export const tableModel = {
     },
     {
       name: 'Loại hình',
-      width: 80,
+      width: 100,
     },
     {
       name: 'Trạng thái',
-      width: 100,
+      width: 150,
     },
 
     {
-      name: 'Hành động',
-      width: null,
+      name: '',
+      width: 100,
     },
   ],
   bodyCell: [
@@ -43,7 +43,7 @@ export const tableModel = {
     'image',
     'linkDetail',
     'quantity',
-    'event',
+    'eventPlace',
     'address',
     'type',
     'status',

@@ -119,7 +119,7 @@ const TableCustom = ({
           </TableHead>
 
           <TableBody>
-            {dataTable.map((data, index) => (
+            {(dataTable || []).map((data, index) => (
               <TableRow key={data.id}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
@@ -133,7 +133,9 @@ const TableCustom = ({
                                 border: '1px solid #ddd',
                                 borderRadius: '4px',
                                 padding: '5px',
-                                width: '150px',
+                                width: '120px',
+                                height: '90px',
+                                objectFit: 'cover',
                               }}
                             />
                           )}
@@ -223,6 +225,17 @@ const TableCustom = ({
                           </Link>
                         </TableCell>
                       )
+                    case 'eventPlace':
+                      return (
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <span style={{ color: '#217f32' }}>
+                            {data[element].active} -
+                          </span>{' '}
+                          <span style={{ color: 'red' }}>
+                            {data[element].inactive}
+                          </span>
+                        </TableCell>
+                      )
                     default:
                       return (
                         <TableCell align="center" key={`${element}${id}`}>
@@ -271,6 +284,9 @@ const TableCustom = ({
             style={{ backgroundColor: '#cccccc' }}
             variant="contained"
             type="button"
+            onClick={() => {
+              dialogConfirm.current.handleClose()
+            }}
           >
             Hủy
           </Button>

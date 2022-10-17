@@ -1,4 +1,11 @@
-import { Grid, TextField, Autocomplete, Button } from '@mui/material'
+import {
+  Grid,
+  TextField,
+  Autocomplete,
+  Button,
+  Stack,
+  Icon,
+} from '@mui/material'
 import UploadImage from 'app/components/common/uploadImage'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
@@ -15,6 +22,7 @@ import { useForm, Controller } from 'react-hook-form'
 import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import DialogCustom from 'app/components/common/DialogCustom'
 
 export default function InformationPlace(props) {
   const [hashtag, setHashtag] = React.useState([])
@@ -29,6 +37,7 @@ export default function InformationPlace(props) {
   const mapRef = React.useRef()
   const uploadImageRef = React.useRef()
   const [createDegrees, setCreateDegrees] = React.useState()
+  const dialogCustomRef = React.useRef(null)
   const navigate = useNavigate()
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
@@ -168,8 +177,6 @@ export default function InformationPlace(props) {
       return media
     })
 
-    const { lat, lng } = mapRef.current.getCreateDegrees()
-
     const paramDetail = {
       medias: [...medias, ...mediasUpdate],
       id: params.id,
@@ -178,8 +185,8 @@ export default function InformationPlace(props) {
       idProvince: data?.province.id || null,
       idWard: data?.ward?.id || null,
       idDistrict: data?.district?.id || null,
-      longitude: lng || createDegrees.lng,
-      latitude: lat || createDegrees.lat,
+      longitude: createDegrees.lng,
+      latitude: createDegrees.lat,
       address: data.address,
       tags: data.hashtag,
       imgUrl: '',
@@ -323,8 +330,41 @@ export default function InformationPlace(props) {
               )}
             />
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <MapCustom ref={mapRef} center={createDegrees} />
+          </Grid> */}
+          <Grid item xs={12} md={12}>
+            <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Button
+                variant="text"
+                onClick={() => {
+                  dialogCustomRef.current.handleClickOpen()
+                }}
+              >
+                Chọn vị trí trên bản đồ <Icon>map</Icon>
+              </Button>
+            </Stack>
+            <Stack
+              mt={2}
+              mb={4}
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              justifyContent="center"
+            >
+              {createDegrees && (
+                <>
+                  <Typography>Kinh độ: {createDegrees.lat || ''}</Typography>
+                  <Typography>Vĩ độ: {createDegrees.lng || ''}</Typography>
+                </>
+              )}
+            </Stack>
           </Grid>
           <Grid item xs={12} md={12}>
             <Controller
@@ -363,10 +403,15 @@ export default function InformationPlace(props) {
                 <Autocomplete
                   {...field}
                   multiple
+                  open={false}
+                  popupIcon={''}
+                  sx={{
+                    width: 500,
+                    marginRight: 5,
+                  }}
                   options={[...hashtag]}
                   getOptionLabel={option => option.value}
                   filterSelectedOptions
-                  sx={{ width: 400, marginRight: 5 }}
                   onChange={(_, data) => field.onChange(data)}
                   renderInput={params => (
                     <TextField
@@ -414,6 +459,35 @@ export default function InformationPlace(props) {
           Lưu
         </Button>
       </form>
+      <DialogCustom
+        ref={dialogCustomRef}
+        title="Chọn vị trí trên map"
+        maxWidth="md"
+      >
+        <MapCustom ref={mapRef} center={createDegrees}></MapCustom>
+        <Stack spacing={2} direction="row" justifyContent="center">
+          <Button
+            variant="contained"
+            onClick={() => {
+              const value = mapRef.current.getCreateDegrees()
+              setCreateDegrees(value)
+              setValue('latitude', value.lat)
+              setValue('longitude', value.lng)
+              dialogCustomRef.current.handleClose()
+            }}
+          >
+            Xác nhận
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              dialogCustomRef.current.handleClose()
+            }}
+          >
+            Hủy
+          </Button>
+        </Stack>
+      </DialogCustom>
     </>
   )
 }

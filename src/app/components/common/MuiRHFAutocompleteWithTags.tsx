@@ -35,7 +35,9 @@ export function MuiAutocompleteWithTags({
 
   const handleKeyDown = (event: any) => {
     switch (event.key) {
-      case 'Enter': {
+      case 'Enter':
+      case ',':
+      case ' ': {
         event.preventDefault()
         event.stopPropagation()
         if (event.target.value.length > 0) {

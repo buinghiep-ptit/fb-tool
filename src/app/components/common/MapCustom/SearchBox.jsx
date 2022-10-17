@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
+import './searchBox.css'
 class SearchBox extends Component {
   static propTypes = {
     mapsapi: PropTypes.shape({

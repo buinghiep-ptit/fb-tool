@@ -25,17 +25,17 @@ class EditorConvertToHTML extends Component {
   render() {
     const { editorState } = this.state
     return (
-      <div>
+      <div style={{ marginBottom: '15px' }}>
         <Editor
           editorState={editorState}
           wrapperClassName="demo-wrapper"
           editorClassName="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
         />
-        <textarea
+        {/* <textarea
           disabled
           value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
-        />
+        /> */}
       </div>
     )
   }

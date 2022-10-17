@@ -143,7 +143,8 @@ export default function ManagerMerchant(props) {
                 })
               }}
             >
-              <Icon>search</Icon>
+              <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}
+              <span>Tìm kiếm</span>
             </Button>
           </Grid>
         </Grid>
@@ -152,7 +153,12 @@ export default function ManagerMerchant(props) {
             item
             sm={6}
             xs={6}
-            sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '20px 0',
+              cursor: 'pointer',
+            }}
           >
             <Icon
               fontSize="large"

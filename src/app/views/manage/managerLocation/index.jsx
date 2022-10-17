@@ -39,16 +39,17 @@ export default function ManagerLocation(props) {
         const newList = cloneDeep(data.content).map(campGround => {
           const convertCampGround = {}
           convertCampGround.id = campGround.id
-          convertCampGround.imageGround = campGround.imgUrl
+          convertCampGround.image = campGround.imageUrl
           convertCampGround.linkDetail = {
             link: campGround.name,
             path: '/chi-tiet-diem-camp/',
           }
+          convertCampGround.type = campGround.campTypes
+          convertCampGround.service = campGround.campRentalAmount
           convertCampGround.place = campGround.campAreaName
           convertCampGround.contact =
             campGround.merchantEmail + campGround.merchantMobilePhone
           convertCampGround.address = campGround.address
-          convertCampGround.type = campGround.campType
           if (convertCampGround.status !== 0) {
             convertCampGround.status = campGround.status === 1 ? true : false
           }
@@ -128,7 +129,8 @@ export default function ManagerLocation(props) {
                 })
               }}
             >
-              <Icon>search</Icon>
+              <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}
+              <span>Tìm kiếm</span>
             </Button>
           </Grid>
         </Grid>
@@ -137,7 +139,12 @@ export default function ManagerLocation(props) {
             item
             sm={6}
             xs={6}
-            sx={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              margin: '20px 0',
+              cursor: 'pointer',
+            }}
           >
             <Icon
               fontSize="large"

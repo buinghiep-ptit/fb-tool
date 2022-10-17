@@ -2,30 +2,27 @@ import {
   Box,
   Button,
   Grid,
-  Autocomplete,
+  FormHelperText,
   styled,
   TextField,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 
-import { createPlace } from 'app/apis/place/place.service'
-import { useParams, useNavigate } from 'react-router-dom'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 
 import { useForm, Controller } from 'react-hook-form'
-import { object, string } from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { createMerchant } from 'app/apis/merchant/merchant.service'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import { generate } from 'generate-password'
-import { Upload } from '@mui/icons-material'
 
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -37,30 +34,39 @@ const Container = styled('div')(({ theme }) => ({
 }))
 
 export default function CreateMerchant(props) {
-  // const [contract, setContract] = React.useState()
-  // const [document, setDocument] = React.useState()
+  const navigate = useNavigate()
   const schema = yup
     .object({
-      nameMerchant: yup.string().required('Vui lòng nhập tên đối tác').trim(),
-      merchantType: yup.number().required(),
+      nameMerchant: yup
+        .string()
+        .required('Vui lòng nhập tên đối tác')
+        .trim()
+        .max(254, 'Đã đạt số ký tự tối đa'),
+      merchantType: yup.string().required('Vui lòng chọn loại đối tác'),
       email: yup
         .string()
         .required('Vui lòng nhập email')
-        .email('Vui lòng đúng email'),
+        .email('Vui lòng đúng email')
+        .max(254, 'Đã đạt số ký tự tối đa'),
       password: yup
         .string()
-        .required()
+        .required('Vui lòng nhập password')
         .min(8, 'Có ít nhất 8 ký tự')
-        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số'),
+        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
+        .max(254, 'Đã đạt số ký tự tối đa'),
       mobilePhone: yup
         .string()
         .required('Vui nhập số điện thoại')
         .min(1)
         .max(20),
-      website: yup.string().url(),
-      taxCode: yup.string().required('Vui lòng nhập mã số thuế'),
-      address: yup.string().required('Vui lòng nhập địa chỉ'),
-      representative: yup.string().required('Vui lòng nhập người đại diện'),
+      website: yup.string().url().max(100, 'Đã đạt số ký tự tối đa'),
+      taxCode: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
+      businessModel: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
+      address: yup.string().max(254, 'Đã đạt số ký tự tối đa'),
+      representative: yup
+        .string()
+        .required('Vui lòng nhập người đại diện')
+        .max(254, 'Đã đạt số ký tự tối đa'),
     })
     .required()
 
@@ -73,7 +79,6 @@ export default function CreateMerchant(props) {
     resolver: yupResolver(schema),
     defaultValues: {
       nameMerchant: '',
-      merchantType: 0,
       email: '',
       password: '',
       mobilePhone: '',
@@ -123,11 +128,11 @@ export default function CreateMerchant(props) {
     newData.email = data.email
     newData.password = data.password
     newData.mobilePhone = data.mobilePhone
-    newData.website = data.website
-    newData.contractNo = data.taxCode
-    newData.businessCode = data.businessModel
+    newData.website = data.website || null
+    newData.contractNo = data.taxCode || null
+    newData.businessCode = data.businessModel || null
     newData.represent = data.representative
-    newData.address = data.address
+    newData.address = data.address || null
     newData.contracts = contracts.map(contract => {
       return {
         mediaType: 4,
@@ -180,8 +185,8 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '50%' }}
-                    error={errors.nameMerchant}
-                    helperText={errors.nameMerchant?.message}
+                    error={!!errors?.nameMerchant}
+                    helperText={errors?.nameMerchant?.message}
                     {...field}
                     label="Tên đối tác*"
                     variant="outlined"
@@ -195,7 +200,11 @@ export default function CreateMerchant(props) {
                 name="merchantType"
                 control={control}
                 render={({ field }) => (
-                  <FormControl style={{ width: '150px' }} margin="normal">
+                  <FormControl
+                    style={{ width: '300px' }}
+                    margin="normal"
+                    error={!!errors?.merchantType}
+                  >
                     <InputLabel id="demo-simple-select-label">
                       Loại đối tác*
                     </InputLabel>
@@ -210,6 +219,11 @@ export default function CreateMerchant(props) {
                       <MenuItem value={1}>Điểm camp</MenuItem>
                       <MenuItem value={2}>Nhà cung cấp</MenuItem>
                     </Select>
+                    {!!errors?.merchantType?.message && (
+                      <FormHelperText>
+                        {errors?.merchantType.message}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -221,7 +235,7 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.email}
+                    error={!!errors?.email}
                     helperText={errors.email?.message}
                     {...field}
                     label="Email*"
@@ -243,7 +257,7 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.password}
+                    error={!!errors.password}
                     helperText={errors.password?.message}
                     {...field}
                     label="Mật khẩu*"
@@ -268,7 +282,7 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.mobilePhone}
+                    error={!!errors.mobilePhone}
                     helperText={errors.mobilePhone?.message}
                     {...field}
                     label="Số điện thoại*"
@@ -285,7 +299,7 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.website}
+                    error={!!errors.website}
                     helperText={errors.website?.message}
                     {...field}
                     label="Website"
@@ -302,7 +316,7 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.taxCode}
+                    error={!!errors.taxCode}
                     helperText={errors.taxCode?.message}
                     {...field}
                     label="Mã số thuế"
@@ -319,10 +333,10 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     fullWidth
-                    error={errors.businessModel}
+                    error={!!errors.businessModel}
                     helperText={errors.businessModel?.message}
                     {...field}
-                    label="Mô hình kinh doanh*"
+                    label="Mô hình kinh doanh"
                     margin="normal"
                     multiline
                     rows={10}
@@ -353,10 +367,10 @@ export default function CreateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     style={{ width: '30%' }}
-                    error={errors.representative}
+                    error={!!errors.representative}
                     helperText={errors.representative?.message}
                     {...field}
-                    label="Người đại diện"
+                    label="Người đại diện*"
                     variant="outlined"
                     margin="normal"
                   />
@@ -385,7 +399,7 @@ export default function CreateMerchant(props) {
                 name="address"
                 render={({ field }) => (
                   <TextField
-                    error={errors.address}
+                    error={!!errors.address}
                     helperText={errors.address?.message}
                     {...field}
                     label="Địa chỉ"

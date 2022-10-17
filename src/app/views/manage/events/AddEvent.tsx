@@ -173,7 +173,7 @@ export default function AddEvent(props: Props) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
       defaultValues.hashtag = event.tags
-      defaultValues.amount = event.amount ?? 0
+      defaultValues.amount = 20000
       defaultValues.status = event.status
       defaultValues.editor_content = event.content
       defaultValues.startDate = event.startDate

@@ -175,7 +175,7 @@ export default function UpdateMerchant(props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý địa danh', path: '/quan-ly-thong-tin-doi-tac' },
+            { name: 'Quản lý đối tác', path: '/quan-ly-thong-tin-doi-tac' },
             { name: 'Thông tin đối tác' },
           ]}
         />

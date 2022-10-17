@@ -6,44 +6,44 @@ export const tableModel = {
     },
     {
       name: 'Ảnh',
-      width: null,
+      width: 200,
     },
     {
       name: 'Tên địa điểm Camping',
-      width: null,
+      width: 200,
     },
     {
       name: 'Loại hình',
-      width: null,
+      width: 200,
     },
     {
       name: 'Liên hệ',
-      width: null,
+      width: 250,
     },
     {
       name: 'Địa danh',
-      width: null,
+      width: 150,
     },
     {
       name: 'Địa chỉ',
-      width: null,
+      width: 250,
     },
     {
       name: 'Dịch vụ',
-      width: null,
+      width: 150,
     },
     {
       name: 'Trạng thái',
-      width: null,
+      width: 100,
     },
     {
       name: '',
-      width: null,
+      width: 100,
     },
   ],
   bodyCell: [
     'index',
-    'imageGround',
+    'image',
     'linkDetail',
     'type',
     'contact',
@@ -63,7 +63,7 @@ export const tableModelSevrvice = {
     },
     {
       name: 'Ảnh',
-      width: null,
+      width: 200,
     },
     {
       name: 'Tên dịch vụ',
@@ -95,6 +95,50 @@ export const tableModelSevrvice = {
     'status',
     'action',
   ],
+}
+
+export const tableModelHandBook = {
+  headCell: [
+    {
+      name: 'STT',
+      width: 50,
+    },
+    {
+      name: 'Tên cẩm nang',
+      width: null,
+    },
+    {
+      name: 'Trạng thái',
+      width: null,
+    },
+    {
+      name: 'Ngưởi thêm',
+      width: null,
+    },
+    {
+      name: '',
+      width: null,
+    },
+  ],
+  bodyCell: ['index', 'nameHandBook', 'status', 'creator', 'action'],
+}
+
+export const tableModelHandBookUnLinked = {
+  headCell: [
+    {
+      name: 'STT',
+      width: 50,
+    },
+    {
+      name: 'Tên cẩm nang',
+      width: null,
+    },
+    {
+      name: '',
+      width: null,
+    },
+  ],
+  bodyCell: ['index', 'nameHandBook', 'action'],
 }
 
 export const seasons = [

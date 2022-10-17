@@ -85,11 +85,11 @@ const DialogCustom = React.forwardRef(
             {title}
           </BootstrapDialogTitle>
           <DialogContent dividers>{children}</DialogContent>
-          <DialogActions>
+          {/* <DialogActions>
             <Button autoFocus onClick={handleClose}>
               Close
             </Button>
-          </DialogActions>
+          </DialogActions> */}
         </BootstrapDialog>
       </div>
     )

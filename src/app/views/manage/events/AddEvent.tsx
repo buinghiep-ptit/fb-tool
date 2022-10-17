@@ -441,7 +441,7 @@ export default function AddEvent(props: Props) {
                       md:
                         fileConfigs.mediaFormat === EMediaFormat.VIDEO
                           ? 300
-                          : 500,
+                          : 450,
                     }}
                     position="relative"
                   >

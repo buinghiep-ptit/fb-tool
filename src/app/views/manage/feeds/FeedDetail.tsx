@@ -263,6 +263,14 @@ export default function FeedDetail(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
+          title="Chỉnh sửa"
+          variant="outlined"
+          color="primary"
+          onClick={() => navigate(`chinh-sua-feed`, {})}
+          loading={approveLoading}
+          startIcon={<Icon>edit</Icon>}
+        />
+        <MuiButton
           disabled={feed?.data && feed?.data.status === -1}
           title="Vi phạm"
           variant="contained"

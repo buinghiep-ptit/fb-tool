@@ -13,7 +13,11 @@ import {
   customerSystemDefault,
   fetchCustomers,
 } from 'app/apis/accounts/customer.service'
-import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
+import {
+  fetchCampAreas,
+  fetchCampGrounds,
+  fetchFeedDetail,
+} from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -42,13 +46,13 @@ import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {}
 
 type SchemaType = {
-  type?: 1 | 2
+  type?: 1 | 2 | number
   cusType?: number | string
   customer?: any // idCustomer
   idSrcType?: number | string
@@ -74,6 +78,7 @@ export default function CreateFeed(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
+  const { feedId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
@@ -85,6 +90,17 @@ export default function CreateFeed(props: Props) {
     cusType: '',
     idSrcType: '',
     hashtag: [],
+    customer: [
+      {
+        fullName: 'Bùi Văn Nghiệp',
+        customerId: 32,
+        dateCreated: '2022-09-13T07:41:19Z',
+        mobilePhone: '0975452750',
+        email: 'nghiepbvptit@gmail.com',
+        lastLoginDate: null,
+        status: -3,
+      },
+    ],
   })
   const [filters, setFilters] = useState({ cusType: 0 })
 
@@ -140,6 +156,14 @@ export default function CreateFeed(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
+  const { data: feed }: UseQueryResult<IFeedDetail, Error> = useQuery<
+    IFeedDetail,
+    Error
+  >(['feed', feedId], () => fetchFeedDetail(Number(feedId ?? 0)), {
+    enabled: !!feedId,
+    staleTime: 5 * 60 * 1000,
+  })
+
   const { data: campAreas }: UseQueryResult<ICampAreaResponse, Error> =
     useQuery<ICampAreaResponse, Error>(
       ['camp-areas'],
@@ -184,6 +208,80 @@ export default function CreateFeed(props: Props) {
     )
 
   useEffect(() => {
+    initDefaultValues(feed)
+  }, [feed])
+
+  useEffect(() => {
+    if (!feed) return
+    if (feed.customerInfo?.type && feed.customerInfo?.type === 0) {
+      methods.setValue('customer', customerCampdi ?? undefined)
+    } else {
+      if (customers && customers.content) {
+        const cus = customers.content.find(
+          c => c.customerId === feed.idCustomer,
+        ) as ICustomerDetail
+        if (cus) {
+          methods.setValue(
+            'customer',
+            Object.assign(cus, {
+              labelText:
+                (cus?.fullName ?? '') +
+                '_' +
+                (cus?.email ?? '') +
+                '_' +
+                (cus?.mobilePhone ?? ''),
+            }),
+          )
+        }
+      }
+    }
+    if (campGrounds && campGrounds.content) {
+      const campGround = campGrounds.content.find(c => c.id === feed.idSrc)
+      methods.setValue('camp', campGround ?? undefined)
+    } else if (campAreas && campAreas.content) {
+      const campArea = campAreas.content.find(c => c.id === feed.idSrc)
+      methods.setValue('camp', campArea ?? undefined)
+    }
+  }, [feed, customers, campGrounds, campAreas])
+
+  const initDefaultValues = (feed?: IFeedDetail) => {
+    if (feed) {
+      defaultValues.type = feed.type ?? 0
+      defaultValues.cusType = feed.customerInfo?.type // check lai
+      defaultValues.idSrcType = feed.idSrcType
+      defaultValues.content = feed.content
+      defaultValues.hashtag = feed.tags
+      defaultValues.webUrl = feed.webUrl ?? ''
+
+      if (
+        feed.images &&
+        feed.images.length &&
+        feed.images[0].mediaFormat === EMediaFormat.IMAGE
+      ) {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.IMAGE,
+          multiple: true,
+          accept: 'image/*',
+        }))
+      } else {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.VIDEO,
+          accept: 'video/*',
+          multiple: false,
+        }))
+      }
+      setMediasSrcPreviewer((feed.video && [feed.video]) ?? feed.images ?? [])
+      setInitialFileInfos((feed.video && [feed.video]) ?? feed.images ?? [])
+    } else {
+      setMediasSrcPreviewer([])
+    }
+
+    methods.reset({ ...defaultValues })
+  }
+
+  useEffect(() => {
     let accounts: any[] = []
     if (
       parseInt((methods.watch('cusType') ?? 0) as unknown as string, 10) !== 0
@@ -204,8 +302,8 @@ export default function CreateFeed(props: Props) {
         labelText,
       }
     })
+
     setAccountList([...newAccounts])
-    // methods.setValue('customer', accounts.length && accounts[0])
   }, [methods.setValue, methods.watch('cusType'), customers, customerCampdi])
 
   const [
@@ -216,7 +314,7 @@ export default function CreateFeed(props: Props) {
     uploading,
     progressInfos,
     message,
-    setFileInfos,
+    setInitialFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -480,7 +578,9 @@ export default function CreateFeed(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
-                      initialMedias={[]}
+                      initialMedias={
+                        (feed?.images ?? [feed?.video] ?? []) as IMediaOverall[]
+                      }
                       fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}

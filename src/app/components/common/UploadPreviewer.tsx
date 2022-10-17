@@ -294,94 +294,98 @@ export function UploadPreviewer({
           open={open}
         />
       )}
-
-      {!!mediasSrcPreviewer.length &&
-        (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
-          checkIsMatchMediaFormat(files, mediaFormat)) &&
-        mediaFormat === EMediaFormat.IMAGE && (
-          <Box mt={-2} position="relative">
-            <ImageListView
-              medias={[...mediasSrcPreviewer] as any}
-              oldMedias={_mediasSrcRef.current.val}
-              progressInfos={progressInfos}
-              onClickMedia={onShowMediaDetail}
-            />
-            <ModalFullScreen
-              mode="edit"
-              data={mediasSrcPreviewer as Image[]}
-              open={openSlider}
-              onCloseModal={handleCloseSlider}
-              onSubmit={handleRemoveMedia}
-              initialIndexSlider={initialIndexSlider}
-            />
-            {!uploading && (
-              <>
-                <CustomIconButton
-                  handleClick={open}
-                  iconName={'add_circle_outlined'}
-                  title={'Thêm ảnh'}
-                  position={{ top: '16px', left: '16px' }}
+      {mediaType !== EMediaType.AVATAR && (
+        <>
+          {' '}
+          {!!mediasSrcPreviewer.length &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
+            mediaFormat === EMediaFormat.IMAGE && (
+              <Box mt={-2} position="relative">
+                <ImageListView
+                  medias={[...mediasSrcPreviewer] as any}
+                  oldMedias={_mediasSrcRef.current.val}
+                  progressInfos={progressInfos}
+                  onClickMedia={onShowMediaDetail}
                 />
-                <CustomIconButton
-                  handleClick={handleRemoveAllMedias}
-                  iconName={'delete'}
-                  title={'Xoá tất cả'}
-                  position={{ top: '16px', right: '16px' }}
+                <ModalFullScreen
+                  mode="edit"
+                  data={mediasSrcPreviewer as Image[]}
+                  open={openSlider}
+                  onCloseModal={handleCloseSlider}
+                  onSubmit={handleRemoveMedia}
+                  initialIndexSlider={initialIndexSlider}
                 />
-              </>
+                {!uploading && (
+                  <>
+                    <CustomIconButton
+                      handleClick={open}
+                      iconName={'add_circle_outlined'}
+                      title={'Thêm ảnh'}
+                      position={{ top: '16px', left: '16px' }}
+                    />
+                    <CustomIconButton
+                      handleClick={handleRemoveAllMedias}
+                      iconName={'delete'}
+                      title={'Xoá tất cả'}
+                      position={{ top: '16px', right: '16px' }}
+                    />
+                  </>
+                )}
+              </Box>
             )}
-          </Box>
-        )}
-      {!!mediasSrcPreviewer.length &&
-        mediasSrcPreviewer[0].url &&
-        (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
-          checkIsMatchMediaFormat(files, mediaFormat)) &&
-        mediaFormat === EMediaFormat.VIDEO && (
-          <Box
-            sx={{
-              position: 'relative',
-              aspectRatio: 'auto 9 / 16',
-              borderRadius: 1.5,
-              overflow: 'hidden',
-              display: 'flex',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <>
-              <MediaPlayer
-                url={mediasSrcPreviewer[0].url}
-                setDuration={setDurationVideo}
-              />
-              {!uploading && (
+          {!!mediasSrcPreviewer.length &&
+            mediasSrcPreviewer[0].url &&
+            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
+              checkIsMatchMediaFormat(files, mediaFormat)) &&
+            mediaFormat === EMediaFormat.VIDEO && (
+              <Box
+                sx={{
+                  position: 'relative',
+                  aspectRatio: 'auto 9 / 16',
+                  borderRadius: 1.5,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
                 <>
-                  <CustomIconButton
-                    handleClick={open}
-                    iconName={'cached'}
-                    title={'Chọn lại'}
-                    position={{ top: '16px', left: '16px' }}
+                  <MediaPlayer
+                    url={mediasSrcPreviewer[0].url}
+                    setDuration={setDurationVideo}
                   />
-                  <CustomIconButton
-                    handleClick={handleRemoveAllMedias}
-                    iconName={'delete'}
-                    title={'Xoá'}
-                    position={{ top: '16px', right: '16px' }}
-                  />
+                  {!uploading && (
+                    <>
+                      <CustomIconButton
+                        handleClick={open}
+                        iconName={'cached'}
+                        title={'Chọn lại'}
+                        position={{ top: '16px', left: '16px' }}
+                      />
+                      <CustomIconButton
+                        handleClick={handleRemoveAllMedias}
+                        iconName={'delete'}
+                        title={'Xoá'}
+                        position={{ top: '16px', right: '16px' }}
+                      />
+                    </>
+                  )}
                 </>
-              )}
-            </>
-            {uploading &&
-              progressInfos?.val &&
-              progressInfos.val[0] &&
-              (progressInfos.val[0].percentage ?? 0) < 100 && (
-                <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
-                  <CircularProgressWithLabel
-                    value={progressInfos.val[0].percentage ?? 0}
-                  />
-                </AbsoluteFillObject>
-              )}
-          </Box>
-        )}
+                {uploading &&
+                  progressInfos?.val &&
+                  progressInfos.val[0] &&
+                  (progressInfos.val[0].percentage ?? 0) < 100 && (
+                    <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
+                      <CircularProgressWithLabel
+                        value={progressInfos.val[0].percentage ?? 0}
+                      />
+                    </AbsoluteFillObject>
+                  )}
+              </Box>
+            )}
+        </>
+      )}
 
       <Box px={1.5} my={1.5}>
         {files && files.length && uploading && (

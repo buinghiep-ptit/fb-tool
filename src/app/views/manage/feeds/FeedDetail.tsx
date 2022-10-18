@@ -7,6 +7,7 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { CountdownTimer } from 'app/components/common/CountdownTimer'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
@@ -306,7 +307,7 @@ export default function FeedDetail(props: Props) {
         />
       </Stack>
       <Stack gap={3}>
-        <SimpleCard title="Chi tiết Feed">
+        <SimpleCard>
           <Box>
             <Grid container spacing={2}>
               <Grid item sm={8} xs={12}>
@@ -329,7 +330,6 @@ export default function FeedDetail(props: Props) {
                     </MuiTypography>
                   </Stack>
                 </Stack>
-
                 <Stack flexDirection={'row'} gap={1} my={2}>
                   {feed.data?.tags?.map(tag => (
                     <Chip

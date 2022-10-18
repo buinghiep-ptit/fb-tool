@@ -274,7 +274,7 @@ export default function OrdersHistory() {
             setCurrentTab={setCurrentTab}
             data={data ?? []}
           />
-          <SimpleCard title="Danh sách đơn hàng">
+          <SimpleCard>
             <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
               <FormProvider {...methods}>
                 <Grid container spacing={2}>

@@ -2,6 +2,7 @@ import { Avatar, Chip, Divider, Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { CountdownTimer } from 'app/components/common/CountdownTimer'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
@@ -62,6 +63,10 @@ export default function PostsCheck(props: Props) {
   const handleClose = () => {
     setOpen(false)
   }
+  const THREE_DAYS_IN_MS = 30 * 60 * 1000
+  const NOW_IN_MS = new Date().getTime()
+
+  const dateTimeAfterThreeDays = NOW_IN_MS + THREE_DAYS_IN_MS
 
   const renderRowItem = (post: IFeedDetail, index: number) => {
     return (
@@ -191,8 +196,19 @@ export default function PostsCheck(props: Props) {
         />
       </Box>
       <Stack
-        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
+        sx={{
+          position: 'fixed',
+          right: '48px',
+          top: '80px',
+          zIndex: 999,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 2,
+        }}
       >
+        <CountdownTimer targetDate={dateTimeAfterThreeDays} />
+
         <MuiButton
           title="Quay lại"
           variant="contained"

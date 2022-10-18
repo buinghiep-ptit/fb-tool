@@ -102,7 +102,7 @@ export default function CreateFeed(props: Props) {
       },
     ],
   })
-  const [filters, setFilters] = useState({ cusType: 0 })
+  const [filters, setFilters] = useState({ cusType: 1 })
 
   const validationSchema = Yup.object().shape(
     {
@@ -110,7 +110,7 @@ export default function CreateFeed(props: Props) {
       customer: Yup.object()
         .nullable()
         .when(['cusType'], {
-          is: (cusType: string) => !!cusType && Number(cusType) !== 0,
+          is: (cusType: string) => !!cusType && Number(cusType) !== 1,
           then: Yup.object().required(messages.MSG1).nullable(),
         }),
       idSrcType: Yup.string().required(messages.MSG1),
@@ -203,7 +203,7 @@ export default function CreateFeed(props: Props) {
       () => customerSystemDefault(),
       {
         refetchOnWindowFocus: false,
-        enabled: !!filters && filters.cusType === 0,
+        enabled: !!filters && filters.cusType === 1,
       },
     )
 
@@ -213,7 +213,7 @@ export default function CreateFeed(props: Props) {
 
   useEffect(() => {
     if (!feed) return
-    if (feed.customerInfo?.type && feed.customerInfo?.type === 0) {
+    if (feed.customerInfo?.type && feed.customerInfo?.type === 1) {
       methods.setValue('customer', customerCampdi ?? undefined)
     } else {
       if (customers && customers.content) {
@@ -284,7 +284,7 @@ export default function CreateFeed(props: Props) {
   useEffect(() => {
     let accounts: any[] = []
     if (
-      parseInt((methods.watch('cusType') ?? 0) as unknown as string, 10) !== 0
+      parseInt((methods.watch('cusType') ?? 1) as unknown as string, 10) !== 1
     ) {
       accounts = customers?.content ?? []
     } else {
@@ -331,9 +331,9 @@ export default function CreateFeed(props: Props) {
       type: Number(values.type ?? 0),
       idSrcType: Number(values.idSrcType ?? 0),
       idSrc: Number(values.camp?.id ?? 0),
-      webUrl: values.webUrl,
+      webUrl: values.webUrl ?? null,
       idCustomer:
-        Number(values.cusType) === 0
+        Number(values.cusType) === 1
           ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
@@ -473,13 +473,13 @@ export default function CreateFeed(props: Props) {
                   </Stack>
                   <Stack>
                     <SelectDropDown name="cusType" label="Loại tài khoản*">
-                      <MenuItem value="0">Campdi</MenuItem>
+                      <MenuItem value="1">Campdi</MenuItem>
                       <MenuItem value="3">Campdi (food)</MenuItem>
                       <MenuItem value="2">KOL</MenuItem>
                     </SelectDropDown>
                   </Stack>
 
-                  {Number(methods.watch('cusType') ?? 0) !== 0 && (
+                  {Number(methods.watch('cusType') ?? 0) !== 1 && (
                     <Stack
                       flexDirection={'row'}
                       gap={1.5}

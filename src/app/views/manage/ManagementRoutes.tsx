@@ -6,6 +6,10 @@ import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 import { ROLES } from 'app/utils/enums/roles'
+import AvailablePayment from './orders/details/ButtonsLink/AvailablePayment'
+import UnAvailableOrder from './orders/details/ButtonsLink/UnAvailableOrder'
+import OrderDetail from './orders/OrderDetail'
+import OrdersHistory from './orders/OrdersHistory'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -41,17 +45,15 @@ const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
-const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
-const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
-const UnAvailableOrder = Loadable(
-  lazy(() => import('./orders/details/ButtonsLink/UnAvailableOrder')),
+
+const ManagerServices = Loadable(
+  lazy(() => import('./managerServices/ServiceSetting')),
 )
-const AvailablePayment = Loadable(
-  lazy(() => import('./orders/details/ButtonsLink/AvailablePayment')),
-)
-const ManagerServices = Loadable(lazy(() => import('./ManagerServices')))
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
+)
+const ManagerServiceDetail = Loadable(
+  lazy(() => import('./managerServices/ServiceDetail')),
 )
 const DetailPlace = Loadable(
   lazy(() => import('./managerPlace/detailPlace/detailPlace')),
@@ -156,6 +158,10 @@ const ManagementRoutes = [
         element: <ReportDialog title="Vi phạm" />,
       },
     ],
+  },
+  {
+    path: '/quan-ly-feeds/:feedId/chinh-sua-feed',
+    element: <CreateFeed />,
   },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportDialog /> }, // ?? unused
   {
@@ -268,6 +274,14 @@ const ManagementRoutes = [
     auth: [ROLES.ADMIN, ROLES.SALE],
   },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
+  {
+    path: '/quan-ly-dich-vu/chi-tiet-dich-vu',
+    element: <ManagerServiceDetail />,
+  },
+  {
+    path: '/quan-ly-dich-vu/:serviceId/*',
+    element: <ManagerServiceDetail />,
+  },
   { path: '/danh-sach-dia-diem', element: <ManagerLocation /> },
 ]
 export default ManagementRoutes

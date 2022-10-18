@@ -29,7 +29,7 @@ const Brand = ({ children }) => {
         <img src="/assets/images/logo-campdi.svg" alt="" />
         {/* <MatxLogo /> */}
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          CampDi
+          campdi
         </StyledSpan>
       </Box>
 

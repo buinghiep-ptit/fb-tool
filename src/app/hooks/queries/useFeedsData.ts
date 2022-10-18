@@ -3,6 +3,7 @@ import {
   approveFeed,
   createFeed,
   deleteFeed,
+  editFeed,
   fetchPostsCheck,
   fetchPostsReported,
   violateFeed,
@@ -52,6 +53,20 @@ export const useDeleteFeed = (onSuccess?: any, onError?: any) => {
     },
     onSuccess,
   })
+}
+
+export const useUpdateFeed = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (payload: Record<string, any>) => editFeed(payload.id, payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['feeds'])
+      },
+      onSuccess,
+    },
+  )
 }
 
 export const useViolateFeed = (onSuccess?: any, onError?: any) => {

@@ -82,3 +82,11 @@ export interface IFeedsFilters {
   page?: number | 0
   size?: number | 20
 }
+
+export interface ServicesFilters {
+  search?: string
+  status?: 1 | -1 | 'all' | string | undefined //   1:Hiệu lực -1:Không hiệu lực
+  rentalType?: 1 | 2 | 3 | 'all' | string | undefined // 1: gói dịch vụ 2: lưu trú 3: Khác
+  page?: number | 0
+  size?: number | 20
+}

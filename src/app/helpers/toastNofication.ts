@@ -52,6 +52,8 @@ export const toastSuccess = (success: { message: string }) => {
   let message = null
   ;({ message: message } = success)
 
-  toast.success(message)
+  toast.success(message, { toastId: 'custom-success-id' })
 }
-export const toastWarning = (warning: { message: string }) => {}
+export const toastWarning = (warning: { message: string }) => {
+  toast.warning(warning.message, { toastId: 'custom-warning-id' })
+}

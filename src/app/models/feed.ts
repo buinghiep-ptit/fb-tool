@@ -46,6 +46,7 @@ export interface IFeedDetail {
 
 export interface ICustomerInfo {
   id?: number
+  type?: number
   email?: string
   mobilePhone?: string
   fullName?: string

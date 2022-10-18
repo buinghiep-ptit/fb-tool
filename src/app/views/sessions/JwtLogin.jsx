@@ -123,7 +123,7 @@ const JwtLogin = () => {
           <Grid item sm={6} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
               <MuiTypography variant="h6">Hệ thống quản trị</MuiTypography>
-              <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
+              <StyledSpan className="sidenavHoverShow pb-3">campdi</StyledSpan>
               <img
                 src="/assets/images/login/bg-login.png"
                 width="100%"

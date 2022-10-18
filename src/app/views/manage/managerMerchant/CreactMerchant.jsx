@@ -170,7 +170,7 @@ export default function CreateMerchant(props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý địa danh', path: '/quan-ly-thong-tin-doi-tac' },
+            { name: 'Quản lý đối tác', path: '/quan-ly-thong-tin-doi-tac' },
             { name: 'Thêm đối tác' },
           ]}
         />
@@ -201,7 +201,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <FormControl
-                    style={{ width: '300px' }}
+                    style={{ width: '50%' }}
                     margin="normal"
                     error={!!errors?.merchantType}
                   >
@@ -234,7 +234,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors?.email}
                     helperText={errors.email?.message}
                     {...field}
@@ -256,7 +256,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors.password}
                     helperText={errors.password?.message}
                     {...field}
@@ -281,7 +281,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors.mobilePhone}
                     helperText={errors.mobilePhone?.message}
                     {...field}
@@ -298,7 +298,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors.website}
                     helperText={errors.website?.message}
                     {...field}
@@ -315,7 +315,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors.taxCode}
                     helperText={errors.taxCode?.message}
                     {...field}
@@ -366,7 +366,7 @@ export default function CreateMerchant(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    style={{ width: '30%' }}
+                    style={{ width: '50%' }}
                     error={!!errors.representative}
                     helperText={errors.representative?.message}
                     {...field}

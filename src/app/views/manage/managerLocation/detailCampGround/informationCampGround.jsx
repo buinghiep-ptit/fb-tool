@@ -28,6 +28,7 @@ import Feature from './feature'
 import { cloneDeep } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import Policy from './policy'
 
 export default function InformationCampGround({ action }) {
   const [provinceId, setProvinceId] = React.useState(null)
@@ -42,6 +43,7 @@ export default function InformationCampGround({ action }) {
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState()
   const [listMerchant, setListMerchant] = React.useState([])
+  const [detailPolicy, setDetailPolicy] = React.useState()
   const params = useParams()
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
@@ -104,6 +106,7 @@ export default function InformationCampGround({ action }) {
       latitude: 21.027161210811197,
       longitude: 105.78872657468659,
       note: '',
+      policy: '',
     },
   })
 
@@ -176,7 +179,7 @@ export default function InformationCampGround({ action }) {
     dataUpdate.id = params.id
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
-    dataUpdate.policy = ''
+    dataUpdate.idDepositPolicy = data.policy
     dataUpdate.idMerchant = data.idMerchant.id
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
@@ -251,6 +254,7 @@ export default function InformationCampGround({ action }) {
               lat: data.latitude,
               lng: data.longitude,
             })
+            setDetailPolicy(data.depositPolicy)
             setValue('note', data.noteTopography)
             setMedias(data.medias)
             setIdMerchant(data.idMerchant)
@@ -314,10 +318,10 @@ export default function InformationCampGround({ action }) {
   }
 
   const handleDeleteCampGround = async () => {
-    // const res = await deleteCampGround(params.id)
-    // if (res) {
-    //   navigate('/quan-ly-thong-tin-diem-camp')
-    // }
+    const res = await deleteCampGround(params.id)
+    if (res) {
+      navigate('/quan-ly-thong-tin-diem-camp')
+    }
     navigate('/quan-ly-thong-tin-diem-camp')
   }
 
@@ -409,7 +413,6 @@ export default function InformationCampGround({ action }) {
             medias={medias}
             setMedias={setMedias}
           />
-          {description}
         </AccordionDetails>
       </Accordion>
       <Accordion>
@@ -431,6 +434,22 @@ export default function InformationCampGround({ action }) {
           />
         </AccordionDetails>
       </Accordion>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel5a-content"
+          id="panel5a-header"
+        >
+          <Typography>5. Chính sách</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Policy
+            setValue={setValue}
+            action={action}
+            detailPolicy={detailPolicy}
+          />
+        </AccordionDetails>
+      </Accordion>
       <div style={{ marginTop: '50px' }}>
         <Button
           color="primary"
@@ -443,7 +462,7 @@ export default function InformationCampGround({ action }) {
         <Button
           color="primary"
           variant="contained"
-          onClick={handleDeleteCampGround}
+          onClick={() => handleDeleteCampGround()}
         >
           Xóa
         </Button>

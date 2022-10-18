@@ -23,6 +23,7 @@ export default function ListCampHandBook(props) {
   const [listHandBookLinked, setListHandBookLinked] = useState([])
   const [totalListHandBookLinked, setTotalListHandBookLinked] = useState()
   const [listHandBookUnLinked, setListHandBookUnLinked] = useState([])
+  const [filterHandBook, setFilterHandBook] = useState('')
   const params = useParams()
   const dialogCustomRef = React.useRef(null)
   const fetchListHandBookLinked = async param => {
@@ -168,12 +169,20 @@ export default function ListCampHandBook(props) {
               variant="outlined"
               placeholder="Nhập tên cẩm nang ..."
               onChange={e => {
-                // setFilterCamp(e.target.value)
+                setFilterHandBook(e.target.value)
               }}
             />
             <Button
               variant="contained"
               sx={{ height: '53px', marginLeft: '15px' }}
+              onClick={() => {
+                const param = {
+                  page: 0,
+                  size: 5,
+                  title: filterHandBook,
+                }
+                fetchListHandBookUnLinked(param)
+              }}
             >
               Tìm kiếm
             </Button>

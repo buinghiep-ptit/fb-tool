@@ -135,3 +135,10 @@ export const addHandBookToCamp = async (params: any): Promise<any> => {
   )
   return data
 }
+
+export const getListPolicy = async (params: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/policies`, {
+    params,
+  })
+  return data
+}

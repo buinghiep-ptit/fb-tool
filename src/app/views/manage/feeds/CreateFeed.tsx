@@ -41,7 +41,11 @@ import {
   IMediaOverall,
   ITags,
 } from 'app/models'
-import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
+import {
+  ICampArea,
+  ICampAreaResponse,
+  ICampGroundResponse,
+} from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
@@ -164,14 +168,12 @@ export default function CreateFeed(props: Props) {
     staleTime: 5 * 60 * 1000,
   })
 
-  const { data: campAreas }: UseQueryResult<ICampAreaResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(
-      ['camp-areas'],
-      () => fetchCampAreas({ size: 200, page: 0 }),
-      {
-        enabled: Number(methods.watch('idSrcType')) === 1,
-      },
-    )
+  const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
+    ICampArea[],
+    Error
+  >(['camp-areas'], () => fetchCampAreas({ size: 200, page: 0 }), {
+    enabled: Number(methods.watch('idSrcType')) === 1,
+  })
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
     useQuery<ICampAreaResponse, Error>(
@@ -238,8 +240,8 @@ export default function CreateFeed(props: Props) {
     if (campGrounds && campGrounds.content) {
       const campGround = campGrounds.content.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campGround ?? undefined)
-    } else if (campAreas && campAreas.content) {
-      const campArea = campAreas.content.find(c => c.id == feed.idSrc)
+    } else if (campAreas) {
+      const campArea = campAreas.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campArea ?? undefined)
     }
   }, [feed, customers, campGrounds, campAreas])
@@ -339,6 +341,7 @@ export default function CreateFeed(props: Props) {
       content: values.content,
       video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
       images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
+      idAudio: 1,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
@@ -428,7 +431,7 @@ export default function CreateFeed(props: Props) {
       >
         <MuiButton
           title="Lưu"
-          disabled={uploading || createLoading}
+          disabled={uploading || createLoading || editLoading}
           variant="contained"
           color="primary"
           type="submit"
@@ -529,7 +532,7 @@ export default function CreateFeed(props: Props) {
                             name="camp"
                             options={
                               Number(methods.watch('idSrcType')) === 1
-                                ? campAreas?.content ?? []
+                                ? campAreas ?? []
                                 : campGrounds?.content ?? []
                             }
                             optionProperty="name"
@@ -561,7 +564,9 @@ export default function CreateFeed(props: Props) {
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
                   </Stack>
 
-                  {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
+                  {(createLoading || editLoading) && (
+                    <LinearProgress sx={{ mt: 0.5 }} />
+                  )}
                 </Stack>
               </Grid>
 

@@ -35,6 +35,7 @@ export interface IFeedDetail {
   status?: number
   video?: IMediaOverall
   images?: IMediaOverall[]
+  idAudio?: number
   tags?: ITags[]
   createdBy?: number
   lastModifiedBy?: number

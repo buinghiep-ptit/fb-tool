@@ -3,12 +3,12 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Divider,
   Grid,
   Stack,
 } from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { ICampground } from 'app/models/order'
-import * as React from 'react'
 
 export interface ICampgroundInfoProps {
   campground?: ICampground
@@ -54,7 +54,9 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
             </Grid>
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
-                nghiepbv2 - 090000000 - Bui Nghiep
+                {campground?.merchant?.email} -{' '}
+                {campground?.merchant?.mobilePhone} -{' '}
+                {campground?.merchant?.fullName}
               </MuiTypography>
             </Grid>
           </Grid>
@@ -64,9 +66,24 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
               <MuiTypography variant="subtitle2">Địa danh</MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <MuiTypography color="primary" variant="body2">
-                Hà Nội
-              </MuiTypography>
+              <Stack flexDirection={'row'} gap={1}>
+                {campground.campAreas?.map((camp, index) => (
+                  <Stack key={camp.id} flexDirection={'row'}>
+                    <MuiTypography color="primary" variant="body2">
+                      {camp.name}
+                    </MuiTypography>
+                    {campground.campAreas &&
+                      campground.campAreas?.length &&
+                      index !== campground.campAreas?.length - 1 && (
+                        <Divider
+                          orientation="vertical"
+                          sx={{ backgroundColor: '#D9D9D9', mx: 1, my: 0.5 }}
+                          flexItem
+                        />
+                      )}
+                  </Stack>
+                ))}
+              </Stack>
             </Grid>
           </Grid>
         </Stack>

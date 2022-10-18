@@ -1,3 +1,4 @@
+import { ICampArea } from './camp'
 import { IPagingResponse } from './common'
 
 export interface IOrderResponse extends IPagingResponse {
@@ -64,38 +65,7 @@ export interface IOrderDetail {
       dateUpdated: '2022-09-29T10:24:10Z'
     },
   ]
-  campGround: {
-    id: 4
-    name: 'test4'
-    description: 'test4'
-    policy: null
-    note: null
-    noteTopography: null
-    idMerchant: 2
-    idTopography: 1
-    idProvince: 1
-    idDistrict: 1
-    isSupportBooking: 1
-    contact: null
-    idWard: 1
-    openTime: null
-    closeTime: null
-    address: '101 Phan Văn Trường'
-    capacity: 5
-    latitude: 9.618203
-    longitude: 105.593244
-    isPopular: 1
-    status: -1
-    medias: []
-    campAreas: []
-    tags: []
-    campTypes: null
-    campGroundSeasons: []
-    campGroundInternets: []
-    campGroundUtilities: []
-    campGroundVehicles: []
-    freeParking: false
-  }
+  campGround?: ICampground
 }
 
 export interface ICustomerOrder {
@@ -133,6 +103,7 @@ export interface ICampground {
   id?: number
   name?: string
   description?: string
+  merchant?: IMerchant
   policy?: null
   note?: null
   noteTopography?: null
@@ -152,7 +123,7 @@ export interface ICampground {
   isPopular?: 1
   status?: -1
   medias?: []
-  campAreas?: []
+  campAreas?: ICampArea[]
   tags?: []
   campTypes?: null
   campGroundSeasons?: []
@@ -160,6 +131,14 @@ export interface ICampground {
   campGroundUtilities?: []
   campGroundVehicles?: []
   freeParking?: false
+}
+
+export interface IMerchant {
+  id?: number
+  userType?: number
+  fullName?: string
+  email?: string
+  mobilePhone?: string
 }
 
 export type TitleOrders = keyof IOrderOverall | 'order' | 'action'

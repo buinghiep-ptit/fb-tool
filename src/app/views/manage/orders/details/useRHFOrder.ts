@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { IOrderDetail, IService } from 'app/models/order'
+import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -30,28 +31,28 @@ export const useRHFOrder = (order: IOrderDetail) => {
   const [defaultValues] = useState<SchemaType>({})
 
   const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required('Tên không được bỏ trống'),
+    fullName: Yup.string().required(messages.MSG1),
     dateStart: Yup.date()
       .typeError('Sai dịnh dạng.')
       .nullable()
-      .required('Chọn ngày bắt đầu'),
+      .required(messages.MSG1),
     dateEnd: Yup.date()
       .when('startDate', (startDate, yup) => {
         if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 86400000)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          const dayAfter = new Date(startDate.getTime() + 0)
+          return yup.min(dayAfter, 'Ngày kết thúc >= ngày bắt đầu')
         }
         return yup
       })
       .typeError('Sai định dạng.')
       .nullable()
-      .required('Chọn ngày kết thúc.'),
+      .required(messages.MSG1),
     services: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
-          quantity: Yup.number().required('Quantity is required'),
-          // prop1: yup.string().required(), // validate each object's entry
-          // prop2: yup.number().required(), // independently
+          quantity: Yup.string()
+            .required(messages.MSG1)
+            .max(11, 'Tối đa 9 ký tự'),
         }),
       ),
     ),

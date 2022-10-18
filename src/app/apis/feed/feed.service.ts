@@ -126,3 +126,8 @@ export const deleteFeed = async (feedId: number): Promise<any> => {
   const { data } = await http.delete<IFeedDetail>(`/api/feed/${feedId}`)
   return data
 }
+
+export const editFeed = async (feedId: number, payload: any): Promise<any> => {
+  const { data } = await http.put<IFeedDetail>(`/api/feed/${feedId}`, payload)
+  return data
+}

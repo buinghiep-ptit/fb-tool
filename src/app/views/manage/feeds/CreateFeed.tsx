@@ -30,7 +30,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateFeed } from 'app/hooks/queries/useFeedsData'
+import { useCreateFeed, useUpdateFeed } from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
@@ -236,10 +236,10 @@ export default function CreateFeed(props: Props) {
       }
     }
     if (campGrounds && campGrounds.content) {
-      const campGround = campGrounds.content.find(c => c.id === feed.idSrc)
+      const campGround = campGrounds.content.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campGround ?? undefined)
     } else if (campAreas && campAreas.content) {
-      const campArea = campAreas.content.find(c => c.id === feed.idSrc)
+      const campArea = campAreas.content.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campArea ?? undefined)
     }
   }, [feed, customers, campGrounds, campAreas])
@@ -342,19 +342,28 @@ export default function CreateFeed(props: Props) {
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
-      status: Number(values.cusType ?? 0) === 2 ? 0 : 1,
+      status: 1,
     }
-    add(payload)
+    if (feedId) {
+      edit({ ...payload, id: Number(feedId) })
+    } else {
+      add(payload)
+    }
   }
 
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Thêm mới thành công' })
+  const onRowUpdateSuccess = (data: any, message: string) => {
+    toastSuccess({ message: message })
     navigate('/quan-ly-feeds', {})
     setMediasSrcPreviewer([])
     methods.reset()
   }
-  const { mutate: add, isLoading: createLoading } =
-    useCreateFeed(onRowUpdateSuccess)
+  const { mutate: add, isLoading: createLoading } = useCreateFeed(() =>
+    onRowUpdateSuccess(null, 'Thêm mới thành công'),
+  )
+
+  const { mutate: edit, isLoading: editLoading } = useUpdateFeed(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
 
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {

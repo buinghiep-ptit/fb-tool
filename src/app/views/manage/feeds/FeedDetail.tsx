@@ -266,6 +266,10 @@ export default function FeedDetail(props: Props) {
           title="Chỉnh sửa"
           variant="outlined"
           color="primary"
+          disabled={
+            feed.data?.customerInfo?.type !== 0 &&
+            feed.data?.customerInfo?.type !== 3
+          }
           onClick={() => navigate(`chinh-sua-feed`, {})}
           loading={approveLoading}
           startIcon={<Icon>edit</Icon>}

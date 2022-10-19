@@ -18,8 +18,10 @@ export default function GeneralInformation({
   errors,
   provinces,
   districts,
+  fetchDistricts,
   wards,
   setDistrictId,
+  fetchWards,
   setProvinceId,
   getValues,
   setValue,
@@ -108,6 +110,7 @@ export default function GeneralInformation({
                 onChange={(_, data) => {
                   field.onChange(data)
                   setProvinceId(getValues('province').id)
+                  fetchDistricts(getValues('province').id)
                 }}
                 renderInput={params => (
                   <TextField
@@ -134,6 +137,7 @@ export default function GeneralInformation({
                 onChange={(_, data) => {
                   field.onChange(data)
                   setDistrictId(getValues('district').id)
+                  fetchWards(getValues('district').id)
                 }}
                 options={districts}
                 getOptionLabel={option => option.name}

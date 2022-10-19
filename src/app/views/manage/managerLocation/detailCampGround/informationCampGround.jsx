@@ -29,6 +29,7 @@ import { cloneDeep } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function InformationCampGround({ action }) {
   const [provinceId, setProvinceId] = React.useState(null)
@@ -58,10 +59,10 @@ export default function InformationCampGround({ action }) {
       nameCampground: yup
         .string()
         .required('Vui lòng nhập tên địa danh')
+        .max(255, 'Số ký tự quá dài')
         .trim(),
-      province: yup.object().required(),
-      district: yup.object().required(),
-      description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
+      district: yup.object().required('Vui lòng chọn quận/huyện'),
     })
     .required()
 
@@ -72,7 +73,7 @@ export default function InformationCampGround({ action }) {
     getValues,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
     defaultValues: {
       nameCampground: '',
       province: null,
@@ -180,7 +181,7 @@ export default function InformationCampGround({ action }) {
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
     dataUpdate.idDepositPolicy = data.policy
-    dataUpdate.idMerchant = data.idMerchant.id
+    dataUpdate.idMerchant = data.idMerchant?.id || null
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
@@ -267,7 +268,7 @@ export default function InformationCampGround({ action }) {
               'province',
               res.find(province => province.id === data.idProvince),
             )
-
+            setValue('policy', data.depositPolicy.id)
             setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
@@ -325,27 +326,25 @@ export default function InformationCampGround({ action }) {
     navigate('/quan-ly-thong-tin-diem-camp')
   }
 
-  React.useEffect(() => {
-    if (provinceId)
-      getDistricts(provinceId)
-        .then(dataDistrict => {
-          setDistricts(dataDistrict)
-          setValue('district', null)
-          setValue('ward', null)
-          setWards([])
-        })
-        .catch(err => console.log(err))
-  }, [provinceId])
+  const fetchDistricts = provinceId => {
+    getDistricts(provinceId)
+      .then(dataDistrict => {
+        setDistricts(dataDistrict)
+        setValue('district', null)
+        setValue('ward', null)
+        setWards([])
+      })
+      .catch(err => console.log(err))
+  }
 
-  React.useEffect(() => {
-    if (districtId)
-      getWards(districtId)
-        .then(dataWard => {
-          setWards(dataWard)
-          setValue('ward', null)
-        })
-        .catch(err => console.log(err))
-  }, [districtId])
+  const fetchWards = districtId => {
+    getWards(districtId)
+      .then(dataWard => {
+        setWards(dataWard)
+        setValue('ward', null)
+      })
+      .catch(err => console.log(err))
+  }
 
   React.useEffect(() => {
     fetchListCampArea()
@@ -364,11 +363,13 @@ export default function InformationCampGround({ action }) {
         </AccordionSummary>
         <AccordionDetails>
           <GeneralInformation
+            fetchDistricts={fetchDistricts}
             control={control}
             errors={errors}
             provinces={provinces}
             districts={districts}
             wards={wards}
+            fetchWards={fetchWards}
             setProvinceId={setProvinceId}
             setDistrictId={setDistrictId}
             getValues={getValues}

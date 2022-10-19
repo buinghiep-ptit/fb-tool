@@ -199,10 +199,10 @@ export default function ServiceDetail(props: Props) {
     },
   )
 
-  const { data: campAreas }: UseQueryResult<ICampAreaResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(['camp-areas'], () =>
-      fetchCampAreas({ size: 200, page: 0 }),
-    )
+  const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
+    ICampArea[],
+    Error
+  >(['camp-areas'], () => fetchCampAreas({ size: 200, page: 0 }))
   React.useEffect(() => {
     if (campService) {
       defaultValues.rentalType = campService.rentalType
@@ -212,8 +212,8 @@ export default function ServiceDetail(props: Props) {
       defaultValues.description = campService.description
 
       defaultValues.weekdayPrices = campService.weekdayPrices
-      if (campAreas && campAreas.content) {
-        const getCamp = campAreas.content.find(
+      if (campAreas) {
+        const getCamp = campAreas.find(
           camp => camp.id === campService.campGroundId,
         )
         defaultValues.camp = getCamp ?? {}
@@ -297,7 +297,7 @@ export default function ServiceDetail(props: Props) {
               <Grid item xs={9} sx={{ display: 'flex', alignItems: 'center' }}>
                 <MuiRHFAutoComplete
                   name="camp"
-                  options={campAreas?.content ?? []}
+                  options={campAreas ?? []}
                   optionProperty="name"
                   getOptionLabel={option => option.name ?? ''}
                   defaultValue=""

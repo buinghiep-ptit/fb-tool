@@ -9,7 +9,7 @@ import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
 import { IOrderDetail, IService } from 'app/models/order'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
 import { DiagLogConfirm } from './details/ButtonsLink/DialogConfirm'
@@ -40,6 +40,7 @@ type SchemaType = {
 export interface Props {}
 
 export default function OrderDetail(props: Props) {
+  const navigate = useNavigate()
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const { orderId } = useParams()
@@ -91,7 +92,7 @@ export default function OrderDetail(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
       >
         <MuiButton
-          title="Lưu cập nhật đơn"
+          title="Lưu"
           variant="contained"
           color="primary"
           type="submit"
@@ -99,11 +100,18 @@ export default function OrderDetail(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
-          title="Huỷ cập nhật"
+          title="Huỷ"
           variant="contained"
           color="secondary"
           onClick={() => methods.reset()}
           startIcon={<Icon>clear</Icon>}
+        />
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
       <Stack
@@ -144,7 +152,7 @@ export default function OrderDetail(props: Props) {
               </Grid>
             </Grid>
             <Stack>
-              <OrderServices order={order} fields={fields} />
+              <OrderServices order={order} fields={fields} methods={methods} />
             </Stack>
             <Stack>
               <OrderProcesses rows={order.orderProcess} />

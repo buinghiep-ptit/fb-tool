@@ -282,7 +282,11 @@ export const columnsOrderProcessesDetail: any = [
     minWidth: 120,
     align: 'center',
     status: (value: any) => (
-      <Chip label={value} size="small" color={'default'} />
+      <Chip
+        label={getOrderStatusSpec(value, 1).title}
+        size="small"
+        color={'default'}
+      />
     ),
   },
   {

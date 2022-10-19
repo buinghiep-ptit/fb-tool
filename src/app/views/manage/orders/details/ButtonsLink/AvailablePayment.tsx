@@ -133,7 +133,7 @@ export default function AvailablePayment({ title }: Props) {
               </Grid>
             </Grid>
             <Stack>
-              <OrderServices order={order} fields={fields} />
+              <OrderServices order={order} fields={fields} methods={methods} />
             </Stack>
             <Stack>
               <OrderProcesses rows={order.orderProcess} />

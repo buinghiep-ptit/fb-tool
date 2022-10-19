@@ -10,6 +10,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { IOrderDetail } from 'app/models/order'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
@@ -36,8 +37,8 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
             </Grid>
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
-                [{order?.customer.fullName}] - [{order?.customer.mobilePhone}] -
-                [{order?.customer.email}]
+                [{order?.customer?.fullName}] - [{order?.customer?.mobilePhone}]
+                - [{order?.customer?.email}]
               </MuiTypography>
             </Grid>
           </Grid>
@@ -52,10 +53,18 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
               <Stack flexDirection={'row'} gap={1}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack flexDirection={'row'} gap={1}>
-                    <MuiRHFDatePicker name="dateStart" label="Từ" />
+                    <MuiRHFDatePicker
+                      name="dateStart"
+                      label="Từ"
+                      required={true}
+                    />
                   </Stack>
                   <Stack flexDirection={'row'} gap={1}>
-                    <MuiRHFDatePicker name="dateEnd" label="Đến" />
+                    <MuiRHFDatePicker
+                      name="dateEnd"
+                      label="Đến"
+                      required={true}
+                    />
                   </Stack>
                 </LocalizationProvider>
               </Stack>
@@ -83,6 +92,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
               <Stack gap={2}>
                 <FormInputText
                   label={'Người sử dụng'}
+                  required
                   type="text"
                   name="fullName"
                   defaultValue=""
@@ -90,6 +100,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                 />
                 <FormInputText
                   label={'Số điện thoại'}
+                  required
                   type="text"
                   name="mobilePhone"
                   defaultValue=""
@@ -111,7 +122,11 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
               <MuiTypography variant="subtitle2">Ghi chú</MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <MuiTypography variant="body2">Yêu cầu sạch sẽ</MuiTypography>
+              <FormTextArea
+                name="note"
+                defaultValue={''}
+                placeholder="Ghi chú"
+              />
             </Grid>
           </Grid>
 

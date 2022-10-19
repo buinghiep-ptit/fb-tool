@@ -482,33 +482,32 @@ export default function CreateFeed(props: Props) {
                     </SelectDropDown>
                   </Stack>
 
-                  {methods.watch('cusType') &&
-                    Number(methods.watch('cusType') ?? 0) !== 1 && (
-                      <Stack
-                        flexDirection={'row'}
-                        gap={1.5}
-                        justifyContent="center"
-                      >
-                        <MuiTypography fontSize="12px" fontStyle="italic">
-                          Tài khoản post*
-                        </MuiTypography>
-                        <Box sx={{ flex: 1 }}>
-                          {/* <MuiAutoComplete
+                  {Number(methods.watch('cusType') ?? 0) !== 1 && (
+                    <Stack
+                      flexDirection={'row'}
+                      gap={1.5}
+                      justifyContent="center"
+                    >
+                      <MuiTypography fontSize="12px" fontStyle="italic">
+                        Tài khoản post*
+                      </MuiTypography>
+                      <Box sx={{ flex: 1 }}>
+                        {/* <MuiAutoComplete
                         itemList={accountList}
                         name="customer"
                         disabled={Number(methods.getValues('cusType')) === 0}
                       /> */}
-                          <MuiRHFAutoComplete
-                            name="customer"
-                            label="Tài khoản post"
-                            options={accountList ?? []}
-                            optionProperty="labelText"
-                            getOptionLabel={option => option.labelText ?? ''}
-                            defaultValue=""
-                          />
-                        </Box>
-                      </Stack>
-                    )}
+                        <MuiRHFAutoComplete
+                          name="customer"
+                          label="Tài khoản post"
+                          options={accountList ?? []}
+                          optionProperty="labelText"
+                          getOptionLabel={option => option.labelText ?? ''}
+                          defaultValue=""
+                        />
+                      </Box>
+                    </Stack>
+                  )}
 
                   <Stack>
                     <SelectDropDown name="idSrcType" label="Liên kết với">

@@ -15,6 +15,7 @@ export interface IMuiRHFDatePickerProps {
   defaultValue?: string
   label?: string
   inputFormat?: 'DD/MM/YYYY' | 'DD/MM'
+  required?: boolean
 }
 
 export function MuiRHFDatePicker({
@@ -22,6 +23,7 @@ export function MuiRHFDatePicker({
   defaultValue,
   label = '',
   inputFormat = 'DD/MM/YYYY',
+  required,
 }: IMuiRHFDatePickerProps) {
   const {
     control,
@@ -48,6 +50,7 @@ export function MuiRHFDatePicker({
               helperText={
                 errors[name] ? (errors[name]?.message as unknown as string) : ''
               }
+              required={required}
               InputLabelProps={{ shrink: true }}
               size="medium"
               variant="outlined"

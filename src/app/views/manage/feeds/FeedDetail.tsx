@@ -404,6 +404,8 @@ export default function FeedDetail(props: Props) {
           <MuiStyledTable
             rows={reportsDecline?.data?.content as IReportDecline[]}
             columns={columnsFeedLogsReports as any}
+            rowsPerPage={sizeReports}
+            page={pageReports}
             onClickRow={() => {}}
             isFetching={isFetching}
           />
@@ -422,6 +424,8 @@ export default function FeedDetail(props: Props) {
           <MuiStyledTable
             rows={actionsHistory?.data?.content as IActionHistory[]}
             columns={columnsFeedLogsActions as any}
+            rowsPerPage={sizeActions}
+            page={pageActions}
             onClickRow={() => {}}
             isFetching={isFetching}
           />

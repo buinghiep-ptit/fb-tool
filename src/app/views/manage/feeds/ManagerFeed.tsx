@@ -367,6 +367,8 @@ export default function ManagerFeed(props: Props) {
           <MuiStyledTable
             rows={data ? (data?.content as IFeed[]) : []}
             columns={columnFeeds}
+            rowsPerPage={size}
+            page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}

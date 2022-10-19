@@ -5,8 +5,10 @@ import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
 import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
 import { IOrderDetail, IService } from 'app/models/order'
+import { getOrderStatusSpec } from 'app/utils/enums/order'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -34,6 +36,7 @@ type SchemaType = {
   fullName?: string
   mobilePhone?: string
   email?: string
+  note?: string
   services?: IService[]
 }
 
@@ -52,10 +55,45 @@ export default function OrderDetail(props: Props) {
     error,
   } = useOrderDetailData(Number(orderId ?? 0))
 
+  const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
+
+  const onRowUpdateSuccess = (data: any, message: string) => {
+    toastSuccess({ message: message })
+  }
+
   const [methods, fields] = useRHFOrder(order as IOrderDetail)
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log('values:', values)
+    values = {
+      ...values,
+      dateStart: (values.dateStart as any)?.toISOString(),
+      dateEnd: (values.dateEnd as any)?.toISOString(),
+    }
+    if (values.services && values.services.length) {
+      values.services = values.services.map(item => ({
+        ...item,
+        quantity: Number(
+          item.quantity?.toString().replace(/,(?=\d{3})/g, '') ?? 0,
+        ),
+      })) as IService[]
+    }
+
+    const payload: IOrderDetail = {
+      ...order,
+      dateStart: values.dateStart,
+      dateEnd: values.dateEnd,
+      note: values.note,
+      contact: {
+        ...order?.contact,
+        fullName: values.fullName,
+        email: values.email,
+        mobilePhone: values.mobilePhone,
+      },
+      services: [...(values?.services ?? [])],
+    }
+    edit({ ...payload, id: Number(orderId ?? 0) })
   }
 
   const onSuccess = (data?: any) => {
@@ -89,13 +127,15 @@ export default function OrderDetail(props: Props) {
       <Stack
         flexDirection={'row'}
         gap={2}
-        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
           title="Lưu"
           variant="contained"
           color="primary"
           type="submit"
+          disabled={editLoading}
+          loading={editLoading}
           onClick={methods.handleSubmit(onSubmitHandler)}
           startIcon={<Icon>done</Icon>}
         />
@@ -131,9 +171,13 @@ export default function OrderDetail(props: Props) {
             startIcon={<Icon>clear</Icon>}
           />
         ) : (
-          <ButtonsActions />
+          <ButtonsActions order={order} />
         )}
-        <Chip label={'Tiếp nhận'} size="medium" color={'default'} />
+        <Chip
+          label={getOrderStatusSpec(1, order?.status).title}
+          size="medium"
+          color={'default'}
+        />
       </Stack>
 
       <form

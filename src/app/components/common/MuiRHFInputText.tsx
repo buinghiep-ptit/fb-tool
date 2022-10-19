@@ -35,6 +35,7 @@ export type IFormInputTextProps = {
   label?: string
   defaultValue?: string
   inputProps?: InputProps
+  clearIcon?: boolean
 } & TextFieldProps
 
 const FormInputText: FC<IFormInputTextProps> = ({
@@ -46,6 +47,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
   iconStart,
   iconEnd,
   inputProps,
+  clearIcon = true,
   ...otherProps
 }) => {
   const {
@@ -92,7 +94,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
             // endAdornment: iconEnd ? (
             //   <InputAdornment position="end">{iconEnd}</InputAdornment>
             // ) : null,
-            endAdornment: (
+            endAdornment: clearIcon ? (
               <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
                 {iconEnd ? (
                   iconEnd
@@ -102,7 +104,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
                   </IconButton>
                 ) : null}
               </InputAdornment>
-            ),
+            ) : null,
           }}
         />
       )}

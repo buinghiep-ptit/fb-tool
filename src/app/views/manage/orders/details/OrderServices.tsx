@@ -74,6 +74,7 @@ export function OrderServices({
                     label={'Số lượng'}
                     name={`services.${index}.quantity`}
                     fullWidth
+                    required
                   />
                   {methods.formState.errors?.services &&
                     methods.formState.errors?.services[index].quantity

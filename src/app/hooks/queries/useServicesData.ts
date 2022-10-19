@@ -29,7 +29,8 @@ export const useDeleteService = (onSuccess?: any, onError?: any) => {
 export const useUpdateService = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
-    (payload: Record<string, any>) => updateService(payload.serviceId, payload),
+    (campService: Record<string, any>) =>
+      updateService(campService.serviceId, campService),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['camp-service'])

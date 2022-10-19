@@ -10,9 +10,13 @@ import {
   LinearProgress,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import { ICampArea, ICampAreaResponse } from 'app/models/camp'
+import {
+  ICampAreaResponse,
+  ICampGround,
+  ICampGroundResponse,
+} from 'app/models/camp'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchCampAreas } from 'app/apis/feed/feed.service'
+import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
 import {
   FormProvider,
   SubmitHandler,
@@ -36,17 +40,13 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import { DetailService, WeekdayPrices } from 'app/models/service'
 import { getServiceDetail } from 'app/apis/services/services.service'
 import { useNavigate, useParams } from 'react-router-dom'
-import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { find, findIndex } from 'lodash'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
-import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useCreateService,
   useUpdateService,
 } from 'app/hooks/queries/useServicesData'
-import { number, string } from 'yup/lib/locale'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -57,6 +57,17 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 export interface Props {}
+type TypeElement = {
+  camp?: ICampGround
+  files?: any
+  description?: string
+  rentalType?: number | string
+  capacity?: number
+  name?: string
+  status?: number | string
+  amount?: WeekdayPrices[]
+  weekdayPrices?: WeekdayPrices[]
+}
 export default function ServiceDetail(props: Props) {
   const navigate = useNavigate()
   const { serviceId } = useParams()
@@ -75,22 +86,11 @@ export default function ServiceDetail(props: Props) {
     'Chủ nhật:',
   ]
   const [fileConfigs, setFileConfigs] = useState({
-    mediaFormat: 2,
+    mediaType: EMediaType.POST,
+    mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
   })
-
-  type TypeElement = {
-    camp?: ICampArea
-    files?: any
-    description?: string
-    rentalType?: number | string
-    capacity?: number
-    name?: string
-    status?: number | string
-    amount?: WeekdayPrices[]
-    weekdayPrices?: WeekdayPrices[]
-  }
   const [defaultValues] = useState<TypeElement>({
     status: '',
     rentalType: '',
@@ -101,9 +101,27 @@ export default function ServiceDetail(props: Props) {
     name: Yup.string().required(messages.MSG1),
     description: Yup.string().nullable(),
     files: Yup.mixed()
-      .required(messages.MSG1)
-      .test('fileSize', 'Dung lượng file quá lớn (10MB/ảnh )', files =>
-        checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
+      .test('empty', messages.MSG1, files => {
+        // if (!!Number(eventId ?? 0)) {
+        const media = ((fileInfos ?? []) as IMediaOverall[]).find(
+          media => media.mediaFormat === fileConfigs.mediaFormat,
+        )
+
+        if (files && files.length) {
+          return true
+        }
+
+        return !!media
+        // }
+        // const isError = files && !!files.length
+        // return isError
+      })
+      .test(
+        'fileSize',
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? 'Dung lượng video tối đa 3 phút'
+          : 'Dung lượng ảnh tối đa 10MB/ảnh',
+        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
@@ -114,7 +132,7 @@ export default function ServiceDetail(props: Props) {
     ),
   })
 
-  const methods = useForm<any>({
+  const methods = useForm<TypeElement>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -125,21 +143,46 @@ export default function ServiceDetail(props: Props) {
     control: methods.control,
   })
 
+  const [
+    selectFiles,
+    uploadFiles,
+    removeUploadedFiles,
+    cancelUploading,
+    uploading,
+    progressInfos,
+    message,
+    setInitialFileInfos,
+    fileInfos,
+  ] = useUploadFiles()
+  const {
+    data: campService,
+    isLoading,
+    fetchStatus,
+    isError,
+    error,
+  }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
+    ['campService', serviceId],
+    () => getServiceDetail(Number(serviceId ?? 0)),
+    {
+      enabled: !!serviceId,
+      staleTime: 5 * 60 * 1000, // 5min
+    },
+  )
+
   const onSubmitHandler: SubmitHandler<TypeElement> = (values: TypeElement) => {
-    console.log(values)
     values.weekdayPrices &&
       values.weekdayPrices.length &&
       values.weekdayPrices.map(item => ({
         ...item,
         amount: item.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0,
       }))
-
-    const files = [...mediasSrcPreviewer].map(file => ({
-      mediaType: EMediaType.POST,
-      mediaFormat: fileConfigs.mediaFormat,
-      url: file.url,
-      detail: null,
-    }))
+    const files = (fileInfos as IMediaOverall[])
+      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .map((file: IMediaOverall) => ({
+        mediaType: EMediaType.POST,
+        mediaFormat: fileConfigs.mediaFormat,
+        url: file.url,
+      }))
 
     const payload: DetailService = {
       name: values.name,
@@ -147,7 +190,10 @@ export default function ServiceDetail(props: Props) {
       rentalType: Number(values.rentalType),
       capacity: values.capacity,
       description: values.description ?? '',
-      images: files,
+      images:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? files
+          : [files[files.length - 1]],
       status: Number(values.status ?? -1),
       weekdayPrices: values.weekdayPrices ?? [],
     }
@@ -172,36 +218,9 @@ export default function ServiceDetail(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
-  const [
-    selectFiles,
-    uploadFiles,
-    removeUploadedFiles,
-    cancelUploading,
-    uploading,
-    progressInfos,
-    message,
-    setFileInfos,
-    fileInfos,
-  ] = useUploadFiles()
-
-  const {
-    data: campService,
-    isLoading,
-    fetchStatus,
-    isError,
-    error,
-  }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
-    ['campService', serviceId],
-    () => getServiceDetail(Number(serviceId ?? 0)),
-    {
-      enabled: !!serviceId,
-      staleTime: 5 * 60 * 1000, // 5min
-    },
-  )
-
-  const { data: campAreas }: UseQueryResult<ICampAreaResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(['camp-areas'], () =>
-      fetchCampAreas({ size: 200, page: 0 }),
+  const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
+    useQuery<ICampAreaResponse, Error>(['camp-grounds'], () =>
+      fetchCampGrounds({ size: 200, page: 0 }),
     )
   React.useEffect(() => {
     if (campService) {
@@ -210,21 +229,22 @@ export default function ServiceDetail(props: Props) {
       defaultValues.capacity = campService.capacity
       defaultValues.name = campService.name
       defaultValues.description = campService.description
-
       defaultValues.weekdayPrices = campService.weekdayPrices
-      if (campAreas && campAreas.content) {
-        const getCamp = campAreas.content.find(
+      if (campGrounds && campGrounds.content) {
+        const getCamp = campGrounds.content.find(
           camp => camp.id === campService.campGroundId,
         )
-        defaultValues.camp = getCamp ?? {}
+        console.log(campService.campGroundId),
+          (defaultValues.camp = getCamp ?? {})
       }
       setMediasSrcPreviewer([...(campService?.images ?? [])])
+      setInitialFileInfos([...(campService.images ?? [])])
     } else {
       setMediasSrcPreviewer([])
     }
 
     methods.reset({ ...defaultValues })
-  }, [campService, campAreas])
+  }, [campService, campGrounds])
 
   React.useEffect(() => {
     const currentProp = campService?.weekdayPrices.length || 0
@@ -297,7 +317,7 @@ export default function ServiceDetail(props: Props) {
               <Grid item xs={9} sx={{ display: 'flex', alignItems: 'center' }}>
                 <MuiRHFAutoComplete
                   name="camp"
-                  options={campAreas?.content ?? []}
+                  options={campGrounds?.content ?? []}
                   optionProperty="name"
                   getOptionLabel={option => option.name ?? ''}
                   defaultValue=""
@@ -428,7 +448,7 @@ export default function ServiceDetail(props: Props) {
                     <UploadPreviewer
                       name="files"
                       initialMedias={campService?.images ?? []}
-                      fileInfos={fileInfos as any}
+                      fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}
                       mediaConfigs={fileConfigs as any}
@@ -454,34 +474,46 @@ export default function ServiceDetail(props: Props) {
                 </InputLabel>
               </Grid>
 
-              <Stack gap={3}>
-                {calendar.map(date => (
-                  <MuiTypography>{date}</MuiTypography>
-                ))}
-                {(fields as unknown as WeekdayPrices[]).map(
-                  ({ id, day, amount }: any, index) => (
-                    <Stack
-                      key={id}
-                      flexDirection="row"
-                      alignItems="center"
-                      justifyContent={'space-between'}
+              {calendar.map((date, index) => (
+                <Grid
+                  container
+                  sx={{ display: 'flex', alignItems: 'center' }}
+                  key={index}
+                >
+                  <Grid item xs={2}>
+                    <InputLabel
+                      sx={{
+                        fontSize: '15px',
+                        fontWeight: '500',
+                      }}
                     >
-                      <MuiTypography>{day}</MuiTypography>
-
-                      <MuiRHFNumericFormatInput
-                        label={''}
-                        name={`weekdayPrices.${index}.amount`}
-                        iconEnd={
-                          <MuiTypography variant="subtitle2">
-                            VNĐ/Ngày
-                          </MuiTypography>
-                        }
-                        fullWidth
-                      />
-                    </Stack>
-                  ),
-                )}
-              </Stack>
+                      {date}
+                    </InputLabel>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginRight: 3,
+                      marginTop: 2,
+                      marginBottom: 1,
+                    }}
+                  >
+                    <MuiRHFNumericFormatInput
+                      label={''}
+                      name={`weekdayPrices.${index}.amount`}
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">
+                          VNĐ/Ngày
+                        </MuiTypography>
+                      }
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+              ))}
             </Grid>
           </FormProvider>
         </form>

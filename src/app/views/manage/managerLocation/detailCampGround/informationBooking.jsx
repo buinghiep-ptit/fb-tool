@@ -59,7 +59,7 @@ export default function InformationBooking({ control, errors, listMerchant }) {
           </Grid>
         )}
         {isBooking === '1' && (
-          <Grid item xs={4} md={4} style={{ paddingRight: '15px' }}>
+          <Grid item xs={6} md={6} style={{ paddingRight: '15px' }}>
             <Controller
               name="idMerchant"
               control={control}
@@ -67,8 +67,11 @@ export default function InformationBooking({ control, errors, listMerchant }) {
                 <Autocomplete
                   disablePortal
                   {...field}
+                  fullWidth
                   options={listMerchant}
-                  getOptionLabel={option => option.name}
+                  getOptionLabel={option =>
+                    `${option.email}, ${option.mobilePhone}`
+                  }
                   onChange={(_, data) => {
                     field.onChange(data)
                   }}
@@ -80,7 +83,7 @@ export default function InformationBooking({ control, errors, listMerchant }) {
             />
           </Grid>
         )}
-        <Grid item xs={8} md={8}>
+        <Grid item xs={6} md={6}>
           <Controller
             name="openTime"
             control={control}

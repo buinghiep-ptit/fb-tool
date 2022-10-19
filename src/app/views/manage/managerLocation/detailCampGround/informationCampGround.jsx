@@ -21,6 +21,7 @@ import {
   getListCampAreaWithoutProvince,
   createCampGround,
   getListMerchant,
+  deleteCampGround,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -32,17 +33,14 @@ import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function InformationCampGround({ action }) {
-  const [provinceId, setProvinceId] = React.useState(null)
-  const [districtId, setDistrictId] = React.useState('')
   const [hashtag, setHashtag] = React.useState([])
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
   const [feature, setFeature] = React.useState({})
   const [campAreas, setCampAreas] = React.useState([])
-  const [idMerchant, setIdMerchant] = React.useState()
   const [medias, setMedias] = React.useState([])
-  const [description, setDescription] = React.useState()
+  const [description, setDescription] = React.useState('')
   const [listMerchant, setListMerchant] = React.useState([])
   const [detailPolicy, setDetailPolicy] = React.useState()
   const params = useParams()
@@ -52,6 +50,14 @@ export default function InformationCampGround({ action }) {
   })
   const introductionRef = React.useRef()
 
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
+  ]
   const navigate = useNavigate()
 
   const schema = yup
@@ -118,7 +124,6 @@ export default function InformationCampGround({ action }) {
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
     const fileUpload = [...introData].map(file => {
-      console.log(file)
       const formData = new FormData()
       formData.append('file', file)
       try {
@@ -147,11 +152,7 @@ export default function InformationCampGround({ action }) {
 
     const mediasUpdate = listUrlImage.map((url, index) => {
       const media = new Object()
-      if (index === 0) {
-        media.mediaType = 2
-      } else {
-        media.mediaType = 1
-      }
+      media.mediaType = 1
       media.srcType = 2
       media.mediaFormat = 2
       media.url = url
@@ -160,7 +161,7 @@ export default function InformationCampGround({ action }) {
 
     const dataUpdate = new Object()
     dataUpdate.medias = [...medias, ...mediasUpdate]
-    dataUpdate.description = description
+    dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
     const arrInternet = [
       { provider: 'viettel', speed: 'speedViettel' },
@@ -203,7 +204,6 @@ export default function InformationCampGround({ action }) {
         value: tag.value,
       }
     })
-    dataUpdate.campTypes = [0]
     dataUpdate.campGroundSeasons = (data.campGroundSeasons || []).map(
       season => season.id,
     )
@@ -216,7 +216,6 @@ export default function InformationCampGround({ action }) {
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
     dataUpdate.freeParking = true
-    console.log(dataUpdate)
 
     if (action === 'create') {
       const res = await createCampGround(dataUpdate)
@@ -255,15 +254,19 @@ export default function InformationCampGround({ action }) {
               lat: data.latitude,
               lng: data.longitude,
             })
+            setValue(
+              'campTypes',
+              data.campTypes.map(type => typeCamp[type - 1]),
+            )
+            setDescription(data.description || '')
             setDetailPolicy(data.depositPolicy)
             setValue('note', data.noteTopography)
             setMedias(data.medias)
-            setIdMerchant(data.idMerchant)
             setHashtag(data.tags)
             setValue('campAreas', data.campAreas)
             setValue('hashtag', data.tags)
             setValue('nameCampground', data.name)
-            setProvinceId(data.idProvince)
+
             setValue(
               'province',
               res.find(province => province.id === data.idProvince),
@@ -277,7 +280,6 @@ export default function InformationCampGround({ action }) {
               item => seasonsById[item],
             )
             setValue('campGroundSeasons', seasons)
-            setDistrictId(data.idDistrict)
             setValue('address', data.address)
             setValue('description', data.description)
             setValue('topographic', data.idTopography)
@@ -370,8 +372,6 @@ export default function InformationCampGround({ action }) {
             districts={districts}
             wards={wards}
             fetchWards={fetchWards}
-            setProvinceId={setProvinceId}
-            setDistrictId={setDistrictId}
             getValues={getValues}
             setValue={setValue}
             hashtag={hashtag}
@@ -412,6 +412,8 @@ export default function InformationCampGround({ action }) {
             setDescription={setDescription}
             ref={introductionRef}
             medias={medias}
+            action={action}
+            description={description}
             setMedias={setMedias}
           />
         </AccordionDetails>

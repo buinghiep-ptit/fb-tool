@@ -20,9 +20,7 @@ export default function GeneralInformation({
   districts,
   fetchDistricts,
   wards,
-  setDistrictId,
   fetchWards,
-  setProvinceId,
   getValues,
   setValue,
   hashtag,
@@ -109,7 +107,6 @@ export default function GeneralInformation({
                 sx={{ width: 200, marginRight: 5 }}
                 onChange={(_, data) => {
                   field.onChange(data)
-                  setProvinceId(getValues('province').id)
                   fetchDistricts(getValues('province').id)
                 }}
                 renderInput={params => (
@@ -136,7 +133,6 @@ export default function GeneralInformation({
                 id="combo-box-demo"
                 onChange={(_, data) => {
                   field.onChange(data)
-                  setDistrictId(getValues('district').id)
                   fetchWards(getValues('district').id)
                 }}
                 options={districts}

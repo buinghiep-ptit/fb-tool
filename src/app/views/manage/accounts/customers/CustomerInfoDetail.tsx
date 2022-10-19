@@ -194,7 +194,14 @@ export default function CustomerDetail(props: Props) {
             customer.data.avatar ?? '/assets/images/avatars/avatar-duck.jpeg',
         },
       ])
-
+      setInitialFileInfos([
+        {
+          mediaType: EMediaType.AVATAR,
+          mediaFormat: EMediaFormat.IMAGE,
+          url:
+            customer.data.avatar ?? '/assets/images/avatars/avatar-duck.jpeg',
+        },
+      ])
       methods.reset({ ...defaultValues })
     }
   }, [customer.data])
@@ -225,7 +232,7 @@ export default function CustomerDetail(props: Props) {
     uploading,
     progressInfos,
     message,
-    setFileInfos,
+    setInitialFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -242,7 +249,10 @@ export default function CustomerDetail(props: Props) {
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     updateCustomer({
       ...values,
-      avatar: (fileInfos[0] && fileInfos[0].url) ?? '',
+      avatar:
+        (fileInfos[fileInfos.length - 1] &&
+          fileInfos[fileInfos.length - 1].url) ??
+        '',
       cusId: customerId,
     })
   }
@@ -340,6 +350,8 @@ export default function CustomerDetail(props: Props) {
                     placeholder="Nhập Email"
                     fullWidth
                     defaultValue=""
+                    disabled
+                    clearIcon={false}
                   />
                   <FormInputText
                     label={' Số điện thoại'}
@@ -410,7 +422,6 @@ export default function CustomerDetail(props: Props) {
                       <Grid item sm={6} md={8} xs={6}>
                         <MuiTypography
                           variant="subtitle2"
-                          pb={1}
                           color="primary"
                           sx={{ textDecorationLine: 'underline' }}
                         >
@@ -460,11 +471,25 @@ export default function CustomerDetail(props: Props) {
                     <>
                       <UploadPreviewer
                         name="files"
+                        initialMedias={
+                          [
+                            {
+                              mediaType: EMediaType.AVATAR,
+                              mediaFormat: EMediaFormat.IMAGE,
+                              url:
+                                customer?.data?.avatar ??
+                                '/assets/images/avatars/avatar-duck.jpeg',
+                            },
+                          ] as IMediaOverall[]
+                        }
+                        fileInfos={fileInfos}
                         mediasSrcPreviewer={mediasSrcPreviewer}
                         setMediasSrcPreviewer={setMediasSrcPreviewer}
                         mediaConfigs={fileConfigs}
                         selectFiles={selectFiles}
                         uploadFiles={uploadFiles}
+                        removeUploadedFiles={removeUploadedFiles}
+                        cancelUploading={cancelUploading}
                         uploading={uploading}
                         progressInfos={progressInfos}
                       />
@@ -626,6 +651,8 @@ export default function CustomerDetail(props: Props) {
         <MuiStyledTable
           rows={logs?.data?.content as ILogsActionCustomer[]}
           columns={columnLogsCustomer as any}
+          rowsPerPage={size}
+          page={page}
           onClickRow={() => {}}
           isFetching={isFetching}
         />

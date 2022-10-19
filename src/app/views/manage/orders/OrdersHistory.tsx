@@ -15,7 +15,8 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { useOrdersData } from 'app/hooks/queries/useOrdersData'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useOrdersData, useReceiveOrder } from 'app/hooks/queries/useOrdersData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IOrderOverall } from 'app/models/order'
 import {
@@ -29,6 +30,7 @@ import React, { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from './details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -84,6 +86,10 @@ export default function OrdersHistory() {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
+
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [orderId, setOrderId] = useState(0)
 
   const [defaultValues] = useState<ISearchFilters>({
     search: queryParams.search ?? '',
@@ -238,9 +244,34 @@ export default function OrdersHistory() {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      navigation(`${row.orderId}`, {})
+    if (cell.id === 'action') {
+      if (row.status === 0) {
+        setTitleDialog('Tiếp nhận')
+        setOrderId(row.orderId)
+        setOpenDialog(true)
+      } else {
+        navigation(`${row.orderId}`, {})
+      }
+    } else if (cell.id === 'cusAccount') {
+      // navigation(`${row.orderId}`, {})
+    } else if (cell.id === 'campGroundName') {
+      // navigation(`${row.orderId}`, {})
     }
+  }
+
+  const onSuccess = (data: any, message?: string) => {
+    toastSuccess({
+      message: message ?? '',
+    })
+    setOpenDialog(false)
+    navigation(`${orderId}`, {})
+  }
+  const { mutate: receive, isLoading: approveLoading } = useReceiveOrder(() =>
+    onSuccess(null, 'Tiếp nhận thành công'),
+  )
+
+  const approveConfirm = () => {
+    receive(orderId)
   }
 
   if (isLoading) return <MuiLoading />
@@ -341,6 +372,8 @@ export default function OrdersHistory() {
             <MuiStyledTable
               rows={data ? (data?.content as IOrderOverall[]) : []}
               columns={getColumns(currentTab)}
+              rowsPerPage={size}
+              page={page}
               onClickRow={onClickRow}
               isFetching={isFetching}
               error={isError ? error : null}
@@ -357,6 +390,19 @@ export default function OrdersHistory() {
           </SimpleCard>
         </Stack>
       </React.Fragment>
+
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={approveConfirm}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            Đồng ý tiếp nhận đơn hàng?
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

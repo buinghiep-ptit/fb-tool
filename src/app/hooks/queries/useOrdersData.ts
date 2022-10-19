@@ -1,10 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchActionsHistory } from 'app/apis/feed/feed.service'
 import {
+  availableOrder,
   fetchLogsActionDetail,
   fetchOrdersCancelRequests,
   fetchOrdersOverall,
   orderDetail,
+  reassignOrder,
+  receiveOrder,
+  unavailableOrder,
 } from 'app/apis/order/order.service'
 import { IOrderResponse } from 'app/models/order'
 
@@ -47,4 +51,52 @@ export const useLogsActionOrderData = (
 
 export const useOrderDetailData = (orderId: number) => {
   return useQuery(['order-detail', orderId], () => orderDetail(orderId))
+}
+
+export const useReceiveOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((orderId: number) => receiveOrder(orderId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['order-detail'])
+      queryClient.invalidateQueries(['orders'])
+    },
+    onSuccess,
+  })
+}
+
+export const useAvailableOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((orderId: number) => availableOrder(orderId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['order-detail'])
+      queryClient.invalidateQueries(['orders'])
+    },
+    onSuccess,
+  })
+}
+
+export const useUnAvailableOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((orderId: number) => unavailableOrder(orderId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['order-detail'])
+      queryClient.invalidateQueries(['orders'])
+    },
+    onSuccess,
+  })
+}
+
+export const useReassignOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (payload: { orderId?: number; userId?: number }) =>
+      reassignOrder(payload.orderId ?? 0, payload.userId ?? 0),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+      },
+      onSuccess,
+    },
+  )
 }

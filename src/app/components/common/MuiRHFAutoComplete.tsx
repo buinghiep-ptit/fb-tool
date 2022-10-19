@@ -29,6 +29,7 @@ export interface Props {
   optionProperty: string // keyof options
   renderInput?: any
   getOptionLabel?: (option: any) => string
+  required?: boolean
 }
 
 function CustomPaper({ children, ...others }: any) {
@@ -58,6 +59,7 @@ export function MuiRHFAutoComplete({
   options = [],
   optionProperty,
   getOptionLabel,
+  required,
 }: Props) {
   const {
     control,
@@ -94,7 +96,9 @@ export function MuiRHFAutoComplete({
           }}
           getOptionLabel={getOptionLabel}
           renderOption={(props, option, index) => {
-            const key = `listItem-${index}-${option.id}`
+            const key = `listItem-${index}-${
+              option.id ?? option[optionProperty]
+            }`
             return (
               <li {...props} key={key}>
                 {option[optionProperty]}
@@ -103,6 +107,7 @@ export function MuiRHFAutoComplete({
           }}
           renderInput={params => (
             <TextField
+              required={required}
               {...params}
               label={label}
               error={!!errors[name]}
@@ -110,6 +115,7 @@ export function MuiRHFAutoComplete({
                 errors[name] ? (errors[name]?.message as unknown as string) : ''
               }
               variant="outlined"
+              InputLabelProps={{ shrink: true }}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (

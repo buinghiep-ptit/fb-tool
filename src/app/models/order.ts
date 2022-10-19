@@ -27,11 +27,12 @@ export interface IOrderDetail {
   amount?: number
   deposit?: number
   status?: number
-  customer: ICustomerOrder
-  contact: IContact
-  services: IService[]
-  orderProcess: IOrderProcess[]
-  cancelRequest: {
+  note?: string
+  customer?: ICustomerOrder
+  contact?: IContact
+  services?: IService[]
+  orderProcess?: IOrderProcess[]
+  cancelRequest?: {
     requester: {
       id: 2
       userType: 2
@@ -45,7 +46,7 @@ export interface IOrderDetail {
     status: 1
     idOrder: null
   }
-  transactions: [
+  transactions?: [
     {
       id: 1
       txnCode: 'DEV001000001'

@@ -11,6 +11,7 @@ type SchemaType = {
   fullName?: string
   mobilePhone?: string
   email?: string
+  note?: string
   services?: IService[]
 }
 
@@ -19,10 +20,11 @@ export const useRHFOrder = (order: IOrderDetail) => {
     if (order) {
       defaultValues.dateStart = order.dateStart
       defaultValues.dateEnd = order.dateEnd
-      defaultValues.fullName = order.contact.fullName
-      defaultValues.mobilePhone = order.contact.mobilePhone
-      defaultValues.email = order.contact.email
+      defaultValues.fullName = order.contact?.fullName
+      defaultValues.mobilePhone = order.contact?.mobilePhone
+      defaultValues.email = order.contact?.email
       defaultValues.services = order.services
+      defaultValues.note = order.note
 
       methods.reset({ ...defaultValues })
     }
@@ -32,6 +34,15 @@ export const useRHFOrder = (order: IOrderDetail) => {
 
   const validationSchema = Yup.object().shape({
     fullName: Yup.string().required(messages.MSG1),
+    mobilePhone: Yup.string()
+      .required(messages.MSG1)
+      .test('check valid', 'Số điện thoại không hợp lệ', phone => {
+        const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+        if (!phone) {
+          return true
+        }
+        return regex.test(phone as string)
+      }),
     dateStart: Yup.date()
       .typeError('Sai dịnh dạng.')
       .nullable()
@@ -70,7 +81,7 @@ export const useRHFOrder = (order: IOrderDetail) => {
   })
 
   useEffect(() => {
-    const currentProp = order?.services.length || 0
+    const currentProp = order?.services?.length || 0
     const previousProp = fields.length
     if (currentProp > previousProp) {
       for (let i = previousProp; i < currentProp; i++) {

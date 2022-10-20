@@ -21,6 +21,7 @@ import {
   getListCampAreaWithoutProvince,
   createCampGround,
   getListMerchant,
+  deleteCampGround,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -28,20 +29,20 @@ import Feature from './feature'
 import { cloneDeep } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import Policy from './policy'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function InformationCampGround({ action }) {
-  const [provinceId, setProvinceId] = React.useState(null)
-  const [districtId, setDistrictId] = React.useState('')
   const [hashtag, setHashtag] = React.useState([])
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
   const [feature, setFeature] = React.useState({})
   const [campAreas, setCampAreas] = React.useState([])
-  const [idMerchant, setIdMerchant] = React.useState()
   const [medias, setMedias] = React.useState([])
-  const [description, setDescription] = React.useState()
+  const [description, setDescription] = React.useState('')
   const [listMerchant, setListMerchant] = React.useState([])
+  const [detailPolicy, setDetailPolicy] = React.useState()
   const params = useParams()
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
@@ -49,6 +50,14 @@ export default function InformationCampGround({ action }) {
   })
   const introductionRef = React.useRef()
 
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
+  ]
   const navigate = useNavigate()
 
   const schema = yup
@@ -56,10 +65,10 @@ export default function InformationCampGround({ action }) {
       nameCampground: yup
         .string()
         .required('Vui lòng nhập tên địa danh')
+        .max(255, 'Số ký tự quá dài')
         .trim(),
-      province: yup.object().required(),
-      district: yup.object().required(),
-      description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
+      district: yup.object().required('Vui lòng chọn quận/huyện'),
     })
     .required()
 
@@ -70,7 +79,7 @@ export default function InformationCampGround({ action }) {
     getValues,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
     defaultValues: {
       nameCampground: '',
       province: null,
@@ -104,6 +113,7 @@ export default function InformationCampGround({ action }) {
       latitude: 21.027161210811197,
       longitude: 105.78872657468659,
       note: '',
+      policy: '',
     },
   })
 
@@ -114,7 +124,6 @@ export default function InformationCampGround({ action }) {
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
     const fileUpload = [...introData].map(file => {
-      console.log(file)
       const formData = new FormData()
       formData.append('file', file)
       try {
@@ -143,11 +152,7 @@ export default function InformationCampGround({ action }) {
 
     const mediasUpdate = listUrlImage.map((url, index) => {
       const media = new Object()
-      if (index === 0) {
-        media.mediaType = 2
-      } else {
-        media.mediaType = 1
-      }
+      media.mediaType = 1
       media.srcType = 2
       media.mediaFormat = 2
       media.url = url
@@ -156,7 +161,7 @@ export default function InformationCampGround({ action }) {
 
     const dataUpdate = new Object()
     dataUpdate.medias = [...medias, ...mediasUpdate]
-    dataUpdate.description = description
+    dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
     const arrInternet = [
       { provider: 'viettel', speed: 'speedViettel' },
@@ -176,8 +181,8 @@ export default function InformationCampGround({ action }) {
     dataUpdate.id = params.id
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
-    dataUpdate.policy = ''
-    dataUpdate.idMerchant = data.idMerchant.id
+    dataUpdate.idDepositPolicy = data.policy
+    dataUpdate.idMerchant = data.idMerchant?.id || null
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
@@ -199,7 +204,6 @@ export default function InformationCampGround({ action }) {
         value: tag.value,
       }
     })
-    dataUpdate.campTypes = [0]
     dataUpdate.campGroundSeasons = (data.campGroundSeasons || []).map(
       season => season.id,
     )
@@ -212,7 +216,6 @@ export default function InformationCampGround({ action }) {
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
     dataUpdate.freeParking = true
-    console.log(dataUpdate)
 
     if (action === 'create') {
       const res = await createCampGround(dataUpdate)
@@ -251,19 +254,24 @@ export default function InformationCampGround({ action }) {
               lat: data.latitude,
               lng: data.longitude,
             })
+            setValue(
+              'campTypes',
+              data.campTypes.map(type => typeCamp[type - 1]),
+            )
+            setDescription(data.description || '')
+            setDetailPolicy(data.depositPolicy)
             setValue('note', data.noteTopography)
             setMedias(data.medias)
-            setIdMerchant(data.idMerchant)
             setHashtag(data.tags)
             setValue('campAreas', data.campAreas)
             setValue('hashtag', data.tags)
             setValue('nameCampground', data.name)
-            setProvinceId(data.idProvince)
+
             setValue(
               'province',
               res.find(province => province.id === data.idProvince),
             )
-
+            setValue('policy', data.depositPolicy.id)
             setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
@@ -272,7 +280,6 @@ export default function InformationCampGround({ action }) {
               item => seasonsById[item],
             )
             setValue('campGroundSeasons', seasons)
-            setDistrictId(data.idDistrict)
             setValue('address', data.address)
             setValue('description', data.description)
             setValue('topographic', data.idTopography)
@@ -314,34 +321,32 @@ export default function InformationCampGround({ action }) {
   }
 
   const handleDeleteCampGround = async () => {
-    // const res = await deleteCampGround(params.id)
-    // if (res) {
-    //   navigate('/quan-ly-thong-tin-diem-camp')
-    // }
+    const res = await deleteCampGround(params.id)
+    if (res) {
+      navigate('/quan-ly-thong-tin-diem-camp')
+    }
     navigate('/quan-ly-thong-tin-diem-camp')
   }
 
-  React.useEffect(() => {
-    if (provinceId)
-      getDistricts(provinceId)
-        .then(dataDistrict => {
-          setDistricts(dataDistrict)
-          setValue('district', null)
-          setValue('ward', null)
-          setWards([])
-        })
-        .catch(err => console.log(err))
-  }, [provinceId])
+  const fetchDistricts = provinceId => {
+    getDistricts(provinceId)
+      .then(dataDistrict => {
+        setDistricts(dataDistrict)
+        setValue('district', null)
+        setValue('ward', null)
+        setWards([])
+      })
+      .catch(err => console.log(err))
+  }
 
-  React.useEffect(() => {
-    if (districtId)
-      getWards(districtId)
-        .then(dataWard => {
-          setWards(dataWard)
-          setValue('ward', null)
-        })
-        .catch(err => console.log(err))
-  }, [districtId])
+  const fetchWards = districtId => {
+    getWards(districtId)
+      .then(dataWard => {
+        setWards(dataWard)
+        setValue('ward', null)
+      })
+      .catch(err => console.log(err))
+  }
 
   React.useEffect(() => {
     fetchListCampArea()
@@ -360,13 +365,13 @@ export default function InformationCampGround({ action }) {
         </AccordionSummary>
         <AccordionDetails>
           <GeneralInformation
+            fetchDistricts={fetchDistricts}
             control={control}
             errors={errors}
             provinces={provinces}
             districts={districts}
             wards={wards}
-            setProvinceId={setProvinceId}
-            setDistrictId={setDistrictId}
+            fetchWards={fetchWards}
             getValues={getValues}
             setValue={setValue}
             hashtag={hashtag}
@@ -407,9 +412,10 @@ export default function InformationCampGround({ action }) {
             setDescription={setDescription}
             ref={introductionRef}
             medias={medias}
+            action={action}
+            description={description}
             setMedias={setMedias}
           />
-          {description}
         </AccordionDetails>
       </Accordion>
       <Accordion>
@@ -431,6 +437,22 @@ export default function InformationCampGround({ action }) {
           />
         </AccordionDetails>
       </Accordion>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel5a-content"
+          id="panel5a-header"
+        >
+          <Typography>5. Chính sách</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Policy
+            setValue={setValue}
+            action={action}
+            detailPolicy={detailPolicy}
+          />
+        </AccordionDetails>
+      </Accordion>
       <div style={{ marginTop: '50px' }}>
         <Button
           color="primary"
@@ -443,7 +465,7 @@ export default function InformationCampGround({ action }) {
         <Button
           color="primary"
           variant="contained"
-          onClick={handleDeleteCampGround}
+          onClick={() => handleDeleteCampGround()}
         >
           Xóa
         </Button>

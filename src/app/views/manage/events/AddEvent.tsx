@@ -100,7 +100,7 @@ export default function AddEvent(props: Props) {
         .typeError('Sai định dạng.')
         .nullable()
         .required('Chọn ngày kết thúc.'),
-      amount: Yup.string().nullable(),
+      amount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
           // if (!!Number(eventId ?? 0)) {
@@ -441,7 +441,7 @@ export default function AddEvent(props: Props) {
                       md:
                         fileConfigs.mediaFormat === EMediaFormat.VIDEO
                           ? 300
-                          : 500,
+                          : 450,
                     }}
                     position="relative"
                   >

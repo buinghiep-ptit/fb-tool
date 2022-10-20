@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import {
+  ICampArea,
   ICampAreaResponse,
   ICampGround,
   ICampGroundResponse,
@@ -218,10 +219,37 @@ export default function ServiceDetail(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
-  const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(['camp-grounds'], () =>
-      fetchCampGrounds({ size: 200, page: 0 }),
-    )
+  // const [
+  //   selectFiles,
+  //   uploadFiles,
+  //   removeUploadedFiles,
+  //   cancelUploading,
+  //   uploading,
+  //   progressInfos,
+  //   message,
+  //   setFileInfos,
+  //   fileInfos,
+  // ] = useUploadFiles()
+
+  // const {
+  //   data: campService,
+  //   isLoading,
+  //   fetchStatus,
+  //   isError,
+  //   error,
+  // }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
+  //   ['campService', serviceId],
+  //   () => getServiceDetail(Number(serviceId ?? 0)),
+  //   {
+  //     enabled: !!serviceId,
+  //     staleTime: 5 * 60 * 1000, // 5min
+  //   },
+  // )
+
+  const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
+    ICampArea[],
+    Error
+  >(['camp-areas'], () => fetchCampAreas({ size: 200, page: 0 }))
   React.useEffect(() => {
     if (campService) {
       defaultValues.rentalType = campService.rentalType
@@ -230,9 +258,9 @@ export default function ServiceDetail(props: Props) {
       defaultValues.name = campService.name
       defaultValues.description = campService.description
       defaultValues.weekdayPrices = campService.weekdayPrices
-      if (campGrounds && campGrounds.content) {
-        const getCamp = campGrounds.content.find(
-          camp => camp.id == campService.campGroundId,
+      if (campAreas) {
+        const getCamp = campAreas.find(
+          camp => camp.id === campService.campGroundId,
         )
         defaultValues.camp = getCamp ?? {}
         console.log(campService.weekdayPrices)
@@ -244,7 +272,7 @@ export default function ServiceDetail(props: Props) {
     }
 
     methods.reset({ ...defaultValues })
-  }, [campService, campGrounds])
+  }, [campService, campAreas])
 
   React.useEffect(() => {
     const currentProp = campService?.weekdayPrices.length || 0
@@ -317,7 +345,7 @@ export default function ServiceDetail(props: Props) {
               <Grid item xs={9} sx={{ display: 'flex', alignItems: 'center' }}>
                 <MuiRHFAutoComplete
                   name="camp"
-                  options={campGrounds?.content ?? []}
+                  options={campAreas ?? []}
                   optionProperty="name"
                   getOptionLabel={option => option.name ?? ''}
                   defaultValue=""

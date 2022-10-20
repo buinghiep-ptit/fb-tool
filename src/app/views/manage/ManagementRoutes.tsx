@@ -159,6 +159,10 @@ const ManagementRoutes = [
       },
     ],
   },
+  {
+    path: '/quan-ly-feeds/:feedId/chinh-sua-feed',
+    element: <CreateFeed />,
+  },
   { path: '/quan-ly-feeds/bao-cao-vi-pham', element: <ReportDialog /> }, // ?? unused
   {
     path: '/quan-ly-feeds/hau-kiem',

@@ -85,7 +85,7 @@ export default function LockCustomer({ title }: Props) {
       is: (lockType: string) => lockType && lockType === '2',
       then: Yup.string()
         .required(messages.MSG1)
-        .max(10, 'Thời gian không hợp lệ (<= 10 số)')
+        .max(12, 'Thời gian không hợp lệ (<= 10 số)')
         .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
     }),
 

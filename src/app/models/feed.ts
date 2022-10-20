@@ -35,6 +35,7 @@ export interface IFeedDetail {
   status?: number
   video?: IMediaOverall
   images?: IMediaOverall[]
+  idAudio?: number
   tags?: ITags[]
   createdBy?: number
   lastModifiedBy?: number
@@ -46,6 +47,7 @@ export interface IFeedDetail {
 
 export interface ICustomerInfo {
   id?: number
+  type?: number
   email?: string
   mobilePhone?: string
   fullName?: string

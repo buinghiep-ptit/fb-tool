@@ -265,6 +265,8 @@ export default function ManagerEvents(props: Props) {
               data ? (newEvents(data?.content ?? []) as IEventOverall[]) : []
             }
             columns={columnsEvents}
+            rowsPerPage={size}
+            page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}

@@ -13,7 +13,11 @@ import {
   customerSystemDefault,
   fetchCustomers,
 } from 'app/apis/accounts/customer.service'
-import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
+import {
+  fetchCampAreas,
+  fetchCampGrounds,
+  fetchFeedDetail,
+} from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -26,7 +30,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateFeed } from 'app/hooks/queries/useFeedsData'
+import { useCreateFeed, useUpdateFeed } from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
@@ -37,18 +41,22 @@ import {
   IMediaOverall,
   ITags,
 } from 'app/models'
-import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
+import {
+  ICampArea,
+  ICampAreaResponse,
+  ICampGroundResponse,
+} from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {}
 
 type SchemaType = {
-  type?: 1 | 2
+  type?: 1 | 2 | number
   cusType?: number | string
   customer?: any // idCustomer
   idSrcType?: number | string
@@ -74,6 +82,7 @@ export default function CreateFeed(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
+  const { feedId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
@@ -85,8 +94,19 @@ export default function CreateFeed(props: Props) {
     cusType: '',
     idSrcType: '',
     hashtag: [],
+    customer: [
+      {
+        fullName: 'Bùi Văn Nghiệp',
+        customerId: 32,
+        dateCreated: '2022-09-13T07:41:19Z',
+        mobilePhone: '0975452750',
+        email: 'nghiepbvptit@gmail.com',
+        lastLoginDate: null,
+        status: -3,
+      },
+    ],
   })
-  const [filters, setFilters] = useState({ cusType: 0 })
+  const [filters, setFilters] = useState({ cusType: 1 })
 
   const validationSchema = Yup.object().shape(
     {
@@ -94,7 +114,7 @@ export default function CreateFeed(props: Props) {
       customer: Yup.object()
         .nullable()
         .when(['cusType'], {
-          is: (cusType: string) => !!cusType && Number(cusType) !== 0,
+          is: (cusType: string) => !!cusType && Number(cusType) !== 1,
           then: Yup.object().required(messages.MSG1).nullable(),
         }),
       idSrcType: Yup.string().required(messages.MSG1),
@@ -140,14 +160,20 @@ export default function CreateFeed(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const { data: campAreas }: UseQueryResult<ICampAreaResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(
-      ['camp-areas'],
-      () => fetchCampAreas({ size: 200, page: 0 }),
-      {
-        enabled: Number(methods.watch('idSrcType')) === 1,
-      },
-    )
+  const { data: feed }: UseQueryResult<IFeedDetail, Error> = useQuery<
+    IFeedDetail,
+    Error
+  >(['feed', feedId], () => fetchFeedDetail(Number(feedId ?? 0)), {
+    enabled: !!feedId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
+    ICampArea[],
+    Error
+  >(['camp-areas'], () => fetchCampAreas({ size: 200, page: 0 }), {
+    enabled: Number(methods.watch('idSrcType')) === 1,
+  })
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
     useQuery<ICampAreaResponse, Error>(
@@ -179,14 +205,88 @@ export default function CreateFeed(props: Props) {
       () => customerSystemDefault(),
       {
         refetchOnWindowFocus: false,
-        enabled: !!filters && filters.cusType === 0,
+        enabled: !!filters && filters.cusType === 1,
       },
     )
 
   useEffect(() => {
+    initDefaultValues(feed)
+  }, [feed])
+
+  useEffect(() => {
+    if (!feed) return
+    if (feed.customerInfo?.type && feed.customerInfo?.type === 1) {
+      methods.setValue('customer', customerCampdi ?? undefined)
+    } else {
+      if (customers && customers.content) {
+        const cus = customers.content.find(
+          c => c.customerId === feed.idCustomer,
+        ) as ICustomerDetail
+        if (cus) {
+          methods.setValue(
+            'customer',
+            Object.assign(cus, {
+              labelText:
+                (cus?.fullName ?? '') +
+                '_' +
+                (cus?.email ?? '') +
+                '_' +
+                (cus?.mobilePhone ?? ''),
+            }),
+          )
+        }
+      }
+    }
+    if (campGrounds && campGrounds.content) {
+      const campGround = campGrounds.content.find(c => c.id == feed.idSrc)
+      methods.setValue('camp', campGround ?? undefined)
+    } else if (campAreas) {
+      const campArea = campAreas.find(c => c.id == feed.idSrc)
+      methods.setValue('camp', campArea ?? undefined)
+    }
+  }, [feed, customers, campGrounds, campAreas])
+
+  const initDefaultValues = (feed?: IFeedDetail) => {
+    if (feed) {
+      defaultValues.type = feed.type ?? 0
+      defaultValues.cusType = feed.customerInfo?.type // check lai
+      defaultValues.idSrcType = feed.idSrcType
+      defaultValues.content = feed.content
+      defaultValues.hashtag = feed.tags
+      defaultValues.webUrl = feed.webUrl ?? ''
+
+      if (
+        feed.images &&
+        feed.images.length &&
+        feed.images[0].mediaFormat === EMediaFormat.IMAGE
+      ) {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.IMAGE,
+          multiple: true,
+          accept: 'image/*',
+        }))
+      } else {
+        setFileConfigs(prev => ({
+          ...prev,
+          mediaFormat: EMediaFormat.VIDEO,
+          accept: 'video/*',
+          multiple: false,
+        }))
+      }
+      setMediasSrcPreviewer((feed.video && [feed.video]) ?? feed.images ?? [])
+      setInitialFileInfos((feed.video && [feed.video]) ?? feed.images ?? [])
+    } else {
+      setMediasSrcPreviewer([])
+    }
+
+    methods.reset({ ...defaultValues })
+  }
+
+  useEffect(() => {
     let accounts: any[] = []
     if (
-      parseInt((methods.watch('cusType') ?? 0) as unknown as string, 10) !== 0
+      parseInt((methods.watch('cusType') ?? 1) as unknown as string, 10) !== 1
     ) {
       accounts = customers?.content ?? []
     } else {
@@ -204,8 +304,8 @@ export default function CreateFeed(props: Props) {
         labelText,
       }
     })
+
     setAccountList([...newAccounts])
-    // methods.setValue('customer', accounts.length && accounts[0])
   }, [methods.setValue, methods.watch('cusType'), customers, customerCampdi])
 
   const [
@@ -216,7 +316,7 @@ export default function CreateFeed(props: Props) {
     uploading,
     progressInfos,
     message,
-    setFileInfos,
+    setInitialFileInfos,
     fileInfos,
   ] = useUploadFiles()
 
@@ -233,30 +333,40 @@ export default function CreateFeed(props: Props) {
       type: Number(values.type ?? 0),
       idSrcType: Number(values.idSrcType ?? 0),
       idSrc: Number(values.camp?.id ?? 0),
-      webUrl: values.webUrl,
+      webUrl: values.webUrl ?? null,
       idCustomer:
-        Number(values.cusType) === 0
+        Number(values.cusType) === 1
           ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
       video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
       images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
+      idAudio: 1,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
-      status: Number(values.cusType ?? 0) === 2 ? 0 : 1,
+      status: 1,
     }
-    add(payload)
+    if (feedId) {
+      edit({ ...payload, id: Number(feedId) })
+    } else {
+      add(payload)
+    }
   }
 
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Thêm mới thành công' })
+  const onRowUpdateSuccess = (data: any, message: string) => {
+    toastSuccess({ message: message })
     navigate('/quan-ly-feeds', {})
     setMediasSrcPreviewer([])
     methods.reset()
   }
-  const { mutate: add, isLoading: createLoading } =
-    useCreateFeed(onRowUpdateSuccess)
+  const { mutate: add, isLoading: createLoading } = useCreateFeed(() =>
+    onRowUpdateSuccess(null, 'Thêm mới thành công'),
+  )
+
+  const { mutate: edit, isLoading: editLoading } = useUpdateFeed(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
 
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
@@ -321,7 +431,7 @@ export default function CreateFeed(props: Props) {
       >
         <MuiButton
           title="Lưu"
-          disabled={uploading}
+          disabled={uploading || createLoading || editLoading}
           variant="contained"
           color="primary"
           type="submit"
@@ -366,38 +476,39 @@ export default function CreateFeed(props: Props) {
                   </Stack>
                   <Stack>
                     <SelectDropDown name="cusType" label="Loại tài khoản*">
-                      <MenuItem value="0">Campdi</MenuItem>
+                      <MenuItem value="1">Campdi</MenuItem>
                       <MenuItem value="3">Campdi (food)</MenuItem>
                       <MenuItem value="2">KOL</MenuItem>
                     </SelectDropDown>
                   </Stack>
 
-                  {Number(methods.watch('cusType') ?? 0) !== 0 && (
-                    <Stack
-                      flexDirection={'row'}
-                      gap={1.5}
-                      justifyContent="center"
-                    >
-                      <MuiTypography fontSize="12px" fontStyle="italic">
-                        Tài khoản post*
-                      </MuiTypography>
-                      <Box sx={{ flex: 1 }}>
-                        {/* <MuiAutoComplete
+                  {methods.watch('cusType') &&
+                    Number(methods.watch('cusType') ?? 0) !== 1 && (
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1.5}
+                        justifyContent="center"
+                      >
+                        <MuiTypography fontSize="12px" fontStyle="italic">
+                          Tài khoản post*
+                        </MuiTypography>
+                        <Box sx={{ flex: 1 }}>
+                          {/* <MuiAutoComplete
                         itemList={accountList}
                         name="customer"
                         disabled={Number(methods.getValues('cusType')) === 0}
                       /> */}
-                        <MuiRHFAutoComplete
-                          name="customer"
-                          label="Tài khoản post"
-                          options={accountList ?? []}
-                          optionProperty="labelText"
-                          getOptionLabel={option => option.labelText ?? ''}
-                          defaultValue=""
-                        />
-                      </Box>
-                    </Stack>
-                  )}
+                          <MuiRHFAutoComplete
+                            name="customer"
+                            label="Tài khoản post"
+                            options={accountList ?? []}
+                            optionProperty="labelText"
+                            getOptionLabel={option => option.labelText ?? ''}
+                            defaultValue=""
+                          />
+                        </Box>
+                      </Stack>
+                    )}
 
                   <Stack>
                     <SelectDropDown name="idSrcType" label="Liên kết với">
@@ -422,7 +533,7 @@ export default function CreateFeed(props: Props) {
                             name="camp"
                             options={
                               Number(methods.watch('idSrcType')) === 1
-                                ? campAreas?.content ?? []
+                                ? campAreas ?? []
                                 : campGrounds?.content ?? []
                             }
                             optionProperty="name"
@@ -454,7 +565,9 @@ export default function CreateFeed(props: Props) {
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
                   </Stack>
 
-                  {createLoading && <LinearProgress sx={{ mt: 0.5 }} />}
+                  {(createLoading || editLoading) && (
+                    <LinearProgress sx={{ mt: 0.5 }} />
+                  )}
                 </Stack>
               </Grid>
 
@@ -480,7 +593,9 @@ export default function CreateFeed(props: Props) {
                   >
                     <UploadPreviewer
                       name="files"
-                      initialMedias={[]}
+                      initialMedias={
+                        (feed?.images ?? [feed?.video] ?? []) as IMediaOverall[]
+                      }
                       fileInfos={fileInfos}
                       mediasSrcPreviewer={mediasSrcPreviewer}
                       setMediasSrcPreviewer={setMediasSrcPreviewer}

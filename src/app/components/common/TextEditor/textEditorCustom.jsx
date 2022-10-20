@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
-import { EditorState, convertToRaw } from 'draft-js'
+import {
+  EditorState,
+  convertToRaw,
+  ContentState,
+  convertFromHTML,
+} from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
 // import htmlToDraft from 'html-to-draftjs'
@@ -7,19 +12,21 @@ import '../../../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg
 import './text-editor.css'
 class EditorConvertToHTML extends Component {
   state = {
-    editorState: EditorState.createEmpty(),
+    editorState: EditorState.createWithContent(
+      ContentState.createFromBlockArray(
+        convertFromHTML(this.props.description),
+      ),
+    ),
+  }
+
+  getValueTextEditor = () => {
+    return draftToHtml(convertToRaw(this.state.editorState.getCurrentContent()))
   }
 
   onEditorStateChange = editorState => {
     this.setState({
       editorState,
     })
-    console.log(
-      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
-    )
-    this.props.setDescription(
-      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
-    )
   }
 
   render() {
@@ -32,10 +39,6 @@ class EditorConvertToHTML extends Component {
           editorClassName="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
         />
-        {/* <textarea
-          disabled
-          value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
-        /> */}
       </div>
     )
   }

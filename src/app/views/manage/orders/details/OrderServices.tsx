@@ -3,20 +3,43 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  FormHelperText,
   Stack,
 } from '@mui/material'
-import FormInputText from 'app/components/common/MuiRHFInputText'
+import { Box } from '@mui/system'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { IOrderDetail, IService } from 'app/models/order'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
-import * as React from 'react'
 
 export interface IOrderServicesProps {
+  methods?: any
   order?: IOrderDetail
   fields?: IService[]
 }
 
-export function OrderServices({ order, fields = [] }: IOrderServicesProps) {
+export function OrderServices({
+  methods,
+  order,
+  fields = [],
+}: IOrderServicesProps) {
+  const services = methods.watch('services')
+
+  const getTotalAmount = (
+    services?: {
+      quantity?: number
+      amount?: number
+    }[],
+  ) => {
+    const total = services?.reduce(
+      (acc, service) =>
+        acc + Number(service?.quantity ?? 0) * Number(service?.amount ?? 0),
+      0,
+    )
+
+    return total
+  }
+
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -46,12 +69,24 @@ export function OrderServices({ order, fields = [] }: IOrderServicesProps) {
                   <MuiTypography>{name}</MuiTypography>
                   <MuiTypography>[{type}]</MuiTypography>
                 </Stack>
-                <FormInputText
-                  label={'Số lượng'}
-                  type="number"
-                  name={`services.${index}.quantity`}
-                  defaultValue={(quantity ?? 0).toString()}
-                />
+                <Box>
+                  <MuiRHFNumericFormatInput
+                    label={'Số lượng'}
+                    name={`services.${index}.quantity`}
+                    fullWidth
+                    required
+                  />
+                  {methods.formState.errors?.services &&
+                    methods.formState.errors?.services[index].quantity
+                      .message && (
+                      <FormHelperText error>
+                        {
+                          methods.formState.errors?.services[index].quantity
+                            .message
+                        }
+                      </FormHelperText>
+                    )}
+                </Box>
               </Stack>
 
               <Stack
@@ -81,7 +116,11 @@ export function OrderServices({ order, fields = [] }: IOrderServicesProps) {
             <Stack flexDirection="row" gap={2}>
               <MuiTypography variant="subtitle2">Tổng thực tế:</MuiTypography>
               <MuiTypography variant="body2" color={'primary'} fontWeight={500}>
-                {CurrencyFormatter(order?.amount ?? 0, 2)} VNĐ
+                {CurrencyFormatter(
+                  getTotalAmount(services) ?? order?.amount ?? 0,
+                  2,
+                )}
+                VNĐ
               </MuiTypography>
             </Stack>
           </Stack>

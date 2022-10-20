@@ -256,6 +256,8 @@ export default function CustomerAccounts(props: Props) {
           <MuiStyledTable
             rows={data ? (data?.content as ICustomer[]) : []}
             columns={columnCustomerAccounts}
+            rowsPerPage={size}
+            page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}

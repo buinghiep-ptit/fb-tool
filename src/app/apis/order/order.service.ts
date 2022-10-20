@@ -22,8 +22,44 @@ export const fetchOrdersCancelRequests = async (
   return data
 }
 
+export const receiveOrder = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/receive`)
+  return data
+}
+
 export const orderDetail = async (orderId: number): Promise<IOrderDetail> => {
   const { data } = await http.get<IOrderDetail>(`/api/order/${orderId}`)
+  return data
+}
+
+export const updateOrder = async (
+  orderId: number,
+  payload: any,
+): Promise<IOrderDetail> => {
+  const { data } = await http.put<IOrderDetail>(
+    `/api/order/${orderId}/update`,
+    payload,
+  )
+  return data
+}
+
+export const availableOrder = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/available`)
+  return data
+}
+
+export const unavailableOrder = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/unavailable`)
+  return data
+}
+
+export const reassignOrder = async (
+  orderId: number,
+  userId: number,
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/reassign/${userId}`,
+  )
   return data
 }
 

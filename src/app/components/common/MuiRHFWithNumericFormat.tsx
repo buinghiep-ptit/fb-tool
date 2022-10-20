@@ -17,6 +17,7 @@ export type Props = {
   defaultValue?: string
   inputProps?: InputProps
   disabled?: boolean
+  required?: boolean
 } & TextFieldProps
 
 const MAX_LIMIT = 1000
@@ -30,6 +31,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
   iconEnd,
   inputProps,
   disabled = false,
+  required,
   ...otherProps
 }) => {
   const {
@@ -53,6 +55,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
           disabled={disabled}
           onChange={onChange}
           InputLabelProps={{ shrink: true }}
+          required={required}
           InputProps={{
             ...inputProps,
             sx: {

@@ -42,7 +42,7 @@ const Footer = () => {
           <FooterContent>
             <a href="">
               <Button variant="contained" color="secondary">
-                Campdi
+                campdi
               </Button>
             </a>
             <Span sx={{ m: 'auto' }}></Span>

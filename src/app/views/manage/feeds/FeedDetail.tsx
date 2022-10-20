@@ -7,6 +7,7 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { CountdownTimer } from 'app/components/common/CountdownTimer'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
@@ -263,6 +264,18 @@ export default function FeedDetail(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
+          title="Chỉnh sửa"
+          variant="outlined"
+          color="primary"
+          disabled={
+            feed.data?.customerInfo?.type !== 0 &&
+            feed.data?.customerInfo?.type !== 3
+          }
+          onClick={() => navigate(`chinh-sua-feed`, {})}
+          loading={approveLoading}
+          startIcon={<Icon>edit</Icon>}
+        />
+        <MuiButton
           disabled={feed?.data && feed?.data.status === -1}
           title="Vi phạm"
           variant="contained"
@@ -294,7 +307,7 @@ export default function FeedDetail(props: Props) {
         />
       </Stack>
       <Stack gap={3}>
-        <SimpleCard title="Chi tiết Feed">
+        <SimpleCard>
           <Box>
             <Grid container spacing={2}>
               <Grid item sm={8} xs={12}>
@@ -317,7 +330,6 @@ export default function FeedDetail(props: Props) {
                     </MuiTypography>
                   </Stack>
                 </Stack>
-
                 <Stack flexDirection={'row'} gap={1} my={2}>
                   {feed.data?.tags?.map(tag => (
                     <Chip
@@ -392,6 +404,8 @@ export default function FeedDetail(props: Props) {
           <MuiStyledTable
             rows={reportsDecline?.data?.content as IReportDecline[]}
             columns={columnsFeedLogsReports as any}
+            rowsPerPage={sizeReports}
+            page={pageReports}
             onClickRow={() => {}}
             isFetching={isFetching}
           />
@@ -410,6 +424,8 @@ export default function FeedDetail(props: Props) {
           <MuiStyledTable
             rows={actionsHistory?.data?.content as IActionHistory[]}
             columns={columnsFeedLogsActions as any}
+            rowsPerPage={sizeActions}
+            page={pageActions}
             onClickRow={() => {}}
             isFetching={isFetching}
           />

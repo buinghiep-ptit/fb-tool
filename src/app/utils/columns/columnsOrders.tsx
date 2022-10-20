@@ -7,12 +7,21 @@ import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
-  { id: 'cusAccount', label: 'Tài khoản đặt', minWidth: 170 },
+  {
+    id: 'cusAccount',
+    label: 'Tài khoản đặt',
+    minWidth: 170,
+    link: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
     minWidth: 170,
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>
@@ -30,7 +39,9 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     minWidth: 170,
     align: 'center',
     format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      <Typography color={'primary'}>
+        {CurrencyFormatter(value ?? 0, 2)}
+      </Typography>
     ),
   },
   {
@@ -39,7 +50,9 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     minWidth: 100,
     align: 'center',
     format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      <Typography color={'primary'}>
+        {CurrencyFormatter(value ?? 0, 2)}
+      </Typography>
     ),
   },
   {
@@ -54,26 +67,32 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     label: 'Trạng thái đơn',
     minWidth: 100,
     align: 'center',
-    status: (value: any) => (
-      <Chip
-        label={getOrderStatusSpec(value, 2).title}
-        size="small"
-        color={'default'}
-      />
-    ),
+    status: (value: any) =>
+      value ? (
+        <Chip
+          label={getOrderStatusSpec(value, 2).title}
+          size="small"
+          color={'default'}
+        />
+      ) : (
+        <></>
+      ),
   },
   {
-    id: 'status',
+    id: 'cancelRequestStatus',
     label: 'Trạng thái y/c huỷ',
     minWidth: 120,
     align: 'center',
-    status: (value: any) => (
-      <Chip
-        label={getOrderStatusSpec(value, 3).title}
-        size="small"
-        color={'default'}
-      />
-    ),
+    status: (value: any) =>
+      value ? (
+        <Chip
+          label={getOrderStatusSpec(value, 3).title}
+          size="small"
+          color={'default'}
+        />
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'handledBy',
@@ -86,9 +105,9 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     label: 'Hành động',
     minWidth: 120,
     align: 'right',
-    action: () => (
+    action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
-        Chi tiết
+        {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
   },
@@ -96,12 +115,21 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
 
 export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
-  { id: 'cusAccount', label: 'Tài khoản đặt', minWidth: 170 },
+  {
+    id: 'cusAccount',
+    label: 'Tài khoản đặt',
+    minWidth: 170,
+    link: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
     minWidth: 170,
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>
@@ -168,9 +196,9 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     label: 'Hành động',
     minWidth: 120,
     align: 'right',
-    action: () => (
+    action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
-        Tiếp nhận
+        {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
   },
@@ -178,12 +206,21 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
 
 export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
-  { id: 'cusAccount', label: 'Tài khoản đặt', minWidth: 170 },
+  {
+    id: 'cusAccount',
+    label: 'Tài khoản đặt',
+    minWidth: 170,
+    link: (value: any) => (
+      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+        {value}
+      </Typography>
+    ),
+  },
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
     minWidth: 170,
-    action: (value: any) => (
+    link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
       </Typography>
@@ -272,7 +309,11 @@ export const columnsOrderProcessesDetail: any = [
     minWidth: 120,
     align: 'center',
     status: (value: any) => (
-      <Chip label={value} size="small" color={'default'} />
+      <Chip
+        label={getOrderStatusSpec(value, 1).title}
+        size="small"
+        color={'default'}
+      />
     ),
   },
   {

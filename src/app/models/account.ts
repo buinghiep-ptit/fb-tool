@@ -25,6 +25,7 @@ export interface ICustomer {
   mobilePhone?: string
   displayName?: string
   email?: string
+  customerId?: number
   customerType?: number
   dateCreated?: number
   dateUpdated?: number

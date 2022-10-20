@@ -5,7 +5,11 @@ import {
   IFeedResponse,
   IReportDeclineResponse,
 } from 'app/models'
-import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
+import {
+  ICampArea,
+  ICampAreaResponse,
+  ICampGroundResponse,
+} from 'app/models/camp'
 
 type Props = {
   feedId?: number
@@ -100,10 +104,10 @@ export const unLockCustomer = async (
 export const fetchCampAreas = async (params: {
   page?: number
   size?: number
-}): Promise<ICampAreaResponse> => {
-  const { data } = await http.get<ICampAreaResponse>(`/api/camp-areas`, {
-    params,
-  })
+}): Promise<ICampArea[]> => {
+  const { data } = await http.get<ICampArea[]>(
+    `/api/camp-areas/select-list-without-province`,
+  )
   return data
 }
 
@@ -124,5 +128,10 @@ export const createFeed = async (payload: IFeedDetail): Promise<any> => {
 
 export const deleteFeed = async (feedId: number): Promise<any> => {
   const { data } = await http.delete<IFeedDetail>(`/api/feed/${feedId}`)
+  return data
+}
+
+export const editFeed = async (feedId: number, payload: any): Promise<any> => {
+  const { data } = await http.put<IFeedDetail>(`/api/feed/${feedId}`, payload)
   return data
 }

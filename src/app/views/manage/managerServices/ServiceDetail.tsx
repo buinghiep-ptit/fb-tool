@@ -77,13 +77,13 @@ export default function ServiceDetail(props: Props) {
   )
 
   const calendar = [
-    'Thứ 2:',
-    'Thứ 3:',
-    'Thứ 4:',
-    'Thứ 5:',
-    'Thứ 6:',
-    'Thứ 7:',
-    'Chủ nhật:',
+    { label: 'Thứ 2:', id: 2 },
+    { label: 'Thứ 3:', id: 3 },
+    { label: 'Thứ 4:', id: 4 },
+    { label: 'Thứ 5:', id: 5 },
+    { label: 'Thứ 6:', id: 6 },
+    { label: 'Thứ 7:', id: 7 },
+    { label: 'Chủ nhật:', id: 1 },
   ]
   const [fileConfigs, setFileConfigs] = useState({
     mediaType: EMediaType.POST,
@@ -232,10 +232,10 @@ export default function ServiceDetail(props: Props) {
       defaultValues.weekdayPrices = campService.weekdayPrices
       if (campGrounds && campGrounds.content) {
         const getCamp = campGrounds.content.find(
-          camp => camp.id === campService.campGroundId,
+          camp => camp.id == campService.campGroundId,
         )
-        console.log(campService.campGroundId),
-          (defaultValues.camp = getCamp ?? {})
+        defaultValues.camp = getCamp ?? {}
+        console.log(campService.weekdayPrices)
       }
       setMediasSrcPreviewer([...(campService?.images ?? [])])
       setInitialFileInfos([...(campService.images ?? [])])
@@ -474,11 +474,11 @@ export default function ServiceDetail(props: Props) {
                 </InputLabel>
               </Grid>
 
-              {calendar.map((date, index) => (
+              {calendar.map(date => (
                 <Grid
                   container
                   sx={{ display: 'flex', alignItems: 'center' }}
-                  key={index}
+                  key={date.id}
                 >
                   <Grid item xs={2}>
                     <InputLabel
@@ -487,7 +487,7 @@ export default function ServiceDetail(props: Props) {
                         fontWeight: '500',
                       }}
                     >
-                      {date}
+                      {date.label}
                     </InputLabel>
                   </Grid>
                   <Grid
@@ -503,7 +503,7 @@ export default function ServiceDetail(props: Props) {
                   >
                     <MuiRHFNumericFormatInput
                       label={''}
-                      name={`weekdayPrices.${index}.amount`}
+                      name={`weekdayPrices.${date.id}.amount`}
                       iconEnd={
                         <MuiTypography variant="subtitle2">
                           VNĐ/Ngày

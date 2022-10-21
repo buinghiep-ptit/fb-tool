@@ -1,13 +1,20 @@
 import * as React from 'react'
-import { Grid, TextField, Autocomplete } from '@mui/material'
+import { Grid, TextField, Autocomplete, Button } from '@mui/material'
 import { Controller } from 'react-hook-form'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
-
-export default function InformationBooking({ control, errors, listMerchant }) {
+import DeleteIcon from '@mui/icons-material/Delete'
+import AddIcon from '@mui/icons-material/Add'
+export default function InformationBooking({
+  control,
+  errors,
+  listContact,
+  setListContact,
+  listMerchant,
+}) {
   const [isBooking, setIsBooking] = React.useState('1')
 
   return (
@@ -40,22 +47,111 @@ export default function InformationBooking({ control, errors, listMerchant }) {
             )}
           />
         </Grid>
+        {isBooking !== '1' &&
+          listContact.map((contact, index) => {
+            return (
+              <Grid container key={index}>
+                <Grid
+                  item
+                  xs={12}
+                  md={12}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginTop: '10px',
+                  }}
+                >
+                  <Controller
+                    name={`contactName${index}`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        style={{ marginRight: '15px' }}
+                        label="Tên"
+                        variant="outlined"
+                        value={contact.name}
+                        onChange={e => {
+                          const newList = [...listContact]
+                          newList[index].name = e.target.value
+                          setListContact(newList)
+                        }}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name={`contactWebsite${index}`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        style={{ marginRight: '15px' }}
+                        label="Website"
+                        variant="outlined"
+                        value={contact.web}
+                        onChange={e => {
+                          const newList = [...listContact]
+                          newList[index].web = e.target.value
+                          setListContact(newList)
+                        }}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name={`contactPhone${index}`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        style={{ marginRight: '15px' }}
+                        label="Số điện thoại"
+                        variant="outlined"
+                        value={contact.phone}
+                        onChange={e => {
+                          const newList = [...listContact]
+                          newList[index].phone = e.target.value
+                          setListContact(newList)
+                        }}
+                      />
+                    )}
+                  />
+                  <Button
+                    style={{ height: '50px' }}
+                    color="error"
+                    variant="contained"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => {
+                      const arr = [...listContact]
+                      arr.splice(index, 1)
+                      setListContact(arr)
+                    }}
+                  >
+                    Xóa
+                  </Button>
+                </Grid>
+              </Grid>
+            )
+          })}
         {isBooking !== '1' && (
-          <Grid item xs={4} md={4}>
-            <Controller
-              name="contact"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  margin="normal"
-                  label="Liên hệ"
-                  variant="outlined"
-                  error={errors.namePlace}
-                  helperText={errors.namePlace?.message}
-                />
-              )}
-            />
+          <Grid item xs={12} md={12}>
+            <Button
+              style={{ margin: '25px 0 25px' }}
+              color="primary"
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setListContact([
+                  ...listContact,
+                  {
+                    name: '',
+                    web: '',
+                    phone: '',
+                  },
+                ])
+              }}
+            >
+              Thêm
+            </Button>
           </Grid>
         )}
         {isBooking === '1' && (
@@ -76,7 +172,7 @@ export default function InformationBooking({ control, errors, listMerchant }) {
                     field.onChange(data)
                   }}
                   renderInput={params => (
-                    <TextField {...params} label="Địa danh" margin="normal" />
+                    <TextField {...params} label="Liên hệ" margin="normal" />
                   )}
                 />
               )}

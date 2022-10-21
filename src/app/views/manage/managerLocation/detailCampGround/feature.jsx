@@ -380,12 +380,15 @@ export default function Feature({
             control={control}
             name="status"
             render={({ field }) => (
-              <FormControl style={{ width: '150px' }}>
+              <FormControl style={{ width: '150px' }} error={!!errors?.status}>
                 <Select {...field} labelId="status-label" id="status">
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
                   <MenuItem value={0}>Lưu nháp </MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                 </Select>
+                {!!errors?.status?.message && (
+                  <FormHelperText>{errors?.status.message}</FormHelperText>
+                )}
               </FormControl>
             )}
           />

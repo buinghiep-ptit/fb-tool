@@ -49,6 +49,13 @@ export default function InformationCampGround({ action }) {
     lng: 105.78872657468659,
   })
   const introductionRef = React.useRef()
+  const [listContact, setListContact] = React.useState([
+    {
+      name: '',
+      web: '',
+      phone: '',
+    },
+  ])
 
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
@@ -69,6 +76,7 @@ export default function InformationCampGround({ action }) {
         .trim(),
       province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
       district: yup.object().required('Vui lòng chọn quận/huyện'),
+      status: yup.string().required('Vui lòng chọn trạng thái'),
     })
     .required()
 
@@ -123,6 +131,7 @@ export default function InformationCampGround({ action }) {
 
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
+    console.log(introData)
     const fileUpload = [...introData].map(file => {
       const formData = new FormData()
       formData.append('file', file)
@@ -158,7 +167,7 @@ export default function InformationCampGround({ action }) {
       media.url = url
       return media
     })
-
+    console.log(mediasUpdate)
     const dataUpdate = new Object()
     dataUpdate.medias = [...medias, ...mediasUpdate]
     dataUpdate.description = introductionRef.current.getValueEditor()
@@ -187,7 +196,9 @@ export default function InformationCampGround({ action }) {
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
     dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
-    dataUpdate.contact = data.contact
+    dataUpdate.contact = listContact.map(
+      contact => `${contact.name},${contact.web},${contact.phone}`,
+    )
     dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
@@ -272,7 +283,7 @@ export default function InformationCampGround({ action }) {
               res.find(province => province.id === data.idProvince),
             )
             setValue('policy', data.depositPolicy.id)
-            setValue('contact', data.contact)
+            // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
             setFeature({ utility: data.campGroundUtilities })
@@ -392,6 +403,8 @@ export default function InformationCampGround({ action }) {
         <AccordionDetails>
           <InformationBooking
             control={control}
+            listContact={listContact}
+            setListContact={setListContact}
             errors={errors}
             getValues={getValues}
             setValue={setValue}

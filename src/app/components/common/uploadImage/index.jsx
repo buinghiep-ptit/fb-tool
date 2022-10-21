@@ -9,9 +9,8 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
 
   React.useImperativeHandle(ref, () => ({
     getFiles: () => {
-      const data = document.getElementById('inputFile').files
-      console.log(data, 'data')
-      return data
+      console.log(files, 'data')
+      return files
     },
   }))
 
@@ -33,6 +32,7 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
         <input
           type="file"
           id="inputFile"
+          accept=".png, .jpg, .jpeg"
           style={{ display: 'none' }}
           multiple
           onChange={event => {

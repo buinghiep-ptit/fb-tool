@@ -3,7 +3,7 @@ import UploadImage from 'app/components/common/uploadImage'
 import EditorConvertToHTML from 'app/components/common/TextEditor/textEditorCustom'
 
 const Introduction = React.forwardRef(
-  ({ medias, setMedias, setDescription, description, action }, ref) => {
+  ({ medias, setMedias, description }, ref) => {
     const uploadImageRef = React.useRef()
     const editorRef = React.useRef()
     React.useImperativeHandle(ref, () => ({
@@ -15,7 +15,6 @@ const Introduction = React.forwardRef(
         return editorRef.current.getValueTextEditor()
       },
     }))
-    console.log(action)
 
     return (
       <>

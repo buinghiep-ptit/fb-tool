@@ -42,7 +42,14 @@ export default function InformationCampGround({ action }) {
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState('')
   const [listMerchant, setListMerchant] = React.useState([])
-  const [detailPolicy, setDetailPolicy] = React.useState()
+  const [detailPolicy, setDetailPolicy] = React.useState({
+    id: 1,
+    name: 'Default Deposit Policy',
+    scope: 1,
+    scaleAmount: 50.0,
+    minAmount: 200000,
+    maxAmount: 2000000,
+  })
   const params = useParams()
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
@@ -116,12 +123,12 @@ export default function InformationCampGround({ action }) {
       motobike: false,
       campAreas: [],
       campTypes: [],
-      isSupportBooking: 1,
+      isSupportBooking: '1',
       idMerchant: null,
       latitude: 21.027161210811197,
       longitude: 105.78872657468659,
       note: '',
-      policy: '',
+      policy: 1,
     },
   })
 
@@ -167,7 +174,7 @@ export default function InformationCampGround({ action }) {
       media.url = url
       return media
     })
-    console.log(mediasUpdate)
+
     const dataUpdate = new Object()
     dataUpdate.medias = [...medias, ...mediasUpdate]
     dataUpdate.description = introductionRef.current.getValueEditor()
@@ -196,9 +203,16 @@ export default function InformationCampGround({ action }) {
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
     dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
-    dataUpdate.contact = listContact.map(
-      contact => `${contact.name},${contact.web},${contact.phone}`,
-    )
+    if (parseInt(data.isSupportBooking) === 1) {
+      dataUpdate.idMerchant = data.idMerchant?.id || null
+      dataUpdate.contact = []
+    } else {
+      dataUpdate.contact = listContact.map(
+        contact => `${contact.name},${contact.web},${contact.phone}`,
+      )
+      dataUpdate.idMerchant = null
+    }
+
     dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
@@ -257,10 +271,6 @@ export default function InformationCampGround({ action }) {
       if (action === 'edit') {
         getDetailCampGround(params.id)
           .then(data => {
-            setValue(
-              'idMerchant',
-              merchants.filter(merchant => merchant.id == data.idMerchant)[0],
-            )
             setCreateDegrees({
               lat: data.latitude,
               lng: data.longitude,
@@ -277,11 +287,11 @@ export default function InformationCampGround({ action }) {
             setValue('campAreas', data.campAreas)
             setValue('hashtag', data.tags)
             setValue('nameCampground', data.name)
-
             setValue(
               'province',
               res.find(province => province.id === data.idProvince),
             )
+
             setValue('policy', data.depositPolicy.id)
             // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
@@ -296,6 +306,23 @@ export default function InformationCampGround({ action }) {
             setValue('topographic', data.idTopography)
             setValue('capacity', data.capacity)
             setValue('status', data.status)
+            setValue('isSupportBooking', data.isSupportBooking.toString())
+            if (data.isSupportBooking === 1) {
+              setValue(
+                'idMerchant',
+                merchants.filter(merchant => merchant.id == data.idMerchant)[0],
+              )
+            } else {
+              const newListContact = data.contact.map(item => {
+                const arr = item.split(',')
+                return {
+                  name: arr[0],
+                  web: arr[1],
+                  phone: arr[2],
+                }
+              })
+              setListContact(newListContact)
+            }
             data.campGroundInternets.forEach(item => {
               setValue(INTERNET[item.idInternet].name, true)
               setValue(INTERNET[item.idInternet].speed, item.signalQuality)
@@ -409,6 +436,7 @@ export default function InformationCampGround({ action }) {
             getValues={getValues}
             setValue={setValue}
             listMerchant={listMerchant}
+            defaultCheck={getValues('isSupportBooking')}
           />
         </AccordionDetails>
       </Accordion>
@@ -463,6 +491,7 @@ export default function InformationCampGround({ action }) {
             setValue={setValue}
             action={action}
             detailPolicy={detailPolicy}
+            setDetailPolicy={setDetailPolicy}
           />
         </AccordionDetails>
       </Accordion>

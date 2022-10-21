@@ -14,38 +14,48 @@ export default function InformationBooking({
   listContact,
   setListContact,
   listMerchant,
+  setValue,
+  defaultCheck,
+  getValues,
 }) {
-  const [isBooking, setIsBooking] = React.useState('1')
+  const [isBooking, setIsBooking] = React.useState()
+
+  React.useEffect(() => {
+    setIsBooking(defaultCheck)
+  }, [defaultCheck])
 
   return (
     <div>
       <Grid container>
         <Grid item xs={12} md={12}>
-          <Controller
-            name="isSupportBooking"
-            control={control}
-            render={({ field }) => (
-              <FormControl>
-                <FormLabel>Hỗ trợ đặt chỗ*</FormLabel>
-                <RadioGroup
-                  row
-                  {...field}
-                  value={isBooking}
-                  onChange={event => {
-                    console.log(event.target.value === '1')
-                    setIsBooking(event.target.value)
-                  }}
-                >
-                  <FormControlLabel value={1} control={<Radio />} label="Có" />
-                  <FormControlLabel
-                    value={0}
-                    control={<Radio />}
-                    label="Không"
-                  />
-                </RadioGroup>
-              </FormControl>
-            )}
-          />
+          <FormControl
+            component="fieldset"
+            onChange={event => {
+              setIsBooking(event.target.value)
+            }}
+          >
+            <FormLabel component="legend">Hỗ trợ đặt chỗ*</FormLabel>
+            <Controller
+              control={control}
+              name="isSupportBooking"
+              render={({ field }) => {
+                return (
+                  <RadioGroup {...field}>
+                    <FormControlLabel
+                      value={1}
+                      control={<Radio />}
+                      label="Có"
+                    />
+                    <FormControlLabel
+                      value={0}
+                      control={<Radio />}
+                      label="Không"
+                    />
+                  </RadioGroup>
+                )
+              }}
+            />
+          </FormControl>
         </Grid>
         {isBooking !== '1' &&
           listContact.map((contact, index) => {

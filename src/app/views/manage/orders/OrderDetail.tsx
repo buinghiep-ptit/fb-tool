@@ -142,7 +142,7 @@ export default function OrderDetail(props: Props) {
         <MuiButton
           title="Huỷ"
           variant="contained"
-          color="secondary"
+          color="warning"
           onClick={() => methods.reset()}
           startIcon={<Icon>clear</Icon>}
         />

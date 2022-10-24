@@ -9,7 +9,7 @@ export const navigations = [
     auth: [ROLES.ADMIN],
   },
   {
-    name: 'Quản lý tài khoản KH',
+    name: 'Quản lý tài khoản End-User',
     path: '/quan-ly-tai-khoan-khach-hang',
     icon: 'account_box',
     auth: [ROLES.ADMIN, ROLES.CS],

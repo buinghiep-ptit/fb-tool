@@ -1,27 +1,16 @@
 import { Divider, Icon, LinearProgress, Stack } from '@mui/material'
-import { Box } from '@mui/system'
 import { MuiButton } from 'app/components/common/MuiButton'
-import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAvailableOrder,
-  useReassignOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
+import { IUser } from 'app/models'
 import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
-import * as Yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { messages } from 'app/utils/messages'
-import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
-import { useUsersData } from 'app/hooks/queries/useUsersData'
-import { IUser, IUserResponse } from 'app/models'
-import { UseQueryResult } from '@tanstack/react-query'
-import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
@@ -37,20 +26,10 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
   const { orderId } = useParams()
   const [dialogData, setDialogData] = useState<{
     title?: string
-    message?: string | ReactElement
+    message?: () => ReactElement
     type?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
-
-  const validationSchemaReassign = Yup.object().shape({
-    newHandler: Yup.object().required(messages.MSG1).nullable(),
-    reason: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
-  })
-
-  const methods = useForm<ReassignSchema>({
-    mode: 'onChange',
-    resolver: yupResolver(validationSchemaReassign),
-  })
 
   const onSuccess = (data: any, message?: string) => {
     toastSuccess({
@@ -59,9 +38,6 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
     setOpenDialog(false)
   }
 
-  const { data: handlerUsers }: UseQueryResult<IUserResponse, Error> =
-    useUsersData({ page: 0, size: 200, status: 1, role: 2 })
-
   const { mutate: available, isLoading: availableLoading } = useAvailableOrder(
     () => onSuccess(null, 'Cập nhật đơn hàng thành công'),
   )
@@ -69,11 +45,7 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
   const { mutate: unavailable, isLoading: unavailableLoading } =
     useUnAvailableOrder(() => onSuccess(null, 'Cập nhật đơn hàng thành công'))
 
-  const { mutate: reassign, isLoading: reassignLoading } = useReassignOrder(
-    () => onSuccess(null, 'Chuyển tiếp thành công'),
-  )
-
-  const loading = availableLoading || unavailableLoading || reassignLoading
+  const loading = availableLoading || unavailableLoading
 
   const onClickButton = (type?: string) => {
     setOpenDialog(true)
@@ -82,7 +54,7 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Còn chỗ',
-          message: (
+          message: () => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
                 Xác nhận còn chỗ
@@ -96,7 +68,7 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Hết chỗ',
-          message: (
+          message: () => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
                 Xác nhận hết chỗ
@@ -104,15 +76,6 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
             </Stack>
           ),
           type: 'UN_AVAILABLE',
-        }))
-        break
-
-      case 'RE_ASSIGN':
-        setDialogData(prev => ({
-          ...prev,
-          title: 'Chuyển tiếp',
-          message: getContentReassignHandler(),
-          type: 'RE_ASSIGN',
         }))
         break
 
@@ -131,52 +94,9 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         unavailable(Number(orderId ?? 0))
         break
 
-      case 'RE_ASSIGN':
-        methods.handleSubmit(onSubmitHandler)()
-        break
-
       default:
         break
     }
-  }
-
-  const onSubmitHandler: SubmitHandler<ReassignSchema> = (
-    values: ReassignSchema,
-  ) => {
-    reassign({
-      orderId: order?.id,
-      userId: values.newHandler?.userId,
-    })
-  }
-
-  const getContentReassignHandler = () => {
-    return (
-      <BoxWrapperDialog>
-        <FormProvider {...methods}>
-          <Stack my={1.5} gap={2}>
-            <MuiRHFAutoComplete
-              name="newHandler"
-              label="Chuyển tiếp cho"
-              options={handlerUsers?.content ?? []}
-              optionProperty="email"
-              getOptionLabel={option => option.email ?? ''}
-              defaultValue=""
-              required
-            />
-            <Box>
-              <MuiTypography variant="subtitle2" pb={1}>
-                Lý do:
-              </MuiTypography>
-              <FormTextArea
-                name="reason"
-                defaultValue={''}
-                placeholder="Nhập lý do"
-              />
-            </Box>
-          </Stack>
-        </FormProvider>
-      </BoxWrapperDialog>
-    )
   }
 
   return (
@@ -220,7 +140,11 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         title="Chuyển tiếp"
         variant="outlined"
         color="warning"
-        onClick={() => onClickButton('RE_ASSIGN')}
+        onClick={() =>
+          navigate(`chuyen-tiep`, {
+            state: { modal: true },
+          })
+        }
         startIcon={<Icon>cached</Icon>}
       />
       <Divider
@@ -232,6 +156,11 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         title="Ghi chú"
         variant="outlined"
         color="warning"
+        onClick={() =>
+          navigate(`ghi-chu`, {
+            state: { modal: true },
+          })
+        }
         startIcon={<Icon>event_note</Icon>}
       />
 
@@ -242,7 +171,7 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         onSubmit={() => onSubmitDialog(dialogData.type)}
       >
         <>
-          {getContentReassignHandler()}
+          {dialogData.message && dialogData.message()}
           {loading && <LinearProgress sx={{ flex: 1 }} />}
         </>
       </DiagLogConfirm>

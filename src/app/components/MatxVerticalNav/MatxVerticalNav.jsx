@@ -32,9 +32,11 @@ const ExtAndIntCommon = {
   },
   '& .icon': {
     fontSize: '18px',
-    paddingLeft: '16px',
-    paddingRight: '16px',
+    paddingLeft: '4px', // 16px
+    paddingRight: '8px', // '16px'
     verticalAlign: 'middle',
+    display: 'flex',
+    alignItems: 'center',
   },
 }
 const ExternalLink = styled('a')(({ theme }) => ({
@@ -54,7 +56,7 @@ const InternalLink = styled(Box)(({ theme }) => ({
 
 const StyledText = styled(Span)(({ mode }) => ({
   fontSize: '0.875rem',
-  paddingLeft: '0.8rem',
+  // paddingLeft: '0.8rem',
   display: mode === 'compact' && 'none',
 }))
 

@@ -25,8 +25,7 @@ const StyledTable = styled(Table)(() => ({
     '& tr': { '& td': { paddingLeft: 0, textTransform: 'capitalize' } },
   },
 }))
-const Policy = ({ setValue, action, detailPolicy }) => {
-  const [status, setStatus] = useState(action === 'edit')
+const Policy = ({ setValue, detailPolicy, setDetailPolicy }) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [tableData, setTableData] = useState([])
@@ -63,18 +62,18 @@ const Policy = ({ setValue, action, detailPolicy }) => {
 
   return (
     <>
-      {status && !!detailPolicy && (
+      {!!detailPolicy && (
         <div>
           <Typography variant="h6" gutterBottom>
             Đặt cọc
           </Typography>
           <div>
             {`- Loại chính sách: ${
-              detailPolicy.scope === 1 ? 'Chung' : 'Riêng'
+              detailPolicy?.scope === 1 ? 'Chung' : 'Riêng'
             }`}
           </div>
-          <div>{`- Tên chính sách: ${detailPolicy.name}`}</div>
-          <div>{`- ${detailPolicy.scaleAmount}% giá trị giao dịch, Tối đa: ${detailPolicy.maxAmount}, Tối thiểu ${detailPolicy.minAmount}`}</div>
+          <div>{`- Tên chính sách: ${detailPolicy?.name}`}</div>
+          <div>{`- ${detailPolicy?.scaleAmount}% giá trị giao dịch, Tối đa: ${detailPolicy?.maxAmount}, Tối thiểu ${detailPolicy.minAmount}`}</div>
         </div>
       )}
       <Button
@@ -127,6 +126,11 @@ const Policy = ({ setValue, action, detailPolicy }) => {
                         variant="text"
                         onClick={() => {
                           setValue('policy', policy.id)
+                          setDetailPolicy({
+                            scope: policy.scope,
+                            scaleAmount: policy.scaleAmount,
+                            name: policy.name,
+                          })
                           dialogCustomRef.current.handleClose()
                         }}
                       >

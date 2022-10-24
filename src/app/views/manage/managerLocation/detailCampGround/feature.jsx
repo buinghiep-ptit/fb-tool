@@ -1,7 +1,16 @@
 import * as React from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-import { Grid, Icon, Box, Chip, Button, TextField, Stack } from '@mui/material'
+import {
+  Grid,
+  Icon,
+  Box,
+  Chip,
+  Button,
+  TextField,
+  Stack,
+  FormHelperText,
+} from '@mui/material'
 import { Controller } from 'react-hook-form'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
@@ -24,11 +33,15 @@ export default function Feature({
   action,
   updateFeature,
   getValues,
+  setValue,
 }) {
   const dialogCustomRef = React.useRef(null)
   const params = useParams()
   const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
   const [listUtility, setListUtility] = React.useState([])
+  const [disabledViettel, setDisabledViettel] = React.useState(
+    getValues('viettel'),
+  )
 
   const handleClickAddUtility = async () => {
     dialogCustomRef.current.handleClickOpen()
@@ -137,7 +150,14 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     control={
-                      <Checkbox checked={getValues('viettel')} {...field} />
+                      <Checkbox
+                        checked={getValues('viettel')}
+                        {...field}
+                        onChange={e => {
+                          setValue('viettel', !getValues('viettel'))
+                          setDisabledViettel(!disabledViettel)
+                        }}
+                      />
                     }
                     label="Viettel"
                   />
@@ -149,6 +169,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledViettel}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -380,12 +401,15 @@ export default function Feature({
             control={control}
             name="status"
             render={({ field }) => (
-              <FormControl style={{ width: '150px' }}>
+              <FormControl style={{ width: '150px' }} error={!!errors?.status}>
                 <Select {...field} labelId="status-label" id="status">
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
                   <MenuItem value={0}>Lưu nháp </MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                 </Select>
+                {!!errors?.status?.message && (
+                  <FormHelperText>{errors?.status.message}</FormHelperText>
+                )}
               </FormControl>
             )}
           />

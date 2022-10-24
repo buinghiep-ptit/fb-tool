@@ -21,6 +21,7 @@ import {
   getListCampAreaWithoutProvince,
   createCampGround,
   getListMerchant,
+  deleteCampGround,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -32,26 +33,45 @@ import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function InformationCampGround({ action }) {
-  const [provinceId, setProvinceId] = React.useState(null)
-  const [districtId, setDistrictId] = React.useState('')
   const [hashtag, setHashtag] = React.useState([])
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
   const [feature, setFeature] = React.useState({})
   const [campAreas, setCampAreas] = React.useState([])
-  const [idMerchant, setIdMerchant] = React.useState()
   const [medias, setMedias] = React.useState([])
-  const [description, setDescription] = React.useState()
+  const [description, setDescription] = React.useState('')
   const [listMerchant, setListMerchant] = React.useState([])
-  const [detailPolicy, setDetailPolicy] = React.useState()
+  const [detailPolicy, setDetailPolicy] = React.useState({
+    id: 1,
+    name: 'Default Deposit Policy',
+    scope: 1,
+    scaleAmount: 50.0,
+    minAmount: 200000,
+    maxAmount: 2000000,
+  })
   const params = useParams()
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
     lng: 105.78872657468659,
   })
   const introductionRef = React.useRef()
+  const [listContact, setListContact] = React.useState([
+    {
+      name: '',
+      web: '',
+      phone: '',
+    },
+  ])
 
+  const typeCamp = [
+    { label: 'Cắm trại', id: 1 },
+    { label: 'Chạy bộ', id: 2 },
+    { label: 'Teambuiding', id: 3 },
+    { label: 'Lưu trú', id: 4 },
+    { label: 'Trekking', id: 5 },
+    { label: 'Leo núi', id: 6 },
+  ]
   const navigate = useNavigate()
 
   const schema = yup
@@ -63,6 +83,7 @@ export default function InformationCampGround({ action }) {
         .trim(),
       province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
       district: yup.object().required('Vui lòng chọn quận/huyện'),
+      status: yup.string().required('Vui lòng chọn trạng thái'),
     })
     .required()
 
@@ -102,12 +123,12 @@ export default function InformationCampGround({ action }) {
       motobike: false,
       campAreas: [],
       campTypes: [],
-      isSupportBooking: 1,
+      isSupportBooking: '1',
       idMerchant: null,
       latitude: 21.027161210811197,
       longitude: 105.78872657468659,
       note: '',
-      policy: '',
+      policy: 1,
     },
   })
 
@@ -117,8 +138,8 @@ export default function InformationCampGround({ action }) {
 
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
+    console.log(introData)
     const fileUpload = [...introData].map(file => {
-      console.log(file)
       const formData = new FormData()
       formData.append('file', file)
       try {
@@ -147,11 +168,7 @@ export default function InformationCampGround({ action }) {
 
     const mediasUpdate = listUrlImage.map((url, index) => {
       const media = new Object()
-      if (index === 0) {
-        media.mediaType = 2
-      } else {
-        media.mediaType = 1
-      }
+      media.mediaType = 1
       media.srcType = 2
       media.mediaFormat = 2
       media.url = url
@@ -160,7 +177,7 @@ export default function InformationCampGround({ action }) {
 
     const dataUpdate = new Object()
     dataUpdate.medias = [...medias, ...mediasUpdate]
-    dataUpdate.description = description
+    dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
     const arrInternet = [
       { provider: 'viettel', speed: 'speedViettel' },
@@ -186,7 +203,16 @@ export default function InformationCampGround({ action }) {
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
     dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
-    dataUpdate.contact = data.contact
+    if (parseInt(data.isSupportBooking) === 1) {
+      dataUpdate.idMerchant = data.idMerchant?.id || null
+      dataUpdate.contact = []
+    } else {
+      dataUpdate.contact = listContact.map(
+        contact => `${contact.name},${contact.web},${contact.phone}`,
+      )
+      dataUpdate.idMerchant = null
+    }
+
     dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
@@ -203,7 +229,6 @@ export default function InformationCampGround({ action }) {
         value: tag.value,
       }
     })
-    dataUpdate.campTypes = [0]
     dataUpdate.campGroundSeasons = (data.campGroundSeasons || []).map(
       season => season.id,
     )
@@ -216,7 +241,6 @@ export default function InformationCampGround({ action }) {
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
     dataUpdate.freeParking = true
-    console.log(dataUpdate)
 
     if (action === 'create') {
       const res = await createCampGround(dataUpdate)
@@ -247,29 +271,29 @@ export default function InformationCampGround({ action }) {
       if (action === 'edit') {
         getDetailCampGround(params.id)
           .then(data => {
-            setValue(
-              'idMerchant',
-              merchants.filter(merchant => merchant.id == data.idMerchant)[0],
-            )
             setCreateDegrees({
               lat: data.latitude,
               lng: data.longitude,
             })
+            setValue(
+              'campTypes',
+              data.campTypes.map(type => typeCamp[type - 1]),
+            )
+            setDescription(data.description || '')
             setDetailPolicy(data.depositPolicy)
             setValue('note', data.noteTopography)
             setMedias(data.medias)
-            setIdMerchant(data.idMerchant)
             setHashtag(data.tags)
             setValue('campAreas', data.campAreas)
             setValue('hashtag', data.tags)
             setValue('nameCampground', data.name)
-            setProvinceId(data.idProvince)
             setValue(
               'province',
               res.find(province => province.id === data.idProvince),
             )
+
             setValue('policy', data.depositPolicy.id)
-            setValue('contact', data.contact)
+            // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
             setFeature({ utility: data.campGroundUtilities })
@@ -277,12 +301,28 @@ export default function InformationCampGround({ action }) {
               item => seasonsById[item],
             )
             setValue('campGroundSeasons', seasons)
-            setDistrictId(data.idDistrict)
             setValue('address', data.address)
             setValue('description', data.description)
             setValue('topographic', data.idTopography)
             setValue('capacity', data.capacity)
             setValue('status', data.status)
+            setValue('isSupportBooking', data.isSupportBooking.toString())
+            if (data.isSupportBooking === 1) {
+              setValue(
+                'idMerchant',
+                merchants.filter(merchant => merchant.id == data.idMerchant)[0],
+              )
+            } else {
+              const newListContact = data.contact.map(item => {
+                const arr = item.split(',')
+                return {
+                  name: arr[0],
+                  web: arr[1],
+                  phone: arr[2],
+                }
+              })
+              setListContact(newListContact)
+            }
             data.campGroundInternets.forEach(item => {
               setValue(INTERNET[item.idInternet].name, true)
               setValue(INTERNET[item.idInternet].speed, item.signalQuality)
@@ -295,7 +335,7 @@ export default function InformationCampGround({ action }) {
                 setDistricts(dataDistrict)
                 setValue(
                   'district',
-                  dataDistrict.find(district => district.id == data.idProvince),
+                  dataDistrict.find(district => district.id == data.idDistrict),
                 )
               })
               .catch(err => console.log(err))
@@ -305,7 +345,7 @@ export default function InformationCampGround({ action }) {
                   setWards(dataWard)
                   setValue(
                     'ward',
-                    dataWard.find(ward => ward.id == data.idDistrict),
+                    dataWard.find(ward => ward.id == data.idWard),
                   )
                 })
                 .catch(err => console.log(err))
@@ -370,8 +410,6 @@ export default function InformationCampGround({ action }) {
             districts={districts}
             wards={wards}
             fetchWards={fetchWards}
-            setProvinceId={setProvinceId}
-            setDistrictId={setDistrictId}
             getValues={getValues}
             setValue={setValue}
             hashtag={hashtag}
@@ -392,10 +430,13 @@ export default function InformationCampGround({ action }) {
         <AccordionDetails>
           <InformationBooking
             control={control}
+            listContact={listContact}
+            setListContact={setListContact}
             errors={errors}
             getValues={getValues}
             setValue={setValue}
             listMerchant={listMerchant}
+            defaultCheck={getValues('isSupportBooking')}
           />
         </AccordionDetails>
       </Accordion>
@@ -412,6 +453,8 @@ export default function InformationCampGround({ action }) {
             setDescription={setDescription}
             ref={introductionRef}
             medias={medias}
+            action={action}
+            description={description}
             setMedias={setMedias}
           />
         </AccordionDetails>
@@ -430,6 +473,7 @@ export default function InformationCampGround({ action }) {
             control={control}
             errors={errors}
             getValues={getValues}
+            setValue={setValue}
             feature={feature}
             updateFeature={updateFeature}
           />
@@ -448,6 +492,7 @@ export default function InformationCampGround({ action }) {
             setValue={setValue}
             action={action}
             detailPolicy={detailPolicy}
+            setDetailPolicy={setDetailPolicy}
           />
         </AccordionDetails>
       </Accordion>

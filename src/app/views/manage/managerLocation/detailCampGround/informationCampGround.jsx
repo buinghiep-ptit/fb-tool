@@ -335,7 +335,7 @@ export default function InformationCampGround({ action }) {
                 setDistricts(dataDistrict)
                 setValue(
                   'district',
-                  dataDistrict.find(district => district.id == data.idProvince),
+                  dataDistrict.find(district => district.id == data.idDistrict),
                 )
               })
               .catch(err => console.log(err))
@@ -345,7 +345,7 @@ export default function InformationCampGround({ action }) {
                   setWards(dataWard)
                   setValue(
                     'ward',
-                    dataWard.find(ward => ward.id == data.idDistrict),
+                    dataWard.find(ward => ward.id == data.idWard),
                   )
                 })
                 .catch(err => console.log(err))
@@ -473,6 +473,7 @@ export default function InformationCampGround({ action }) {
             control={control}
             errors={errors}
             getValues={getValues}
+            setValue={setValue}
             feature={feature}
             updateFeature={updateFeature}
           />

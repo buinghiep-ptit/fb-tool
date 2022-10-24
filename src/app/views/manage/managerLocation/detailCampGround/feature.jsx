@@ -33,11 +33,15 @@ export default function Feature({
   action,
   updateFeature,
   getValues,
+  setValue,
 }) {
   const dialogCustomRef = React.useRef(null)
   const params = useParams()
   const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
   const [listUtility, setListUtility] = React.useState([])
+  const [disabledViettel, setDisabledViettel] = React.useState(
+    getValues('viettel'),
+  )
 
   const handleClickAddUtility = async () => {
     dialogCustomRef.current.handleClickOpen()
@@ -146,7 +150,14 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     control={
-                      <Checkbox checked={getValues('viettel')} {...field} />
+                      <Checkbox
+                        checked={getValues('viettel')}
+                        {...field}
+                        onChange={e => {
+                          setValue('viettel', !getValues('viettel'))
+                          setDisabledViettel(!disabledViettel)
+                        }}
+                      />
                     }
                     label="Viettel"
                   />
@@ -158,6 +169,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledViettel}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"

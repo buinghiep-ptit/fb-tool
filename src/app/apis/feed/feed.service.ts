@@ -18,7 +18,6 @@ type Props = {
 }
 
 export const fetchFeeds = async (params: any): Promise<IFeedResponse> => {
-  console.log('params:', params)
   const { data } = await http.get<IFeedResponse>('/api/feed', {
     params,
   })

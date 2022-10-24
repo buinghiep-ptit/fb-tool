@@ -8,8 +8,6 @@ import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 import { ROLES } from 'app/utils/enums/roles'
 import AvailablePayment from './orders/details/ButtonsLink/AvailablePayment'
 import UnAvailableOrder from './orders/details/ButtonsLink/UnAvailableOrder'
-import OrderDetail from './orders/OrderDetail'
-import OrdersHistory from './orders/OrdersHistory'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -66,6 +64,12 @@ const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
 const UpdateMerchant = Loadable(
   lazy(() => import('./managerMerchant/updateMerchant')),
 )
+const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
+const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
+const Reassign = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/Reassign')),
+)
+const Note = Loadable(lazy(() => import('./orders/details/ButtonsLink/Note')))
 
 const ManagementRoutes = [
   {
@@ -216,6 +220,14 @@ const ManagementRoutes = [
           </>
         ),
         children: [
+          {
+            path: 'chuyen-tiep',
+            element: <Reassign title="Chuyển tiếp" />,
+          },
+          {
+            path: 'ghi-chu',
+            element: <Note title="Ghi chú" />,
+          },
           {
             path: 'het-cho',
             element: <UnAvailableOrder title="Chi tiết đơn hàng (Hết chỗ)" />,

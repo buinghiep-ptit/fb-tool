@@ -63,6 +63,14 @@ export const reassignOrder = async (
   return data
 }
 
+export const orderNote = async (
+  orderId: number,
+  payload: { note?: string },
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/note`, payload)
+  return data
+}
+
 export const fetchLogsActionDetail = async ({
   orderId,
   page,

@@ -217,7 +217,7 @@ export default function AdminAccounts(props: Props) {
                 <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Email'}
-                    type="email"
+                    type="text"
                     name="email"
                     defaultValue=""
                     placeholder="Nhập Email"

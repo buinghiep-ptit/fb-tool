@@ -28,14 +28,6 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          console.log(files)
-        }}
-      >
-        Ntn
-      </button>
       <Grid container>
         <input
           type="file"

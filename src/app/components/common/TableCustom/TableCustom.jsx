@@ -120,7 +120,7 @@ const TableCustom = ({
 
           <TableBody>
             {(dataTable || []).map((data, index) => (
-              <TableRow key={data.id}>
+              <TableRow key={data.id} style={{ wordbreak: 'normal' }}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
                     case 'image':
@@ -219,7 +219,10 @@ const TableCustom = ({
                       )
                     case 'linkDetail':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           <Link to={`${data[element].path}${data.id}`}>
                             {data[element].link}
                           </Link>
@@ -227,7 +230,10 @@ const TableCustom = ({
                       )
                     case 'eventPlace':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           <span style={{ color: '#217f32' }}>
                             {data[element].active} -
                           </span>{' '}
@@ -238,7 +244,11 @@ const TableCustom = ({
                       )
                     default:
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          align="left"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           {data[element]}
                         </TableCell>
                       )

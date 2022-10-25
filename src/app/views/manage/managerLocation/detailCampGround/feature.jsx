@@ -1,7 +1,16 @@
 import * as React from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-import { Grid, Icon, Box, Chip, Button, TextField, Stack } from '@mui/material'
+import {
+  Grid,
+  Icon,
+  Box,
+  Chip,
+  Button,
+  TextField,
+  Stack,
+  FormHelperText,
+} from '@mui/material'
 import { Controller } from 'react-hook-form'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
@@ -15,7 +24,7 @@ import {
 } from 'app/apis/campGround/ground.service'
 import { useParams } from 'react-router-dom'
 import FormGroup from '@mui/material/FormGroup'
-import { cloneDeep, remove, set } from 'lodash'
+import { cloneDeep, remove } from 'lodash'
 
 export default function Feature({
   control,
@@ -24,11 +33,24 @@ export default function Feature({
   action,
   updateFeature,
   getValues,
+  setValue,
 }) {
   const dialogCustomRef = React.useRef(null)
   const params = useParams()
   const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
   const [listUtility, setListUtility] = React.useState([])
+  const [disabledViettel, setDisabledViettel] = React.useState(
+    !getValues('viettel'),
+  )
+  const [disabledVinaphone, setDisabledVinaphone] = React.useState(
+    !getValues('vinaphone'),
+  )
+  const [disabledVietnamMobile, setDisabledVietNamMobile] = React.useState(
+    !getValues('vietnamMobile'),
+  )
+  const [disabledMobiphone, setDisabledMobiphone] = React.useState(
+    !getValues('mobiphone'),
+  )
 
   const handleClickAddUtility = async () => {
     dialogCustomRef.current.handleClickOpen()
@@ -137,7 +159,14 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     control={
-                      <Checkbox checked={getValues('viettel')} {...field} />
+                      <Checkbox
+                        checked={getValues('viettel')}
+                        {...field}
+                        onChange={e => {
+                          setValue('viettel', !getValues('viettel'))
+                          setDisabledViettel(!disabledViettel)
+                        }}
+                      />
                     }
                     label="Viettel"
                   />
@@ -149,6 +178,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledViettel}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -175,7 +205,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('mobiphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('mobiphone')}
+                        onChange={e => {
+                          setValue('mobiphone', !getValues('mobiphone'))
+                          setDisabledMobiphone(!disabledMobiphone)
+                        }}
+                      />
+                    }
                     label="Mobiphone"
                   />
                 )}
@@ -186,6 +224,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledMobiphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -216,7 +255,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vinaphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vinaphone')}
+                        onChange={e => {
+                          setValue('vinaphone', !getValues('vinaphone'))
+                          setDisabledVinaphone(!disabledVinaphone)
+                        }}
+                      />
+                    }
                     label="Vinaphone"
                   />
                 )}
@@ -227,6 +274,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledVinaphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -253,7 +301,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vietnamMobile')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vietnamMobile')}
+                        onChange={e => {
+                          setValue('vietnamMobile', !getValues('vietnamMobile'))
+                          setDisabledVietNamMobile(!disabledVietnamMobile)
+                        }}
+                      />
+                    }
                     label="VietnamMobile"
                   />
                 )}
@@ -264,6 +320,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledVietnamMobile}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -380,12 +437,15 @@ export default function Feature({
             control={control}
             name="status"
             render={({ field }) => (
-              <FormControl style={{ width: '150px' }}>
+              <FormControl style={{ width: '150px' }} error={!!errors?.status}>
                 <Select {...field} labelId="status-label" id="status">
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
                   <MenuItem value={0}>Lưu nháp </MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                 </Select>
+                {!!errors?.status?.message && (
+                  <FormHelperText>{errors?.status.message}</FormHelperText>
+                )}
               </FormControl>
             )}
           />

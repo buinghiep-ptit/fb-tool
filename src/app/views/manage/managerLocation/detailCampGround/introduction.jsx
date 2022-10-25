@@ -3,12 +3,16 @@ import UploadImage from 'app/components/common/uploadImage'
 import EditorConvertToHTML from 'app/components/common/TextEditor/textEditorCustom'
 
 const Introduction = React.forwardRef(
-  ({ medias, setMedias, setDescription }, ref) => {
+  ({ medias, setMedias, description }, ref) => {
     const uploadImageRef = React.useRef()
+    const editorRef = React.useRef()
     React.useImperativeHandle(ref, () => ({
       getIntro: () => {
         console.log(uploadImageRef.current.getFiles(), 'x')
         return uploadImageRef.current.getFiles()
+      },
+      getValueEditor: () => {
+        return editorRef.current.getValueTextEditor()
       },
     }))
 
@@ -16,8 +20,10 @@ const Introduction = React.forwardRef(
       <>
         Nội dung:
         <EditorConvertToHTML
-          setDescription={setDescription}
-        ></EditorConvertToHTML>
+          ref={editorRef}
+          description={description}
+          key={description}
+        />
         Ảnh:
         <UploadImage
           ref={uploadImageRef}

@@ -22,6 +22,7 @@ import {
   createCampGround,
   getListMerchant,
   deleteCampGround,
+  updateCampGroundStatus,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -92,7 +93,7 @@ export default function InformationCampGround({ action }) {
       district: yup.object().required('Vui lòng chọn quận/huyện'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
       campTypes: yup.array().min(1, ''),
-      hashtag: yup.array().max(50, ''),
+      hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
 
@@ -566,21 +567,68 @@ export default function InformationCampGround({ action }) {
         </AccordionDetails>
       </Accordion>
       <div style={{ marginTop: '50px' }}>
-        <Button
-          color="primary"
-          type="submit"
-          variant="contained"
-          style={{ marginRight: '10px' }}
-        >
-          Lưu
-        </Button>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => handleDeleteCampGround()}
-        >
-          Xóa
-        </Button>
+        {action === 'create' ? (
+          <>
+            <Button
+              color="primary"
+              type="submit"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+            >
+              Lưu
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleDeleteCampGround()}
+            >
+              Xóa
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={async () => {
+                const res = await updateCampGroundStatus(params.id, 0)
+                if (res) {
+                  toastSuccess({ message: 'Lưu nháp thành công' })
+                  navigate('/quan-ly-thong-tin-diem-camp')
+                }
+              }}
+            >
+              Lưu Nháp
+            </Button>
+            <Button
+              color="primary"
+              type="submit"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+            >
+              Lưu
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleDeleteCampGround()}
+              style={{ marginRight: '10px' }}
+            >
+              Xóa
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                navigate('/quan-ly-thong-tin-diem-camp')
+              }}
+            >
+              Quay lại
+            </Button>
+          </>
+        )}
       </div>
     </form>
   )

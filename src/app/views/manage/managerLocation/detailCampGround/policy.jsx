@@ -50,6 +50,8 @@ const Policy = ({ setValue, detailPolicy, setDetailPolicy }) => {
         convertPolicy.scaleAmount = policy.scaleAmount
         convertPolicy.scope = policy.scope
         convertPolicy.dateUpdated = policy.dateUpdated
+        convertPolicy.minAmount = policy.minAmount
+        convertPolicy.maxAmount = policy.maxAmount
         return convertPolicy
       })
       setTableData(newList)
@@ -130,6 +132,8 @@ const Policy = ({ setValue, detailPolicy, setDetailPolicy }) => {
                             scope: policy.scope,
                             scaleAmount: policy.scaleAmount,
                             name: policy.name,
+                            minAmount: policy.minAmount,
+                            maxAmount: policy.maxAmount,
                           })
                           dialogCustomRef.current.handleClose()
                         }}

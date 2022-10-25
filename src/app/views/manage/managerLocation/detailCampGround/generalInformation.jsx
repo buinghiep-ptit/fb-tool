@@ -307,6 +307,8 @@ export default function GeneralInformation({
                 renderInput={params => (
                   <TextField
                     {...params}
+                    error={!!errors.hashtag}
+                    helperText={!!errors.hashtag ? 'Tối đa 50 hashtag' : ''}
                     variant="outlined"
                     label="Hashtag"
                     placeholder="Hashtag"

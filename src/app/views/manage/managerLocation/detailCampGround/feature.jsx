@@ -24,7 +24,7 @@ import {
 } from 'app/apis/campGround/ground.service'
 import { useParams } from 'react-router-dom'
 import FormGroup from '@mui/material/FormGroup'
-import { cloneDeep, remove, set } from 'lodash'
+import { cloneDeep, remove } from 'lodash'
 
 export default function Feature({
   control,

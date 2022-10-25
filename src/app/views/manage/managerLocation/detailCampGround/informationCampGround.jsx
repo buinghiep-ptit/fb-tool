@@ -84,6 +84,7 @@ export default function InformationCampGround({ action }) {
       province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
       district: yup.object().required('Vui lòng chọn quận/huyện'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
+      // campTypes: yup.object().required('Vui lòng chọn loại hình'),
     })
     .required()
 
@@ -199,7 +200,7 @@ export default function InformationCampGround({ action }) {
   const onSubmit = async data => {
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
-    if (listUrl.image.length > 0) {
+    if (listUrl?.image && listUrl?.image.length > 0) {
       mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
         if (url) {
           const media = new Object()
@@ -212,7 +213,7 @@ export default function InformationCampGround({ action }) {
       })
     }
     let mediasUpdateVideo = []
-    if (listUrl.video.length > 0) {
+    if (listUrl?.video && listUrl?.video.length > 0) {
       mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
         if (url) {
           const media = new Object()

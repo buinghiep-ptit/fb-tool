@@ -59,7 +59,7 @@ export default function GeneralInformation({
                 {...field}
                 label="Tên điểm camp*"
                 variant="outlined"
-                error={errors.nameCampground}
+                error={!!errors.nameCampground}
                 helperText={errors.nameCampground?.message}
               />
             )}
@@ -111,7 +111,7 @@ export default function GeneralInformation({
                 }}
                 renderInput={params => (
                   <TextField
-                    error={errors.province}
+                    error={!!errors.province}
                     helperText={
                       errors.province ? 'Vui lòng chọn tỉnh/thành' : ''
                     }
@@ -143,7 +143,7 @@ export default function GeneralInformation({
                     {...params}
                     label="Quận huyện"
                     margin="normal"
-                    error={errors.district}
+                    error={!!errors.district}
                     helperText={
                       errors.district ? 'Vui lòng chọn quận/huyện' : ''
                     }
@@ -175,7 +175,7 @@ export default function GeneralInformation({
             name="address"
             render={({ field }) => (
               <TextField
-                error={errors.address}
+                error={!!errors.address}
                 helperText={errors.address?.message}
                 {...field}
                 label="Địa chỉ"
@@ -218,7 +218,7 @@ export default function GeneralInformation({
             name="note"
             render={({ field }) => (
               <TextField
-                error={errors.address}
+                error={!!errors.address}
                 helperText={errors.address?.message}
                 {...field}
                 placeholder="Nhập mô tả lưu ý về địa hình nếu có"
@@ -246,13 +246,15 @@ export default function GeneralInformation({
                 renderInput={params => (
                   <TextField
                     {...params}
-                    // error={errors.namePlace}
-                    // helperText={errors.namePlace?.message}
                     variant="outlined"
                     label="Loại hình"
                     placeholder="Loại hình"
                     fullWidth
                     margin="normal"
+                    error={!!errors.campTypes}
+                    helperText={
+                      !!errors.campTypes ? 'Vui lòng chọn loại hình' : ''
+                    }
                   />
                 )}
               />

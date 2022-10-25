@@ -84,7 +84,7 @@ export default function InformationCampGround({ action }) {
       province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
       district: yup.object().required('Vui lòng chọn quận/huyện'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
-      // campTypes: yup.object().required('Vui lòng chọn loại hình'),
+      // campTypes: yup.array().min(1, 'Vui lòng chọn loại hình'),
     })
     .required()
 

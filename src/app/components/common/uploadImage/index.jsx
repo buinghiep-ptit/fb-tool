@@ -1,4 +1,4 @@
-import { Grid, Icon } from '@mui/material'
+import { Button, Grid, Icon } from '@mui/material'
 
 import * as React from 'react'
 
@@ -28,6 +28,14 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
 
   return (
     <>
+      <button
+        type="button"
+        onClick={() => {
+          console.log(files)
+        }}
+      >
+        Ntn
+      </button>
       <Grid container>
         <input
           type="file"
@@ -51,13 +59,20 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
             <Grid item xs={3} md={3} key={index}>
               <div className="uploader" id="fileSelect">
                 <Icon
-                  style={{ color: 'red' }}
+                  style={{ color: 'red', cursor: 'pointer' }}
                   className="uploader__icon-delete"
                   onClick={() => deleteItemImageMedias(index)}
                 >
-                  clear
+                  delete
                 </Icon>
-                <img src={file.url}></img>
+
+                {file?.mediaFormat === 1 ? (
+                  <video width="90%" height="auto" controls>
+                    <source src={file.url} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={file.url} />
+                )}
               </div>
             </Grid>
           )
@@ -75,6 +90,14 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
                 </Icon>
                 {file.type.startsWith('image/') && (
                   <img src={window.URL.createObjectURL(file)}></img>
+                )}
+                {file.type.startsWith('video/') && (
+                  <video width="90%" height="auto" controls>
+                    <source
+                      src={window.URL.createObjectURL(file)}
+                      type="video/mp4"
+                    />
+                  </video>
                 )}
               </div>
             </Grid>

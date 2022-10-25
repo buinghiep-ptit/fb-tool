@@ -40,7 +40,16 @@ export default function Feature({
   const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
   const [listUtility, setListUtility] = React.useState([])
   const [disabledViettel, setDisabledViettel] = React.useState(
-    getValues('viettel'),
+    !getValues('viettel'),
+  )
+  const [disabledVinaphone, setDisabledVinaphone] = React.useState(
+    !getValues('vinaphone'),
+  )
+  const [disabledVietnamMobile, setDisabledVietNamMobile] = React.useState(
+    !getValues('vietnamMobile'),
+  )
+  const [disabledMobiphone, setDisabledMobiphone] = React.useState(
+    !getValues('mobiphone'),
   )
 
   const handleClickAddUtility = async () => {
@@ -196,7 +205,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('mobiphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('mobiphone')}
+                        onChange={e => {
+                          setValue('mobiphone', !getValues('mobiphone'))
+                          setDisabledMobiphone(!disabledMobiphone)
+                        }}
+                      />
+                    }
                     label="Mobiphone"
                   />
                 )}
@@ -207,6 +224,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledMobiphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -237,7 +255,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vinaphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vinaphone')}
+                        onChange={e => {
+                          setValue('vinaphone', !getValues('vinaphone'))
+                          setDisabledVinaphone(!disabledVinaphone)
+                        }}
+                      />
+                    }
                     label="Vinaphone"
                   />
                 )}
@@ -248,6 +274,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledVinaphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -274,7 +301,15 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vietnamMobile')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vietnamMobile')}
+                        onChange={e => {
+                          setValue('vietnamMobile', !getValues('vietnamMobile'))
+                          setDisabledVietNamMobile(!disabledVietnamMobile)
+                        }}
+                      />
+                    }
                     label="VietnamMobile"
                   />
                 )}
@@ -285,6 +320,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledVietnamMobile}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"

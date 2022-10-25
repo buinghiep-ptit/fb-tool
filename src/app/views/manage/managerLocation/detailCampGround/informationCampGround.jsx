@@ -139,44 +139,99 @@ export default function InformationCampGround({ action }) {
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
     console.log(introData)
-    const fileUpload = [...introData].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+    const fileUploadImage = [...introData].map(file => {
+      console.log(file.type.startsWith('image/'), 'upload')
+      if (file.type.startsWith('image/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
       }
     })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    const fileUploadVideo = [...introData].map(file => {
+      if (file.type.startsWith('video/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    })
+
+    const responseImage = await Promise.all(fileUploadImage)
+    const responseVideo = await Promise.all(fileUploadVideo)
+    const listUrl = new Object()
+    if (responseImage && responseVideo) {
+      if (responseImage.length > 0)
+        listUrl.image = responseImage.map(item => item?.data.url)
+      if (responseVideo.length > 0)
+        listUrl.video = responseVideo.map(item => item?.data.url)
+    }
+    return listUrl
   }
 
   const onSubmit = async data => {
-    const listUrlImage = await handleDataImageUpload()
-
-    const mediasUpdate = listUrlImage.map((url, index) => {
-      const media = new Object()
-      media.mediaType = 1
-      media.srcType = 2
-      media.mediaFormat = 2
-      media.url = url
-      return media
-    })
+    const listUrl = await handleDataImageUpload()
+    let mediasUpdateImage = []
+    if (listUrl.image.length > 0) {
+      mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 2
+          media.url = url
+          return media
+        }
+      })
+    }
+    let mediasUpdateVideo = []
+    if (listUrl.video.length > 0) {
+      mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 1
+          media.url = url
+          return media
+        }
+      })
+    }
 
     const dataUpdate = new Object()
-    dataUpdate.medias = [...medias, ...mediasUpdate]
+    dataUpdate.medias = [
+      ...medias,
+      ...mediasUpdateImage,
+      ...mediasUpdateVideo,
+    ].filter(item => !!item)
+    console.log(dataUpdate.medias)
     dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
     const arrInternet = [
@@ -216,7 +271,7 @@ export default function InformationCampGround({ action }) {
     dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
-    dataUpdate.address = data.address
+    dataUpdate.address = data.address || null
     dataUpdate.capacity = data.capacity
     dataUpdate.latitude = data.latitude
     dataUpdate.longitude = data.longitude
@@ -323,6 +378,7 @@ export default function InformationCampGround({ action }) {
               })
               setListContact(newListContact)
             }
+
             data.campGroundInternets.forEach(item => {
               setValue(INTERNET[item.idInternet].name, true)
               setValue(INTERNET[item.idInternet].speed, item.signalQuality)

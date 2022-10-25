@@ -33,24 +33,14 @@ export default function Feature({
   action,
   updateFeature,
   getValues,
+  disabledInternet,
   setValue,
+  setDisabledInternet,
 }) {
   const dialogCustomRef = React.useRef(null)
   const params = useParams()
   const [unlinkedUtilitys, setUnlinkedUtilitys] = React.useState([])
   const [listUtility, setListUtility] = React.useState([])
-  const [disabledViettel, setDisabledViettel] = React.useState(
-    !getValues('viettel'),
-  )
-  const [disabledVinaphone, setDisabledVinaphone] = React.useState(
-    !getValues('vinaphone'),
-  )
-  const [disabledVietnamMobile, setDisabledVietNamMobile] = React.useState(
-    !getValues('vietnamMobile'),
-  )
-  const [disabledMobiphone, setDisabledMobiphone] = React.useState(
-    !getValues('mobiphone'),
-  )
 
   const handleClickAddUtility = async () => {
     dialogCustomRef.current.handleClickOpen()
@@ -164,7 +154,9 @@ export default function Feature({
                         {...field}
                         onChange={e => {
                           setValue('viettel', !getValues('viettel'))
-                          setDisabledViettel(!disabledViettel)
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.viettel = !newObj.viettel
+                          setDisabledInternet(newObj)
                         }}
                       />
                     }
@@ -178,7 +170,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
-                      disabled={disabledViettel}
+                      disabled={disabledInternet.viettel}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -210,7 +202,9 @@ export default function Feature({
                         checked={getValues('mobiphone')}
                         onChange={e => {
                           setValue('mobiphone', !getValues('mobiphone'))
-                          setDisabledMobiphone(!disabledMobiphone)
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.mobiphone = !newObj.mobiphone
+                          setDisabledInternet(newObj)
                         }}
                       />
                     }
@@ -224,7 +218,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
-                      disabled={disabledMobiphone}
+                      disabled={disabledInternet.mobiphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -260,7 +254,9 @@ export default function Feature({
                         checked={getValues('vinaphone')}
                         onChange={e => {
                           setValue('vinaphone', !getValues('vinaphone'))
-                          setDisabledVinaphone(!disabledVinaphone)
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.vinaphone = !newObj.vinaphone
+                          setDisabledInternet(newObj)
                         }}
                       />
                     }
@@ -274,7 +270,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
-                      disabled={disabledVinaphone}
+                      disabled={disabledInternet.vinaphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -306,7 +302,9 @@ export default function Feature({
                         checked={getValues('vietnamMobile')}
                         onChange={e => {
                           setValue('vietnamMobile', !getValues('vietnamMobile'))
-                          setDisabledVietNamMobile(!disabledVietnamMobile)
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.vietnamMobile = !newObj.vietnamMobile
+                          setDisabledInternet(newObj)
                         }}
                       />
                     }
@@ -320,7 +318,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
-                      disabled={disabledVietnamMobile}
+                      disabled={disabledInternet.vietnamMobile}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"

@@ -239,7 +239,7 @@ export default function GeneralInformation({
                 multiple
                 {...field}
                 options={[...typeCamp]}
-                getOptionLabel={option => option.label}
+                getOptionLabel={option => option?.label || ''}
                 filterSelectedOptions
                 onChange={(_, data) => field.onChange(data)}
                 sx={{ width: 400, marginRight: 5 }}

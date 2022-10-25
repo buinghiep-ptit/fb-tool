@@ -32,7 +32,7 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
         <input
           type="file"
           id="inputFile"
-          accept=".png, .jpg, .jpeg"
+          accept=".png, .jpg, .jpeg, .mp4, .webm"
           style={{ display: 'none' }}
           multiple
           onChange={event => {
@@ -59,11 +59,11 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
                 </Icon>
 
                 {file?.mediaFormat === 1 ? (
-                  <video width="90%" height="auto" controls>
+                  <video width="150px" height="100px" controls>
                     <source src={file.url} type="video/mp4" />
                   </video>
                 ) : (
-                  <img src={file.url} />
+                  <img src={file.url} width="150px" height="100px" />
                 )}
               </div>
             </Grid>
@@ -81,10 +81,14 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
                   clear
                 </Icon>
                 {file.type.startsWith('image/') && (
-                  <img src={window.URL.createObjectURL(file)}></img>
+                  <img
+                    src={window.URL.createObjectURL(file)}
+                    width="150px"
+                    height="100px"
+                  ></img>
                 )}
                 {file.type.startsWith('video/') && (
-                  <video width="90%" height="auto" controls>
+                  <video width="150px" height="100px" controls>
                     <source
                       src={window.URL.createObjectURL(file)}
                       type="video/mp4"

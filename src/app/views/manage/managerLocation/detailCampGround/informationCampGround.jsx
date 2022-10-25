@@ -42,6 +42,13 @@ export default function InformationCampGround({ action }) {
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState('')
   const [listMerchant, setListMerchant] = React.useState([])
+  const [disabledInternet, setDisabledInternet] = React.useState({
+    viettel: true,
+    mobiphone: true,
+    vinaphone: true,
+    vietnamMobile: true,
+  })
+
   const [detailPolicy, setDetailPolicy] = React.useState({
     id: 1,
     name: 'Default Deposit Policy',
@@ -85,7 +92,7 @@ export default function InformationCampGround({ action }) {
       district: yup.object().required('Vui lòng chọn quận/huyện'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
       campTypes: yup.array().min(1, ''),
-      hashtag: yup.array().max(2, ''),
+      hashtag: yup.array().max(50, ''),
     })
     .required()
 
@@ -380,11 +387,13 @@ export default function InformationCampGround({ action }) {
               })
               setListContact(newListContact)
             }
-
+            const newObj = cloneDeep(disabledInternet)
             data.campGroundInternets.forEach(item => {
               setValue(INTERNET[item.idInternet].name, true)
+              newObj[INTERNET[item.idInternet].name] = false
               setValue(INTERNET[item.idInternet].speed, item.signalQuality)
             })
+            setDisabledInternet(newObj)
             data.campGroundVehicles.forEach(item => {
               setValue(VEHICLES[item]?.name, true)
             })
@@ -534,6 +543,8 @@ export default function InformationCampGround({ action }) {
             setValue={setValue}
             feature={feature}
             updateFeature={updateFeature}
+            disabledInternet={disabledInternet}
+            setDisabledInternet={setDisabledInternet}
           />
         </AccordionDetails>
       </Accordion>

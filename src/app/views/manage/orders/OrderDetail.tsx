@@ -14,7 +14,6 @@ import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
-import { DiagLogConfirm } from './details/ButtonsLink/DialogConfirm'
 import { CampgroundInfo } from './details/CampgroundInfo'
 import { CustomerInfo } from './details/CustomerInfo'
 import { OrderProcesses } from './details/OrderProcesses'
@@ -44,8 +43,6 @@ export interface Props {}
 
 export default function OrderDetail(props: Props) {
   const navigate = useNavigate()
-  const [titleDialog, setTitleDialog] = useState('')
-  const [openDialog, setOpenDialog] = useState(false)
   const { orderId } = useParams()
   const {
     data: order,
@@ -94,15 +91,6 @@ export default function OrderDetail(props: Props) {
       services: [...(values?.services ?? [])],
     }
     edit({ ...payload, id: Number(orderId ?? 0) })
-  }
-
-  const onSuccess = (data?: any) => {
-    toastSuccess({ message: 'Huỷ thành công' })
-    setOpenDialog(false)
-  }
-
-  const cancelOrderConfirm = () => {
-    onSuccess()
   }
 
   if (isLoading) return <MuiLoading />
@@ -159,22 +147,9 @@ export default function OrderDetail(props: Props) {
         justifyContent="space-between"
         alignItems={'center'}
       >
-        {false ? (
-          <MuiButton
-            title="Huỷ chỗ, hoàn tiền"
-            variant="outlined"
-            color="error"
-            onClick={() => {
-              setTitleDialog('Hoàn tiền')
-              setOpenDialog(true)
-            }}
-            startIcon={<Icon>clear</Icon>}
-          />
-        ) : (
-          <ButtonsActions order={order} />
-        )}
+        <ButtonsActions order={order} />
         <Chip
-          label={getOrderStatusSpec(1, order?.status).title}
+          label={getOrderStatusSpec(order?.status ?? 0, 2).title}
           size="medium"
           color={'default'}
         />
@@ -207,12 +182,6 @@ export default function OrderDetail(props: Props) {
           </Stack>
         </FormProvider>
       </form>
-      <DiagLogConfirm
-        title={titleDialog}
-        open={openDialog}
-        setOpen={setOpenDialog}
-        onSubmit={cancelOrderConfirm}
-      />
     </Container>
   )
 }

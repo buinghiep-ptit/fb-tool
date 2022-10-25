@@ -6,6 +6,7 @@ import {
   fetchOrdersOverall,
   orderDetail,
   orderNote,
+  paymentConfirm,
   reassignOrder,
   receiveOrder,
   unavailableOrder,
@@ -85,6 +86,22 @@ export const useReassignOrder = (onSuccess?: any, onError?: any) => {
   return useMutation(
     (payload: { orderId?: number; userId?: number }) =>
       reassignOrder(payload.orderId ?? 0, payload.userId ?? 0),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const usePaymentConfirmOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId?: number; payload?: any }) =>
+      paymentConfirm(params.orderId ?? 0, params.payload),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])

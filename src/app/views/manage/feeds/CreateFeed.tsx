@@ -149,6 +149,9 @@ export default function CreateFeed(props: Props) {
             : 'Dung lượng ảnh tối đa 10MB/ảnh',
           files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
         ),
+      content: Yup.string()
+        .required(messages.MSG1)
+        .max(255, 'Nội dung tối đa 255 ký tự'),
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
     },
     [['files', 'files']],
@@ -332,8 +335,8 @@ export default function CreateFeed(props: Props) {
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
       idSrcType: Number(values.idSrcType ?? 0),
-      idSrc: Number(values.camp?.id ?? 0),
-      webUrl: values.webUrl ?? null,
+      idSrc: values.idSrcType != 4 ? Number(values.camp?.id) : null,
+      webUrl: values.idSrcType == 4 ? values.webUrl : null,
       idCustomer:
         Number(values.cusType) === 1
           ? customerCampdi && (customerCampdi as any)?.id
@@ -341,7 +344,7 @@ export default function CreateFeed(props: Props) {
       content: values.content,
       video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
       images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
-      idAudio: 1,
+      idAudio: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? 1 : null,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,

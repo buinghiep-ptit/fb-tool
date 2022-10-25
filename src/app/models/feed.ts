@@ -25,7 +25,7 @@ export interface IFeedDetail {
   id?: number
   type?: number // 1: video, 2: images
   idSrcType?: number // Liên kết với 1:Địa danh 2:Điểm camp 4:Sản phẩm
-  idSrc?: number
+  idSrc?: number | null
   webUrl?: string | null
   idCustomer?: number
   customerInfo?: ICustomerInfo
@@ -35,7 +35,7 @@ export interface IFeedDetail {
   status?: number
   video?: IMediaOverall
   images?: IMediaOverall[]
-  idAudio?: number
+  idAudio?: number | null
   tags?: ITags[]
   createdBy?: number
   lastModifiedBy?: number

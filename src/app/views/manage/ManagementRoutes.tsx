@@ -66,6 +66,9 @@ const UpdateMerchant = Loadable(
 )
 const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
 const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
+const PaymentConfirm = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/PaymentConfirm')),
+)
 const Reassign = Loadable(
   lazy(() => import('./orders/details/ButtonsLink/Reassign')),
 )
@@ -220,6 +223,10 @@ const ManagementRoutes = [
           </>
         ),
         children: [
+          {
+            path: 'xac-nhan-thanh-toan',
+            element: <PaymentConfirm title="Xác nhận thanh toán" />,
+          },
           {
             path: 'chuyen-tiep',
             element: <Reassign title="Chuyển tiếp" />,

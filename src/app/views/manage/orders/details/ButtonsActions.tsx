@@ -101,41 +101,80 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
 
   return (
     <Stack flexDirection={'row'}>
-      <MuiButton
-        title="Còn chỗ"
-        variant="outlined"
-        color="primary"
-        onClick={() => onClickButton('AVAILABLE')}
-        startIcon={<Icon>how_to_reg</Icon>}
-      />
-      <Divider
-        orientation="vertical"
-        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-        flexItem
-      />
-      <MuiButton
-        title="Hết chỗ"
-        variant="outlined"
-        sx={{ color: '#AAAAAA' }}
-        onClick={() => onClickButton('UN_AVAILABLE')}
-        startIcon={<Icon>person_off</Icon>}
-      />
-      <Divider
-        orientation="vertical"
-        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-        flexItem
-      />
-      <MuiButton
-        title="Huỷ"
-        variant="outlined"
-        color="error"
-        startIcon={<Icon>person_remove</Icon>}
-      />
-      <Divider
-        orientation="vertical"
-        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-        flexItem
-      />
+      {order?.status === 2 && (
+        <>
+          <MuiButton
+            title="Xác nhận KH đã thanh toán"
+            variant="outlined"
+            color="primary"
+            onClick={() =>
+              navigate(`xac-nhan-thanh-toan`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>how_to_reg</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+          <MuiButton
+            title="Huỷ đơn"
+            variant="outlined"
+            color="error"
+            onClick={() => onClickButton('AVAILABLE')}
+            startIcon={<Icon>clear</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
+      {order?.status === 1 && (
+        <>
+          <MuiButton
+            title="Còn chỗ"
+            variant="outlined"
+            color="primary"
+            onClick={() => onClickButton('AVAILABLE')}
+            startIcon={<Icon>how_to_reg</Icon>}
+          />
+
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+          <MuiButton
+            title="Hết chỗ"
+            variant="outlined"
+            sx={{ color: '#AAAAAA' }}
+            onClick={() => onClickButton('UN_AVAILABLE')}
+            startIcon={<Icon>person_off</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+          <MuiButton
+            title="Huỷ"
+            variant="outlined"
+            color="error"
+            startIcon={<Icon>person_remove</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
       <MuiButton
         title="Chuyển tiếp"
         variant="outlined"

@@ -8,6 +8,8 @@ export const enum EMediaType {
 }
 
 export const enum EMediaFormat {
+  ALL = 0,
   VIDEO = 1,
   IMAGE = 2,
+  OFFICE = 3,
 }

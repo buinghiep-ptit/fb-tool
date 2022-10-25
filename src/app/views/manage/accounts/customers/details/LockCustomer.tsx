@@ -1,19 +1,18 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { FormControlLabel, LinearProgress, Radio, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import FormInputText from 'app/components/common/MuiRHFInputText'
-import { MuiRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
-import MuiStyledModal from 'app/components/common/MuiStyledModal'
+import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
+import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useLockCustomer } from 'app/hooks/queries/useCustomersData'
+import { messages } from 'app/utils/messages'
 import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
-import { messages } from 'app/utils/messages'
-import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 
 type Props = {
   title: string
@@ -47,23 +46,8 @@ const RHFInputLockTime = ({ methods, name }: RHFInputLockTimeProps) => {
       name="lockDuration"
       label="Thời gian"
       placeholder="Nhập giá"
-      // iconEnd={<MuiTypography variant="subtitle2">VNĐ</MuiTypography>}
       fullWidth
     />
-    // <FormInputText
-    //   disabled={parseInt(lockType, 10) !== 2}
-    //   type="number"
-    //   label={'Thời gian'}
-    //   name="lockDuration"
-    //   placeholder="Nhập thời gian"
-    //   inputProps={{
-    //     inputProps: {
-    //       // max: 100,
-    //       min: 1,
-    //     },
-    //   }}
-    //   defaultValue={''}
-    // />
   )
 }
 
@@ -71,7 +55,6 @@ export default function LockCustomer({ title }: Props) {
   const navigate = useNavigate()
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
-  const data = location.state?.data ?? {}
 
   const { customerId } = useParams()
 
@@ -136,7 +119,7 @@ export default function LockCustomer({ title }: Props) {
       >
         <FormProvider {...methods}>
           <Stack>
-            <MuiRadioGroup name="lockType" defaultValue={1}>
+            <MuiRHFRadioGroup name="lockType" defaultValue={1}>
               <FormControlLabel
                 value={1}
                 control={<Radio />}
@@ -157,7 +140,7 @@ export default function LockCustomer({ title }: Props) {
                   </MuiTypography>
                 </>
               </Stack>
-            </MuiRadioGroup>
+            </MuiRHFRadioGroup>
           </Stack>
 
           <Stack my={1.5}>

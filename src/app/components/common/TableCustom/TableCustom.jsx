@@ -33,7 +33,8 @@ const StyledTable = styled(Table)(({ theme }) => ({
   '& tbody': {
     '& tr': {
       '& td': {
-        paddingLeft: 0,
+        paddingLeft: 10,
+        paddingRight: 10,
         textTransform: 'capitalize',
       },
     },
@@ -220,6 +221,7 @@ const TableCustom = ({
                     case 'linkDetail':
                       return (
                         <TableCell
+                          align="center"
                           key={`${element}${id}`}
                           style={{ wordBreak: 'normal' }}
                         >
@@ -231,6 +233,7 @@ const TableCustom = ({
                     case 'eventPlace':
                       return (
                         <TableCell
+                          align="center"
                           key={`${element}${id}`}
                           style={{ wordBreak: 'normal' }}
                         >
@@ -244,12 +247,21 @@ const TableCustom = ({
                       )
                     default:
                       return (
-                        <TableCell
-                          align="left"
-                          key={`${element}${id}`}
-                          style={{ wordBreak: 'normal' }}
-                        >
-                          {data[element]}
+                        <TableCell align="center" key={`${element}${id}`}>
+                          <div
+                            style={{
+                              wordBreak: 'normal',
+                              // whiteSpace: 'nowrap',
+                              width: '200px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              webkitLineClamp: '2',
+                              display: '-webkit-box',
+                              webkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {data[element]}
+                          </div>
                         </TableCell>
                       )
                   }

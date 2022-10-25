@@ -29,6 +29,9 @@ export default function GeneralInformation({
   setCreateDegrees,
 }) {
   const addHashTag = e => {
+    if (e.value.target && e.value.target.charAt(0) === '#') {
+      errors.hashtag.message = "Phải bắt đầu bằng ký tự '#'"
+    }
     if (e.keyCode === 13) {
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
@@ -308,7 +311,7 @@ export default function GeneralInformation({
                   <TextField
                     {...params}
                     error={!!errors.hashtag}
-                    helperText={!!errors.hashtag ? 'Tối đa 50 hashtag' : ''}
+                    helperText={!!errors.hashtag ? errors.hashtag.message : ''}
                     variant="outlined"
                     label="Hashtag"
                     placeholder="Hashtag"

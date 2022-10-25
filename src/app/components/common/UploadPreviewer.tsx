@@ -21,15 +21,15 @@ import { MuiTypography } from './MuiTypography'
 interface Props {
   name: string
   mediaConfigs: {
-    mediaFormat: 1 | 2
+    mediaFormat: number
     accept: string
     multiple: boolean
     mediaType?: number
   }
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
-  uploadFiles: (files: any, mediaFormat?: 1 | 2, controller?: any) => void
-  removeUploadedFiles?: (index?: number, mediaFormat?: 1 | 2) => void
+  uploadFiles: (files: any, mediaFormat?: number, controller?: any) => void
+  removeUploadedFiles?: (index?: number, mediaFormat?: number) => void
   cancelUploading?: () => void
   uploading?: boolean
   progressInfos: any
@@ -122,9 +122,8 @@ export function UploadPreviewer({
     setMediasSrcPreviewer([...mediasSrcPreviewer])
 
     if (files) {
-      if (mediaIndex ?? 0 <= files.length ?? 0 - 1) {
+      if (mediaIndex !== -1) {
         files.splice(mediaIndex ?? 0, 1)
-
         setValue('files', [...files])
       }
     } else setValue('files', null)
@@ -170,7 +169,10 @@ export function UploadPreviewer({
 
       if (mediaFormat === EMediaFormat.VIDEO || mediaType === EMediaType.AVATAR)
         setMediasSrcPreviewer([{ url: URL.createObjectURL(extractFiles[0]) }])
-      else if (mediaFormat === EMediaFormat.IMAGE) {
+      else if (
+        mediaFormat === EMediaFormat.IMAGE ||
+        mediaFormat === EMediaFormat.OFFICE
+      ) {
         const newImages = [...extractFiles].map((originalFile: File) =>
           // deep clone
           Object.assign(
@@ -205,15 +207,7 @@ export function UploadPreviewer({
     noClick: !!mediasSrcPreviewer.length,
     noDrag: uploading,
     multiple: multiple,
-    accept:
-      mediaFormat === EMediaFormat.VIDEO
-        ? {
-            'video/*': ['.mp4', '.webm', '.ogg'],
-          }
-        : {
-            'image/png': ['.png'],
-            'image/jpeg': ['.jpg', '.jpeg'],
-          },
+    accept: getFilesType(mediaFormat) as any,
     onDrop,
     maxFiles: 15,
     maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 10 * 1024 * 1024,
@@ -245,7 +239,7 @@ export function UploadPreviewer({
             justifyContent: 'center',
             alignItems: 'center',
             cursor: 'pointer',
-            border: '2px dashed rgba(22, 24, 35, 0.2)',
+            border: '2px dashed rgba(22, 24 , 35, 0.2)',
             '&:hover': {
               border: '2px dashed #2F9B42',
             },
@@ -254,20 +248,21 @@ export function UploadPreviewer({
           <input {...getInputProps()} />
           <Stack flexDirection={'column'} alignItems="center" gap={1}>
             <MuiTypography fontSize={'1.125rem'}>
-              {mediaFormat === EMediaFormat.VIDEO
-                ? 'Chọn video để tải lên'
-                : 'Chọn ảnh để tải lên'}
+              {mediaFormat === EMediaFormat.VIDEO && 'Chọn video để tải lên'}
+              {mediaFormat === EMediaFormat.IMAGE && 'Chọn ảnh để tải lên'}
+              {mediaFormat === EMediaFormat.OFFICE && 'Chọn tệp đính kèm'}
             </MuiTypography>
             <MuiTypography variant="body2">
               Hoặc kéo và thả tập tin
             </MuiTypography>
             <UploadFile fontSize="medium" />
-            {mediaFormat === EMediaFormat.VIDEO ? (
+            {mediaFormat === EMediaFormat.VIDEO && (
               <>
                 <MuiTypography variant="body2">MP4 hoặc WebM</MuiTypography>
                 <MuiTypography variant="body2">tối đa 3 phút</MuiTypography>
               </>
-            ) : (
+            )}
+            {mediaFormat === EMediaFormat.IMAGE && (
               <>
                 <MuiTypography variant="body2">
                   PNG / JPEG hoặc JPG
@@ -275,6 +270,13 @@ export function UploadPreviewer({
                 <MuiTypography variant="body2">nhỏ hơn 10MB/ảnh</MuiTypography>
                 <MuiTypography variant="body2">
                   tối đa 15 ảnh/lần chọn
+                </MuiTypography>
+              </>
+            )}
+            {mediaFormat === EMediaFormat.OFFICE && (
+              <>
+                <MuiTypography variant="body2">
+                  *.pdf , *.xlsx hoặc *.docx
                 </MuiTypography>
               </>
             )}
@@ -296,7 +298,6 @@ export function UploadPreviewer({
       )}
       {mediaType !== EMediaType.AVATAR && (
         <>
-          {' '}
           {!!mediasSrcPreviewer.length &&
             (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
               checkIsMatchMediaFormat(files, mediaFormat)) &&
@@ -384,11 +385,55 @@ export function UploadPreviewer({
                   )}
               </Box>
             )}
+          {files &&
+            !!files.length &&
+            !!mediasSrcPreviewer.length &&
+            mediaFormat === EMediaFormat.OFFICE && (
+              <AbsoluteFillObject bgcolor="white">
+                <Box sx={{ width: '100%', height: '100%', marginTop: 7 }}>
+                  {[...mediasSrcPreviewer].map((media, index) => (
+                    <Stack
+                      key={index}
+                      flexDirection={'row'}
+                      alignItems="center"
+                    >
+                      <MuiTypography
+                        variant="body2"
+                        fontSize="0.75rem"
+                        sx={{ whiteSpace: 'pre-line' }}
+                      >
+                        {(media as any).name}
+                      </MuiTypography>
+                      <IconButton onClick={() => handleRemoveMedia(index)}>
+                        <Icon color="error">clear</Icon>
+                      </IconButton>
+                    </Stack>
+                  ))}
+
+                  {!uploading && (
+                    <Stack>
+                      <CustomIconButton
+                        handleClick={open}
+                        iconName={'add_circle_outlined'}
+                        title={'Thêm'}
+                        position={{ top: -16, left: 0 }}
+                      />
+                      <CustomIconButton
+                        handleClick={handleRemoveAllMedias}
+                        iconName={'delete'}
+                        title={'Xoá tất cả'}
+                        position={{ top: -16, right: 0 }}
+                      />
+                    </Stack>
+                  )}
+                </Box>
+              </AbsoluteFillObject>
+            )}
         </>
       )}
 
       <Box px={1.5} my={1.5}>
-        {files && files.length && uploading && (
+        {files && !!files.length && uploading && (
           <Stack direction={'row'} gap={1.5} alignItems="center">
             {mediaFormat === EMediaFormat.VIDEO && (
               <IconButton
@@ -427,6 +472,35 @@ export function UploadPreviewer({
   )
 }
 
+const getFilesType = (formatType?: number) => {
+  switch (formatType) {
+    case EMediaFormat.VIDEO:
+      return {
+        'video/*': ['.mp4', '.webm', '.ogg'],
+      }
+    case EMediaFormat.IMAGE:
+      return {
+        'image/png': ['.png'],
+        'image/jpeg': ['.jpg', '.jpeg'],
+      }
+    case EMediaFormat.OFFICE:
+      return { 'text/*': ['.xlsx', '.docx', '.pdf'] }
+    case EMediaFormat.ALL:
+      return {
+        'video/*': [],
+        'image/*': [],
+        'text/*': [],
+      }
+
+    default:
+      return {
+        'video/*': [],
+        'image/*': [],
+        'text/*': [],
+      }
+  }
+}
+
 const checkIsMatchMediaFormat = (
   files?: File[],
   mediaFormat?: number,
@@ -438,6 +512,10 @@ const checkIsMatchMediaFormat = (
     } else return false
   } else if (mediaFormat && mediaFormat === 2) {
     if (files[0].type.includes('image')) {
+      return true
+    } else return false
+  } else if (mediaFormat && mediaFormat === 3) {
+    if (files[0].type.includes('text')) {
       return true
     } else return false
   }

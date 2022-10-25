@@ -268,8 +268,8 @@ export default function FeedDetail(props: Props) {
           variant="outlined"
           color="primary"
           disabled={
-            feed.data?.customerInfo?.type !== 0 &&
-            feed.data?.customerInfo?.type !== 3
+            feed.data?.customerInfo?.type !== 3 &&
+            feed.data?.customerInfo?.type !== 1
           }
           onClick={() => navigate(`chinh-sua-feed`, {})}
           loading={approveLoading}

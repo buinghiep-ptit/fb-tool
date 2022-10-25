@@ -63,6 +63,17 @@ export const reassignOrder = async (
   return data
 }
 
+export const paymentConfirm = async (
+  orderId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/confirm-bank-transfer`,
+    payload,
+  )
+  return data
+}
+
 export const orderNote = async (
   orderId: number,
   payload: { note?: string },

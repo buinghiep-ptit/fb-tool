@@ -1,12 +1,19 @@
 import { http } from 'app/helpers/http-config'
 
 export const uploadFile = async (
-  mediaFormat?: 1 | 2,
+  mediaFormat?: number,
   file?: any,
   onUploadProgress?: any,
   controller?: any,
 ): Promise<any> => {
-  const path = mediaFormat === 1 ? '/api/video/upload' : '/api/image/upload'
+  let path = ''
+  if (mediaFormat === 1) {
+    path = '/api/video/upload'
+  } else if (mediaFormat === 2) {
+    path = '/api/image/upload'
+  } else {
+    path = '/api/file/upload'
+  }
 
   const formData = new FormData()
   formData.append('file', file)

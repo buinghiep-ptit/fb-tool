@@ -37,7 +37,7 @@ export const useUploadFiles = () => {
     setProgressInfos({ val: [] })
   }
 
-  const upload = (file: any, idx: number, mediaFormat?: 1 | 2) => {
+  const upload = (file: any, idx: number, mediaFormat?: number) => {
     abortController.current = new AbortController()
 
     if (!progressInfosRef || !progressInfosRef.current) return
@@ -72,7 +72,7 @@ export const useUploadFiles = () => {
       })
   }
 
-  const uploadFiles = async (files?: File[], mediaFormat?: 1 | 2) => {
+  const uploadFiles = async (files?: File[], mediaFormat?: number) => {
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
     const _progressInfos = selectedFilesToArr.map(file => ({
@@ -100,7 +100,7 @@ export const useUploadFiles = () => {
     setUploading(false)
   }
 
-  const removeUploadedFiles = (index?: number, mediaFormat?: 1 | 2) => {
+  const removeUploadedFiles = (index?: number, mediaFormat?: number) => {
     if (index !== undefined) {
       fileInfos.splice(index, 1)
       setFileInfos([...fileInfos])
@@ -115,8 +115,8 @@ export const useUploadFiles = () => {
 
   return [
     (files?: File[]) => selectFiles(files),
-    (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
-    (index?: number, mediaFormat?: 1 | 2) =>
+    (files?: File[], mediaFormat?: number) => uploadFiles(files, mediaFormat),
+    (index?: number, mediaFormat?: number) =>
       removeUploadedFiles(index, mediaFormat),
     cancelUploading,
     uploading,

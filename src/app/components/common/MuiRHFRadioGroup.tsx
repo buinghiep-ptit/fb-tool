@@ -8,7 +8,7 @@ export interface IRadioGroupProps extends RadioGroupProps {
   children: React.ReactElement[] | React.ReactElement
 }
 
-export function MuiRadioGroup({
+export function MuiRHFRadioGroup({
   name,
   defaultValue,
   children,
@@ -32,24 +32,5 @@ export function MuiRadioGroup({
         )}
       />
     </FormControl>
-    // <FormControl
-    //   sx={{
-    //     width: '100%',
-    //     '& .MuiInputBase-root': {
-    //       height: 40,
-    //     },
-    //   }}
-    // >
-    //   <Controller
-    //     name={name}
-    //     control={control}
-    //     defaultValue={defaultValue}
-    //     render={({ field }) => (
-    //       <Select {...field} {...props}>
-    //         {children}
-    //       </Select>
-    //     )}
-    //   />
-    // </FormControl>
   )
 }

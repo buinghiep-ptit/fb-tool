@@ -225,8 +225,26 @@ const TableCustom = ({
                           key={`${element}${id}`}
                           style={{ wordBreak: 'normal' }}
                         >
-                          <Link to={`${data[element].path}${data.id}`}>
+                          <Link
+                            to={`${data[element].path}${data.id}`}
+                            style={{ textDecoration: 'underline' }}
+                          >
                             {data[element].link}
+                          </Link>
+                        </TableCell>
+                      )
+                    case 'contact':
+                      return (
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
+                          <Link
+                            style={{ textDecoration: 'underline' }}
+                            to={`/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`}
+                          >
+                            {data[element]}
                           </Link>
                         </TableCell>
                       )

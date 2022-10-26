@@ -24,15 +24,24 @@ export default function GeneralInformation({
   getValues,
   setValue,
   hashtag,
+  setError,
+  clearErrors,
   campAreas,
   createDegrees,
   setCreateDegrees,
 }) {
   const addHashTag = e => {
-    if (e.value.target && e.value.target.charAt(0) === '#') {
-      errors.hashtag.message = "Phải bắt đầu bằng ký tự '#'"
-    }
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      if (e.target.value && e.target.value.charAt(0) !== '#') {
+        console.log(e.target.value)
+        setError('hashtag', {
+          type: 'required',
+          message: 'Hashtag phải bắt đầu bằng #',
+        })
+        e.preventDefault()
+        return
+      }
+      clearErrors(['hashtag'])
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
     }

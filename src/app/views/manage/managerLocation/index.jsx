@@ -44,6 +44,7 @@ export default function ManagerLocation(props) {
             link: campGround.name,
             path: '/chi-tiet-diem-camp/',
           }
+          convertCampGround.idMerchant = campGround.idMerchant
           convertCampGround.type = campGround.campTypes
           convertCampGround.service = campGround.campRentalAmount
           convertCampGround.place = campGround.campAreaName

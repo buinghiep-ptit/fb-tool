@@ -102,6 +102,8 @@ export default function InformationCampGround({ action }) {
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -139,6 +141,7 @@ export default function InformationCampGround({ action }) {
       longitude: 105.78872657468659,
       note: '',
       policy: 1,
+      topographic: 1,
     },
   })
 
@@ -150,7 +153,6 @@ export default function InformationCampGround({ action }) {
     const introData = introductionRef.current.getIntro()
     console.log(introData)
     const fileUploadImage = [...introData].map(file => {
-      console.log(file.type.startsWith('image/'), 'upload')
       if (file.type.startsWith('image/')) {
         const formData = new FormData()
         formData.append('file', file)
@@ -272,8 +274,8 @@ export default function InformationCampGround({ action }) {
       dataUpdate.idMerchant = data.idMerchant?.id || null
       dataUpdate.contact = []
     } else {
-      dataUpdate.contact = listContact.map(
-        contact => `${contact.name},${contact.web},${contact.phone}`,
+      dataUpdate.contact = (listContact || []).map(
+        contact => `${contact?.name},${contact?.web},${contact?.phone}`,
       )
       dataUpdate.idMerchant = null
     }
@@ -283,8 +285,8 @@ export default function InformationCampGround({ action }) {
     dataUpdate.closeTime = data.closeTime
     dataUpdate.address = data.address || null
     dataUpdate.capacity = data.capacity
-    dataUpdate.latitude = data.latitude
-    dataUpdate.longitude = data.longitude
+    dataUpdate.latitude = createDegrees.lat
+    dataUpdate.longitude = createDegrees.lng
     dataUpdate.isPopular = 0
     dataUpdate.noteTopography = data.note
     dataUpdate.status = data.status
@@ -340,6 +342,8 @@ export default function InformationCampGround({ action }) {
               lat: data.latitude,
               lng: data.longitude,
             })
+            setValue('latitude', data.latitude)
+            setValue('longitude', data.longitude)
             setValue(
               'campTypes',
               data.campTypes.map(type => typeCamp[type - 1]),
@@ -378,7 +382,7 @@ export default function InformationCampGround({ action }) {
                 merchants.filter(merchant => merchant.id == data.idMerchant)[0],
               )
             } else {
-              const newListContact = data.contact.map(item => {
+              const newListContact = (data.contact || []).map(item => {
                 const arr = item.split(',')
                 return {
                   name: arr[0],
@@ -429,9 +433,9 @@ export default function InformationCampGround({ action }) {
   const handleDeleteCampGround = async () => {
     const res = await deleteCampGround(params.id)
     if (res) {
+      toastSuccess({ message: 'Xóa điểm camp thành công' })
       navigate('/quan-ly-thong-tin-diem-camp')
     }
-    navigate('/quan-ly-thong-tin-diem-camp')
   }
 
   const fetchDistricts = provinceId => {
@@ -474,6 +478,8 @@ export default function InformationCampGround({ action }) {
             fetchDistricts={fetchDistricts}
             control={control}
             errors={errors}
+            setError={setError}
+            clearErrors={clearErrors}
             provinces={provinces}
             districts={districts}
             wards={wards}

@@ -6,7 +6,7 @@ import {
   useAvailableOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
-import { IUser } from 'app/models'
+import { IUser, IUserProfile } from 'app/models'
 import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -14,6 +14,7 @@ import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
+  currentUser?: IUserProfile
 }
 
 export type ReassignSchema = {
@@ -21,7 +22,7 @@ export type ReassignSchema = {
   reason?: string
 }
 
-export function ButtonsActions({ order }: IButtonsActionProps) {
+export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const navigate = useNavigate()
   const { orderId } = useParams()
   const [dialogData, setDialogData] = useState<{

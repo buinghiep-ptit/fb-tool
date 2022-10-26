@@ -7,9 +7,10 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
 import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
+import useAuth from 'app/hooks/useAuth'
+import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
-import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
@@ -44,6 +45,13 @@ const getBreadCrumbDetailName = (slug?: string) => {
   }
 }
 
+export const isExpiredReceiveUser = (expiredTimeISO: string) => {
+  const NOW_IN_MS = new Date().getTime()
+  const EXP_IN_MS = new Date(expiredTimeISO).getTime()
+
+  return EXP_IN_MS > NOW_IN_MS + 30 * 60 * 1000
+}
+
 type SchemaType = {
   dateStart?: string
   dateEnd?: string
@@ -57,6 +65,8 @@ type SchemaType = {
 export interface Props {}
 
 export default function OrderDetail(props: Props) {
+  const { user } = useAuth()
+
   const navigate = useNavigate()
   const { source, orderId } = useParams()
   const {
@@ -138,7 +148,9 @@ export default function OrderDetail(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          disabled={editLoading}
+          disabled={
+            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
+          }
           loading={editLoading}
           onClick={methods.handleSubmit(onSubmitHandler)}
           startIcon={<Icon>done</Icon>}
@@ -147,6 +159,9 @@ export default function OrderDetail(props: Props) {
           title="Huỷ"
           variant="contained"
           color="warning"
+          disabled={
+            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
+          }
           onClick={() => methods.reset()}
           startIcon={<Icon>clear</Icon>}
         />
@@ -163,7 +178,10 @@ export default function OrderDetail(props: Props) {
         justifyContent="space-between"
         alignItems={'center'}
       >
-        <ButtonsActions order={order} />
+        <ButtonsActions
+          order={order}
+          currentUser={user as unknown as IUserProfile}
+        />
         <Chip
           label={
             order.cancelRequest

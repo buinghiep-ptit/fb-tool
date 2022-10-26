@@ -213,14 +213,48 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
+    // const files = (fileInfos as IMediaOverall[])
+    //   .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+    //   .map((file: IMediaOverall) => ({
+    //     mediaType: EMediaType.POST,
+    //     mediaFormat: fileConfigs.mediaFormat,
+    //     url: file.url,
+    //     detail: null,
+    //   }))
+
     const files = (fileInfos as IMediaOverall[])
-      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .filter(
+        (f: IMediaOverall) =>
+          f.mediaFormat === fileConfigs.mediaFormat && !f.thumbnail,
+      )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,
         mediaFormat: fileConfigs.mediaFormat,
         url: file.url,
-        detail: null,
+        detail: file.detail ?? null,
       }))
+
+    let thumbnails = (fileInfos as IMediaOverall[]).filter(
+      (f: IMediaOverall) => f.thumbnail,
+    )
+
+    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    }
 
     const payload: IEventDetail = {
       name: values.name,

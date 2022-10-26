@@ -16,7 +16,11 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useOrdersData, useReceiveOrder } from 'app/hooks/queries/useOrdersData'
+import {
+  useOrdersData,
+  useReceiveCancelOrder,
+  useReceiveOrder,
+} from 'app/hooks/queries/useOrdersData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IOrderOverall } from 'app/models/order'
 import {
@@ -89,6 +93,7 @@ export default function OrdersHistory() {
 
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
+  const [receiveType, setReceiveType] = useState(0)
   const [orderId, setOrderId] = useState(0)
 
   const [defaultValues] = useState<ISearchFilters>({
@@ -245,7 +250,15 @@ export default function OrdersHistory() {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'action') {
-      if (row.status === 0) {
+      if (row.status === 0 || row.cancelRequestStatus === 0) {
+        if (currentTab === 0) {
+          setReceiveType(1)
+        } else if (currentTab === 1) {
+          setReceiveType(row.cancelRequestStatus === 0 ? 2 : 1)
+        } else if (currentTab === 2) {
+          setReceiveType(2)
+        }
+
         setTitleDialog('Tiếp nhận')
         setOrderId(row.orderId)
         setOpenDialog(true)
@@ -267,11 +280,20 @@ export default function OrdersHistory() {
     navigation(`${orderId}`, {})
   }
   const { mutate: receive, isLoading: approveLoading } = useReceiveOrder(() =>
-    onSuccess(null, 'Tiếp nhận thành công'),
+    onSuccess(null, 'Tiếp nhận đơn hàng thành công'),
   )
+  const { mutate: receiveCancel, isLoading: cancelLoading } =
+    useReceiveCancelOrder(() =>
+      onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
+    )
 
   const approveConfirm = () => {
-    receive(orderId)
+    console.log(receiveType)
+    if (receiveType === 1) {
+      receive(orderId)
+    } else if (receiveType === 2) {
+      receiveCancel(orderId)
+    }
   }
 
   if (isLoading) return <MuiLoading />
@@ -372,6 +394,7 @@ export default function OrdersHistory() {
             <MuiStyledTable
               rows={data ? (data?.content as IOrderOverall[]) : []}
               columns={getColumns(currentTab)}
+              actionKeys={['status', 'cancelRequestStatus']}
               rowsPerPage={size}
               page={page}
               onClickRow={onClickRow}
@@ -398,9 +421,7 @@ export default function OrdersHistory() {
         onSubmit={approveConfirm}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            Đồng ý tiếp nhận đơn hàng?
-          </MuiTypography>
+          <MuiTypography variant="subtitle1">Đồng ý tiếp nhận?</MuiTypography>
         </Stack>
       </DiagLogConfirm>
     </Container>

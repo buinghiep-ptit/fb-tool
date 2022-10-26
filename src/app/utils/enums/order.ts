@@ -29,7 +29,7 @@ export const getOrderStatusSpec = (
       case OrderStatusEnum.WAIT_PAY:
         return { key: 2, value: 2, title: 'Chờ thanh toán' }
       case OrderStatusEnum.SUCCEEDED:
-        return { key: 3, value: 3, title: 'Thành công' }
+        return { key: 3, value: 3, title: 'Đặt thành công' }
       case OrderStatusEnum.COMPLETED:
         return { key: 4, value: 4, title: 'Đã sử dụng' }
       case OrderStatusEnum.CANCELED:
@@ -54,11 +54,27 @@ export const getOrderStatusSpec = (
     switch (status) {
       case OrderStatusEnum.WAIT_HANDLE:
         return { key: 0, value: 0, title: 'Chờ xử lý' }
+      case OrderStatusEnum.RECEIVED:
+        return { key: 1, value: 1, title: 'Tiếp nhận' }
       case OrderStatusEnum.HANDLE_COMPLETED:
-        return { key: 1, value: 1, title: 'Đã xử lý' }
+        return { key: 2, value: 2, title: 'Đã xử lý' }
 
       default:
         return {}
     }
+  }
+}
+
+export const getServiceNameByType = (type?: number) => {
+  switch (type) {
+    case 1:
+      return 'Gói dịch vụ'
+    case 2:
+      return 'Lưu trú'
+    case 3:
+      return 'Khác'
+
+    default:
+      return 'Khác'
   }
 }

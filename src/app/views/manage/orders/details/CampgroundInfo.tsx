@@ -54,8 +54,16 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
             </Grid>
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
-                {campground?.merchant?.email} -{' '}
-                {campground?.merchant?.mobilePhone} -{' '}
+                {`${
+                  campground?.merchant?.email
+                    ? campground?.merchant?.email + '-'
+                    : ''
+                }`}
+                {`${
+                  campground?.merchant?.mobilePhone
+                    ? campground?.merchant?.mobilePhone + '-'
+                    : ''
+                }`}
                 {campground?.merchant?.fullName}
               </MuiTypography>
             </Grid>

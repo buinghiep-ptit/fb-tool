@@ -7,14 +7,16 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
 import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
+import useAuth from 'app/hooks/useAuth'
+import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
-import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
 import { CampgroundInfo } from './details/CampgroundInfo'
+import { CancelOrderInfo } from './details/CancelOrderInfo'
 import { CustomerInfo } from './details/CustomerInfo'
 import { OrderProcesses } from './details/OrderProcesses'
 import { OrderServices } from './details/OrderServices'
@@ -29,6 +31,27 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
+const getBreadCrumbDetailName = (slug?: string) => {
+  switch (slug) {
+    case 'xu-ly':
+      return 'Cần xử lý'
+    case 'tat-ca':
+      return 'Tất cả'
+    case 'yeu-cau-huy':
+      return 'Yêu cầu huỷ'
+
+    default:
+      return 'Tất cả'
+  }
+}
+
+export const isExpiredReceiveUser = (expiredTimeISO: string) => {
+  const NOW_IN_MS = new Date().getTime()
+  const EXP_IN_MS = new Date(expiredTimeISO).getTime()
+
+  return EXP_IN_MS > NOW_IN_MS + 30 * 60 * 1000
+}
+
 type SchemaType = {
   dateStart?: string
   dateEnd?: string
@@ -42,8 +65,10 @@ type SchemaType = {
 export interface Props {}
 
 export default function OrderDetail(props: Props) {
+  const { user } = useAuth()
+
   const navigate = useNavigate()
-  const { orderId } = useParams()
+  const { source, orderId } = useParams()
   const {
     data: order,
     isLoading,
@@ -107,8 +132,9 @@ export default function OrderDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý đặt chỗ', path: '/quan-ly-don-hang' },
+            { name: 'Quản lý đơn hàng', path: '/quan-ly-don-hang' },
             { name: 'Chi tiết' },
+            { name: getBreadCrumbDetailName(source ?? '') },
           ]}
         />
       </Box>
@@ -122,7 +148,9 @@ export default function OrderDetail(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          disabled={editLoading}
+          disabled={
+            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
+          }
           loading={editLoading}
           onClick={methods.handleSubmit(onSubmitHandler)}
           startIcon={<Icon>done</Icon>}
@@ -131,6 +159,9 @@ export default function OrderDetail(props: Props) {
           title="Huỷ"
           variant="contained"
           color="warning"
+          disabled={
+            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
+          }
           onClick={() => methods.reset()}
           startIcon={<Icon>clear</Icon>}
         />
@@ -147,9 +178,16 @@ export default function OrderDetail(props: Props) {
         justifyContent="space-between"
         alignItems={'center'}
       >
-        <ButtonsActions order={order} />
+        <ButtonsActions
+          order={order}
+          currentUser={user as unknown as IUserProfile}
+        />
         <Chip
-          label={getOrderStatusSpec(order?.status ?? 0, 2).title}
+          label={
+            order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
+              : getOrderStatusSpec(order?.status ?? 0, 2).title
+          }
           size="medium"
           color={'default'}
         />
@@ -162,6 +200,11 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
+            {order.cancelRequest && (
+              <Stack>
+                <CancelOrderInfo order={order} />
+              </Stack>
+            )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <CustomerInfo order={order} />

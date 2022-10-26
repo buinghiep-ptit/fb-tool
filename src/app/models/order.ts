@@ -15,6 +15,7 @@ export interface IOrderOverall {
   handledBy?: string
   dateCreated?: string
   amount?: number
+  cancelRequestStatus?: number
   status?: number
 }
 
@@ -24,6 +25,8 @@ export interface IOrderDetail {
   dateEnd?: string
   dateCreated?: string
   orderCode?: string
+  paymentMethod?: number
+  paymentType?: 1 | 2
   amount?: number
   deposit?: number
   status?: number
@@ -32,40 +35,23 @@ export interface IOrderDetail {
   contact?: IContact
   services?: IService[]
   orderProcess?: IOrderProcess[]
+  handledBy?: number | null
+  handleExpireTime?: string | null
   cancelRequest?: {
     requester: {
-      id: 2
-      userType: 2
-      fullName: null
-      email: 'giangcm@fpt.com.vn'
-      mobilePhone: null
+      id?: number
+      userType?: number
+      fullName?: string
+      email?: string
+      mobilePhone?: string
     }
-    reason: 'dev tạo yc hủy'
-    refundType: 2
-    note: 'dev hoan tien'
-    status: 1
-    idOrder: null
+    reason?: string
+    refundType?: number
+    note?: string
+    status?: number
+    idOrder?: number
   }
-  transactions?: [
-    {
-      id: 1
-      txnCode: 'DEV001000001'
-      type: 1
-      amount: 2000000
-      status: 3
-      dateCreated: '2022-09-29T10:17:16Z'
-      dateUpdated: '2022-09-29T10:17:18Z'
-    },
-    {
-      id: 2
-      txnCode: 'RF954F1E705041'
-      type: 2
-      amount: 1000000
-      status: 3
-      dateCreated: '2022-09-29T10:24:10Z'
-      dateUpdated: '2022-09-29T10:24:10Z'
-    },
-  ]
+  transactions?: ITransaction[]
   campGround?: ICampground
 }
 
@@ -140,6 +126,16 @@ export interface IMerchant {
   fullName?: string
   email?: string
   mobilePhone?: string
+}
+
+export interface ITransaction {
+  id?: number
+  txnCode?: string
+  type?: number
+  amount?: number
+  status?: number
+  dateCreated?: string
+  dateUpdated?: string
 }
 
 export type TitleOrders = keyof IOrderOverall | 'order' | 'action'

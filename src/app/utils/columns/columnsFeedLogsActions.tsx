@@ -12,8 +12,8 @@ export const columnsFeedLogsActions: readonly TableColumn<TitleActionsHistory>[]
       align: 'center',
     },
     {
-      id: 'requestStatus',
-      label: 'Trạng thái xử lý',
+      id: 'note',
+      label: 'Ghi chú',
       minWidth: 170,
       align: 'center',
     },

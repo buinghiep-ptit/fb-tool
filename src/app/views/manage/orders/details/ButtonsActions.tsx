@@ -6,7 +6,7 @@ import {
   useAvailableOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
-import { IUser } from 'app/models'
+import { IUser, IUserProfile } from 'app/models'
 import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -14,6 +14,7 @@ import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
+  currentUser?: IUserProfile
 }
 
 export type ReassignSchema = {
@@ -21,7 +22,7 @@ export type ReassignSchema = {
   reason?: string
 }
 
-export function ButtonsActions({ order }: IButtonsActionProps) {
+export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const navigate = useNavigate()
   const { orderId } = useParams()
   const [dialogData, setDialogData] = useState<{
@@ -175,22 +176,85 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         </>
       )}
 
-      <MuiButton
-        title="Chuyển tiếp"
-        variant="outlined"
-        color="warning"
-        onClick={() =>
-          navigate(`chuyen-tiep`, {
-            state: { modal: true },
-          })
-        }
-        startIcon={<Icon>cached</Icon>}
-      />
-      <Divider
-        orientation="vertical"
-        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-        flexItem
-      />
+      {order?.status && order?.status < 3 && (
+        <>
+          <MuiButton
+            title="Chuyển tiếp"
+            variant="outlined"
+            color="warning"
+            onClick={() =>
+              navigate(`chuyen-tiep`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>cached</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
+      {!order?.cancelRequest && order?.status === 3 && (
+        <>
+          <MuiButton
+            title="Hoàn tất"
+            variant="outlined"
+            color="primary"
+            onClick={() =>
+              navigate(`hoan-tat`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>how_to_reg</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+          <MuiButton
+            title="Huỷ đặt chỗ"
+            variant="outlined"
+            color="error"
+            onClick={() =>
+              navigate(`yeu-cau-huy-dat-cho`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>clear</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
+      {order?.cancelRequest && (
+        <>
+          <MuiButton
+            title="Huỷ chỗ, hoàn tiền"
+            variant="outlined"
+            color="error"
+            onClick={() =>
+              navigate(`hoan-tien`, {
+                state: { modal: true, data: order },
+              })
+            }
+            startIcon={<Icon>cached</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
       <MuiButton
         title="Ghi chú"
         variant="outlined"

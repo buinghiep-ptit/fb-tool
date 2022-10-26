@@ -5,7 +5,17 @@ import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
   {
     id: 'account',
     label: 'Tài khoản',
@@ -15,6 +25,14 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
         {value}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      left: 50,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
   },
   {
     id: 'content',
@@ -92,6 +110,13 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
         <Icon color="primary">east</Icon>
       </IconButton>
     ),
+    sticky: {
+      position: 'sticky',
+      right: 130,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
   {
     id: 'approve',
@@ -106,6 +131,11 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
       ) : (
         <></>
       ),
+    sticky: {
+      position: 'sticky',
+      right: 50,
+      background: 'white',
+    },
   },
   {
     id: 'violate',
@@ -120,5 +150,12 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
       ) : (
         <></>
       ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      // boxShadow: '5px 2px 5px green',
+      // borderRight: '1px solid green',
+    },
   },
 ]

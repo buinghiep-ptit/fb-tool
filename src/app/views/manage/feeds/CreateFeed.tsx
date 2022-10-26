@@ -324,13 +324,40 @@ export default function CreateFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    console.log('fileInfos:', fileInfos)
     const files = (fileInfos as IMediaOverall[])
-      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .filter(
+        (f: IMediaOverall) =>
+          f.mediaFormat === fileConfigs.mediaFormat && !f.thumbnail,
+      )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,
         mediaFormat: fileConfigs.mediaFormat,
         url: file.url,
+        detail: file.detail ?? null,
       }))
+
+    let thumbnails = (fileInfos as IMediaOverall[]).filter(
+      (f: IMediaOverall) => f.thumbnail,
+    )
+
+    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    }
 
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
@@ -342,14 +369,32 @@ export default function CreateFeed(props: Props) {
           ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
-      video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
-      images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
+      video:
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? {
+              ...files[files.length - 1],
+              detail:
+                thumbnails && thumbnails.length
+                  ? {
+                      ...files[files.length - 1].detail,
+                      coverImgUrl: thumbnails[thumbnails.length - 1].url,
+                    }
+                  : null,
+            }
+          : {},
+      images:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? [thumbnails[0], ...files]
+          : [],
       idAudio: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? 1 : null,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
       status: 1,
     }
+
+    console.log('payload:', payload)
+
     if (feedId) {
       edit({ ...payload, id: Number(feedId) })
     } else {
@@ -442,7 +487,7 @@ export default function CreateFeed(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
-          title="Xoá"
+          title="Huỷ"
           disabled={uploading}
           variant="contained"
           color="warning"
@@ -451,7 +496,7 @@ export default function CreateFeed(props: Props) {
             removeUploadedFiles()
             methods.reset()
           }}
-          startIcon={<Icon>clear</Icon>}
+          startIcon={<Icon>cached</Icon>}
         />
         <MuiButton
           title="Quay lại"

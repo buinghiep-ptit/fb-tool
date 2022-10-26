@@ -87,6 +87,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                       width: 50,
                       padding: '12px',
                       backgroundColor: 'white',
+                      ...column.sticky,
                     }}
                   >
                     {column.label}
@@ -124,6 +125,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           align={column.align}
                           onClick={() => onClickRow?.(column, row)}
                           sx={{
+                            ...column.sticky,
                             minWidth: column.minWidth,
                             px: 1.5,
                             cursor:
@@ -137,6 +139,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
 
                             // whiteSpace: 'normal',
                             // wordWrap: 'break-word',
+                            zIndex: 1,
                           }}
                         >
                           {cellFormatter(column, row, value)}

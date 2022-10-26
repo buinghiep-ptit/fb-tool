@@ -2,7 +2,7 @@ export const tableModel = {
   headCell: [
     {
       name: 'STT',
-      width: 50,
+      width: 30,
     },
     {
       name: 'Ảnh',
@@ -18,7 +18,7 @@ export const tableModel = {
     },
     {
       name: 'Liên hệ',
-      width: 250,
+      width: 200,
     },
     {
       name: 'Địa danh',
@@ -26,7 +26,7 @@ export const tableModel = {
     },
     {
       name: 'Địa chỉ',
-      width: 250,
+      width: 200,
     },
     {
       name: 'Dịch vụ',

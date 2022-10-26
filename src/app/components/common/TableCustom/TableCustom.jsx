@@ -33,7 +33,8 @@ const StyledTable = styled(Table)(({ theme }) => ({
   '& tbody': {
     '& tr': {
       '& td': {
-        paddingLeft: 0,
+        paddingLeft: 10,
+        paddingRight: 10,
         textTransform: 'capitalize',
       },
     },
@@ -120,7 +121,7 @@ const TableCustom = ({
 
           <TableBody>
             {(dataTable || []).map((data, index) => (
-              <TableRow key={data.id}>
+              <TableRow key={data.id} style={{ wordbreak: 'normal' }}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
                     case 'image':
@@ -219,7 +220,11 @@ const TableCustom = ({
                       )
                     case 'linkDetail':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           <Link to={`${data[element].path}${data.id}`}>
                             {data[element].link}
                           </Link>
@@ -227,7 +232,11 @@ const TableCustom = ({
                       )
                     case 'eventPlace':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           <span style={{ color: '#217f32' }}>
                             {data[element].active} -
                           </span>{' '}
@@ -239,7 +248,20 @@ const TableCustom = ({
                     default:
                       return (
                         <TableCell align="center" key={`${element}${id}`}>
-                          {data[element]}
+                          <div
+                            style={{
+                              wordBreak: 'normal',
+                              // whiteSpace: 'nowrap',
+                              width: '200px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              webkitLineClamp: '2',
+                              display: '-webkit-box',
+                              webkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {data[element]}
+                          </div>
                         </TableCell>
                       )
                   }

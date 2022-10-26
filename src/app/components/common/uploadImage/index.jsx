@@ -1,4 +1,4 @@
-import { Grid, Icon } from '@mui/material'
+import { Button, Grid, Icon } from '@mui/material'
 
 import * as React from 'react'
 
@@ -9,9 +9,8 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
 
   React.useImperativeHandle(ref, () => ({
     getFiles: () => {
-      const data = document.getElementById('inputFile').files
-      console.log(data, 'data')
-      return data
+      console.log(files, 'data')
+      return files
     },
   }))
 
@@ -33,6 +32,7 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
         <input
           type="file"
           id="inputFile"
+          accept=".png, .jpg, .jpeg, .mp4, .webm"
           style={{ display: 'none' }}
           multiple
           onChange={event => {
@@ -51,13 +51,20 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
             <Grid item xs={3} md={3} key={index}>
               <div className="uploader" id="fileSelect">
                 <Icon
-                  style={{ color: 'red' }}
+                  style={{ color: 'red', cursor: 'pointer' }}
                   className="uploader__icon-delete"
                   onClick={() => deleteItemImageMedias(index)}
                 >
-                  clear
+                  delete
                 </Icon>
-                <img src={file.url}></img>
+
+                {file?.mediaFormat === 1 ? (
+                  <video width="150px" height="100px" controls>
+                    <source src={file.url} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={file.url} width="150px" height="100px" />
+                )}
               </div>
             </Grid>
           )
@@ -74,7 +81,19 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
                   clear
                 </Icon>
                 {file.type.startsWith('image/') && (
-                  <img src={window.URL.createObjectURL(file)}></img>
+                  <img
+                    src={window.URL.createObjectURL(file)}
+                    width="150px"
+                    height="100px"
+                  ></img>
+                )}
+                {file.type.startsWith('video/') && (
+                  <video width="150px" height="100px" controls>
+                    <source
+                      src={window.URL.createObjectURL(file)}
+                      type="video/mp4"
+                    />
+                  </video>
                 )}
               </div>
             </Grid>

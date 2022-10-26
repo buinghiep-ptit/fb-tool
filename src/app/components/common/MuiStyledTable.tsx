@@ -33,6 +33,7 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
   error?: { message?: string } | undefined | null
   rowsPerPage?: number
   page?: number
+  actionKeys?: string[]
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -43,6 +44,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   error,
   rowsPerPage = 20,
   page = 0,
+  actionKeys = ['status'],
 }: MuiPagingTableProps<T>) {
   const [rowHeight, setRowHeight] = React.useState(0)
   const memoizedData = React.useMemo(() => rows, [rows])
@@ -59,7 +61,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
       return cell.status(value)
     }
     if (cell.action) {
-      return cell.action(value ? value : row.status)
+      return cell.action(
+        value ? value : row[actionKeys[1]] ?? row[actionKeys[0]],
+      )
     }
     if (cell.link) {
       return cell.link(value)

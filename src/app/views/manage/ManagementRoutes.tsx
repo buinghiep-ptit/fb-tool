@@ -69,6 +69,15 @@ const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
 const PaymentConfirm = Loadable(
   lazy(() => import('./orders/details/ButtonsLink/PaymentConfirm')),
 )
+const CancelBooking = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/CancelBooking')),
+)
+const CancelOrder = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/CancelOrder')),
+)
+const RefundOrder = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/RefundOrder')),
+)
 const Reassign = Loadable(
   lazy(() => import('./orders/details/ButtonsLink/Reassign')),
 )
@@ -226,6 +235,18 @@ const ManagementRoutes = [
           {
             path: 'xac-nhan-thanh-toan',
             element: <PaymentConfirm title="Xác nhận thanh toán" />,
+          },
+          {
+            path: 'yeu-cau-huy-dat-cho',
+            element: <CancelBooking title="Tạo yêu cầu huỷ" />,
+          },
+          {
+            path: 'huy-don-hang',
+            element: <CancelOrder title="Huỷ đơn hàng" />,
+          },
+          {
+            path: 'hoan-tien',
+            element: <RefundOrder title="Hoàn tiền" />,
           },
           {
             path: 'chuyen-tiep',

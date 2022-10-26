@@ -3,13 +3,18 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Divider,
+  FormControlLabel,
   FormHelperText,
+  Radio,
   Stack,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { IOrderDetail, IService } from 'app/models/order'
+import { getServiceNameByType } from 'app/utils/enums/order'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 
 export interface IOrderServicesProps {
@@ -53,7 +58,7 @@ export function OrderServices({
         <Stack gap={3}>
           {fields.map(({ serviceId, quantity, name, type, amount }, index) => (
             <Stack
-              key={serviceId}
+              key={index ?? serviceId}
               flexDirection="row"
               alignItems="center"
               justifyContent={'space-between'}
@@ -66,8 +71,10 @@ export function OrderServices({
                 flex={1}
               >
                 <Stack>
-                  <MuiTypography>{name}</MuiTypography>
-                  <MuiTypography>[{type}]</MuiTypography>
+                  <MuiTypography variant="subtitle1">{name}</MuiTypography>
+                  <MuiTypography variant="body2">
+                    Loại dịch vụ: {getServiceNameByType(type ?? 0)}
+                  </MuiTypography>
                 </Stack>
                 <Box>
                   <MuiRHFNumericFormatInput
@@ -106,23 +113,70 @@ export function OrderServices({
               </Stack>
             </Stack>
           ))}
-          <Stack alignItems={'flex-end'}>
+          <Stack alignItems={'flex-end'} gap={1}>
             <Stack flexDirection="row" gap={2}>
               <MuiTypography variant="subtitle2">Cọc:</MuiTypography>
               <MuiTypography variant="body2" color={'primary'} fontWeight={500}>
                 {CurrencyFormatter(order?.deposit ?? 0, 2)} VNĐ
               </MuiTypography>
             </Stack>
-            <Stack flexDirection="row" gap={2}>
-              <MuiTypography variant="subtitle2">Tổng thực tế:</MuiTypography>
-              <MuiTypography variant="body2" color={'primary'} fontWeight={500}>
-                {CurrencyFormatter(
-                  getTotalAmount(services) ?? order?.amount ?? 0,
-                  2,
-                )}
-                VNĐ
-              </MuiTypography>
-            </Stack>
+            <Box>
+              <Stack flexDirection="row" gap={2}>
+                <MuiTypography variant="subtitle2">Tổng thực tế:</MuiTypography>
+                <MuiTypography
+                  variant="body2"
+                  color={'primary'}
+                  fontWeight={500}
+                >
+                  {CurrencyFormatter(
+                    getTotalAmount(services) ?? order?.amount ?? 0,
+                    2,
+                  )}{' '}
+                  VNĐ
+                </MuiTypography>
+              </Stack>
+              {order?.status === 3 && (
+                <>
+                  <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
+                    <Stack flexDirection={'row'} gap={1.5}>
+                      <FormControlLabel
+                        value={2}
+                        disabled
+                        control={<Radio />}
+                        label="Thanh toán toàn bộ"
+                      />
+                      <FormControlLabel
+                        value={1}
+                        disabled
+                        control={<Radio />}
+                        label="Đặt cọc"
+                      />
+                    </Stack>
+                  </MuiRHFRadioGroup>
+                  <Divider
+                    orientation="horizontal"
+                    sx={{ backgroundColor: '#D9D9D9', my: 1 }}
+                    flexItem
+                  />
+                  <Stack flexDirection="row" gap={2}>
+                    <MuiTypography variant="subtitle2">
+                      Tổng thanh toán:
+                    </MuiTypography>
+                    <MuiTypography
+                      variant="body2"
+                      color={'primary'}
+                      fontWeight={500}
+                    >
+                      {CurrencyFormatter(
+                        getTotalAmount(services) ?? order?.amount ?? 0,
+                        2,
+                      )}{' '}
+                      VNĐ
+                    </MuiTypography>
+                  </Stack>
+                </>
+              )}
+            </Box>
           </Stack>
         </Stack>
       </AccordionDetails>

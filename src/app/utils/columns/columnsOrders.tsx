@@ -84,7 +84,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     minWidth: 120,
     align: 'center',
     status: (value: any) =>
-      value ? (
+      value !== null ? (
         <Chip
           label={getOrderStatusSpec(value, 3).title}
           size="small"
@@ -281,9 +281,9 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     label: 'Hành động',
     minWidth: 120,
     align: 'right',
-    action: () => (
+    action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
-        Tiếp nhận
+        {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
   },
@@ -310,7 +310,7 @@ export const columnsOrderProcessesDetail: any = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={getOrderStatusSpec(value, 1).title}
+        label={getOrderStatusSpec(value, 2).title}
         size="small"
         color={'default'}
       />

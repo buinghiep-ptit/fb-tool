@@ -15,6 +15,7 @@ export interface IOrderOverall {
   handledBy?: string
   dateCreated?: string
   amount?: number
+  cancelRequestStatus?: number
   status?: number
 }
 
@@ -24,6 +25,8 @@ export interface IOrderDetail {
   dateEnd?: string
   dateCreated?: string
   orderCode?: string
+  paymentMethod?: number
+  paymentType?: 1 | 2
   amount?: number
   deposit?: number
   status?: number
@@ -34,17 +37,17 @@ export interface IOrderDetail {
   orderProcess?: IOrderProcess[]
   cancelRequest?: {
     requester: {
-      id: 2
-      userType: 2
-      fullName: null
-      email: 'giangcm@fpt.com.vn'
-      mobilePhone: null
+      id?: number
+      userType?: number
+      fullName?: string
+      email?: string
+      mobilePhone?: string
     }
-    reason: 'dev tạo yc hủy'
-    refundType: 2
-    note: 'dev hoan tien'
-    status: 1
-    idOrder: null
+    reason?: string
+    refundType?: number
+    note?: string
+    status?: number
+    idOrder?: number
   }
   transactions?: [
     {

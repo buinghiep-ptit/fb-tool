@@ -4,11 +4,14 @@ import {
   fetchLogsActionDetail,
   fetchOrdersCancelRequests,
   fetchOrdersOverall,
+  initCancelOrder,
   orderDetail,
   orderNote,
   paymentConfirm,
   reassignOrder,
+  receiveCancelOrder,
   receiveOrder,
+  refundOrder,
   unavailableOrder,
 } from 'app/apis/order/order.service'
 import { IOrderResponse } from 'app/models/order'
@@ -102,6 +105,50 @@ export const usePaymentConfirmOrder = (onSuccess?: any, onError?: any) => {
   return useMutation(
     (params: { orderId?: number; payload?: any }) =>
       paymentConfirm(params.orderId ?? 0, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useInitCancelOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId?: number; payload?: any }) =>
+      initCancelOrder(params.orderId ?? 0, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useReceiveCancelOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((orderId: number) => receiveCancelOrder(orderId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['order-detail'])
+      queryClient.invalidateQueries(['orders'])
+      queryClient.invalidateQueries(['logs-order'])
+    },
+    onSuccess,
+  })
+}
+
+export const useRefundOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId?: number; payload?: any }) =>
+      refundOrder(params.orderId ?? 0, params.payload),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])

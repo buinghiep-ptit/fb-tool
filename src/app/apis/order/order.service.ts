@@ -27,6 +27,13 @@ export const receiveOrder = async (orderId: number): Promise<any> => {
   return data
 }
 
+export const receiveCancelOrder = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/receive-request-cancel`,
+  )
+  return data
+}
+
 export const orderDetail = async (orderId: number): Promise<IOrderDetail> => {
   const { data } = await http.get<IOrderDetail>(`/api/order/${orderId}`)
   return data
@@ -69,6 +76,25 @@ export const paymentConfirm = async (
 ): Promise<any> => {
   const { data } = await http.post<any>(
     `/api/order/${orderId}/confirm-bank-transfer`,
+    payload,
+  )
+  return data
+}
+
+export const refundOrder = async (
+  orderId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/refund`, payload)
+  return data
+}
+
+export const initCancelOrder = async (
+  orderId: number,
+  payload: { requester?: number; reason?: string },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/init-request-cancel`,
     payload,
   )
   return data

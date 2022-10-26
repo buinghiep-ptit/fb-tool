@@ -15,6 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
 import { CampgroundInfo } from './details/CampgroundInfo'
+import { CancelOrderInfo } from './details/CancelOrderInfo'
 import { CustomerInfo } from './details/CustomerInfo'
 import { OrderProcesses } from './details/OrderProcesses'
 import { OrderServices } from './details/OrderServices'
@@ -28,6 +29,20 @@ const Container = styled('div')<Props>(({ theme }) => ({
     [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
   },
 }))
+
+const getBreadCrumbDetailName = (slug?: string) => {
+  switch (slug) {
+    case 'xu-ly':
+      return 'Cần xử lý'
+    case 'tat-ca':
+      return 'Tất cả'
+    case 'yeu-cau-huy':
+      return 'Yêu cầu huỷ'
+
+    default:
+      return 'Tất cả'
+  }
+}
 
 type SchemaType = {
   dateStart?: string
@@ -43,7 +58,7 @@ export interface Props {}
 
 export default function OrderDetail(props: Props) {
   const navigate = useNavigate()
-  const { orderId } = useParams()
+  const { source, orderId } = useParams()
   const {
     data: order,
     isLoading,
@@ -107,8 +122,9 @@ export default function OrderDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý đặt chỗ', path: '/quan-ly-don-hang' },
+            { name: 'Quản lý đơn hàng', path: '/quan-ly-don-hang' },
             { name: 'Chi tiết' },
+            { name: getBreadCrumbDetailName(source ?? '') },
           ]}
         />
       </Box>
@@ -149,7 +165,11 @@ export default function OrderDetail(props: Props) {
       >
         <ButtonsActions order={order} />
         <Chip
-          label={getOrderStatusSpec(order?.status ?? 0, 2).title}
+          label={
+            order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
+              : getOrderStatusSpec(order?.status ?? 0, 2).title
+          }
           size="medium"
           color={'default'}
         />
@@ -162,6 +182,11 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
+            {order.cancelRequest && (
+              <Stack>
+                <CancelOrderInfo order={order} />
+              </Stack>
+            )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <CustomerInfo order={order} />

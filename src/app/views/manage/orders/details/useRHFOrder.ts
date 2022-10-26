@@ -13,6 +13,7 @@ type SchemaType = {
   email?: string
   note?: string
   services?: IService[]
+  paymentType?: 1 | 2
 }
 
 export const useRHFOrder = (order: IOrderDetail) => {
@@ -25,6 +26,7 @@ export const useRHFOrder = (order: IOrderDetail) => {
       defaultValues.email = order.contact?.email
       defaultValues.services = order.services
       defaultValues.note = order.note
+      defaultValues.paymentType = order.paymentType
 
       methods.reset({ ...defaultValues })
     }
@@ -48,9 +50,9 @@ export const useRHFOrder = (order: IOrderDetail) => {
       .nullable()
       .required(messages.MSG1),
     dateEnd: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 0)
+      .when('dateStart', (dateStart, yup) => {
+        if (dateStart && dateStart != 'Invalid Date') {
+          const dayAfter = new Date(dateStart.getTime() + 0)
           return yup.min(dayAfter, 'Ngày kết thúc >= ngày bắt đầu')
         }
         return yup

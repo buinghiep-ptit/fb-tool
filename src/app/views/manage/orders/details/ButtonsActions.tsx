@@ -175,22 +175,85 @@ export function ButtonsActions({ order }: IButtonsActionProps) {
         </>
       )}
 
-      <MuiButton
-        title="Chuyển tiếp"
-        variant="outlined"
-        color="warning"
-        onClick={() =>
-          navigate(`chuyen-tiep`, {
-            state: { modal: true },
-          })
-        }
-        startIcon={<Icon>cached</Icon>}
-      />
-      <Divider
-        orientation="vertical"
-        sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-        flexItem
-      />
+      {order?.status && order?.status < 3 && (
+        <>
+          <MuiButton
+            title="Chuyển tiếp"
+            variant="outlined"
+            color="warning"
+            onClick={() =>
+              navigate(`chuyen-tiep`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>cached</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
+      {!order?.cancelRequest && order?.status === 3 && (
+        <>
+          <MuiButton
+            title="Hoàn tất"
+            variant="outlined"
+            color="primary"
+            onClick={() =>
+              navigate(`hoan-tat`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>how_to_reg</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+          <MuiButton
+            title="Huỷ đặt chỗ"
+            variant="outlined"
+            color="error"
+            onClick={() =>
+              navigate(`yeu-cau-huy-dat-cho`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>clear</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
+      {order?.cancelRequest && (
+        <>
+          <MuiButton
+            title="Huỷ chỗ, hoàn tiền"
+            variant="outlined"
+            color="error"
+            onClick={() =>
+              navigate(`hoan-tien`, {
+                state: { modal: true, data: order },
+              })
+            }
+            startIcon={<Icon>cached</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          />
+        </>
+      )}
+
       <MuiButton
         title="Ghi chú"
         variant="outlined"

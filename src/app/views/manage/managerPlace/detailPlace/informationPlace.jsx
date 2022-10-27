@@ -62,6 +62,8 @@ export default function InformationPlace(props) {
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -78,7 +80,16 @@ export default function InformationPlace(props) {
   })
 
   const addHashTag = e => {
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      if (e.target.value && e.target.value.charAt(0) !== '#') {
+        setError('hashtag', {
+          type: 'required',
+          message: 'Hashtag phải bắt đầu bằng #',
+        })
+        e.preventDefault()
+        return
+      }
+      clearErrors(['hashtag'])
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
     }
@@ -141,44 +152,96 @@ export default function InformationPlace(props) {
 
   const handleDataImageUpload = async () => {
     const introData = uploadImageRef.current.getFiles()
-    const fileUpload = [...introData].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+
+    const fileUploadImage = [...introData].map(file => {
+      if (file.type.startsWith('image/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
       }
     })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    const fileUploadVideo = [...introData].map(file => {
+      if (file.type.startsWith('video/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    })
+
+    const responseImage = await Promise.all(fileUploadImage)
+    const responseVideo = await Promise.all(fileUploadVideo)
+    const listUrl = new Object()
+    if (responseImage && responseVideo) {
+      if (responseImage.length > 0)
+        listUrl.image = responseImage.map(item => item?.data.url)
+      if (responseVideo.length > 0)
+        listUrl.video = responseVideo.map(item => item?.data.url)
+    }
+    return listUrl
   }
 
   const onSubmit = async data => {
-    const listUrlImage = await handleDataImageUpload()
-
-    const mediasUpdate = listUrlImage.map(url => {
-      const media = new Object()
-      media.srcType = 2
-      media.mediaType = 1
-      media.mediaFormat = 2
-      media.url = url
-      return media
-    })
+    const listUrl = await handleDataImageUpload()
+    let mediasUpdateImage = []
+    if (listUrl?.image && listUrl?.image.length > 0) {
+      mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 2
+          media.url = url
+          return media
+        }
+      })
+    }
+    let mediasUpdateVideo = []
+    if (listUrl?.video && listUrl?.video.length > 0) {
+      mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 1
+          media.url = url
+          return media
+        }
+      })
+    }
 
     const paramDetail = {
-      medias: [...medias, ...mediasUpdate],
+      medias: [...medias, ...mediasUpdateImage, ...mediasUpdateVideo].filter(
+        item => !!item,
+      ),
       id: params.id,
       name: data.namePlace,
       description: data.description,
@@ -320,7 +383,7 @@ export default function InformationPlace(props) {
               name="address"
               render={({ field }) => (
                 <TextField
-                  error={errors.address}
+                  error={!!errors.address}
                   helperText={errors.address?.message}
                   {...field}
                   label="Địa danh"
@@ -330,9 +393,6 @@ export default function InformationPlace(props) {
               )}
             />
           </Grid>
-          {/* <Grid item xs={12}>
-            <MapCustom ref={mapRef} center={createDegrees} />
-          </Grid> */}
           <Grid item xs={12} md={12}>
             <Typography mt={2}>Vị trí trên bản đồ:</Typography>
             <Stack
@@ -382,8 +442,6 @@ export default function InformationPlace(props) {
                   renderInput={params => (
                     <TextField
                       {...params}
-                      // error={errors.namePlace}
-                      // helperText={errors.namePlace?.message}
                       variant="outlined"
                       label="Loại hình"
                       placeholder="Loại hình"
@@ -416,6 +474,10 @@ export default function InformationPlace(props) {
                   renderInput={params => (
                     <TextField
                       {...params}
+                      error={!!errors.hashtag}
+                      helperText={
+                        !!errors.hashtag ? errors.hashtag.message : ''
+                      }
                       variant="outlined"
                       label="Hashtag"
                       placeholder="Hashtag"

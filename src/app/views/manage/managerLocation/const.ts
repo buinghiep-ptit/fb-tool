@@ -166,4 +166,5 @@ export const VEHICLES = {
   1: { name: 'bus' },
   2: { name: 'car' },
   3: { name: 'motobike' },
+  4: { name: 'boat' },
 }

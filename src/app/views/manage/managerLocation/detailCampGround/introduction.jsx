@@ -8,7 +8,6 @@ const Introduction = React.forwardRef(
     const editorRef = React.useRef()
     React.useImperativeHandle(ref, () => ({
       getIntro: () => {
-        console.log(uploadImageRef.current.getFiles(), 'x')
         return uploadImageRef.current.getFiles()
       },
       getValueEditor: () => {

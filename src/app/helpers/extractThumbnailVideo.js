@@ -12,17 +12,6 @@ export const importFileandPreview = (file, revoke) => {
   })
 }
 
-/**
- *
- * @param videoFile {FIle} // the video file
- * @param numberOfThumbnails {number} //number of thumbnails you want to generate
- * @returns {string[]} // an array of base64 thumbnails images
- *
- * @abstract
- * Idea taken from - https://codepen.io/aertmann/pen/mrVaPx
- * The original functionality of getVideoThumbnail() function is customized as per working code
- * If it didn't work in future then replace it with about links working example
- */
 export const generateVideoThumbnails = async (
   videoFile,
   numberOfThumbnails,
@@ -32,13 +21,9 @@ export const generateVideoThumbnails = async (
   return new Promise(async (resolve, reject) => {
     if (!videoFile.type?.includes('video')) reject('not a valid video file')
     await getVideoDuration(videoFile).then(async duration => {
-      // divide the video timing into particular timestamps in respective to number of thumbnails
-      // ex if time is 10 and numOfthumbnails is 4 then result will be -> 0, 2.5, 5, 7.5 ,10
-      // we will use this timestamp to take snapshots
       for (let i = 0; i <= duration; i += duration / numberOfThumbnails) {
         fractions.push(Math.floor(i))
       }
-      // the array of promises
       let promiseArray = fractions.map(time => {
         return getVideoThumbnail(videoFile, time)
       })
@@ -112,11 +97,6 @@ const getVideoThumbnail = (file, videoTimeInSeconds) => {
   })
 }
 
-/**
- *
- * @param videoFile {File}
- * @returns {number} the duration of video in seconds
- */
 export const getVideoDuration = videoFile => {
   return new Promise((resolve, reject) => {
     if (videoFile) {

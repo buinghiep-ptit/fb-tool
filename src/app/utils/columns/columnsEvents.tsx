@@ -7,7 +7,8 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,

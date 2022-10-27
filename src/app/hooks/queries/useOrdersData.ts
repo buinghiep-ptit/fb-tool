@@ -7,6 +7,7 @@ import {
   initCancelOrder,
   orderDetail,
   orderNote,
+  orderUsed,
   paymentConfirm,
   reassignOrder,
   receiveCancelOrder,
@@ -114,6 +115,18 @@ export const usePaymentConfirmOrder = (onSuccess?: any, onError?: any) => {
       onSuccess,
     },
   )
+}
+
+export const useOrderUsed = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((orderId: number) => orderUsed(orderId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['order-detail'])
+      queryClient.invalidateQueries(['orders'])
+      queryClient.invalidateQueries(['logs-order'])
+    },
+    onSuccess,
+  })
 }
 
 export const useInitCancelOrder = (onSuccess?: any, onError?: any) => {

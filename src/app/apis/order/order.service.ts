@@ -81,6 +81,11 @@ export const paymentConfirm = async (
   return data
 }
 
+export const orderUsed = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/order-used`)
+  return data
+}
+
 export const refundOrder = async (
   orderId: number,
   payload: any,

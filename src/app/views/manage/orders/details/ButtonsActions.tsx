@@ -4,6 +4,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAvailableOrder,
+  useOrderUsed,
   useReceiveCancelOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
@@ -53,7 +54,12 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
     )
 
-  const loading = availableLoading || unavailableLoading || cancelLoading
+  const { mutate: orderUsed, isLoading: usedOrderLoading } = useOrderUsed(() =>
+    onSuccess(null, 'Hoàn tất đơn hàng thành công'),
+  )
+
+  const loading =
+    availableLoading || unavailableLoading || cancelLoading || usedOrderLoading
 
   const onClickButton = (type?: string) => {
     setOpenDialog(true)
@@ -65,7 +71,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           message: () => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
-                Xác nhận còn chỗ
+                Xác nhận còn chỗ?
               </MuiTypography>
             </Stack>
           ),
@@ -79,7 +85,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           message: () => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
-                Xác nhận hết chỗ
+                Xác nhận hết chỗ?
               </MuiTypography>
             </Stack>
           ),
@@ -94,11 +100,26 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           message: () => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
-                Tiếp nhận yêu cầu huỷ
+                Tiếp nhận yêu cầu huỷ?
               </MuiTypography>
             </Stack>
           ),
           type: 'RECEIVE_REQUEST_CANCEL',
+        }))
+        break
+
+      case 'ORDER_USED':
+        setDialogData(prev => ({
+          ...prev,
+          title: 'Hoàn tất',
+          message: () => (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                Xác nhận hoàn tất đơn hàng?
+              </MuiTypography>
+            </Stack>
+          ),
+          type: 'ORDER_USED',
         }))
         break
 
@@ -119,6 +140,10 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
 
       case 'RECEIVE_REQUEST_CANCEL':
         receiveCancel(Number(orderId ?? 0))
+        break
+
+      case 'ORDER_USED':
+        orderUsed(Number(orderId ?? 0))
         break
 
       default:
@@ -202,7 +227,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         </>
       )}
 
-      {order?.status && order?.status < 3 && (
+      {order?.status && order?.status < 3 && !order.cancelRequest && (
         <>
           <MuiButton
             title="Chuyển tiếp"
@@ -229,11 +254,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
             title="Hoàn tất"
             variant="outlined"
             color="primary"
-            onClick={() =>
-              navigate(`hoan-tat`, {
-                state: { modal: true },
-              })
-            }
+            onClick={() => onClickButton('ORDER_USED')}
             startIcon={<Icon>how_to_reg</Icon>}
           />
           <Divider
@@ -263,55 +284,44 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       {order?.cancelRequest &&
         order.cancelRequest.status === 1 &&
         isExpiredReceiveUser(order.cancelRequest.handleExpireTime ?? '') && (
-          <>
-            <MuiButton
-              title="Tiếp nhận lại"
-              variant="outlined"
-              color="primary"
-              onClick={() => onClickButton('RECEIVE_REQUEST_CANCEL')}
-              startIcon={<Icon>how_to_reg</Icon>}
-            />
-            <Divider
-              orientation="vertical"
-              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-              flexItem
-            />
-          </>
+          <MuiButton
+            title="Tiếp nhận lại"
+            variant="outlined"
+            color="primary"
+            onClick={() => onClickButton('RECEIVE_REQUEST_CANCEL')}
+            startIcon={<Icon>how_to_reg</Icon>}
+          />
         )}
 
       {order?.cancelRequest &&
+        order.cancelRequest.status === 1 &&
         !isExpiredReceiveUser(order.cancelRequest.handleExpireTime ?? '') && (
-          <>
-            <MuiButton
-              title="Huỷ chỗ, hoàn tiền"
-              variant="outlined"
-              color="error"
-              onClick={() =>
-                navigate(`hoan-tien`, {
-                  state: { modal: true, data: order },
-                })
-              }
-              startIcon={<Icon>cached</Icon>}
-            />
-            <Divider
-              orientation="vertical"
-              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-              flexItem
-            />
-          </>
+          <MuiButton
+            title="Huỷ chỗ, hoàn tiền"
+            variant="outlined"
+            color="error"
+            onClick={() =>
+              navigate(`hoan-tien`, {
+                state: { modal: true, data: order },
+              })
+            }
+            startIcon={<Icon>cached</Icon>}
+          />
         )}
 
-      <MuiButton
-        title="Ghi chú"
-        variant="outlined"
-        color="warning"
-        onClick={() =>
-          navigate(`ghi-chu`, {
-            state: { modal: true },
-          })
-        }
-        startIcon={<Icon>event_note</Icon>}
-      />
+      {!order?.cancelRequest && (
+        <MuiButton
+          title="Ghi chú"
+          variant="outlined"
+          color="warning"
+          onClick={() =>
+            navigate(`ghi-chu`, {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>event_note</Icon>}
+        />
+      )}
 
       <DiagLogConfirm
         title={dialogData.title ?? ''}

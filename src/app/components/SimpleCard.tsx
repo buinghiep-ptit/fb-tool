@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 
 const CardRoot = styled(Card)(() => ({
   height: '100%',
-  padding: '20px 24px',
+  padding: '16px 20px',
 }))
 
 interface Props {

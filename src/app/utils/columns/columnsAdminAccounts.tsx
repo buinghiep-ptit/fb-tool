@@ -9,7 +9,8 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -28,7 +29,7 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     ),
     sticky: {
       position: 'sticky',
-      left: 50,
+      left: 40,
       background: 'white',
       zIndex: 9,
       boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',

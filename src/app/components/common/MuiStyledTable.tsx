@@ -81,11 +81,11 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                 {columns.map((column, idx) => (
                   <TableCell
                     key={idx}
-                    align={column.align}
+                    align={'center' ?? column.align}
                     sx={{
                       minWidth: column.minWidth,
                       width: 50,
-                      padding: '12px',
+                      padding: '4px',
                       backgroundColor: 'white',
                       ...column.sticky,
                     }}
@@ -127,7 +127,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           sx={{
                             ...column.sticky,
                             minWidth: column.minWidth,
-                            px: 1.5,
+                            px: 0.5,
                             cursor:
                               column.action || column.link
                                 ? 'pointer'

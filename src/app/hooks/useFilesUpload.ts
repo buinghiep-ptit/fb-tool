@@ -68,6 +68,7 @@ export const useUploadFiles = () => {
           ...fileResult,
           mediaFormat,
           thumbnail: thumbnail ? thumbnail : null,
+          mediaType: thumbnail ? 2 : 3,
         }
       })
       .catch(() => {

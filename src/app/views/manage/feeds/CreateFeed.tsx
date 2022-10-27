@@ -277,8 +277,16 @@ export default function CreateFeed(props: Props) {
           multiple: false,
         }))
       }
-      setMediasSrcPreviewer((feed.video && [feed.video]) ?? feed.images ?? [])
-      setInitialFileInfos((feed.video && [feed.video]) ?? feed.images ?? [])
+      setMediasSrcPreviewer(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
+      setInitialFileInfos(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
     } else {
       setMediasSrcPreviewer([])
     }
@@ -327,7 +335,9 @@ export default function CreateFeed(props: Props) {
     const files = (fileInfos as IMediaOverall[])
       .filter(
         (f: IMediaOverall) =>
-          f.mediaFormat === fileConfigs.mediaFormat && !f.thumbnail,
+          f.mediaFormat === fileConfigs.mediaFormat &&
+          !f.thumbnail &&
+          f.mediaType === 3,
       )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,

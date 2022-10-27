@@ -201,8 +201,12 @@ export default function AddEvent(props: Props) {
           multiple: false,
         }))
       }
-      setMediasSrcPreviewer([...(event.medias ?? [])])
-      setInitialFileInfos([...(event.medias ?? [])])
+      setMediasSrcPreviewer([
+        ...(event.medias?.filter(f => f.mediaType === 3) ?? []),
+      ])
+      setInitialFileInfos([
+        ...(event.medias?.filter(f => f.mediaType === 3) ?? []),
+      ])
     } else {
       setMediasSrcPreviewer([])
     }
@@ -213,19 +217,13 @@ export default function AddEvent(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    // const files = (fileInfos as IMediaOverall[])
-    //   .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
-    //   .map((file: IMediaOverall) => ({
-    //     mediaType: EMediaType.POST,
-    //     mediaFormat: fileConfigs.mediaFormat,
-    //     url: file.url,
-    //     detail: null,
-    //   }))
 
     const files = (fileInfos as IMediaOverall[])
       .filter(
         (f: IMediaOverall) =>
-          f.mediaFormat === fileConfigs.mediaFormat && !f.thumbnail,
+          f.mediaFormat === fileConfigs.mediaFormat &&
+          !f.thumbnail &&
+          f.mediaType === 3,
       )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,
@@ -256,13 +254,29 @@ export default function AddEvent(props: Props) {
         }))
     }
 
+    let medias: IMediaOverall[] = []
+    if (fileConfigs.mediaFormat === EMediaFormat.VIDEO) {
+      medias = [
+        {
+          ...files[files.length - 1],
+          detail:
+            thumbnails && thumbnails.length
+              ? {
+                  ...files[files.length - 1].detail,
+                  coverImgUrl: thumbnails[thumbnails.length - 1].url,
+                }
+              : null,
+        },
+      ]
+    } else if (fileConfigs.mediaFormat === EMediaFormat.IMAGE) {
+      medias =
+        thumbnails && thumbnails.length ? [thumbnails[0], ...files] : files
+    }
+
     const payload: IEventDetail = {
       name: values.name,
       content: values.editor_content,
-      medias:
-        fileConfigs.mediaFormat === EMediaFormat.IMAGE
-          ? files
-          : [files[files.length - 1]],
+      medias: medias,
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),

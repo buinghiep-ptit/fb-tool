@@ -151,7 +151,7 @@ export default function CreateFeed(props: Props) {
         ),
       content: Yup.string()
         .required(messages.MSG1)
-        .max(255, 'Nội dung tối đa 255 ký tự'),
+        .max(2200, 'Nội dung tối đa 2200 ký tự'),
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
     },
     [['files', 'files']],
@@ -615,7 +615,7 @@ export default function CreateFeed(props: Props) {
                     <FormTextArea
                       name="content"
                       defaultValue={''}
-                      placeholder="Nội dung"
+                      placeholder="Nội dung (tối đa 2200 ký tự)"
                     />
                   </Stack>
                   <Stack>

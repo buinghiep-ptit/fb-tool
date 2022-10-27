@@ -4,12 +4,14 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAvailableOrder,
+  useReceiveCancelOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
 import { IUser, IUserProfile } from 'app/models'
 import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { isExpiredReceiveUser } from '../OrderDetail'
 import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
@@ -46,7 +48,12 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const { mutate: unavailable, isLoading: unavailableLoading } =
     useUnAvailableOrder(() => onSuccess(null, 'Cập nhật đơn hàng thành công'))
 
-  const loading = availableLoading || unavailableLoading
+  const { mutate: receiveCancel, isLoading: cancelLoading } =
+    useReceiveCancelOrder(() =>
+      onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
+    )
+
+  const loading = availableLoading || unavailableLoading || cancelLoading
 
   const onClickButton = (type?: string) => {
     setOpenDialog(true)
@@ -80,6 +87,21 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         }))
         break
 
+      case 'RECEIVE_REQUEST_CANCEL':
+        setDialogData(prev => ({
+          ...prev,
+          title: 'Tiếp nhận',
+          message: () => (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                Tiếp nhận yêu cầu huỷ
+              </MuiTypography>
+            </Stack>
+          ),
+          type: 'RECEIVE_REQUEST_CANCEL',
+        }))
+        break
+
       default:
         break
     }
@@ -93,6 +115,10 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
 
       case 'UN_AVAILABLE':
         unavailable(Number(orderId ?? 0))
+        break
+
+      case 'RECEIVE_REQUEST_CANCEL':
+        receiveCancel(Number(orderId ?? 0))
         break
 
       default:
@@ -234,26 +260,46 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         </>
       )}
 
-      {order?.cancelRequest && (
-        <>
-          <MuiButton
-            title="Huỷ chỗ, hoàn tiền"
-            variant="outlined"
-            color="error"
-            onClick={() =>
-              navigate(`hoan-tien`, {
-                state: { modal: true, data: order },
-              })
-            }
-            startIcon={<Icon>cached</Icon>}
-          />
-          <Divider
-            orientation="vertical"
-            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-            flexItem
-          />
-        </>
-      )}
+      {order?.cancelRequest &&
+        order.cancelRequest.status === 1 &&
+        isExpiredReceiveUser(order.cancelRequest.handleExpireTime ?? '') && (
+          <>
+            <MuiButton
+              title="Tiếp nhận lại"
+              variant="outlined"
+              color="primary"
+              onClick={() => onClickButton('RECEIVE_REQUEST_CANCEL')}
+              startIcon={<Icon>how_to_reg</Icon>}
+            />
+            <Divider
+              orientation="vertical"
+              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+              flexItem
+            />
+          </>
+        )}
+
+      {order?.cancelRequest &&
+        !isExpiredReceiveUser(order.cancelRequest.handleExpireTime ?? '') && (
+          <>
+            <MuiButton
+              title="Huỷ chỗ, hoàn tiền"
+              variant="outlined"
+              color="error"
+              onClick={() =>
+                navigate(`hoan-tien`, {
+                  state: { modal: true, data: order },
+                })
+              }
+              startIcon={<Icon>cached</Icon>}
+            />
+            <Divider
+              orientation="vertical"
+              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+              flexItem
+            />
+          </>
+        )}
 
       <MuiButton
         title="Ghi chú"

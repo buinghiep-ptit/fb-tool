@@ -50,6 +50,7 @@ export interface IOrderDetail {
     note?: string
     status?: number
     idOrder?: number
+    handleExpireTime?: string
   }
   transactions?: ITransaction[]
   campGround?: ICampground

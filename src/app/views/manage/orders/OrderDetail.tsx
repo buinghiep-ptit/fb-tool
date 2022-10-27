@@ -49,7 +49,7 @@ export const isExpiredReceiveUser = (expiredTimeISO: string) => {
   const NOW_IN_MS = new Date().getTime()
   const EXP_IN_MS = new Date(expiredTimeISO).getTime()
 
-  return EXP_IN_MS > NOW_IN_MS + 30 * 60 * 1000
+  return EXP_IN_MS <= NOW_IN_MS
 }
 
 type SchemaType = {
@@ -143,28 +143,29 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        <MuiButton
-          title="Lưu"
-          variant="contained"
-          color="primary"
-          type="submit"
-          disabled={
-            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
-          }
-          loading={editLoading}
-          onClick={methods.handleSubmit(onSubmitHandler)}
-          startIcon={<Icon>done</Icon>}
-        />
-        <MuiButton
-          title="Huỷ"
-          variant="contained"
-          color="warning"
-          disabled={
-            editLoading || !isExpiredReceiveUser(order.handleExpireTime ?? '')
-          }
-          onClick={() => methods.reset()}
-          startIcon={<Icon>clear</Icon>}
-        />
+        {!isExpiredReceiveUser(order.handleExpireTime ?? '') && (
+          <>
+            <MuiButton
+              title="Lưu"
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={editLoading}
+              loading={editLoading}
+              onClick={methods.handleSubmit(onSubmitHandler)}
+              startIcon={<Icon>done</Icon>}
+            />
+            <MuiButton
+              title="Huỷ"
+              variant="contained"
+              color="warning"
+              disabled={editLoading}
+              onClick={() => methods.reset()}
+              startIcon={<Icon>clear</Icon>}
+            />
+          </>
+        )}
+
         <MuiButton
           title="Quay lại"
           variant="contained"

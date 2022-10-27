@@ -130,6 +130,22 @@ export default function Feature({
               />
             )}
           />
+          <Controller
+            name="boat"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                {...field}
+                control={<Checkbox checked={getValues('boat')} />}
+                label={
+                  <span style={{ color: 'black', display: 'flex' }}>
+                    Thuyền bè
+                    <Icon style={{ color: 'black' }}>sailing_icon</Icon>
+                  </span>
+                }
+              />
+            )}
+          />
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>
           Tình trạng mạng:
@@ -438,7 +454,6 @@ export default function Feature({
               <FormControl style={{ width: '150px' }} error={!!errors?.status}>
                 <Select {...field} labelId="status-label" id="status">
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={0}>Lưu nháp </MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                 </Select>
                 {!!errors?.status?.message && (

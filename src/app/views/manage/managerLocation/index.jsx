@@ -107,7 +107,6 @@ export default function ManagerLocation(props) {
                   id="demo-simple-select"
                   label="Trạng thái"
                   onChange={e => {
-                    console.log(e.target.value)
                     setStatusFilter(e.target.value)
                   }}
                 >

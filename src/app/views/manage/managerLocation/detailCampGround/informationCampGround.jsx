@@ -42,6 +42,7 @@ export default function InformationCampGround({ action }) {
   const [campAreas, setCampAreas] = React.useState([])
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState('')
+  // const [statusCamp, setStatusCamp] = React.useState(null)
   const [listMerchant, setListMerchant] = React.useState([])
   const [disabledInternet, setDisabledInternet] = React.useState({
     viettel: true,
@@ -133,6 +134,7 @@ export default function InformationCampGround({ action }) {
       bus: false,
       car: false,
       motobike: false,
+      boat: false,
       campAreas: [],
       campTypes: [],
       isSupportBooking: '1',
@@ -151,7 +153,6 @@ export default function InformationCampGround({ action }) {
 
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
-    console.log(introData)
     const fileUploadImage = [...introData].map(file => {
       if (file.type.startsWith('image/')) {
         const formData = new FormData()
@@ -243,7 +244,6 @@ export default function InformationCampGround({ action }) {
       ...mediasUpdateImage,
       ...mediasUpdateVideo,
     ].filter(item => !!item)
-    console.log(dataUpdate.medias)
     dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
     const arrInternet = [
@@ -307,6 +307,7 @@ export default function InformationCampGround({ action }) {
     if (data.bus) dataUpdate.campGroundVehicles.push(1)
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
+    if (data.boat) dataUpdate.campGroundVehicles.push(4)
     dataUpdate.freeParking = true
 
     if (action === 'create') {
@@ -375,6 +376,7 @@ export default function InformationCampGround({ action }) {
             setValue('topographic', data.idTopography)
             setValue('capacity', data.capacity)
             setValue('status', data.status)
+            // setStatusCamp(data.status)
             setValue('isSupportBooking', data.isSupportBooking.toString())
             if (data.isSupportBooking === 1) {
               setValue(
@@ -575,6 +577,17 @@ export default function InformationCampGround({ action }) {
       <div style={{ marginTop: '50px' }}>
         {action === 'create' ? (
           <>
+            {/* <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                setValue('status', 0)
+              }}
+            >
+              Lưu Nháp
+            </Button> */}
             <Button
               color="primary"
               type="submit"
@@ -586,27 +599,32 @@ export default function InformationCampGround({ action }) {
             <Button
               color="primary"
               variant="contained"
-              onClick={() => handleDeleteCampGround()}
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                navigate('/quan-ly-thong-tin-diem-camp')
+              }}
             >
-              Xóa
+              Quay lại
             </Button>
           </>
         ) : (
           <>
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-              onClick={async () => {
-                const res = await updateCampGroundStatus(params.id, 0)
-                if (res) {
-                  toastSuccess({ message: 'Lưu nháp thành công' })
-                  navigate('/quan-ly-thong-tin-diem-camp')
-                }
-              }}
-            >
-              Lưu Nháp
-            </Button>
+            {/* {statusCamp === 0 && (
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={async () => {
+                  const res = await updateCampGroundStatus(params.id, 0)
+                  if (res) {
+                    toastSuccess({ message: 'Lưu nháp thành công' })
+                    navigate('/quan-ly-thong-tin-diem-camp')
+                  }
+                }}
+              >
+                Lưu Nháp
+              </Button>
+            )} */}
             <Button
               color="primary"
               type="submit"

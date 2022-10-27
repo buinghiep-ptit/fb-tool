@@ -9,7 +9,6 @@ const UploadImage = React.forwardRef(({ medias, setMedias }, ref) => {
 
   React.useImperativeHandle(ref, () => ({
     getFiles: () => {
-      console.log(files, 'data')
       return files
     },
   }))

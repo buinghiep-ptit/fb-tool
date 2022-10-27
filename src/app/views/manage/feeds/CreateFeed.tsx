@@ -324,7 +324,6 @@ export default function CreateFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    console.log('fileInfos:', fileInfos)
     const files = (fileInfos as IMediaOverall[])
       .filter(
         (f: IMediaOverall) =>
@@ -384,7 +383,9 @@ export default function CreateFeed(props: Props) {
           : {},
       images:
         fileConfigs.mediaFormat === EMediaFormat.IMAGE
-          ? [thumbnails[0], ...files]
+          ? thumbnails && thumbnails.length
+            ? [thumbnails[0], ...files]
+            : files
           : [],
       idAudio: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? 1 : null,
       tags: values.hashtag ?? [],
@@ -392,8 +393,6 @@ export default function CreateFeed(props: Props) {
       isAllowComment: 1,
       status: 1,
     }
-
-    console.log('payload:', payload)
 
     if (feedId) {
       edit({ ...payload, id: Number(feedId) })

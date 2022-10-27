@@ -33,7 +33,6 @@ export default function GeneralInformation({
   const addHashTag = e => {
     if (e.keyCode === 13 || e.keyCode === 32) {
       if (e.target.value && e.target.value.charAt(0) !== '#') {
-        console.log(e.target.value)
         setError('hashtag', {
           type: 'required',
           message: 'Hashtag phải bắt đầu bằng #',

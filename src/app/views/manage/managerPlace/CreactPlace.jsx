@@ -76,6 +76,8 @@ export default function CreatePlace(props) {
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -91,7 +93,16 @@ export default function CreatePlace(props) {
   })
 
   const addHashTag = e => {
-    if (e.keyCode === 13 && !!e.target.value.trim()) {
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      if (e.target.value && e.target.value.charAt(0) !== '#') {
+        setError('hashtag', {
+          type: 'required',
+          message: 'Hashtag phải bắt đầu bằng #',
+        })
+        e.preventDefault()
+        return
+      }
+      clearErrors(['hashtag'])
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
     }
@@ -105,46 +116,96 @@ export default function CreatePlace(props) {
 
   const handleDataImageUpload = async () => {
     const introData = uploadImageRef.current.getFiles()
-    const fileUpload = [...introData].map(file => {
-      console.log(file)
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+
+    const fileUploadImage = [...introData].map(file => {
+      if (file.type.startsWith('image/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
       }
     })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    const fileUploadVideo = [...introData].map(file => {
+      if (file.type.startsWith('video/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    })
+
+    const responseImage = await Promise.all(fileUploadImage)
+    const responseVideo = await Promise.all(fileUploadVideo)
+    const listUrl = new Object()
+    if (responseImage && responseVideo) {
+      if (responseImage.length > 0)
+        listUrl.image = responseImage.map(item => item?.data.url)
+      if (responseVideo.length > 0)
+        listUrl.video = responseVideo.map(item => item?.data.url)
+    }
+    return listUrl
   }
 
   const onSubmit = async data => {
-    console.log(data)
-
-    const listUrlImage = await handleDataImageUpload()
-    const mediasUpdate = listUrlImage.map((url, index) => {
-      const media = new Object()
-      media.srcType = 2
-      media.mediaType = index === 0 ? 2 : 1
-      media.mediaFormat = 2
-      media.url = url
-      return media
-    })
+    const listUrl = await handleDataImageUpload()
+    let mediasUpdateImage = []
+    if (listUrl?.image && listUrl?.image.length > 0) {
+      mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 2
+          media.url = url
+          return media
+        }
+      })
+    }
+    let mediasUpdateVideo = []
+    if (listUrl?.video && listUrl?.video.length > 0) {
+      mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 1
+          media.url = url
+          return media
+        }
+      })
+    }
 
     const paramDetail = {
-      medias: mediasUpdate,
+      medias: [...mediasUpdateImage, ...mediasUpdateVideo].filter(
+        item => !!item,
+      ),
       name: data.namePlace.trim(),
       description: data.description.trim(),
       idProvince: data?.province.id || null,
@@ -316,15 +377,7 @@ export default function CreatePlace(props) {
                 )}
               />
             </Grid>
-            {/* <Grid item xs={12}>
-              <MapCustom
-                ref={mapRef}
-                center={{
-                  lat: 21.027161210811197,
-                  lng: 105.78872657468659,
-                }}
-              />
-            </Grid> */}
+
             <Grid item xs={12} md={12}>
               <Typography mt={2}>Vị trí trên bản đồ:</Typography>
               <Stack
@@ -353,22 +406,6 @@ export default function CreatePlace(props) {
                 <Typography>Kinh độ: {createDegrees.lat}</Typography>
                 <Typography>Vĩ độ: {createDegrees.lng}</Typography>
               </Stack>
-              {/* <Controller
-                control={control}
-                name="note"
-                render={({ field }) => (
-                  <TextField
-                    error={errors.address}
-                    helperText={errors.address?.message}
-                    {...field}
-                    placeholder="Nhập mô tả lưu ý về địa hình nếu có"
-                    label="Lưu ý địa hình"
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                  />
-                )}
-              /> */}
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller
@@ -416,8 +453,10 @@ export default function CreatePlace(props) {
                     onChange={(_, data) => field.onChange(data)}
                     renderInput={params => (
                       <TextField
-                        error={errors.hashtag}
-                        helperText={errors.hashtag?.message}
+                        error={!!errors.hashtag}
+                        helperText={
+                          !!errors.hashtag ? errors.hashtag.message : ''
+                        }
                         {...params}
                         variant="outlined"
                         label="Hashtag"

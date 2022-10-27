@@ -199,7 +199,6 @@ const TableCustom = ({
                                 <IconButton
                                   key={indexType}
                                   onClick={() => {
-                                    console.log(data.linkDetail.path)
                                     navigate(
                                       `${data.linkDetail.path}${data.id}`,
                                     )

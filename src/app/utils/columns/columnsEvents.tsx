@@ -4,7 +4,19 @@ import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
 
 export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
+  },
   {
     id: 'mediaUrl',
     label: 'Ảnh/Video',
@@ -92,9 +104,16 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'flex-end' }}
+        sx={{ justifyContent: 'center' }}
       />
     ),
+    sticky: {
+      position: 'sticky',
+      right: 100,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
   {
     id: 'edit',
@@ -102,6 +121,11 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     minWidth: 50,
     align: 'right',
     action: (value: any) => <Icon color="secondary">edit_calendar</Icon>,
+    sticky: {
+      position: 'sticky',
+      right: 50,
+      background: 'white',
+    },
   },
   {
     id: 'delete',
@@ -109,5 +133,10 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     minWidth: 50,
     align: 'right',
     action: (value: any) => <Icon color="error">delete</Icon>,
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+    },
   },
 ]

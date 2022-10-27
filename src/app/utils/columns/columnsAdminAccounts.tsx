@@ -6,7 +6,17 @@ import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
   {
     id: 'email',
     label: 'Email',
@@ -16,6 +26,14 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
         {value}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      left: 50,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
   },
   {
     id: 'role',
@@ -61,5 +79,12 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
         sx={{ justifyContent: 'flex-end' }}
       />
     ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]

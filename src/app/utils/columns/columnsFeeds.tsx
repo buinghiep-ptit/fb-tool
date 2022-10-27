@@ -154,8 +154,6 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
       position: 'sticky',
       right: 0,
       background: 'white',
-      // boxShadow: '5px 2px 5px green',
-      // borderRight: '1px solid green',
     },
   },
 ]

@@ -16,14 +16,16 @@ const StyledAvatar = styled(Avatar)(() => ({
 }))
 
 export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
   {
-    id: 'avatar',
-    label: '',
-    minWidth: 40,
-    media: (value: string) => (
-      <StyledAvatar src={value ?? '/assets/images/avatars/avatar-duck.jpeg'} />
-    ),
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
   },
   {
     id: 'mobilePhone',
@@ -34,6 +36,14 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
         {value}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      left: 50,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
   },
   {
     id: 'email',
@@ -96,6 +106,13 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
         }}
       />
     ),
+    sticky: {
+      position: 'sticky',
+      right: 50,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
   {
     id: 'action',
@@ -103,5 +120,10 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     minWidth: 50,
     align: 'right',
     action: (value: any) => <EditOutlined />,
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+    },
   },
 ]

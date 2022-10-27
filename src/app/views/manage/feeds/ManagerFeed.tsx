@@ -67,7 +67,7 @@ export default function ManagerFeed(props: Props) {
   const [defaultValues] = useState<IFeedsFilters>({
     status: queryParams.status ?? 'all',
     isCampdi: queryParams.isCampdi ? true : false,
-    isReported: queryParams.isReported ? true : false,
+    // isReported: queryParams.isReported ? true : false,
     search: queryParams.search ?? '',
     hashtag: queryParams.hashtag ?? '',
     page: queryParams.page ? +queryParams.page : 0,
@@ -173,7 +173,7 @@ export default function ManagerFeed(props: Props) {
     methods.reset({
       status: 'all',
       isCampdi: false,
-      isReported: false,
+      // isReported: false,
       search: '',
       hashtag: '',
       page: 0,
@@ -301,7 +301,7 @@ export default function ManagerFeed(props: Props) {
               </Grid>
               <Grid item sm={4} xs={12} pt={2}>
                 <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
+                {/* <MuiCheckBox name="isReported" label="Báo cáo vi phạm" /> */}
               </Grid>
             </FormProvider>
 

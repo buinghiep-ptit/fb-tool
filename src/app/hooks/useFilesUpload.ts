@@ -37,7 +37,12 @@ export const useUploadFiles = () => {
     setProgressInfos({ val: [] })
   }
 
-  const upload = (file: any, idx: number, mediaFormat?: number) => {
+  const upload = (
+    file: any,
+    idx: number,
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => {
     abortController.current = new AbortController()
 
     if (!progressInfosRef || !progressInfosRef.current) return
@@ -54,12 +59,17 @@ export const useUploadFiles = () => {
       },
       abortController.current,
     )
-      .then(files => {
+      .then(fileResult => {
         setMessage(prevMessage => [
           ...prevMessage,
           'Uploaded the file successfully: ' + file.name,
         ])
-        return { ...files, mediaFormat }
+        return {
+          ...fileResult,
+          mediaFormat,
+          thumbnail: thumbnail ? thumbnail : null,
+          mediaType: thumbnail ? 2 : 3,
+        }
       })
       .catch(() => {
         _progressInfos[idx].percentage = 0
@@ -72,7 +82,11 @@ export const useUploadFiles = () => {
       })
   }
 
-  const uploadFiles = async (files?: File[], mediaFormat?: number) => {
+  const uploadFiles = async (
+    files?: File[],
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => {
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
     const _progressInfos = selectedFilesToArr.map(file => ({
@@ -85,7 +99,7 @@ export const useUploadFiles = () => {
     }
 
     const uploadPromises = selectedFilesToArr.map((file, index) =>
-      upload(file, index, mediaFormat),
+      upload(file, index, mediaFormat, thumbnail),
     )
 
     const filesResult = await Promise.all(uploadPromises)
@@ -115,7 +129,11 @@ export const useUploadFiles = () => {
 
   return [
     (files?: File[]) => selectFiles(files),
-    (files?: File[], mediaFormat?: number) => uploadFiles(files, mediaFormat),
+    (
+      files?: File[],
+      mediaFormat?: number,
+      thumbnail?: { type: 'video' | 'image' },
+    ) => uploadFiles(files, mediaFormat, thumbnail),
     (index?: number, mediaFormat?: number) =>
       removeUploadedFiles(index, mediaFormat),
     cancelUploading,

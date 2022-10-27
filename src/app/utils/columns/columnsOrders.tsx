@@ -6,7 +6,19 @@ import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
+  },
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
@@ -103,18 +115,37 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 120,
+    minWidth: 100,
     align: 'right',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]
 
 export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
+  },
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
@@ -194,18 +225,37 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 120,
+    minWidth: 100,
     align: 'right',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]
 
 export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
+      clipPath: 'inset(0px -15px 0px 0px)',
+    },
+  },
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
@@ -279,13 +329,20 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 120,
+    minWidth: 100,
     align: 'right',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]
 

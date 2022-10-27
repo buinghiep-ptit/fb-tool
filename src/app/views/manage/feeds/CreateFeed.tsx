@@ -151,7 +151,7 @@ export default function CreateFeed(props: Props) {
         ),
       content: Yup.string()
         .required(messages.MSG1)
-        .max(255, 'Nội dung tối đa 255 ký tự'),
+        .max(2200, 'Nội dung tối đa 2200 ký tự'),
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
     },
     [['files', 'files']],
@@ -277,8 +277,16 @@ export default function CreateFeed(props: Props) {
           multiple: false,
         }))
       }
-      setMediasSrcPreviewer((feed.video && [feed.video]) ?? feed.images ?? [])
-      setInitialFileInfos((feed.video && [feed.video]) ?? feed.images ?? [])
+      setMediasSrcPreviewer(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
+      setInitialFileInfos(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
     } else {
       setMediasSrcPreviewer([])
     }
@@ -325,12 +333,40 @@ export default function CreateFeed(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const files = (fileInfos as IMediaOverall[])
-      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .filter(
+        (f: IMediaOverall) =>
+          f.mediaFormat === fileConfigs.mediaFormat &&
+          !f.thumbnail &&
+          f.mediaType === 3,
+      )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,
         mediaFormat: fileConfigs.mediaFormat,
         url: file.url,
+        detail: file.detail ?? null,
       }))
+
+    let thumbnails = (fileInfos as IMediaOverall[]).filter(
+      (f: IMediaOverall) => f.thumbnail,
+    )
+
+    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    }
 
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
@@ -342,14 +378,32 @@ export default function CreateFeed(props: Props) {
           ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
-      video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
-      images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
+      video:
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? {
+              ...files[files.length - 1],
+              detail:
+                thumbnails && thumbnails.length
+                  ? {
+                      ...files[files.length - 1].detail,
+                      coverImgUrl: thumbnails[thumbnails.length - 1].url,
+                    }
+                  : null,
+            }
+          : {},
+      images:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? thumbnails && thumbnails.length
+            ? [thumbnails[0], ...files]
+            : files
+          : [],
       idAudio: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? 1 : null,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
       status: 1,
     }
+
     if (feedId) {
       edit({ ...payload, id: Number(feedId) })
     } else {
@@ -442,7 +496,7 @@ export default function CreateFeed(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
-          title="Xoá"
+          title="Huỷ"
           disabled={uploading}
           variant="contained"
           color="warning"
@@ -451,7 +505,7 @@ export default function CreateFeed(props: Props) {
             removeUploadedFiles()
             methods.reset()
           }}
-          startIcon={<Icon>clear</Icon>}
+          startIcon={<Icon>cached</Icon>}
         />
         <MuiButton
           title="Quay lại"
@@ -561,7 +615,7 @@ export default function CreateFeed(props: Props) {
                     <FormTextArea
                       name="content"
                       defaultValue={''}
-                      placeholder="Nội dung"
+                      placeholder="Nội dung (tối đa 2200 ký tự)"
                     />
                   </Stack>
                   <Stack>

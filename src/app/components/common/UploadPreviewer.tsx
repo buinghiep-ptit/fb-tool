@@ -7,6 +7,10 @@ import {
   Stack,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import {
+  compressImageFile,
+  generateVideoThumbnails,
+} from 'app/helpers/extractThumbnailVideo'
 import { Image, IMediaOverall } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -28,7 +32,11 @@ interface Props {
   }
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
-  uploadFiles: (files: any, mediaFormat?: number, controller?: any) => void
+  uploadFiles: (
+    files: any,
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => void
   removeUploadedFiles?: (index?: number, mediaFormat?: number) => void
   cancelUploading?: () => void
   uploading?: boolean
@@ -89,7 +97,9 @@ export function UploadPreviewer({
     clearErrors('files')
     cancelUploading && cancelUploading()
     setMediasSrcPreviewer(
-      (fileInfos ?? []).filter(file => file.mediaFormat === mediaFormat),
+      (fileInfos ?? []).filter(
+        file => file.mediaFormat === mediaFormat && !file.thumbnail,
+      ),
     )
   }, [mediaFormat])
 
@@ -159,8 +169,31 @@ export function UploadPreviewer({
     return newFiles
   }
 
+  const blobToFile = (theBlob: Blob, fileName: string): File => {
+    return new File(
+      [theBlob as any], // cast as any
+      fileName,
+      {
+        lastModified: new Date().getTime(),
+        type: theBlob.type,
+      },
+    )
+  }
+
+  const getThumbnailsFromVideo = async (file: File) => {
+    const thumbnails = await generateVideoThumbnails(file, 1)
+    const blob = await fetch(thumbnails[0]).then(res => res.blob())
+
+    const myFile = blobToFile(blob, 'thumbnail.jpeg')
+    uploadFiles([myFile] as File[], EMediaFormat.IMAGE, { type: 'video' })
+  }
+
+  const getThumbnailsFromImage = async (file: File) => {
+    uploadFiles([file] as File[], EMediaFormat.IMAGE, { type: 'image' })
+  }
+
   const onDrop = useCallback(
-    (droppedFiles: File[]) => {
+    async (droppedFiles: File[]) => {
       const extractFiles = extractDroppedFiles(
         [...(files || [])],
         [...droppedFiles],
@@ -169,10 +202,16 @@ export function UploadPreviewer({
 
       if (mediaFormat === EMediaFormat.VIDEO || mediaType === EMediaType.AVATAR)
         setMediasSrcPreviewer([{ url: URL.createObjectURL(extractFiles[0]) }])
+      if (mediaFormat === EMediaFormat.VIDEO && extractFiles[0])
+        getThumbnailsFromVideo(extractFiles[0])
       else if (
         mediaFormat === EMediaFormat.IMAGE ||
         mediaFormat === EMediaFormat.OFFICE
       ) {
+        await compressImageFile(extractFiles[0]).then(file => {
+          getThumbnailsFromImage(file)
+          console.log('base64 compress: ', file)
+        })
         const newImages = [...extractFiles].map((originalFile: File) =>
           // deep clone
           Object.assign(
@@ -432,6 +471,8 @@ export function UploadPreviewer({
         </>
       )}
 
+      {/* {thumbs} */}
+
       <Box px={1.5} my={1.5}>
         {files && !!files.length && uploading && (
           <Stack direction={'row'} gap={1.5} alignItems="center">
@@ -484,7 +525,9 @@ const getFilesType = (formatType?: number) => {
         'image/jpeg': ['.jpg', '.jpeg'],
       }
     case EMediaFormat.OFFICE:
-      return { 'text/*': ['.xlsx', '.docx', '.pdf'] }
+      return {
+        'text/*': ['.xlsx', '.xls', '.csv', '.pdf', '.pptx', '.pptm', '.ppt'],
+      }
     case EMediaFormat.ALL:
       return {
         'video/*': [],

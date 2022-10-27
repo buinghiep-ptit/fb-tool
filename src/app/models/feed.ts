@@ -64,6 +64,7 @@ export interface IMediaOverall {
   url?: string
   status?: number
   detail?: IMediaDetail | null
+  thumbnail?: { type?: 'video' | 'image' }
 }
 
 export interface IMediaDetail {

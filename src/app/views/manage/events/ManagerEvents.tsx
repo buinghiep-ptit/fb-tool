@@ -64,11 +64,15 @@ export default function ManagerEvents(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
-  const [defaultValues] = useState<ISearchFilters>({})
-  const [filters, setFilters] = useState<ISearchFilters>({
-    page,
-    size,
+  const [defaultValues] = useState<ISearchFilters>({
+    areaNameOrAddress: queryParams.areaNameOrAddress ?? '',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
   })
+
+  const [filters, setFilters] = useState<ISearchFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
 
   const [dialogData, setDialogData] = useState<{
     title?: string

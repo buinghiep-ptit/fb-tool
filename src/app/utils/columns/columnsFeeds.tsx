@@ -106,23 +106,25 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   },
   {
     id: 'reportedNum',
-    label: 'Số b/c vi phạm',
+    label: 'Số BCVP',
     minWidth: 80,
     align: 'center',
   },
   {
     id: 'edit',
     label: '',
-    minWidth: 40,
+    minWidth: 30,
     align: 'right',
     action: () => (
       <IconButton size="small">
-        <Icon color="primary">east</Icon>
+        <Icon color="primary" sx={{ fontSize: '20px !important' }}>
+          east
+        </Icon>
       </IconButton>
     ),
     sticky: {
       position: 'sticky',
-      right: 80,
+      right: 60,
       background: 'white',
       boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
       clipPath: 'inset(0px 0px 0px -15px)',
@@ -131,31 +133,33 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'approve',
     label: '',
-    minWidth: 40,
+    minWidth: 30,
     align: 'center',
     action: (status?: number) =>
       [-2, -1, 0].includes(status ?? 0) ? (
         <IconButton size="small">
-          <Icon color="primary">checklist</Icon>
+          <Icon sx={{ fontSize: '20px !important' }}>checklist</Icon>
         </IconButton>
       ) : (
         <></>
       ),
     sticky: {
       position: 'sticky',
-      right: 40,
+      right: 30,
       background: 'white',
     },
   },
   {
     id: 'violate',
     label: '',
-    minWidth: 40,
+    minWidth: 30,
     align: 'left',
     action: (status?: number) =>
       [-2, 0, 1].includes(status ?? 0) ? (
         <IconButton size="small">
-          <Icon color="error">report</Icon>
+          <Icon color="error" sx={{ fontSize: '20px !important' }}>
+            report
+          </Icon>
         </IconButton>
       ) : (
         <></>

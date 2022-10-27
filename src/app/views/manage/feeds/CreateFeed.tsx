@@ -92,7 +92,7 @@ export default function CreateFeed(props: Props) {
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
     cusType: '',
-    idSrcType: '',
+    idSrcType: 0,
     hashtag: [],
     customer: [
       {
@@ -121,14 +121,16 @@ export default function CreateFeed(props: Props) {
       camp: Yup.object()
         .nullable()
         .when(['idSrcType'], {
-          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) !== 4,
+          is: (idSrcType: any) =>
+            !!idSrcType && Number(idSrcType) !== 4 && idSrcType != 0,
           then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
         })
         .nullable(),
       webUrl: Yup.string()
         .nullable()
         .when(['idSrcType'], {
-          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 4,
+          is: (idSrcType: any) =>
+            !!idSrcType && Number(idSrcType) === 4 && idSrcType != 0,
           then: Yup.string().required(messages.MSG1).nullable(),
         }),
       files: Yup.mixed()
@@ -253,7 +255,7 @@ export default function CreateFeed(props: Props) {
     if (feed) {
       defaultValues.type = feed.type ?? 0
       defaultValues.cusType = feed.customerInfo?.type // check lai
-      defaultValues.idSrcType = feed.idSrcType
+      defaultValues.idSrcType = feed.idSrcType ?? 0
       defaultValues.content = feed.content
       defaultValues.hashtag = feed.tags
       defaultValues.webUrl = feed.webUrl ?? ''
@@ -370,8 +372,11 @@ export default function CreateFeed(props: Props) {
 
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
-      idSrcType: Number(values.idSrcType ?? 0),
-      idSrc: values.idSrcType != 4 ? Number(values.camp?.id) : null,
+      idSrcType: values.idSrcType != 0 ? Number(values.idSrcType) : null,
+      idSrc:
+        values.idSrcType != 4 && values.idSrcType != 0
+          ? Number(values.camp?.id)
+          : null,
       webUrl: values.idSrcType == 4 ? values.webUrl : null,
       idCustomer:
         Number(values.cusType) === 1
@@ -569,47 +574,49 @@ export default function CreateFeed(props: Props) {
 
                   <Stack>
                     <SelectDropDown name="idSrcType" label="Liên kết với">
+                      <MenuItem value="0">Không liên kết</MenuItem>
                       <MenuItem value="1">Địa danh</MenuItem>
                       <MenuItem value="2">Điểm Camp</MenuItem>
                       <MenuItem value="4">Sản phẩm</MenuItem>
                     </SelectDropDown>
                   </Stack>
-                  {!!methods.watch('idSrcType') && (
-                    <Stack
-                      flexDirection={'row'}
-                      gap={1.5}
-                      justifyContent="center"
-                    >
-                      <MuiTypography fontSize="12px" fontStyle="italic">
-                        {getTitleLinked(Number(methods.watch('idSrcType')))} *
-                      </MuiTypography>
+                  {!!methods.watch('idSrcType') &&
+                    methods.watch('idSrcType') != 0 && (
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1.5}
+                        justifyContent="center"
+                      >
+                        <MuiTypography fontSize="12px" fontStyle="italic">
+                          {getTitleLinked(Number(methods.watch('idSrcType')))} *
+                        </MuiTypography>
 
-                      <Box sx={{ flex: 1 }}>
-                        {Number(methods.watch('idSrcType')) !== 4 ? (
-                          <MuiRHFAutoComplete
-                            name="camp"
-                            options={
-                              Number(methods.watch('idSrcType')) === 1
-                                ? campAreas ?? []
-                                : campGrounds?.content ?? []
-                            }
-                            optionProperty="name"
-                            getOptionLabel={option => option.name ?? ''}
-                            defaultValue=""
-                          />
-                        ) : (
-                          <FormInputText
-                            type="text"
-                            name="webUrl"
-                            placeholder="Chèn link"
-                            size="small"
-                            fullWidth
-                            defaultValue=""
-                          />
-                        )}
-                      </Box>
-                    </Stack>
-                  )}
+                        <Box sx={{ flex: 1 }}>
+                          {Number(methods.watch('idSrcType')) !== 4 ? (
+                            <MuiRHFAutoComplete
+                              name="camp"
+                              options={
+                                Number(methods.watch('idSrcType')) === 1
+                                  ? campAreas ?? []
+                                  : campGrounds?.content ?? []
+                              }
+                              optionProperty="name"
+                              getOptionLabel={option => option.name ?? ''}
+                              defaultValue=""
+                            />
+                          ) : (
+                            <FormInputText
+                              type="text"
+                              name="webUrl"
+                              placeholder="Chèn link"
+                              size="small"
+                              fullWidth
+                              defaultValue=""
+                            />
+                          )}
+                        </Box>
+                      </Stack>
+                    )}
 
                   <Stack>
                     <FormTextArea

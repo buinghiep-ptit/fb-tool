@@ -27,6 +27,11 @@ export const navigations = [
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {
+    name: 'Quản lý âm nhạc',
+    path: '/quan-ly-audios',
+    icon: 'audiotrack',
+  },
+  {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
@@ -64,10 +69,30 @@ export const navigations = [
     path: '/quan-ly-tu-cam',
     icon: 'comments_disabled',
   },
+  {
+    name: 'Quản lý cẩm nang',
+    path: '/quan-ly-cam-nang',
+    icon: 'fact_check',
+  },
+  {
+    name: 'Quản lý chính sách',
+    path: '/quan-ly-chinh-sach',
+    icon: 'security',
+  },
+  {
+    name: 'Quản lý  đánh giá',
+    path: '/quan-ly-danh-gia',
+    icon: 'workspace_premium',
+  },
+  {
+    name: 'Quản lý từ khoá yêu thích',
+    path: '/quan-ly-tu-khoa-yeu-thich',
+    icon: 'travel_explore',
+  },
   // { label: 'PAGES', type: 'label' },
   {
     name: 'Session/Auth',
-    icon: 'security',
+    icon: 'shield',
     children: [
       // { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
       // { name: 'Sign up', iconText: 'SU', path: '/session/signup' },

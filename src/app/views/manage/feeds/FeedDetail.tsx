@@ -217,7 +217,7 @@ export default function FeedDetail(props: Props) {
     switch (status) {
       case 1:
         return 'Hợp lệ'
-      case -2:
+      case -3:
         return 'Xoá'
 
       case -1:
@@ -277,7 +277,9 @@ export default function FeedDetail(props: Props) {
           startIcon={<Icon>edit</Icon>}
         />
         <MuiButton
-          disabled={feed?.data && feed?.data.status === -1}
+          disabled={
+            feed?.data && (feed?.data.status === -1 || feed?.data.status === -3)
+          }
           title="Vi phạm"
           variant="contained"
           color="warning"

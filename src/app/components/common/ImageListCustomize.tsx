@@ -232,7 +232,9 @@ export function ImageListView({
               {progressInfos?.val &&
                 progressInfos.val[index - (oldMedias?.length ?? 0)] &&
                 (progressInfos.val[index - (oldMedias?.length ?? 0)]
-                  .percentage ?? 0) < 100 && (
+                  .percentage ?? 0) < 100 &&
+                (progressInfos.val[index - (oldMedias?.length ?? 0)]
+                  .percentage ?? 0) > 0 && (
                   <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
                     <CircularProgressWithLabel
                       value={

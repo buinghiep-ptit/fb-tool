@@ -45,6 +45,7 @@ export interface TableColumn<T> {
   id: T | string
   label: string
   minWidth?: number
+  maxWidth?: number
   align?: 'center' | 'right' | 'left'
   status?: (param?: any) => ReactElement | string
   action?: (param?: any) => ReactElement

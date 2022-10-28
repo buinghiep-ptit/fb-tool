@@ -32,6 +32,7 @@ import { IEventDetail, IMediaOverall, ITags } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
 import { messages } from 'app/utils/messages'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -84,13 +85,19 @@ export default function AddEvent(props: Props) {
   const validationSchema = Yup.object().shape(
     {
       name: Yup.string()
-        .required('Tên không được bỏ trống')
+        .required(messages.MSG1)
         .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       startDate: Yup.date()
-        //   .min(new Date(), 'Tối thiều là hôm nay')
+        .when('endDate', (endDate, yup) => {
+          if (endDate && endDate != 'Invalid Date') {
+            const dayAfter = new Date(endDate.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
         .typeError('Sai định dạng.')
         .nullable()
-        .required('Chọn ngày bắt đầu'),
+        .required(messages.MSG1),
       endDate: Yup.date()
         .when('startDate', (startDate, yup) => {
           if (startDate && startDate != 'Invalid Date') {
@@ -101,7 +108,7 @@ export default function AddEvent(props: Props) {
         })
         .typeError('Sai định dạng.')
         .nullable()
-        .required('Chọn ngày kết thúc.'),
+        .required(messages.MSG1),
       amount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
@@ -129,7 +136,7 @@ export default function AddEvent(props: Props) {
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
       editor_content: Yup.string().required(messages.MSG1),
     },
-    [['files', 'files']],
+    ['startDate', 'endDate'] as any,
   )
 
   const methods = useForm<SchemaType>({
@@ -139,6 +146,19 @@ export default function AddEvent(props: Props) {
   })
 
   const isEveryYear = methods.watch('isEveryYear')
+  const startDate = methods.watch('startDate')
+  const endDate = methods.watch('endDate')
+
+  useEffect(() => {
+    if (!startDate || !endDate) return
+
+    if (
+      moment(new Date(startDate)).unix() <= moment(new Date(endDate)).unix()
+    ) {
+      methods.clearErrors('startDate')
+      methods.clearErrors('endDate')
+    }
+  }, [startDate, endDate])
 
   const [
     selectFiles,
@@ -176,7 +196,7 @@ export default function AddEvent(props: Props) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
       defaultValues.hashtag = event.tags
-      defaultValues.amount = 20000
+      defaultValues.amount = event.amount
       defaultValues.status = event.status
       defaultValues.editor_content = event.content
       defaultValues.startDate = event.startDate

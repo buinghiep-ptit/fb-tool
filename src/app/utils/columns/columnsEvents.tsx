@@ -8,6 +8,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     id: 'order',
     label: 'STT',
     minWidth: 40,
+    maxWidth: 50,
     align: 'center',
     sticky: {
       position: 'sticky',
@@ -21,7 +22,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'mediaUrl',
     label: 'Ảnh/Video',
-    minWidth: 150,
+    minWidth: 100,
     align: 'center',
     media: (value: string) => (
       <Box
@@ -43,7 +44,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'scale-down',
+            objectFit: 'cover',
           }}
           loading="lazy"
           alt="bg"
@@ -54,7 +55,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'name',
     label: 'Tên sự kiện',
-    minWidth: 170,
+    minWidth: 200,
     align: 'left',
     action: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
@@ -71,7 +72,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'tags',
     label: 'Hashtag',
-    minWidth: 170,
+    minWidth: 250,
     align: 'left',
     format: (values: any) => {
       return (
@@ -100,12 +101,12 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'status',
     label: 'Trạng thái',
-    minWidth: 100,
+    minWidth: 75,
     align: 'center',
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'center' }}
+        sx={{ justifyContent: 'center', fontSize: '16px!important' }}
       />
     ),
     sticky: {
@@ -120,7 +121,8 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     id: 'edit',
     label: '',
     minWidth: 50,
-    align: 'right',
+    maxWidth: 50,
+    align: 'center',
     action: (value: any) => <Icon color="secondary">edit_calendar</Icon>,
     sticky: {
       position: 'sticky',
@@ -132,7 +134,8 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     id: 'delete',
     label: '',
     minWidth: 50,
-    align: 'right',
+    maxWidth: 50,
+    align: 'center',
     action: (value: any) => <Icon color="error">delete</Icon>,
     sticky: {
       position: 'sticky',

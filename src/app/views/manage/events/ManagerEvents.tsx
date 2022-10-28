@@ -105,7 +105,7 @@ export default function ManagerEvents(props: Props) {
     () => fetchEvents(filters),
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       keepPreviousData: true,
       enabled: !!filters,
     },

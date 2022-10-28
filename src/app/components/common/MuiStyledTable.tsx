@@ -84,6 +84,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     align={'center' ?? column.align}
                     sx={{
                       minWidth: column.minWidth,
+                      maxWidth: column.maxWidth ?? null,
                       width: 50,
                       padding: '4px',
                       backgroundColor: 'white',
@@ -127,6 +128,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           sx={{
                             ...column.sticky,
                             minWidth: column.minWidth,
+                            maxWidth: column.maxWidth ?? null,
                             px: 0.5,
                             cursor:
                               column.action || column.link

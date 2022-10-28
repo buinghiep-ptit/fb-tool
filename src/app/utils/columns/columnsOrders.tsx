@@ -1,6 +1,8 @@
-import { Chip, Typography } from '@mui/material'
+import { Chip, Stack, Typography } from '@mui/material'
+import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn } from 'app/models'
 import { TitleOrders } from 'app/models/order'
+import moment from 'moment'
 import { getOrderStatusSpec } from '../enums/order'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
@@ -9,7 +11,8 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -32,7 +35,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
-    minWidth: 170,
+    minWidth: 150,
     link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
@@ -42,37 +45,48 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundRepresent',
     label: 'Chủ camp',
-    minWidth: 170,
+    minWidth: 120,
     align: 'center',
   },
   {
     id: 'amount',
     label: 'Tổng thực tế',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>
-        {CurrencyFormatter(value ?? 0, 2)}
-      </Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'paymentAmnt',
-    label: 'Tổng thanh toán',
+    label: 'Đã thanh toán',
     minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>
-        {CurrencyFormatter(value ?? 0, 2)}
-      </Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian đặt',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
+    format: (value: string) => (
+      <Stack>
+        <MuiTypography fontWeight={500}>
+          {moment(value).format('DD/MM/YYYY')}
+        </MuiTypography>
+        <MuiTypography variant="body2" fontSize={'0.75rem'}>
+          {moment(value).format('(HH:mm:ss)')}
+        </MuiTypography>
+      </Stack>
+    ),
   },
   {
     id: 'status',
@@ -115,8 +129,8 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 100,
-    align: 'right',
+    minWidth: 90,
+    align: 'center',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
@@ -136,7 +150,8 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -159,7 +174,7 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
-    minWidth: 170,
+    minWidth: 150,
     link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
@@ -169,33 +184,48 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundRepresent',
     label: 'Chủ camp',
-    minWidth: 170,
+    minWidth: 120,
     align: 'center',
   },
   {
     id: 'amount',
     label: 'Tổng thực tế',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'paymentAmnt',
-    label: 'Tổng thanh toán',
+    label: 'Đã thanh toán',
     minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian đặt',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
+    format: (value: string) => (
+      <Stack>
+        <MuiTypography fontWeight={500}>
+          {moment(value).format('DD/MM/YYYY')}
+        </MuiTypography>
+        <MuiTypography variant="body2" fontSize={'0.75rem'}>
+          {moment(value).format('(HH:mm:ss)')}
+        </MuiTypography>
+      </Stack>
+    ),
   },
   {
     id: 'status',
@@ -225,8 +255,8 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 100,
-    align: 'right',
+    minWidth: 90,
+    align: 'center',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
@@ -246,7 +276,8 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -269,7 +300,7 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundName',
     label: 'Tên điểm camp',
-    minWidth: 170,
+    minWidth: 150,
     link: (value: any) => (
       <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
         {value}
@@ -279,38 +310,53 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'campGroundRepresent',
     label: 'Chủ camp',
-    minWidth: 170,
+    minWidth: 120,
     align: 'center',
   },
   {
     id: 'amount',
     label: 'Tổng thực tế',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'paymentAmnt',
-    label: 'Tổng thanh toán',
+    label: 'Đã thanh toán',
     minWidth: 100,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian đặt',
-    minWidth: 170,
+    minWidth: 100,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
+    format: (value: string) => (
+      <Stack>
+        <MuiTypography fontWeight={500}>
+          {moment(value).format('DD/MM/YYYY')}
+        </MuiTypography>
+        <MuiTypography variant="body2" fontSize={'0.75rem'}>
+          {moment(value).format('(HH:mm:ss)')}
+        </MuiTypography>
+      </Stack>
+    ),
   },
   {
     id: 'status',
     label: 'Trạng thái y/c huỷ',
-    minWidth: 120,
+    minWidth: 100,
     align: 'center',
     status: (value: any) => (
       <Chip
@@ -329,8 +375,8 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'action',
     label: 'Hành động',
-    minWidth: 100,
-    align: 'right',
+    minWidth: 90,
+    align: 'center',
     action: (value?: any) => (
       <Typography variant="subtitle2" color="primary">
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}

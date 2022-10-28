@@ -83,7 +83,9 @@ export default function AddEvent(props: Props) {
 
   const validationSchema = Yup.object().shape(
     {
-      name: Yup.string().required('Tên không được bỏ trống'),
+      name: Yup.string()
+        .required('Tên không được bỏ trống')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       startDate: Yup.date()
         //   .min(new Date(), 'Tối thiều là hôm nay')
         .typeError('Sai định dạng.')
@@ -124,6 +126,7 @@ export default function AddEvent(props: Props) {
             : 'Dung lượng ảnh tối đa 10MB/ảnh',
           files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
         ),
+      hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
       editor_content: Yup.string().required(messages.MSG1),
     },
     [['files', 'files']],

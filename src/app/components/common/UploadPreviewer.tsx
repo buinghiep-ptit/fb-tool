@@ -29,6 +29,7 @@ interface Props {
     accept: string
     multiple: boolean
     mediaType?: number
+    isLimitFiles?: boolean
   }
   mode?: 'append' | 'update' | undefined
   selectFiles: (files: any) => void
@@ -54,6 +55,7 @@ export function UploadPreviewer({
     accept: 'video/*',
     multiple: false,
     mediaType: EMediaType.POST,
+    isLimitFiles: false,
   },
   mode = 'append',
   uploadFiles,
@@ -66,7 +68,8 @@ export function UploadPreviewer({
   fileInfos,
   setMediasSrcPreviewer,
 }: Props) {
-  const { mediaFormat, mediaType, multiple, accept } = mediaConfigs
+  const { mediaFormat, mediaType, multiple, accept, isLimitFiles } =
+    mediaConfigs
   const [durationVideo, setDurationVideo] = useState(0)
   const _mediasSrcRef = useRef<{ val: IMediaOverall[] }>({ val: [] })
   const [openSlider, setOpenSlider] = useState(false)
@@ -200,6 +203,13 @@ export function UploadPreviewer({
       )
       if (!extractFiles.length) return
 
+      if (isLimitFiles) {
+        if (mediasSrcPreviewer.length >= 15) return
+        else {
+          extractFiles.slice(0, 15 - mediasSrcPreviewer.length)
+        }
+      }
+
       if (mediaFormat === EMediaFormat.VIDEO || mediaType === EMediaType.AVATAR)
         setMediasSrcPreviewer([{ url: URL.createObjectURL(extractFiles[0]) }])
       if (mediaFormat === EMediaFormat.VIDEO && extractFiles[0])
@@ -210,7 +220,6 @@ export function UploadPreviewer({
       ) {
         await compressImageFile(extractFiles[0]).then(file => {
           getThumbnailsFromImage(file)
-          console.log('base64 compress: ', file)
         })
         const newImages = [...extractFiles].map((originalFile: File) =>
           // deep clone

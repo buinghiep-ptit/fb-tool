@@ -7,7 +7,6 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import { CountdownTimer } from 'app/components/common/CountdownTimer'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
@@ -108,7 +107,9 @@ export default function FeedDetail(props: Props) {
   )
 
   useEffect(() => {
-    setMediasSrcPreviewer(feed.data?.images ?? [])
+    setMediasSrcPreviewer(
+      feed.data?.images?.filter(img => img.mediaType === 3) ?? [],
+    )
   }, [JSON.stringify(feed)])
 
   const handleChangePageReports = (event: unknown, newPage: number) => {

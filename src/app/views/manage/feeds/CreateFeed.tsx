@@ -88,6 +88,7 @@ export default function CreateFeed(props: Props) {
     accept: 'image/*',
     multiple: true,
     mediaType: EMediaType.POST,
+    isLimitFiles: true,
   })
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,

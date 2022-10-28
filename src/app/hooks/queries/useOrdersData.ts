@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   availableOrder,
+  cancelOrder,
   fetchLogsActionDetail,
   fetchOrdersCancelRequests,
   fetchOrdersOverall,
@@ -83,6 +84,22 @@ export const useUnAvailableOrder = (onSuccess?: any, onError?: any) => {
     },
     onSuccess,
   })
+}
+
+export const useCancelOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (payload: { orderId?: number; note?: string }) =>
+      cancelOrder(payload.orderId ?? 0, { note: payload.note }),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
 }
 
 export const useReassignOrder = (onSuccess?: any, onError?: any) => {

@@ -217,6 +217,11 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
             title="Huỷ"
             variant="outlined"
             color="error"
+            onClick={() =>
+              navigate(`huy-don-hang`, {
+                state: { modal: true },
+              })
+            }
             startIcon={<Icon>person_remove</Icon>}
           />
           <Divider

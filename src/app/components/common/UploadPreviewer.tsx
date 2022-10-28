@@ -197,7 +197,7 @@ export function UploadPreviewer({
 
   const onDrop = useCallback(
     async (droppedFiles: File[]) => {
-      const extractFiles = extractDroppedFiles(
+      let extractFiles = extractDroppedFiles(
         [...(files || [])],
         [...droppedFiles],
       )
@@ -206,7 +206,7 @@ export function UploadPreviewer({
       if (isLimitFiles) {
         if (mediasSrcPreviewer.length >= 15) return
         else {
-          extractFiles.slice(0, 15 - mediasSrcPreviewer.length)
+          extractFiles = extractFiles.slice(0, 15 - mediasSrcPreviewer.length)
         }
       }
 
@@ -317,7 +317,7 @@ export function UploadPreviewer({
                 </MuiTypography>
                 <MuiTypography variant="body2">nhỏ hơn 10MB/ảnh</MuiTypography>
                 <MuiTypography variant="body2">
-                  tối đa 15 ảnh/lần chọn
+                  {isLimitFiles ? 'tối đa 15 ảnh' : 'tối đa 15 ảnh/lần chọn'}
                 </MuiTypography>
               </>
             )}

@@ -1,26 +1,25 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, Stack, styled } from '@mui/material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchEvents } from 'app/apis/events/event.service'
+import { fetchAudios } from 'app/apis/audio/audio.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import {
-  useDeleteEvent,
-  useUpdateStatusEvent,
-} from 'app/hooks/queries/useEventsData'
+import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IEventOverall, IEventResponse } from 'app/models'
-import { columnsEvents } from 'app/utils/columns/columnsEvents'
+import { IFeed } from 'app/models'
+import { IAudioOverall, IAudioResponse } from 'app/models/audio'
+import { columnFeeds } from 'app/utils/columns'
+import { columnsAudios } from 'app/utils/columns/columnsAudios'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { DDMMYYYYFormatter } from 'app/utils/formatters/dateTimeFormatters'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -35,25 +34,17 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export interface Props {}
-
-type ISearchFilters = {
-  areaNameOrAddress?: string
-  page?: number
-  size?: number
+export interface IAudiosFilters {
+  search?: string
+  status?: 0 | 1 | 'all' | string | undefined //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
+  page?: number | 0
+  size?: number | 20
   sort?: string
 }
 
-const newEvents = (events: IEventOverall[]) => {
-  return events.map(event => ({
-    ...event,
-    dateActive: `${DDMMYYYYFormatter(
-      event.startDate ?? '',
-    )} - ${DDMMYYYYFormatter(event.endDate ?? '')}`,
-  }))
-}
+export interface Props {}
 
-export default function ManagerEvents(props: Props) {
+export default function ListAudios(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -64,31 +55,31 @@ export default function ManagerEvents(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
-  const [defaultValues] = useState<ISearchFilters>({
-    areaNameOrAddress: queryParams.areaNameOrAddress ?? '',
+  const [isReset, setIsReset] = useState<boolean>(false)
+
+  const [defaultValues] = useState<IAudiosFilters>({
+    search: queryParams.search ?? '',
+    status: queryParams.status ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
 
-  const [filters, setFilters] = useState<ISearchFilters>(
+  const [filters, setFilters] = useState<IAudiosFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
 
-  const [dialogData, setDialogData] = useState<{
-    title?: string
-    message?: string
-    type?: string
-  }>({})
+  const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
-  const [row, setRow] = useState<any>({})
+  const [dialogType, setDialogType] = useState(1)
+  const [feedId, setFeedId] = useState(0)
 
   const validationSchema = Yup.object().shape({
-    areaNameOrAddress: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
+    search: Yup.string()
+      .min(0, 'email must be at least 0 characters')
+      .max(255, 'email must be at almost 256 characters'),
   })
 
-  const methods = useForm<ISearchFilters>({
+  const methods = useForm<IAudiosFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -100,45 +91,27 @@ export default function ManagerEvents(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IEventResponse, Error> = useQuery<IEventResponse, Error>(
-    ['events', filters],
-    () => fetchEvents(filters),
+  }: UseQueryResult<IAudioResponse, Error> = useQuery<IAudioResponse, Error>(
+    ['audios', filters],
+    () => fetchAudios(filters),
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
       keepPreviousData: true,
       enabled: !!filters,
     },
   )
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: `${dialogData.title ?? ''} thành công` })
-    setOpenDialog(false)
-  }
-  const { mutate: updateStatus } = useUpdateStatusEvent(onRowUpdateSuccess)
-  const { mutate: deleteEvent } = useDeleteEvent(onRowUpdateSuccess)
-
-  const onSubmitDialog = () => {
-    if (dialogData.type === 'toggle-status') {
-      updateStatus({
-        eventId: row.id,
-        status: row.status * -1,
-      })
-    } else {
-      deleteEvent(row.id)
-    }
-  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
-        page: newPage,
+        page: +newPage,
       }
     })
     navigate('', {
       ...filters,
-      page: newPage,
+      page: +newPage,
     } as any)
   }
 
@@ -151,21 +124,22 @@ export default function ManagerEvents(props: Props) {
       return {
         ...prevFilters,
         page: 0,
-        size: parseInt(event.target.value, 10),
+        size: +event.target.value,
       }
     })
     navigate('', {
       ...filters,
       page: 0,
-      size: parseInt(event.target.value, 10),
+      size: +event.target.value,
     } as any)
   }
 
-  const onSubmitHandler: SubmitHandler<ISearchFilters> = (
-    values: ISearchFilters,
+  const onSubmitHandler: SubmitHandler<IAudiosFilters> = (
+    values: IAudiosFilters,
   ) => {
     setPage(0)
     setSize(20)
+    setIsReset(false)
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
@@ -181,65 +155,116 @@ export default function ManagerEvents(props: Props) {
     } as any)
   }
 
-  const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
+  const onResetFilters = () => {
+    setIsReset(true)
+    methods.reset({
+      status: 'all',
+      search: '',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
   }
 
+  const onSuccess = (data: any) => {
+    toastSuccess({
+      message: dialogType === 1 ? 'Duyệt bài thành công' : '',
+    })
+    setOpenDialog(false)
+  }
+  const { mutate: approve, isLoading: approveLoading } =
+    useApproveFeed(onSuccess)
+
+  const approveConfirm = () => {
+    approve(feedId)
+  }
+
+  const onRowUpdate = (cell: any, row: any) => {
+    console.log(cell, row)
+  }
   const onRowDelete = (cell: any, row: any) => {
-    setDialogData(prev => ({
-      ...prev,
-      title: 'Xoá sự kiện',
-      message: 'Bạn có chắc chắn muốn xoá sự kiện',
-      type: 'delete',
-    }))
-    setOpenDialog(true)
-    setRow(row)
+    console.log(cell, row)
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'name') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
-    } else if (cell.id === 'status') {
-      setDialogData(prev => ({
-        ...prev,
-        title: row.status === 1 ? 'Ẩn sự kiện' : 'Mở sự kiện',
-        message:
-          row.status === 1
-            ? 'Bạn có chắc chắn muốn ẩn sự kiện'
-            : 'Bạn có đồng ý mở lại sự kiện',
-        type: 'toggle-status',
-      }))
-      setOpenDialog(true)
-      setRow(row)
+    if (cell.action) {
+      if (['edit', 'account'].includes(cell.id)) {
+        navigation(`${row.feedId}`, {})
+      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
+        setTitleDialog('Duyệt bài đăng')
+        setFeedId(row.feedId)
+        setOpenDialog(true)
+      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
+        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
+          state: { modal: true },
+        })
+      }
     }
   }
 
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm bài hát"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() =>
+            navigation('them-moi', {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
-          <form
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
-            noValidate
-            autoComplete="off"
-          >
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Tên sự kiện'}
+                    label={'Tến bài hát/Người thể hiện/Tác giả'}
                     type="text"
-                    name="areaNameOrAddress"
-                    defaultValue=""
-                    placeholder="Nhập tên sự kiện"
+                    name="search"
+                    size="small"
+                    placeholder="Nhập từ khoá"
                     fullWidth
+                    defaultValue=""
                   />
                 </Grid>
+
+                <Grid item sm={3} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Hoạt động</MenuItem>
+                    <MenuItem value="0">Không hoạt động</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+
                 <Grid item sm={3} xs={12}>
                   <MuiButton
+                    loading={!isReset && isFetching}
                     title="Tìm kiếm"
                     variant="contained"
                     color="primary"
@@ -250,14 +275,13 @@ export default function ManagerEvents(props: Props) {
                 </Grid>
                 <Grid item sm={3} xs={12}>
                   <MuiButton
-                    onClick={() =>
-                      navigation(`them-moi-su-kien`, { state: { mode: 'add' } })
-                    }
-                    title="Tạo mới sự kiện"
-                    variant="contained"
+                    loading={isReset && isFetching}
+                    title="Làm mới"
+                    variant="outlined"
                     color="primary"
+                    onClick={onResetFilters}
                     sx={{ width: '100%' }}
-                    startIcon={<AddBoxSharp />}
+                    startIcon={<ChangeCircleSharp />}
                   />
                 </Grid>
               </Grid>
@@ -267,10 +291,8 @@ export default function ManagerEvents(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={
-              data ? (newEvents(data?.content ?? []) as IEventOverall[]) : []
-            }
-            columns={columnsEvents}
+            rows={data ? (data?.content as IAudioOverall[]) : []}
+            columns={columnsAudios}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -304,17 +326,14 @@ export default function ManagerEvents(props: Props) {
       </Stack>
 
       <DiagLogConfirm
-        title={dialogData.title ?? ''}
+        title={titleDialog}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={onSubmitDialog}
+        onSubmit={approveConfirm}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
-          </MuiTypography>
-          <MuiTypography variant="subtitle1" color="primary">
-            {row.name}
+            Đồng ý duyệt bài đăng?
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

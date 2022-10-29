@@ -207,19 +207,24 @@ export default function ManagerFeed(props: Props) {
     approve(feedId)
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.feedId}`, {})
+  }
+
+  const onRowApprove = (cell: any, row: any) => {
+    setTitleDialog('Duyệt bài đăng')
+    setFeedId(row.feedId)
+    setOpenDialog(true)
+  }
+  const onRowReport = (cell: any, row: any) => {
+    navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
+      state: { modal: true },
+    })
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (['edit', 'account'].includes(cell.id)) {
-        navigation(`${row.feedId}`, {})
-      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
-        setTitleDialog('Duyệt bài đăng')
-        setFeedId(row.feedId)
-        setOpenDialog(true)
-      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
-        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
-          state: { modal: true },
-        })
-      }
+    if (cell.id === 'account') {
+      navigation(`${row.feedId}`, {})
     }
   }
 
@@ -372,6 +377,30 @@ export default function ManagerFeed(props: Props) {
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
+            actions={[
+              {
+                icon: 'edit_calendar',
+                color: 'warning',
+                tooltip: 'Chi tiết',
+                onClick: onRowUpdate,
+              },
+              {
+                icon: 'verified',
+                color: 'primary',
+                tooltip: 'Duyệt bài',
+                onClick: onRowApprove,
+                disableActions: (status?: number) =>
+                  [1, -3].includes(status ?? 0),
+              },
+              {
+                icon: 'warning_amber',
+                color: 'error',
+                tooltip: 'Báo cáo vi phạm',
+                onClick: onRowReport,
+                disableActions: (status?: number) =>
+                  [-1, -3].includes(status ?? 0),
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"

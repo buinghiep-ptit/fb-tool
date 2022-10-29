@@ -29,7 +29,7 @@ export const navigations = [
   {
     name: 'Quản lý âm nhạc',
     path: '/quan-ly-audios',
-    icon: 'audiotrack',
+    icon: 'library_music',
   },
   {
     name: 'Quản lý sự kiện',
@@ -72,7 +72,7 @@ export const navigations = [
   {
     name: 'Quản lý cẩm nang',
     path: '/quan-ly-cam-nang',
-    icon: 'fact_check',
+    icon: 'menu_book',
   },
   {
     name: 'Quản lý chính sách',
@@ -82,7 +82,7 @@ export const navigations = [
   {
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
-    icon: 'workspace_premium',
+    icon: 'stars',
   },
   {
     name: 'Quản lý từ khoá yêu thích',

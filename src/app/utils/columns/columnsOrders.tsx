@@ -18,8 +18,6 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
       left: 0,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {

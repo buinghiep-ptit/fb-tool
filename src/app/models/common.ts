@@ -48,6 +48,7 @@ export interface TableColumn<T> {
   maxWidth?: number
   align?: 'center' | 'right' | 'left'
   status?: (param?: any) => ReactElement | string
+  actions?: (x?: any) => any
   action?: (param?: any) => ReactElement
   format?: (param: any) => string | null | ReactElement
   media?: (param: any) => string | null | ReactElement

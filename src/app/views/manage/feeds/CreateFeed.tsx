@@ -485,7 +485,11 @@ export default function CreateFeed(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Post bài Feed' }]} />
+        <Breadcrumb
+          routeSegments={[
+            { name: feedId ? 'Chỉnh sửa Feed' : 'Thêm mới Feed' },
+          ]}
+        />
       </Box>
       <Stack
         flexDirection={'row'}

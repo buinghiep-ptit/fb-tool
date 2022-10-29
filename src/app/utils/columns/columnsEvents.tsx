@@ -15,8 +15,6 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
       left: 0,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {
@@ -34,6 +32,10 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          border: '1px solid #D9D9D9',
+          backgroundColor: '#EEEEEE',
+          p: 0.25,
+          ml: 1,
         }}
       >
         <img
@@ -45,6 +47,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            borderRadius: 4,
           }}
           loading="lazy"
           alt="bg"
@@ -58,7 +61,10 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     minWidth: 200,
     align: 'left',
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+      <Typography
+        color={'primary'}
+        sx={{ textDecorationLine: 'underline', pl: 1 }}
+      >
         {value}
       </Typography>
     ),
@@ -109,38 +115,25 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
         sx={{ justifyContent: 'center', fontSize: '16px!important' }}
       />
     ),
-    sticky: {
-      position: 'sticky',
-      right: 100,
-      background: 'white',
-      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
-      clipPath: 'inset(0px 0px 0px -15px)',
-    },
+    // sticky: {
+    //   position: 'sticky',
+    //   right: 80,
+    //   background: 'white',
+    //   boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+    //   clipPath: 'inset(0px 0px 0px -15px)',
+    // },
   },
   {
-    id: 'edit',
-    label: '',
-    minWidth: 50,
-    maxWidth: 50,
+    id: 'actions',
+    label: 'Hành động',
+    minWidth: 60,
     align: 'center',
-    action: (value: any) => <Icon color="secondary">edit_calendar</Icon>,
-    sticky: {
-      position: 'sticky',
-      right: 50,
-      background: 'white',
-    },
-  },
-  {
-    id: 'delete',
-    label: '',
-    minWidth: 50,
-    maxWidth: 50,
-    align: 'center',
-    action: (value: any) => <Icon color="error">delete</Icon>,
     sticky: {
       position: 'sticky',
       right: 0,
       background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
     },
   },
 ]

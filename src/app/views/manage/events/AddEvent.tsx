@@ -361,7 +361,7 @@ export default function AddEvent(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý sự kiện', path: '/quan-ly-su-kien' },
-            { name: 'Thêm mới sự kiện' },
+            { name: eventId ? 'Chi tiết sự kiện' : 'Thêm mới sự kiện' },
           ]}
         />
       </Box>

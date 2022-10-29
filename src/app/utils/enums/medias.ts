@@ -12,4 +12,5 @@ export const enum EMediaFormat {
   VIDEO = 1,
   IMAGE = 2,
   OFFICE = 3,
+  AUDIO = 4,
 }

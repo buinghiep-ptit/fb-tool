@@ -540,6 +540,7 @@ const getFilesType = (formatType?: number) => {
     case EMediaFormat.ALL:
       return {
         'video/*': [],
+        'audio/*': [],
         'image/*': [],
         'text/*': [],
       }

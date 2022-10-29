@@ -156,13 +156,13 @@ export default function CustomerAccounts(props: Props) {
     } as any)
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigate(`${row.customerId}/thong-tin`, {})
+  }
+
   const onClickRow = (cell: any, row: any) => {
     if (cell.action || cell.link) {
-      // if (cell.id === 'mobilePhone') {
       navigate(`${row.customerId}/thong-tin`, {})
-      // } else if (cell.id === 'action') {
-      //   navigate(`${row.customerId}/thong-tin`, {})
-      // }
     }
   }
 
@@ -261,6 +261,14 @@ export default function CustomerAccounts(props: Props) {
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
+            actions={[
+              {
+                icon: 'edit_calendar',
+                color: 'warning',
+                tooltip: 'Chi tiết',
+                onClick: onRowUpdate,
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"

@@ -1,4 +1,11 @@
-import { Chip, Icon, IconButton, Stack, Typography } from '@mui/material'
+import {
+  Chip,
+  Icon,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn, TitleFeeds } from 'app/models'
 import moment from 'moment'
@@ -20,19 +27,29 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'account',
     label: 'Tài khoản',
-    minWidth: 170,
+    minWidth: 150,
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
     sticky: {
       position: 'sticky',
       left: 40,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {
@@ -48,6 +65,7 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
           display: '-webkit-box',
           WebkitLineClamp: '2',
           WebkitBoxOrient: 'vertical',
+          pl: 1,
         }}
       >
         {value}
@@ -111,63 +129,16 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     align: 'center',
   },
   {
-    id: 'edit',
-    label: '',
-    minWidth: 30,
-    align: 'right',
-    action: () => (
-      <IconButton size="small">
-        <Icon color="primary" sx={{ fontSize: '20px !important' }}>
-          east
-        </Icon>
-      </IconButton>
-    ),
-    sticky: {
-      position: 'sticky',
-      right: 60,
-      background: 'white',
-      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
-      clipPath: 'inset(0px 0px 0px -15px)',
-    },
-  },
-  {
-    id: 'approve',
-    label: '',
-    minWidth: 30,
+    id: 'actions',
+    label: 'Hành động',
+    minWidth: 80,
     align: 'center',
-    action: (status?: number) =>
-      [-2, -1, 0].includes(status ?? 0) ? (
-        <IconButton size="small">
-          <Icon sx={{ fontSize: '20px !important' }}>checklist</Icon>
-        </IconButton>
-      ) : (
-        <></>
-      ),
-    sticky: {
-      position: 'sticky',
-      right: 30,
-      background: 'white',
-    },
-  },
-  {
-    id: 'violate',
-    label: '',
-    minWidth: 30,
-    align: 'left',
-    action: (status?: number) =>
-      [-2, 0, 1].includes(status ?? 0) ? (
-        <IconButton size="small">
-          <Icon color="error" sx={{ fontSize: '20px !important' }}>
-            report
-          </Icon>
-        </IconButton>
-      ) : (
-        <></>
-      ),
     sticky: {
       position: 'sticky',
       right: 0,
       background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
     },
   },
 ]

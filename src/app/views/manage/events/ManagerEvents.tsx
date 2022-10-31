@@ -308,6 +308,8 @@ export default function ManagerEvents(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

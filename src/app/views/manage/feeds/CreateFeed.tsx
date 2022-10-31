@@ -30,7 +30,11 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateFeed, useUpdateFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  useCreateFeed,
+  useDeleteFeed,
+  useUpdateFeed,
+} from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
@@ -52,6 +56,7 @@ import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -109,6 +114,13 @@ export default function CreateFeed(props: Props) {
   })
   const [filters, setFilters] = useState({ cusType: 1 })
 
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+
   const validationSchema = Yup.object().shape(
     {
       cusType: Yup.string().required(messages.MSG1),
@@ -137,7 +149,9 @@ export default function CreateFeed(props: Props) {
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
           const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-            media => media.mediaFormat === fileConfigs.mediaFormat,
+            media =>
+              media.mediaFormat === fileConfigs.mediaFormat &&
+              media.mediaType === 3,
           )
           if (files && files.length) {
             return true
@@ -431,6 +445,24 @@ export default function CreateFeed(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
+  const { mutate: deletedFeed } = useDeleteFeed(() =>
+    onRowUpdateSuccess(null, 'Xoá bài thành công'),
+  )
+
+  const onDeleteFeed = () => {
+    if (feedId) deletedFeed(Number(feedId))
+  }
+
+  const openDeleteDialog = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá bài feed',
+      message: 'Bạn có chắc chắn muốn xoá bài feed này?',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+  }
+
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
@@ -512,11 +544,22 @@ export default function CreateFeed(props: Props) {
           color="warning"
           onClick={() => {
             setMediasSrcPreviewer([])
-            removeUploadedFiles()
-            methods.reset()
+            removeUploadedFiles(undefined, fileConfigs.mediaFormat)
+
+            initDefaultValues(feed)
           }}
           startIcon={<Icon>cached</Icon>}
         />
+        {feedId && (
+          <MuiButton
+            disabled={uploading}
+            title="Xoá"
+            variant="contained"
+            color="error"
+            onClick={openDeleteDialog}
+            startIcon={<Icon>delete</Icon>}
+          />
+        )}
         <MuiButton
           title="Quay lại"
           variant="contained"
@@ -683,6 +726,20 @@ export default function CreateFeed(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onDeleteFeed}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { MenuItem, Stack } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
@@ -44,9 +44,9 @@ export default function AddAudio({ title }: Props) {
   )
   const [fileConfigs] = useState({
     mediaType: EMediaType.POST,
-    mediaFormat: EMediaFormat.OFFICE,
+    mediaFormat: EMediaFormat.IMAGE,
     accept: '',
-    multiple: true,
+    multiple: false,
   })
   const [defaultValues] = useState<SchemaType>({
     status: 1,
@@ -119,61 +119,71 @@ export default function AddAudio({ title }: Props) {
     return (
       <BoxWrapperDialog>
         <FormProvider {...methods}>
-          <Stack my={1.5} gap={3}>
-            <FormInputText
-              type="text"
-              label={'Tên bài hát'}
-              name="name"
-              placeholder="Nhập tên bài hát"
-              defaultValue=""
-              required
-            />
-
-            <Stack flexDirection={'row'} gap={3}>
-              <MuiTypography variant="body2">Tải bài hát: *</MuiTypography>
-            </Stack>
-
-            <Stack flexDirection={'row'} gap={3}>
-              <MuiTypography variant="body2">Ảnh:(1x1)</MuiTypography>
-              <Box flex={1}>
-                <UploadPreviewer
-                  name="files"
-                  initialMedias={[]}
-                  fileInfos={fileInfos}
-                  mediasSrcPreviewer={mediasSrcPreviewer}
-                  setMediasSrcPreviewer={setMediasSrcPreviewer}
-                  mediaConfigs={fileConfigs}
-                  selectFiles={selectFiles}
-                  uploadFiles={uploadFiles}
-                  removeUploadedFiles={removeUploadedFiles}
-                  cancelUploading={cancelUploading}
-                  uploading={uploading}
-                  progressInfos={progressInfos}
+          <Grid container spacing={3}>
+            <Grid item md={6} xs={12}>
+              <Stack my={3} gap={3}>
+                <FormInputText
+                  type="text"
+                  label={'Tên bài hát'}
+                  name="name"
+                  placeholder="Nhập tên bài hát"
+                  defaultValue=""
+                  required
                 />
-              </Box>
-            </Stack>
 
-            <FormInputText
-              type="text"
-              label={'Tác giả'}
-              name="author"
-              placeholder="Nhập tên tác giả"
-              defaultValue=""
-            />
+                <FormInputText
+                  type="text"
+                  label={'Tác giả'}
+                  name="author"
+                  placeholder="Nhập tên tác giả"
+                  defaultValue=""
+                />
 
-            <FormInputText
-              type="text"
-              label={'Người thể hiện'}
-              name="performer"
-              placeholder="Nhập tên người thế hiện"
-              defaultValue=""
-            />
-            <SelectDropDown name="status" label="Trạng thái">
-              <MenuItem value="1">Hoạt động</MenuItem>
-              <MenuItem value="0">Không hoạt động</MenuItem>
-            </SelectDropDown>
-            <MuiCheckBox name="isDefault" label="Nhạc hay" />
-          </Stack>
+                <FormInputText
+                  type="text"
+                  label={'Người thể hiện'}
+                  name="performer"
+                  placeholder="Nhập tên người thể hiện"
+                  defaultValue=""
+                />
+                <SelectDropDown name="status" label="Trạng thái">
+                  <MenuItem value="1">Hoạt động</MenuItem>
+                  <MenuItem value="0">Không hoạt động</MenuItem>
+                </SelectDropDown>
+                <MuiCheckBox name="isDefault" label="Nhạc hay" />
+              </Stack>
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <Stack flexDirection={'row'} gap={1} mt={2}>
+                <MuiTypography variant="body2">Tải bài hát: *</MuiTypography>
+                <Icon>audiotrack</Icon>
+              </Stack>
+
+              <Stack flexDirection={'row'} gap={1} my={1}>
+                <MuiTypography variant="body2">Thời lượng: 03:00</MuiTypography>
+              </Stack>
+
+              <Stack flexDirection={'row'} gap={1.5} my={2}>
+                <MuiTypography variant="body2">Ảnh(1x1)</MuiTypography>
+                <Box flex={1}>
+                  <UploadPreviewer
+                    name="files"
+                    initialMedias={[]}
+                    fileInfos={fileInfos}
+                    mediasSrcPreviewer={mediasSrcPreviewer}
+                    setMediasSrcPreviewer={setMediasSrcPreviewer}
+                    mediaConfigs={fileConfigs}
+                    selectFiles={selectFiles}
+                    uploadFiles={uploadFiles}
+                    removeUploadedFiles={removeUploadedFiles}
+                    cancelUploading={cancelUploading}
+                    uploading={uploading}
+                    progressInfos={progressInfos}
+                  />
+                </Box>
+              </Stack>
+            </Grid>
+          </Grid>
         </FormProvider>
       </BoxWrapperDialog>
     )
@@ -186,6 +196,7 @@ export default function AddAudio({ title }: Props) {
         open={isModal}
         onCloseModal={handleClose}
         isLoading={isLoading}
+        maxWidth={'md'}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Lưu"
         cancelText="Quay lại"

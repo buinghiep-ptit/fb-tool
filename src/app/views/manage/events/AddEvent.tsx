@@ -26,7 +26,11 @@ import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateEvent, useUpdateEvent } from 'app/hooks/queries/useEventsData'
+import {
+  useCreateEvent,
+  useDeleteEvent,
+  useUpdateEvent,
+} from 'app/hooks/queries/useEventsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
@@ -37,6 +41,7 @@ import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -74,6 +79,15 @@ export default function AddEvent(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
+
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+
+  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false)
 
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
@@ -114,7 +128,9 @@ export default function AddEvent(props: Props) {
         .test('empty', messages.MSG1, files => {
           // if (!!Number(eventId ?? 0)) {
           const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-            media => media.mediaFormat === fileConfigs.mediaFormat,
+            media =>
+              media.mediaFormat === fileConfigs.mediaFormat &&
+              media.mediaType === 3,
           )
 
           if (files && files.length) {
@@ -326,6 +342,24 @@ export default function AddEvent(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
+  const { mutate: deleteEvent } = useDeleteEvent(() =>
+    onRowUpdateSuccess(null, 'Xoá sự kiện thành công'),
+  )
+
+  const onDeleteEvent = () => {
+    if (eventId) deleteEvent(Number(eventId))
+  }
+
+  const openDeleteDialog = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá sự kiện',
+      message: 'Bạn có chắc chắn muốn xoá sự kiện?',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+  }
+
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
@@ -371,7 +405,7 @@ export default function AddEvent(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
         <MuiButton
-          title="Lưu lại"
+          title="Lưu"
           variant="contained"
           color="primary"
           onClick={methods.handleSubmit(onSubmitHandler)}
@@ -381,14 +415,26 @@ export default function AddEvent(props: Props) {
         />
         <MuiButton
           disabled={uploading}
-          title="Huỷ bỏ"
+          title="Huỷ"
           variant="contained"
           color="warning"
           onClick={() => {
+            removeUploadedFiles(undefined, fileConfigs.mediaFormat)
             initDefaultValues(event)
           }}
           startIcon={<Icon>cached</Icon>}
         />
+
+        {eventId && (
+          <MuiButton
+            disabled={uploading}
+            title="Xoá"
+            variant="contained"
+            color="error"
+            onClick={openDeleteDialog}
+            startIcon={<Icon>delete</Icon>}
+          />
+        )}
 
         <MuiButton
           title="Quay lại"
@@ -398,6 +444,8 @@ export default function AddEvent(props: Props) {
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
+      {/* <button onClick={() => setIsFileDialogOpen(true)}>Open Click</button> */}
+
       <SimpleCard>
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -529,6 +577,8 @@ export default function AddEvent(props: Props) {
                       cancelUploading={cancelUploading}
                       uploading={uploading}
                       progressInfos={progressInfos}
+                      isFileDialogOpen={isFileDialogOpen}
+                      setIsFileDialogOpen={setIsFileDialogOpen}
                     />
                   </Box>
                 </Stack>
@@ -546,6 +596,24 @@ export default function AddEvent(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
+
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onDeleteEvent}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+          <MuiTypography variant="subtitle1" color="primary">
+            {event?.name}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

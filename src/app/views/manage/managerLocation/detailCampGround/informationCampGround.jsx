@@ -27,11 +27,12 @@ import {
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
 import Feature from './feature'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { object } from 'prop-types'
 
 export default function InformationCampGround({ action }) {
   const [hashtag, setHashtag] = React.useState([])
@@ -81,6 +82,14 @@ export default function InformationCampGround({ action }) {
     { label: 'Trekking', id: 5 },
     { label: 'Leo núi', id: 6 },
   ]
+
+  const arrInternet = [
+    { provider: 'viettel', speed: 'speedViettel' },
+    { provider: 'vinaphone', speed: 'speedVinaphone' },
+    { provider: 'mobiphone', speed: 'speedMobiphone' },
+    { provider: 'vietnamMobile', speed: 'speedVietnamMobile' },
+  ]
+
   const navigate = useNavigate()
 
   const schema = yup
@@ -175,6 +184,14 @@ export default function InformationCampGround({ action }) {
       }
     })
 
+    const handleDeleteCampGround = async () => {
+      const res = await deleteCampGround(params.id)
+      if (res) {
+        toastSuccess({ message: 'Xóa điểm camp thành công' })
+        navigate('/quan-ly-thong-tin-diem-camp')
+      }
+    }
+
     const fileUploadVideo = [...introData].map(file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
@@ -246,12 +263,7 @@ export default function InformationCampGround({ action }) {
     ].filter(item => !!item)
     dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
-    const arrInternet = [
-      { provider: 'viettel', speed: 'speedViettel' },
-      { provider: 'vinaphone', speed: 'speedVinaphone' },
-      { provider: 'mobilephone', speed: 'speedMobiphone' },
-      { provider: 'vietnamMobile', speed: 'speedVietnamMobile' },
-    ]
+
     arrInternet.forEach((item, index) => {
       if (data[item.provider]) {
         dataUpdate.campGroundInternets.push({
@@ -428,6 +440,19 @@ export default function InformationCampGround({ action }) {
           .catch(err => console.log(err))
       } else {
         setFeature({ utility: [] })
+        for (const property in VEHICLES) {
+          setValue(VEHICLES[property].name, true)
+        }
+        for (const property in INTERNET) {
+          setValue(INTERNET[property].name, true)
+          setValue(INTERNET[property].speed, 1)
+        }
+        setDisabledInternet({
+          viettel: false,
+          mobiphone: false,
+          vinaphone: false,
+          vietnamMobile: false,
+        })
       }
     }
   }

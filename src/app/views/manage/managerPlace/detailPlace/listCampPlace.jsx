@@ -67,7 +67,7 @@ const tableModelCampUnlinked = {
 const param = {
   name: '',
   page: 0,
-  size: 5,
+  size: 20,
 }
 
 export default function ListCampPlace(props) {
@@ -206,7 +206,7 @@ export default function ListCampPlace(props) {
             onClick={() => {
               fetchListCampUnlinked(params.id, {
                 name: filterCamp,
-                size: 5,
+                size: 20,
                 page: 0,
               })
             }}
@@ -223,7 +223,7 @@ export default function ListCampPlace(props) {
               fetchListCampUnlinked(params.id, param)
             }}
             onAddData={linkCampOnArea}
-            filter={{ name: filterCamp }}
+            filter={{ name: filterCamp, size: 20, page: 0 }}
           />
         </div>
       </DialogCustom>

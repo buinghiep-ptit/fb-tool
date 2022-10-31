@@ -28,6 +28,10 @@ class EditorConvertToHTML extends Component {
     this.setState({
       editorState,
     })
+    this.props.setDescription(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
+    return onChange(draftToHtml(convertToRaw(editorState.getCurrentContent())))
   }
 
   uploadImageCallBack = async file => {

@@ -18,12 +18,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-const MENU_DETAL = [
-  'Thông tin',
-  'Danh sách điểm Camp',
-  'Danh sách sự kiện',
-  'Trải nghiệm',
-]
+const MENU_DETAIL = ['Thông tin', 'Danh sách điểm Camp', 'Danh sách sự kiện']
 
 export default function DetailPlace(props) {
   const [value, setValue] = React.useState('1')
@@ -51,7 +46,7 @@ export default function DetailPlace(props) {
                 aria-label="lab API tabs example"
                 variant="fullWidth"
               >
-                {MENU_DETAL.map((itemMenu, index) => (
+                {MENU_DETAIL.map((itemMenu, index) => (
                   <Tab
                     label={itemMenu}
                     value={(index + 1).toString()}
@@ -69,7 +64,6 @@ export default function DetailPlace(props) {
             <TabPanel value="3">
               <ListEventPlace />
             </TabPanel>
-            <TabPanel value="4">Item Three</TabPanel>
           </TabContext>
         </Box>
       </SimpleCard>

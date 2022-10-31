@@ -60,7 +60,7 @@ export default function ListCampService(props) {
       status: statusFilter,
       type: typeFilter,
       page: 0,
-      size: 5,
+      size: 20,
     }
     fetchListCampGroundService(param)
   }, [])
@@ -127,7 +127,7 @@ export default function ListCampService(props) {
                 name: inputFilter,
                 status: statusFilter,
                 page: 0,
-                size: 5,
+                size: 20,
               })
             }}
           >

@@ -27,8 +27,8 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigate } from 'react-router-dom'
 import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import DialogCustom from 'app/components/common/DialogCustom'
-import EditorConvertToHTML from 'app/components/common/TextEditor/textEditorCustom'
-
+import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
+import { messages } from 'app/utils/messages'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -64,15 +64,14 @@ export default function CreatePlace(props) {
   const mapRef = React.useRef()
   const dialogCustomRef = React.useRef(null)
   const navigate = useNavigate()
-  const editorRef = React.useRef()
 
   const schema = yup
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      description: yup.string().required('Vui lòng nhập mô tả').trim(),
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
+      description: yup.string().required(messages.MSG1),
     })
     .required()
 
@@ -180,7 +179,6 @@ export default function CreatePlace(props) {
   }
 
   const onSubmit = async data => {
-    console.log('xxx')
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -214,7 +212,7 @@ export default function CreatePlace(props) {
         item => !!item,
       ),
       name: data.namePlace.trim(),
-      description: editorRef.current.getValueTextEditor(),
+      description: data.description || '',
       idProvince: data?.province?.id || null,
       idWard: data?.ward?.id || null,
       idDistrict: data?.district?.id || null,
@@ -483,35 +481,16 @@ export default function CreatePlace(props) {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              {/* <Controller
-                control={control}
-                name="description"
-                render={({ field }) => (
-                  <TextField
-                    error={errors.description}
-                    helperText={errors.description?.message}
-                    {...field}
-                    label="Mô tả*"
-                    margin="normal"
-                    multiline
-                    rows={10}
-                    fullWidth
-                  />
-                )}
-              /> */}
               Mô tả*:
-              <EditorConvertToHTML
-                ref={editorRef}
-                description={description}
-                setDescription={setDescription}
-                key={description}
-                setError={setError}
-                clearErrors={clearErrors}
-                keyError="description"
+              <Controller
+                render={({ field }) => <WYSIWYGEditor {...field} />}
+                name="description"
+                control={control}
+                defaultValue=""
               />
-              {description === '<p></p>' && !!errors?.description && (
+              {errors.description && (
                 <FormHelperText error>
-                  {errors?.description?.message}
+                  {errors.description?.message}
                 </FormHelperText>
               )}
             </Grid>
@@ -521,6 +500,16 @@ export default function CreatePlace(props) {
           <UploadImage ref={uploadImageRef}></UploadImage>
           <Button color="primary" type="submit" variant="contained">
             Lưu
+          </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            style={{ marginLeft: '10px' }}
+            onClick={() => {
+              navigate('/quan-ly-thong-tin-dia-danh')
+            }}
+          >
+            Quay lại
           </Button>
         </form>
         <DialogCustom

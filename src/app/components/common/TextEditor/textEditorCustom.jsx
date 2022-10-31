@@ -28,6 +28,22 @@ class EditorConvertToHTML extends Component {
     this.setState({
       editorState,
     })
+    this.props.setDescription(
+      convertToRaw(this.state.editorState.getCurrentContent()),
+    )
+    if (
+      draftToHtml(
+        convertToRaw(this.state.editorState.getCurrentContent()),
+      ).trim() === '<p></p>'
+    ) {
+      console.log('xxx')
+      this.props.setError(this.keyError, {
+        type: 'required',
+        message: 'Vui lòng nhập',
+      })
+    } else {
+      this.props.clearErrors([this.keyError])
+    }
   }
 
   uploadImageCallBack = async file => {

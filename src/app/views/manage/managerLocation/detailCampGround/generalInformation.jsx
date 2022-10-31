@@ -197,7 +197,7 @@ export default function GeneralInformation({
           />
         </Grid>
         <Grid item xs={12} md={12}>
-          <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+          <Typography mt={2}>Vị trí trên bản đồ*:</Typography>
           <Stack
             direction="row"
             spacing={2}

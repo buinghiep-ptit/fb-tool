@@ -52,8 +52,8 @@ export default function InformationPlace(props) {
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      district: yup.object().required(),
       description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
 
@@ -250,7 +250,7 @@ export default function InformationPlace(props) {
       idDistrict: data?.district?.id || null,
       longitude: createDegrees.lng,
       latitude: createDegrees.lat,
-      address: data.address,
+      address: data.address === '' ? null : data.address,
       tags: data.hashtag,
       imgUrl: '',
       status: 1,
@@ -386,7 +386,7 @@ export default function InformationPlace(props) {
                   error={!!errors.address}
                   helperText={errors.address?.message}
                   {...field}
-                  label="Địa danh"
+                  label="Địa chỉ"
                   variant="outlined"
                   margin="normal"
                 />
@@ -394,7 +394,7 @@ export default function InformationPlace(props) {
             />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+            <Typography mt={2}>Vị trí trên bản đồ*:</Typography>
             <Stack
               direction="row"
               spacing={2}
@@ -511,7 +511,7 @@ export default function InformationPlace(props) {
           </Grid>
         </Grid>
 
-        <Typography>Ảnh:</Typography>
+        <Typography>Ảnh*:</Typography>
         <UploadImage
           ref={uploadImageRef}
           medias={medias}

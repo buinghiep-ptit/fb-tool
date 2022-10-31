@@ -23,7 +23,7 @@ const Introduction = React.forwardRef(
           description={description}
           key={description}
         />
-        Ảnh:
+        Ảnh*:
         <UploadImage
           ref={uploadImageRef}
           medias={medias}

@@ -24,7 +24,7 @@ const StyledTable = styled(Table)(() => ({
 
 const ListHandBookUnlinked = ({ tableData, handleLinkedHandbook }) => {
   const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
   const [arrCheck, setArrCheck] = useState([])
 
   const handleChangePage = (_, newPage) => {
@@ -99,7 +99,7 @@ const ListHandBookUnlinked = ({ tableData, handleLinkedHandbook }) => {
         rowsPerPage={rowsPerPage}
         count={tableData.length}
         onPageChange={handleChangePage}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[20, 50, 100]}
         onRowsPerPageChange={handleChangeRowsPerPage}
         nextIconButtonProps={{ 'aria-label': 'Next Page' }}
         backIconButtonProps={{ 'aria-label': 'Previous Page' }}

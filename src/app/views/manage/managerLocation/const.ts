@@ -2,7 +2,7 @@ export const tableModel = {
   headCell: [
     {
       name: 'STT',
-      width: 30,
+      width: 50,
     },
     {
       name: 'Ảnh',

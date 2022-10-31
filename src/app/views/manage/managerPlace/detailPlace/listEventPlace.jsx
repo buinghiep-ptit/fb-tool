@@ -67,7 +67,7 @@ const tableModelEventUnlinked = {
 const param = {
   name: '',
   page: 0,
-  size: 5,
+  size: 20,
 }
 
 export default function ListEventPlace(props) {
@@ -191,8 +191,7 @@ export default function ListEventPlace(props) {
       >
         <div>
           <TextField
-            id="outlined-basic"
-            label="Tên điểm camp"
+            label="Tên sự kiện"
             variant="outlined"
             placeholder="Nhập tên sự kiện ..."
             style={{ display: 'block' }}
@@ -206,7 +205,7 @@ export default function ListEventPlace(props) {
             onClick={() => {
               fetchListEventUnlinked(params.id, {
                 name: filterEvent,
-                size: 5,
+                size: 20,
                 page: 0,
               })
             }}
@@ -224,7 +223,7 @@ export default function ListEventPlace(props) {
               fetchListEventUnlinked(params.id, param)
             }}
             onAddData={linkEventOnArea}
-            filter={{ name: filterEvent }}
+            filter={{ name: filterEvent, size: 20, page: 0 }}
           />
         </div>
       </DialogCustom>

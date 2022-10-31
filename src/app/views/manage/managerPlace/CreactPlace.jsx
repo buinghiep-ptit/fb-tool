@@ -7,6 +7,7 @@ import {
   TextField,
   Stack,
   Icon,
+  FormHelperText,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
@@ -26,6 +27,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigate } from 'react-router-dom'
 import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import DialogCustom from 'app/components/common/DialogCustom'
+import EditorConvertToHTML from 'app/components/common/TextEditor/textEditorCustom'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -43,6 +45,7 @@ export default function CreatePlace(props) {
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
+  const [description, setDescription] = React.useState('')
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
     lng: 105.78872657468659,
@@ -61,13 +64,15 @@ export default function CreatePlace(props) {
   const mapRef = React.useRef()
   const dialogCustomRef = React.useRef(null)
   const navigate = useNavigate()
+  const editorRef = React.useRef()
 
   const schema = yup
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      district: yup.object().required(),
       description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      campAreaTypes: yup.array().min(1, ''),
+      hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
 
@@ -89,6 +94,7 @@ export default function CreatePlace(props) {
       address: '',
       description: '',
       hashtag: [],
+      campAreaTypes: [],
     },
   })
 
@@ -174,6 +180,7 @@ export default function CreatePlace(props) {
   }
 
   const onSubmit = async data => {
+    console.log('xxx')
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -207,10 +214,10 @@ export default function CreatePlace(props) {
         item => !!item,
       ),
       name: data.namePlace.trim(),
-      description: data.description.trim(),
-      idProvince: data?.province.id || null,
+      description: editorRef.current.getValueTextEditor(),
+      idProvince: data?.province?.id || null,
       idWard: data?.ward?.id || null,
-      idDistrict: data?.district.id || null,
+      idDistrict: data?.district?.id || null,
       longitude: createDegrees.lng,
       latitude: createDegrees.lat,
       address: data.address.trim(),
@@ -333,7 +340,7 @@ export default function CreatePlace(props) {
                           errors.district ? 'Vui lòng chọn quận/huyện' : ''
                         }
                         {...params}
-                        label="Quận huyện*"
+                        label="Quận huyện"
                         margin="normal"
                       />
                     )}
@@ -370,7 +377,7 @@ export default function CreatePlace(props) {
                     {...field}
                     error={errors.address}
                     helperText={errors.address?.message}
-                    label="Địa danh"
+                    label="Địa chỉ"
                     variant="outlined"
                     margin="normal"
                   />
@@ -379,7 +386,7 @@ export default function CreatePlace(props) {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+              <Typography mt={2}>Vị trí trên bản đồ*:</Typography>
               <Stack
                 direction="row"
                 spacing={2}
@@ -423,10 +430,14 @@ export default function CreatePlace(props) {
                     renderInput={params => (
                       <TextField
                         {...params}
-                        // error={errors.namePlace}
-                        // helperText={errors.namePlace?.message}
+                        error={!!errors.campAreaTypes}
+                        helperText={
+                          !!errors.campAreaTypes
+                            ? 'Vui lòng chọn loại hình'
+                            : ''
+                        }
                         variant="outlined"
-                        label="Loại hình"
+                        label="Loại hình*"
                         placeholder="Loại hình"
                         fullWidth
                         margin="normal"
@@ -472,7 +483,7 @@ export default function CreatePlace(props) {
             </Grid>
 
             <Grid item xs={12} md={12}>
-              <Controller
+              {/* <Controller
                 control={control}
                 name="description"
                 render={({ field }) => (
@@ -487,11 +498,26 @@ export default function CreatePlace(props) {
                     fullWidth
                   />
                 )}
+              /> */}
+              Mô tả*:
+              <EditorConvertToHTML
+                ref={editorRef}
+                description={description}
+                setDescription={setDescription}
+                key={description}
+                setError={setError}
+                clearErrors={clearErrors}
+                keyError="description"
               />
+              {description === '<p></p>' && !!errors?.description && (
+                <FormHelperText error>
+                  {errors?.description?.message}
+                </FormHelperText>
+              )}
             </Grid>
           </Grid>
 
-          <Typography>Ảnh:</Typography>
+          <Typography>Ảnh*:</Typography>
           <UploadImage ref={uploadImageRef}></UploadImage>
           <Button color="primary" type="submit" variant="contained">
             Lưu

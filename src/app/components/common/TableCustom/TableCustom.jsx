@@ -55,8 +55,12 @@ const TableCustom = ({
 }) => {
   const dialogConfirm = React.useRef()
   const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [filterTable, setFilterTable] = useState({ name: '', size: 5, page: 0 })
+  const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [filterTable, setFilterTable] = useState({
+    name: '',
+    size: 20,
+    page: 0,
+  })
   const idDelete = React.useRef()
   const navigate = useNavigate()
   const handleChangePage = (_, newPage) => {
@@ -80,7 +84,7 @@ const TableCustom = ({
     const res = await onDeleteData(id)
     if (res) {
       toastSuccess({ message: 'Đã được xóa' })
-      fetchDataTable({ ...filterTable })
+      fetchDataTable(filter)
     }
   }
 
@@ -88,7 +92,7 @@ const TableCustom = ({
     const res = await onAddData(id)
     if (res) {
       toastSuccess({ message: 'Liên kết thành công' })
-      fetchDataTable({ ...filterTable })
+      fetchDataTable(filter)
     }
   }
 
@@ -295,7 +299,8 @@ const TableCustom = ({
             rowsPerPage={rowsPerPage}
             count={totalData || 0}
             onPageChange={handleChangePage}
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
             onRowsPerPageChange={handleChangeRowsPerPage}
             nextIconButtonProps={{ 'aria-label': 'Next Page' }}
             backIconButtonProps={{ 'aria-label': 'Previous Page' }}

@@ -184,6 +184,14 @@ export default function InformationCampGround({ action }) {
       }
     })
 
+    const handleDeleteCampGround = async () => {
+      const res = await deleteCampGround(params.id)
+      if (res) {
+        toastSuccess({ message: 'Xóa điểm camp thành công' })
+        navigate('/quan-ly-thong-tin-diem-camp')
+      }
+    }
+
     const fileUploadVideo = [...introData].map(file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()

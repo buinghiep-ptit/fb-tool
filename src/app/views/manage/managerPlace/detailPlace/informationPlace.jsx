@@ -5,12 +5,19 @@ import {
   Button,
   Stack,
   Icon,
+  FormHelperText,
 } from '@mui/material'
 import UploadImage from 'app/components/common/uploadImage'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import { getDetailPlace, updateDetailPlace } from 'app/apis/place/place.service'
+import {
+  deletePlace,
+  getDetailPlace,
+  updateDetailPlace,
+} from 'app/apis/place/place.service'
 import { useNavigate, useParams } from 'react-router-dom'
+import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
+import { messages } from 'app/utils/messages'
 import {
   getDistricts,
   getProvinces,
@@ -52,7 +59,7 @@ export default function InformationPlace(props) {
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      description: yup.string().required(messages.MSG1),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
@@ -207,6 +214,14 @@ export default function InformationPlace(props) {
         listUrl.video = responseVideo.map(item => item?.data.url)
     }
     return listUrl
+  }
+
+  const handleDeletePlace = async () => {
+    const res = await deletePlace(params.id)
+    if (res) {
+      toastSuccess({ message: 'Xóa điểm dia danh thành công' })
+      navigate('/quan-ly-thong-tin-dia-danh')
+    }
   }
 
   const onSubmit = async data => {
@@ -492,22 +507,18 @@ export default function InformationPlace(props) {
           </Grid>
 
           <Grid item xs={12} md={12}>
+            Mô tả*:
             <Controller
-              control={control}
+              render={({ field }) => <WYSIWYGEditor {...field} />}
               name="description"
-              render={({ field }) => (
-                <TextField
-                  error={errors.description}
-                  helperText={errors.description?.message}
-                  {...field}
-                  label="Mô tả"
-                  margin="normal"
-                  multiline
-                  rows={10}
-                  fullWidth
-                />
-              )}
+              control={control}
+              defaultValue=""
             />
+            {errors.description && (
+              <FormHelperText error>
+                {errors.description?.message}
+              </FormHelperText>
+            )}
           </Grid>
         </Grid>
 
@@ -519,6 +530,24 @@ export default function InformationPlace(props) {
         ></UploadImage>
         <Button color="primary" type="submit" variant="contained">
           Lưu
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => handleDeletePlace()}
+          style={{ marginLeft: '10px' }}
+        >
+          Xóa
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          style={{ marginLeft: '10px' }}
+          onClick={() => {
+            navigate('/quan-ly-thong-tin-dia-danh')
+          }}
+        >
+          Quay lại
         </Button>
       </form>
       <DialogCustom

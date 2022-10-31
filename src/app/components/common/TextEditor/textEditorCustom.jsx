@@ -29,21 +29,9 @@ class EditorConvertToHTML extends Component {
       editorState,
     })
     this.props.setDescription(
-      convertToRaw(this.state.editorState.getCurrentContent()),
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
     )
-    if (
-      draftToHtml(
-        convertToRaw(this.state.editorState.getCurrentContent()),
-      ).trim() === '<p></p>'
-    ) {
-      console.log('xxx')
-      this.props.setError(this.keyError, {
-        type: 'required',
-        message: 'Vui lòng nhập',
-      })
-    } else {
-      this.props.clearErrors([this.keyError])
-    }
+    return onChange(draftToHtml(convertToRaw(editorState.getCurrentContent())))
   }
 
   uploadImageCallBack = async file => {

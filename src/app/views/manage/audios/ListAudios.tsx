@@ -12,11 +12,13 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  useChangeIsDefaultAudio,
+  useChangeStatusAudio,
+  useDeleteAudio,
+} from 'app/hooks/queries/useAudiosData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeed } from 'app/models'
 import { IAudioOverall, IAudioResponse } from 'app/models/audio'
-import { columnFeeds } from 'app/utils/columns'
 import { columnsAudios } from 'app/utils/columns/columnsAudios'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
@@ -68,10 +70,15 @@ export default function ListAudios(props: Props) {
     extractMergeFiltersObject(defaultValues, {}),
   )
 
-  const [titleDialog, setTitleDialog] = useState('')
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
   const [openDialog, setOpenDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [feedId, setFeedId] = useState(0)
+  const [audioId, setAudioId] = useState(0)
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
@@ -178,39 +185,89 @@ export default function ListAudios(props: Props) {
     } as any)
   }
 
-  const onSuccess = (data: any) => {
+  const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({
-      message: dialogType === 1 ? 'Duyệt bài thành công' : '',
+      message: message ?? '',
     })
     setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } =
-    useApproveFeed(onSuccess)
 
-  const approveConfirm = () => {
-    approve(feedId)
+  const { mutate: changeStatus, isLoading: statusLoading } =
+    useChangeStatusAudio(() => onRowUpdateSuccess(null, 'Cập nhật thành công'))
+
+  const { mutate: changeIsDefault, isLoading: defaultLoading } =
+    useChangeIsDefaultAudio(() =>
+      onRowUpdateSuccess(null, 'Cập nhật thành công'),
+    )
+
+  const { mutate: deleteAudio } = useDeleteAudio(() =>
+    onRowUpdateSuccess(null, 'Xoá nhạc nền thành công'),
+  )
+
+  const submitDialog = () => {
+    switch (dialogData.type) {
+      case 'toggle-status':
+        changeStatus(audioId)
+        break
+      case 'toggle-isDefault':
+        changeIsDefault(audioId)
+        break
+      case 'delete':
+        deleteAudio(audioId)
+        break
+
+      default:
+        break
+    }
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    console.log(cell, row)
+    navigation(`${row.id}/chi-tiet`, { state: { modal: true, data: row } })
   }
   const onRowDelete = (cell: any, row: any) => {
-    console.log(cell, row)
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá nhạc nền',
+      message: 'Bạn có chắc chắn muốn xoá nhạc nền?',
+      type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
+    }))
+    setAudioId(row.id)
+    setOpenDialog(true)
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (['edit', 'account'].includes(cell.id)) {
-        navigation(`${row.feedId}`, {})
-      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
-        setTitleDialog('Duyệt bài đăng')
-        setFeedId(row.feedId)
-        setOpenDialog(true)
-      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
-        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
-          state: { modal: true },
-        })
-      }
+    if (['edit', 'account'].includes(cell.id)) {
+      navigation(`${row.feedId}`, {})
+    } else if (cell.id === 'isDefault') {
+      setDialogData(prev => ({
+        ...prev,
+        title: row.isDefault === 1 ? 'Bỏ làm nhạc hay' : 'Đặt làm nhạc hay',
+        message:
+          row.status === 1
+            ? 'Bạn có chắc chắn muốn bỏ làm nhạc hay'
+            : 'Bạn có chắc chắn muốn chọn làm nhạc hay',
+        type: 'toggle-isDefault',
+        submitText: 'Xác nhận',
+        cancelText: 'Huỷ',
+      }))
+      setAudioId(row.id)
+      setOpenDialog(true)
+    } else if (cell.id === 'status') {
+      setDialogData(prev => ({
+        ...prev,
+        title: row.status === 1 ? 'Ẩn nhạc nền' : 'Mở lại nhạc nền',
+        message:
+          row.status === 1
+            ? 'Bạn có chắc chắn muốn ẩn nhạc nền?'
+            : 'Bạn có chắc chắn muốn mở lại nhạc nền?',
+        type: 'toggle-status',
+        submitText: 'Xác nhận',
+        cancelText: 'Huỷ',
+      }))
+      setAudioId(row.id)
+      setOpenDialog(true)
     }
   }
 
@@ -326,14 +383,16 @@ export default function ListAudios(props: Props) {
       </Stack>
 
       <DiagLogConfirm
-        title={titleDialog}
+        title={dialogData.title}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={approveConfirm}
+        onSubmit={submitDialog}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">
-            Đồng ý duyệt bài đăng?
+            {dialogData.message}
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

@@ -8,10 +8,11 @@ export interface IAudioOverall {
   id?: number
   isDefault?: 0 | 1
   urlAudio?: string
+  duration?: number
   urlImage?: string
   author?: string
   performer?: string
-  status?: 0 | 1
+  status?: number
 }
 
 export type TitleAudios = keyof IAudioOverall | 'order' | 'action'

@@ -255,6 +255,7 @@ export default function AddEvent(props: Props) {
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    console.log(values.hashtag)
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
 
     const files = (fileInfos as IMediaOverall[])

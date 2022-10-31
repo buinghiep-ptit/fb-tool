@@ -124,7 +124,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Trạng thái',
     minWidth: 80,
     align: 'center',
-    action: (value: any) => (
+    status: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
         sx={{ justifyContent: 'center', fontSize: '16px!important' }}
@@ -136,7 +136,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Nhạc hay',
     minWidth: 80,
     align: 'center',
-    action: (value: any) => (
+    status: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
         sx={{ justifyContent: 'center', fontSize: '16px!important' }}

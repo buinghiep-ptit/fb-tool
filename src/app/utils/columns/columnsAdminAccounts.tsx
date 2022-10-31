@@ -9,7 +9,8 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -28,11 +29,9 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     ),
     sticky: {
       position: 'sticky',
-      left: 50,
+      left: 40,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {
@@ -71,12 +70,12 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   {
     id: 'action',
     label: '',
-    minWidth: 85,
-    align: 'right',
+    minWidth: 50,
+    align: 'center',
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'flex-end' }}
+        sx={{ justifyContent: 'center' }}
       />
     ),
     sticky: {

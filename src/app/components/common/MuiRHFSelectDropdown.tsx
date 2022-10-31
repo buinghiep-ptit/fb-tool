@@ -14,12 +14,14 @@ export interface ISelectDropDownProps extends SelectProps {
   label?: string
   defaultValue?: string | number
   children: React.ReactElement[] | React.ReactElement | any
+  required?: boolean
 }
 
 export function SelectDropDown({
   name,
   label = '',
   defaultValue,
+  required = false,
   children,
   ...props
 }: ISelectDropDownProps) {
@@ -37,7 +39,9 @@ export function SelectDropDown({
         },
       }}
     >
-      <InputLabel shrink>{label}</InputLabel>
+      <InputLabel shrink required={required}>
+        {label}
+      </InputLabel>
       <Controller
         name={name}
         control={control}

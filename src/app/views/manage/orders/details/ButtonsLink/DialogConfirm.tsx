@@ -8,6 +8,8 @@ export interface IDiagLogConfirmProps {
   onSubmit: () => void
   children?: React.ReactElement
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false | string
+  submitText?: string
+  cancelText?: string
 }
 
 export function DiagLogConfirm({
@@ -16,6 +18,8 @@ export function DiagLogConfirm({
   setOpen,
   maxWidth = 'sm',
   onSubmit,
+  submitText = 'Xác nhận',
+  cancelText = 'Quay lại',
   children,
 }: IDiagLogConfirmProps) {
   return (
@@ -27,6 +31,8 @@ export function DiagLogConfirm({
         onCloseModal={() => setOpen && setOpen(false)}
         isLoading={false}
         onSubmit={onSubmit}
+        submitText={submitText}
+        cancelText={cancelText}
       >
         {children}
       </MuiStyledModal>

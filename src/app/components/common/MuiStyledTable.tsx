@@ -1,5 +1,12 @@
 import { FilterNone } from '@mui/icons-material'
-import { Skeleton, Stack, styled } from '@mui/material'
+import {
+  Icon,
+  IconButton,
+  Skeleton,
+  Stack,
+  styled,
+  Tooltip,
+} from '@mui/material'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -34,6 +41,22 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
   rowsPerPage?: number
   page?: number
   actionKeys?: string[]
+  actions?: {
+    icon?: string
+    tooltip?: string
+    color?:
+      | 'inherit'
+      | 'action'
+      | 'disabled'
+      | 'primary'
+      | 'secondary'
+      | 'error'
+      | 'info'
+      | 'success'
+      | 'warning'
+    onClick?: (col: any, row?: any) => void
+    disableActions?: (status?: number) => boolean
+  }[]
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -45,8 +68,8 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   rowsPerPage = 20,
   page = 0,
   actionKeys = ['status'],
+  actions = [],
 }: MuiPagingTableProps<T>) {
-  const [rowHeight, setRowHeight] = React.useState(0)
   const memoizedData = React.useMemo(() => rows, [rows])
   const memoizedColumns = React.useMemo(() => columns, [columns])
   const skeletons = Array.from({ length: 10 }, (x, i) => i)
@@ -73,7 +96,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
 
   return (
     <>
-      <TableContainer sx={{ maxHeight: 720 }}>
+      <TableContainer sx={{ maxHeight: 600 }}>
         <Table stickyHeader aria-label="sticky table">
           {!isFetching && (
             <TableHead>
@@ -81,11 +104,12 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                 {columns.map((column, idx) => (
                   <TableCell
                     key={idx}
-                    align={column.align}
+                    align={'center' ?? column.align}
                     sx={{
                       minWidth: column.minWidth,
+                      maxWidth: column.maxWidth ?? null,
                       width: 50,
-                      padding: '12px',
+                      padding: '4px',
                       backgroundColor: 'white',
                       ...column.sticky,
                     }}
@@ -127,22 +151,52 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                           sx={{
                             ...column.sticky,
                             minWidth: column.minWidth,
-                            px: 1.5,
+                            maxWidth: column.maxWidth ?? null,
+                            px: 0.5,
                             cursor:
                               column.action || column.link
                                 ? 'pointer'
                                 : 'default',
-                            // whiteSpace: 'nowrap',
-                            // textOverflow: 'ellipsis',
-                            // overflow: 'hidden',
-                            // maxWidth: '300px',
-
-                            // whiteSpace: 'normal',
-                            // wordWrap: 'break-word',
                             zIndex: 1,
                           }}
                         >
-                          {cellFormatter(column, row, value)}
+                          {column.id === 'actions' ? (
+                            <Stack
+                              flexDirection={'row'}
+                              justifyContent="center"
+                              gap={0.5}
+                            >
+                              {actions.map((action, index) => {
+                                if (
+                                  action.disableActions &&
+                                  action.disableActions(row.status)
+                                ) {
+                                  return <Icon key={index}></Icon>
+                                }
+                                return (
+                                  <Tooltip
+                                    key={index}
+                                    arrow
+                                    title={action.tooltip}
+                                  >
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        action.onClick &&
+                                        action.onClick(column, row)
+                                      }
+                                    >
+                                      <Icon color={action.color ?? 'inherit'}>
+                                        {action.icon}
+                                      </Icon>
+                                    </IconButton>
+                                  </Tooltip>
+                                )
+                              })}
+                            </Stack>
+                          ) : (
+                            cellFormatter(column, row, value)
+                          )}
                         </TableCell>
                       )
                     })}

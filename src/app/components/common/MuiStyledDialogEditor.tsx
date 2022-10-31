@@ -1,12 +1,11 @@
 import { ApprovalRounded, CancelOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
+import { Stack, styled } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
-import { styled } from '@mui/material/styles'
-import { Stack } from '@mui/system'
 import * as React from 'react'
 import { MuiButton } from './MuiButton'
 
@@ -69,18 +68,17 @@ type Props = {
   isLoading?: boolean
 }
 
-export default function MuiStyledModal({
+export default function MuiStyledDialogEditor({
   title,
   submitText = 'Xác nhận',
   cancelText = 'Quay lại',
   open,
-  maxWidth = 'sm',
+  maxWidth = 'xs',
   onCloseModal,
   onSubmit,
   children,
   isLoading,
 }: Props) {
-  //   const [open, setOpen] = React.useState(false)
   return (
     <BootstrapDialog
       onClose={onCloseModal}
@@ -94,22 +92,7 @@ export default function MuiStyledModal({
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       <DialogActions>
-        <Stack
-          py={2}
-          sx={{
-            paddingLeft: {
-              xs: '6.66%',
-              sm: '13.33%',
-            },
-            paddingRight: {
-              xs: '6.66%',
-              sm: '13.33%',
-            },
-          }}
-          direction={'row'}
-          width={'100%'}
-          gap={2}
-        >
+        <Stack direction={'row'} gap={2} px={1}>
           {onSubmit && (
             <MuiButton
               disabled={isLoading}
@@ -117,8 +100,8 @@ export default function MuiStyledModal({
               variant="contained"
               color="primary"
               type="submit"
-              sx={{ flex: 1 }}
               startIcon={<ApprovalRounded />}
+              sx={{ minWidth: 100 }}
               onClick={() => onSubmit()}
               loading={isLoading}
             />
@@ -130,7 +113,7 @@ export default function MuiStyledModal({
               variant="outlined"
               color="secondary"
               type="submit"
-              sx={{ flex: 1, float: 'right' }}
+              sx={{ minWidth: 100 }}
               startIcon={<CancelOutlined />}
               onClick={onCloseModal}
             />

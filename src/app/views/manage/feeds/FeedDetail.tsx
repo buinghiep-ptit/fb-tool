@@ -7,7 +7,6 @@ import {
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import { CountdownTimer } from 'app/components/common/CountdownTimer'
 import { ImageListView } from 'app/components/common/ImageListCustomize'
 import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
@@ -108,7 +107,9 @@ export default function FeedDetail(props: Props) {
   )
 
   useEffect(() => {
-    setMediasSrcPreviewer(feed.data?.images ?? [])
+    setMediasSrcPreviewer(
+      feed.data?.images?.filter(img => img.mediaType === 3) ?? [],
+    )
   }, [JSON.stringify(feed)])
 
   const handleChangePageReports = (event: unknown, newPage: number) => {
@@ -216,7 +217,7 @@ export default function FeedDetail(props: Props) {
     switch (status) {
       case 1:
         return 'Hợp lệ'
-      case -2:
+      case -3:
         return 'Xoá'
 
       case -1:
@@ -254,49 +255,54 @@ export default function FeedDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
-        <MuiButton
-          disabled={feed?.data && feed?.data.status === 1}
-          title="Duyệt bài"
-          variant="contained"
-          color="primary"
-          onClick={() => approveFeed(Number(feedId ?? 0))}
-          loading={approveLoading}
-          startIcon={<Icon>done</Icon>}
-        />
-        <MuiButton
-          title="Chỉnh sửa"
-          variant="outlined"
-          color="primary"
-          disabled={
-            feed.data?.customerInfo?.type !== 3 &&
-            feed.data?.customerInfo?.type !== 1
-          }
-          onClick={() => navigate(`chinh-sua-feed`, {})}
-          loading={approveLoading}
-          startIcon={<Icon>edit</Icon>}
-        />
-        <MuiButton
-          disabled={feed?.data && feed?.data.status === -1}
-          title="Vi phạm"
-          variant="contained"
-          color="warning"
-          onClick={() =>
-            navigate(`vi-pham`, {
-              state: { modal: true },
-            })
-          }
-          startIcon={<Icon>report</Icon>}
-        />
+        {feed?.data?.status !== 1 && (
+          <MuiButton
+            title="Duyệt bài"
+            variant="contained"
+            color="primary"
+            onClick={() => approveFeed(Number(feedId ?? 0))}
+            loading={approveLoading}
+            startIcon={<Icon>done</Icon>}
+          />
+        )}
 
-        <MuiButton
-          disabled={feed?.data && feed?.data.status === -3}
-          title="Xoá bài"
-          variant="contained"
-          color="error"
-          onClick={openDialogDelete}
-          loading={deleteLoading}
-          startIcon={<Icon>clear</Icon>}
-        />
+        {(feed.data?.customerInfo?.type === 3 ||
+          feed.data?.customerInfo?.type === 1) &&
+          feed.data?.status !== -3 && (
+            <MuiButton
+              title="Chỉnh sửa"
+              variant="outlined"
+              color="primary"
+              onClick={() => navigate(`chinh-sua-feed`, {})}
+              loading={approveLoading}
+              startIcon={<Icon>edit</Icon>}
+            />
+          )}
+
+        {feed?.data?.status !== -1 && feed?.data?.status !== -3 && (
+          <MuiButton
+            title="Vi phạm"
+            variant="contained"
+            color="warning"
+            onClick={() =>
+              navigate(`vi-pham`, {
+                state: { modal: true },
+              })
+            }
+            startIcon={<Icon>report</Icon>}
+          />
+        )}
+
+        {feed?.data?.status !== -3 && (
+          <MuiButton
+            title="Xoá bài"
+            variant="contained"
+            color="error"
+            onClick={openDialogDelete}
+            loading={deleteLoading}
+            startIcon={<Icon>delete</Icon>}
+          />
+        )}
 
         <MuiButton
           title="Quay lại"

@@ -1,28 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  ArticleSharp,
-  ChangeCircleSharp,
-  ClearOutlined,
-  ReportSharp,
-  SearchSharp,
-} from '@mui/icons-material'
-import {
-  Divider,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  styled,
-} from '@mui/material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchFeeds } from 'app/apis/feed/feed.service'
+import { fetchAudios } from 'app/apis/audio/audio.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
@@ -31,12 +14,14 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
+import { IFeed } from 'app/models'
+import { IAudioOverall, IAudioResponse } from 'app/models/audio'
 import { columnFeeds } from 'app/utils/columns'
+import { columnsAudios } from 'app/utils/columns/columnsAudios'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
@@ -49,9 +34,17 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
+export interface IAudiosFilters {
+  search?: string
+  status?: 0 | 1 | 'all' | string | undefined //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
+  page?: number | 0
+  size?: number | 20
+  sort?: string
+}
+
 export interface Props {}
 
-export default function ManagerFeed(props: Props) {
+export default function ListAudios(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -64,17 +57,14 @@ export default function ManagerFeed(props: Props) {
   )
   const [isReset, setIsReset] = useState<boolean>(false)
 
-  const [defaultValues] = useState<IFeedsFilters>({
-    status: queryParams.status ?? 'all',
-    isCampdi: queryParams.isCampdi ? true : false,
-    // isReported: queryParams.isReported ? true : false,
+  const [defaultValues] = useState<IAudiosFilters>({
     search: queryParams.search ?? '',
-    hashtag: queryParams.hashtag ?? '',
+    status: queryParams.status ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
 
-  const [filters, setFilters] = useState<IFeedsFilters>(
+  const [filters, setFilters] = useState<IAudiosFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
 
@@ -87,12 +77,9 @@ export default function ManagerFeed(props: Props) {
     search: Yup.string()
       .min(0, 'email must be at least 0 characters')
       .max(255, 'email must be at almost 256 characters'),
-    hashtag: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
   })
 
-  const methods = useForm<IFeedsFilters>({
+  const methods = useForm<IAudiosFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
@@ -104,9 +91,9 @@ export default function ManagerFeed(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IFeedResponse, Error> = useQuery<IFeedResponse, Error>(
-    ['feeds', filters],
-    () => fetchFeeds(filters),
+  }: UseQueryResult<IAudioResponse, Error> = useQuery<IAudioResponse, Error>(
+    ['audios', filters],
+    () => fetchAudios(filters),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,
@@ -147,8 +134,8 @@ export default function ManagerFeed(props: Props) {
     } as any)
   }
 
-  const onSubmitHandler: SubmitHandler<IFeedsFilters> = (
-    values: IFeedsFilters,
+  const onSubmitHandler: SubmitHandler<IAudiosFilters> = (
+    values: IAudiosFilters,
   ) => {
     setPage(0)
     setSize(20)
@@ -172,10 +159,7 @@ export default function ManagerFeed(props: Props) {
     setIsReset(true)
     methods.reset({
       status: 'all',
-      isCampdi: false,
-      // isReported: false,
       search: '',
-      hashtag: '',
       page: 0,
       size: 20,
     })
@@ -208,23 +192,25 @@ export default function ManagerFeed(props: Props) {
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.feedId}`, {})
+    console.log(cell, row)
   }
-
-  const onRowApprove = (cell: any, row: any) => {
-    setTitleDialog('Duyệt bài đăng')
-    setFeedId(row.feedId)
-    setOpenDialog(true)
-  }
-  const onRowReport = (cell: any, row: any) => {
-    navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
-      state: { modal: true },
-    })
+  const onRowDelete = (cell: any, row: any) => {
+    console.log(cell, row)
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'account') {
-      navigation(`${row.feedId}`, {})
+    if (cell.action) {
+      if (['edit', 'account'].includes(cell.id)) {
+        navigation(`${row.feedId}`, {})
+      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
+        setTitleDialog('Duyệt bài đăng')
+        setFeedId(row.feedId)
+        setOpenDialog(true)
+      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
+        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
+          state: { modal: true },
+        })
+      }
     }
   }
 
@@ -233,86 +219,50 @@ export default function ManagerFeed(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm bài hát"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() =>
+            navigation('them-moi', {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={4} xs={12}>
+                <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Email, SĐT, Tên hiển thị'}
+                    label={'Tến bài hát/Người thể hiện/Tác giả'}
                     type="text"
                     name="search"
                     size="small"
-                    placeholder="Nhập email, sđt, tên"
+                    placeholder="Nhập từ khoá"
                     fullWidth
                     defaultValue=""
-                    iconEnd={
-                      methods.watch('search')?.length ? (
-                        <IconButton
-                          onClick={() => methods.setValue('search', '')}
-                          edge="end"
-                        >
-                          <ClearOutlined fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <React.Fragment />
-                      )
-                    }
-                    // focused
-                    // required
                   />
                 </Grid>
-                <Grid item sm={4} xs={12}>
-                  <FormInputText
-                    label={'Hashtag'}
-                    type="text"
-                    name="hashtag"
-                    placeholder="Nhập hashtag"
-                    size="small"
-                    fullWidth
-                    defaultValue=""
-                    iconEnd={
-                      methods.watch('hashtag')?.length ? (
-                        <IconButton
-                          onClick={() => methods.setValue('hashtag', '')}
-                          edge="end"
-                        >
-                          <ClearOutlined fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <React.Fragment />
-                      )
-                    }
-                  />
-                </Grid>
-                <Grid item sm={4} xs={12}>
+
+                <Grid item sm={3} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Hợp lệ</MenuItem>
-                    <MenuItem value="0">Chờ hậu kiểm</MenuItem>
-                    <MenuItem value="-1">Vi phạm</MenuItem>
-                    <MenuItem value="-2">Bị báo cáo</MenuItem>
-                    <MenuItem value="-3">Xoá</MenuItem>
+                    <MenuItem value="1">Hoạt động</MenuItem>
+                    <MenuItem value="0">Không hoạt động</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                {/* <Grid item sm={3} xs={12}>
-                  <SelectDropDown name="range" disabled defaultValue={'all'}>
-                    <MenuItem value="all">Công khai</MenuItem>
-                    <MenuItem value="friends">Bạn bè</MenuItem>
-                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                  </SelectDropDown>
-                </Grid> */}
-              </Grid>
-              <Grid item sm={4} xs={12} pt={2}>
-                <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                {/* <MuiCheckBox name="isReported" label="Báo cáo vi phạm" /> */}
-              </Grid>
-            </FormProvider>
 
-            <Box pt={3}>
-              <Grid container spacing={2}>
-                <Grid item sm={2} xs={12}>
+                <Grid item sm={3} xs={12}>
                   <MuiButton
                     loading={!isReset && isFetching}
                     title="Tìm kiếm"
@@ -323,7 +273,7 @@ export default function ManagerFeed(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={2} xs={12}>
+                <Grid item sm={3} xs={12}>
                   <MuiButton
                     loading={isReset && isFetching}
                     title="Làm mới"
@@ -334,44 +284,15 @@ export default function ManagerFeed(props: Props) {
                     startIcon={<ChangeCircleSharp />}
                   />
                 </Grid>
-                <Grid item sm={8} xs={12}>
-                  <Stack flexDirection={'row'} justifyContent={'flex-end'}>
-                    <MuiButton
-                      title="Hậu kiểm"
-                      variant="text"
-                      color="secondary"
-                      onClick={() =>
-                        navigation(`hau-kiem`, { state: { type: 1 } })
-                      }
-                      startIcon={<ArticleSharp />}
-                    />
-                    <Divider
-                      orientation="vertical"
-                      sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
-                      flexItem
-                    />
-                    {/* <NavLink to={'/quan-ly-feeds/hau-kiem'}> */}
-                    <MuiButton
-                      title="Báo cáo vi phạm"
-                      variant="text"
-                      color="error"
-                      onClick={() =>
-                        navigation(`hau-kiem`, { state: { type: 2 } })
-                      }
-                      startIcon={<ReportSharp />}
-                    />
-                    {/* </NavLink> */}
-                  </Stack>
-                </Grid>
               </Grid>
-            </Box>
+            </FormProvider>
           </form>
         </SimpleCard>
 
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as IFeed[]) : []}
-            columns={columnFeeds}
+            rows={data ? (data?.content as IAudioOverall[]) : []}
+            columns={columnsAudios}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -385,20 +306,10 @@ export default function ManagerFeed(props: Props) {
                 onClick: onRowUpdate,
               },
               {
-                icon: 'verified',
-                color: 'primary',
-                tooltip: 'Duyệt bài',
-                onClick: onRowApprove,
-                disableActions: (status?: number) =>
-                  [1, -3].includes(status ?? 0),
-              },
-              {
-                icon: 'warning_amber',
+                icon: 'delete',
                 color: 'error',
-                tooltip: 'Báo cáo vi phạm',
-                onClick: onRowReport,
-                disableActions: (status?: number) =>
-                  [-1, -3].includes(status ?? 0),
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
               },
             ]}
           />

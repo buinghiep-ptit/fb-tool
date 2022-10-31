@@ -7,7 +7,7 @@ export enum OrderStatusEnum {
   CANCELED = -1,
 
   WAIT_HANDLE = 0,
-  HANDLE_COMPLETED = 1,
+  HANDLE_COMPLETED = 2,
 }
 interface OrderStatusSpec {
   key?: number

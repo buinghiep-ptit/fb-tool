@@ -1,7 +1,6 @@
 import Loadable from 'app/components/Loadable'
 import { navCustomerDetail } from 'app/utils/navbars'
 import { lazy } from 'react'
-// import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
 import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
@@ -41,6 +40,8 @@ const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
+const ListAudios = Loadable(lazy(() => import('./audios/ListAudios')))
+const AddAudio = Loadable(lazy(() => import('./audios/AddAudio')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 
@@ -198,6 +199,26 @@ const ManagementRoutes = [
   {
     path: '/them-moi-feed',
     element: <CreateFeed />,
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-audios',
+    element: (
+      <>
+        <ListAudios />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':audioId/chi-tiet',
+        element: <AddAudio title="Chi tiết bài hát" />,
+      },
+      {
+        path: 'them-moi',
+        element: <AddAudio title="Thêm bài hát" />,
+      },
+    ],
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {

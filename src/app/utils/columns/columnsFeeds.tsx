@@ -1,14 +1,22 @@
-import { Chip, Icon, IconButton, Typography } from '@mui/material'
+import {
+  Chip,
+  Icon,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn, TitleFeeds } from 'app/models'
-import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import moment from 'moment'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -19,25 +27,35 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'account',
     label: 'Tài khoản',
-    minWidth: 170,
+    minWidth: 150,
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
     sticky: {
       position: 'sticky',
-      left: 50,
+      left: 40,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {
     id: 'content',
     label: 'Nội dung',
-    minWidth: 250,
+    minWidth: 200,
     align: 'left',
     format: (value: number) => (
       <Typography
@@ -45,8 +63,9 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           display: '-webkit-box',
-          WebkitLineClamp: '3',
+          WebkitLineClamp: '2',
           WebkitBoxOrient: 'vertical',
+          pl: 1,
         }}
       >
         {value}
@@ -55,28 +74,37 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   },
   {
     id: 'customerType',
-    label: 'Loại tài khoản',
-    minWidth: 170,
+    label: 'Loại TK',
+    minWidth: 80,
     align: 'center',
     format: (value: number) => LabelFormatter(value, 'customerType'),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian đăng',
-    minWidth: 170,
+    minWidth: 120,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
+    format: (value: string) => (
+      <Stack>
+        <MuiTypography fontWeight={500}>
+          {moment(value).format('DD/MM/YYYY')}
+        </MuiTypography>
+        <MuiTypography variant="body2" fontSize={'0.75rem'}>
+          {moment(value).format('(HH:mm:ss)')}
+        </MuiTypography>
+      </Stack>
+    ),
   },
   {
     id: 'type',
     label: 'Thể loại',
-    minWidth: 100,
+    minWidth: 80,
     align: 'center',
     format: (value: any) => (
       <Chip
         label={value === 1 ? 'Video' : 'Ảnh'}
         size="small"
-        color={'primary'}
+        color={value === 1 ? 'primary' : 'warning'}
         sx={{ m: 0.5 }}
       />
     ),
@@ -96,64 +124,21 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   },
   {
     id: 'reportedNum',
-    label: 'Số b/c vi phạm',
-    minWidth: 170,
-    align: 'center',
-  },
-  {
-    id: 'edit',
-    label: '',
-    minWidth: 50,
-    align: 'right',
-    action: () => (
-      <IconButton size="small">
-        <Icon color="primary">east</Icon>
-      </IconButton>
-    ),
-    sticky: {
-      position: 'sticky',
-      right: 130,
-      background: 'white',
-      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
-      clipPath: 'inset(0px 0px 0px -15px)',
-    },
-  },
-  {
-    id: 'approve',
-    label: 'Thao tác',
+    label: 'Số BCVP',
     minWidth: 80,
     align: 'center',
-    action: (status?: number) =>
-      [-2, -1, 0].includes(status ?? 0) ? (
-        <IconButton size="small">
-          <Icon color="primary">checklist</Icon>
-        </IconButton>
-      ) : (
-        <></>
-      ),
-    sticky: {
-      position: 'sticky',
-      right: 50,
-      background: 'white',
-    },
   },
   {
-    id: 'violate',
-    label: '',
-    minWidth: 50,
-    align: 'left',
-    action: (status?: number) =>
-      [-2, 0, 1].includes(status ?? 0) ? (
-        <IconButton size="small">
-          <Icon color="error">report</Icon>
-        </IconButton>
-      ) : (
-        <></>
-      ),
+    id: 'actions',
+    label: 'Hành động',
+    minWidth: 80,
+    align: 'center',
     sticky: {
       position: 'sticky',
       right: 0,
       background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
     },
   },
 ]

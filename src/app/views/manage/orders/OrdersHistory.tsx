@@ -30,7 +30,7 @@ import {
 } from 'app/utils/columns/columnsOrders'
 import { getOrderStatusSpec, OrderStatusEnum } from 'app/utils/enums/order'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -105,11 +105,12 @@ export default function OrdersHistory() {
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
-
   const [filters, setFilters] = useState<ISearchFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
   const { source, orderId: id } = useParams() ?? 0
+
+  const tabRef = useRef<number>(-1)
 
   const getCurrentTabIndex = (source: string) => {
     const index = navOrdersHistory.items.findIndex(item =>
@@ -124,12 +125,15 @@ export default function OrdersHistory() {
   )
 
   useEffect(() => {
-    const idx = getCurrentTabIndex(source ?? '')
-    if (idx !== -1) {
-      setTabName(navOrdersHistory.items[idx].label)
+    // const idx = getCurrentTabIndex(source ?? '')
+    // if (idx !== -1) {
+    //   setTabName(navOrdersHistory.items[idx].label)
+    // }
+    if (tabRef && tabRef.current != -1) {
+      onResetFilters()
     }
-    onResetFilters()
-  }, [source])
+    tabRef.current = currentTab
+  }, [currentTab])
 
   const {
     data,
@@ -204,6 +208,8 @@ export default function OrdersHistory() {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setPage(0)
+    setSize(20)
     values = {
       ...values,
       from: (values.from as any)?.toISOString(),
@@ -212,15 +218,15 @@ export default function OrdersHistory() {
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 

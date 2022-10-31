@@ -1,5 +1,5 @@
 import { EditOutlined } from '@mui/icons-material'
-import { Avatar, Chip, styled, Typography } from '@mui/material'
+import { Avatar, Chip, styled, Tooltip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
@@ -19,7 +19,8 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 50,
+    minWidth: 40,
+    align: 'center',
     sticky: {
       position: 'sticky',
       left: 0,
@@ -38,11 +39,9 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     ),
     sticky: {
       position: 'sticky',
-      left: 50,
+      left: 40,
       background: 'white',
       zIndex: 9,
-      boxShadow: '-10px -10px 15px rgba(0,0,0,0.5)',
-      clipPath: 'inset(0px -15px 0px 0px)',
     },
   },
   {
@@ -115,11 +114,10 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     },
   },
   {
-    id: 'action',
+    id: 'actions',
     label: '',
     minWidth: 50,
-    align: 'right',
-    action: (value: any) => <EditOutlined />,
+    align: 'center',
     sticky: {
       position: 'sticky',
       right: 0,

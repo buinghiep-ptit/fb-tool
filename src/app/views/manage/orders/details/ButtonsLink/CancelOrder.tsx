@@ -6,7 +6,7 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useNoteOrder } from 'app/hooks/queries/useOrdersData'
+import { useCancelOrder, useNoteOrder } from 'app/hooks/queries/useOrdersData'
 import { messages } from 'app/utils/messages'
 import React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -18,7 +18,7 @@ type Props = {
 }
 
 export type ReassignSchema = {
-  reason?: string
+  note?: string
 }
 
 export default function CancelOrder({ title }: Props) {
@@ -35,7 +35,7 @@ export default function CancelOrder({ title }: Props) {
   }
 
   const validationSchema = Yup.object().shape({
-    reason: Yup.string()
+    note: Yup.string()
       .max(255, 'Nội dung không được vượt quá 255 ký tự')
       .required(messages.MSG1),
   })
@@ -45,16 +45,16 @@ export default function CancelOrder({ title }: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const { mutate: note, isLoading: isLoading } = useNoteOrder(() =>
+  const { mutate: cancel, isLoading: isLoading } = useCancelOrder(() =>
     onSuccess(null, 'Huỷ đơn hàng thành công'),
   )
 
   const onSubmitHandler: SubmitHandler<ReassignSchema> = (
     values: ReassignSchema,
   ) => {
-    note({
+    cancel({
       orderId: Number(orderId ?? 0),
-      note: values.reason ?? '',
+      note: values.note ?? '',
     })
   }
 
@@ -75,9 +75,9 @@ export default function CancelOrder({ title }: Props) {
                 Lý do:
               </MuiTypography>
               <FormTextArea
-                name="reason"
+                name="note"
                 defaultValue={''}
-                placeholder="Nhập nội dung"
+                placeholder="Nhập lý do"
               />
             </Box>
           </Stack>

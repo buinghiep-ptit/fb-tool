@@ -26,16 +26,22 @@ import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateEvent, useUpdateEvent } from 'app/hooks/queries/useEventsData'
+import {
+  useCreateEvent,
+  useDeleteEvent,
+  useUpdateEvent,
+} from 'app/hooks/queries/useEventsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
 import { messages } from 'app/utils/messages'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -74,6 +80,15 @@ export default function AddEvent(props: Props) {
     [],
   )
 
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+
+  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false)
+
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
     isEveryYear: false,
@@ -83,12 +98,20 @@ export default function AddEvent(props: Props) {
 
   const validationSchema = Yup.object().shape(
     {
-      name: Yup.string().required('Tên không được bỏ trống'),
+      name: Yup.string()
+        .required(messages.MSG1)
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       startDate: Yup.date()
-        //   .min(new Date(), 'Tối thiều là hôm nay')
+        .when('endDate', (endDate, yup) => {
+          if (endDate && endDate != 'Invalid Date') {
+            const dayAfter = new Date(endDate.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
         .typeError('Sai định dạng.')
         .nullable()
-        .required('Chọn ngày bắt đầu'),
+        .required(messages.MSG1),
       endDate: Yup.date()
         .when('startDate', (startDate, yup) => {
           if (startDate && startDate != 'Invalid Date') {
@@ -99,13 +122,15 @@ export default function AddEvent(props: Props) {
         })
         .typeError('Sai định dạng.')
         .nullable()
-        .required('Chọn ngày kết thúc.'),
+        .required(messages.MSG1),
       amount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
           // if (!!Number(eventId ?? 0)) {
           const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-            media => media.mediaFormat === fileConfigs.mediaFormat,
+            media =>
+              media.mediaFormat === fileConfigs.mediaFormat &&
+              media.mediaType === 3,
           )
 
           if (files && files.length) {
@@ -124,9 +149,10 @@ export default function AddEvent(props: Props) {
             : 'Dung lượng ảnh tối đa 10MB/ảnh',
           files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
         ),
+      hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
       editor_content: Yup.string().required(messages.MSG1),
     },
-    [['files', 'files']],
+    ['startDate', 'endDate'] as any,
   )
 
   const methods = useForm<SchemaType>({
@@ -136,6 +162,19 @@ export default function AddEvent(props: Props) {
   })
 
   const isEveryYear = methods.watch('isEveryYear')
+  const startDate = methods.watch('startDate')
+  const endDate = methods.watch('endDate')
+
+  useEffect(() => {
+    if (!startDate || !endDate) return
+
+    if (
+      moment(new Date(startDate)).unix() <= moment(new Date(endDate)).unix()
+    ) {
+      methods.clearErrors('startDate')
+      methods.clearErrors('endDate')
+    }
+  }, [startDate, endDate])
 
   const [
     selectFiles,
@@ -173,7 +212,7 @@ export default function AddEvent(props: Props) {
       defaultValues.name = event.name
       defaultValues.isEveryYear = event.isEveryYear === 1 ? true : false
       defaultValues.hashtag = event.tags
-      defaultValues.amount = 20000
+      defaultValues.amount = event.amount
       defaultValues.status = event.status
       defaultValues.editor_content = event.content
       defaultValues.startDate = event.startDate
@@ -303,6 +342,24 @@ export default function AddEvent(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
+  const { mutate: deleteEvent } = useDeleteEvent(() =>
+    onRowUpdateSuccess(null, 'Xoá sự kiện thành công'),
+  )
+
+  const onDeleteEvent = () => {
+    if (eventId) deleteEvent(Number(eventId))
+  }
+
+  const openDeleteDialog = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá sự kiện',
+      message: 'Bạn có chắc chắn muốn xoá sự kiện?',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+  }
+
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
       setFileConfigs(prev => ({
@@ -338,7 +395,7 @@ export default function AddEvent(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý sự kiện', path: '/quan-ly-su-kien' },
-            { name: 'Thêm mới sự kiện' },
+            { name: eventId ? 'Chi tiết sự kiện' : 'Thêm mới sự kiện' },
           ]}
         />
       </Box>
@@ -348,7 +405,7 @@ export default function AddEvent(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
         <MuiButton
-          title="Lưu lại"
+          title="Lưu"
           variant="contained"
           color="primary"
           onClick={methods.handleSubmit(onSubmitHandler)}
@@ -358,14 +415,26 @@ export default function AddEvent(props: Props) {
         />
         <MuiButton
           disabled={uploading}
-          title="Huỷ bỏ"
+          title="Huỷ"
           variant="contained"
           color="warning"
           onClick={() => {
+            removeUploadedFiles(undefined, fileConfigs.mediaFormat)
             initDefaultValues(event)
           }}
           startIcon={<Icon>cached</Icon>}
         />
+
+        {eventId && (
+          <MuiButton
+            disabled={uploading}
+            title="Xoá"
+            variant="contained"
+            color="error"
+            onClick={openDeleteDialog}
+            startIcon={<Icon>delete</Icon>}
+          />
+        )}
 
         <MuiButton
           title="Quay lại"
@@ -375,6 +444,8 @@ export default function AddEvent(props: Props) {
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
+      {/* <button onClick={() => setIsFileDialogOpen(true)}>Open Click</button> */}
+
       <SimpleCard>
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -506,6 +577,8 @@ export default function AddEvent(props: Props) {
                       cancelUploading={cancelUploading}
                       uploading={uploading}
                       progressInfos={progressInfos}
+                      isFileDialogOpen={isFileDialogOpen}
+                      setIsFileDialogOpen={setIsFileDialogOpen}
                     />
                   </Box>
                 </Stack>
@@ -523,6 +596,24 @@ export default function AddEvent(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
+
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onDeleteEvent}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+          <MuiTypography variant="subtitle1" color="primary">
+            {event?.name}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

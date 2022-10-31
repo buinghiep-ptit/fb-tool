@@ -135,7 +135,7 @@ export function OrderServices({
                   VNĐ
                 </MuiTypography>
               </Stack>
-              {order?.status === 3 && (
+              {order?.status !== 0 && order?.status !== 1 && (
                 <>
                   <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
                     <Stack flexDirection={'row'} gap={1.5}>

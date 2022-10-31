@@ -24,7 +24,7 @@ export interface IFeed {
 export interface IFeedDetail {
   id?: number
   type?: number // 1: video, 2: images
-  idSrcType?: number // Liên kết với 1:Địa danh 2:Điểm camp 4:Sản phẩm
+  idSrcType?: number | null // Liên kết với 1:Địa danh 2:Điểm camp 4:Sản phẩm
   idSrc?: number | null
   webUrl?: string | null
   idCustomer?: number

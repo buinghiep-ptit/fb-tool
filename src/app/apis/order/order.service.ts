@@ -60,6 +60,14 @@ export const unavailableOrder = async (orderId: number): Promise<any> => {
   return data
 }
 
+export const cancelOrder = async (
+  orderId: number,
+  payload: { note?: string },
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/cancel`, payload)
+  return data
+}
+
 export const reassignOrder = async (
   orderId: number,
   userId: number,
@@ -78,6 +86,11 @@ export const paymentConfirm = async (
     `/api/order/${orderId}/confirm-bank-transfer`,
     payload,
   )
+  return data
+}
+
+export const orderUsed = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/order/${orderId}/order-used`)
   return data
 }
 

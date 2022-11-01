@@ -325,6 +325,25 @@ export default function ServiceDetail(props: Props) {
       </Box>
     )
 
+  const convertToDay = (day?: number) => {
+    switch (day) {
+      case 1:
+        return 'Chủ nhật:'
+      case 2:
+        return 'Thứ 2:'
+      case 3:
+        return 'Thứ 3:'
+      case 4:
+        return 'Thứ 4:'
+      case 5:
+        return 'Thứ 5:'
+      case 6:
+        return 'Thứ 6:'
+      case 7:
+        return 'Thứ 7:'
+    }
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
@@ -495,7 +514,7 @@ export default function ServiceDetail(props: Props) {
                       sx={{ display: 'flex', alignItems: 'center' }}
                     >
                       <Grid item xs={2}>
-                        <MuiTypography>{day}</MuiTypography>
+                        <MuiTypography>{convertToDay(day)}</MuiTypography>
                       </Grid>
                       <Grid
                         item

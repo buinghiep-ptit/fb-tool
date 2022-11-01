@@ -1,58 +1,52 @@
-import * as React from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Box,
   Grid,
-  styled,
+  Icon,
   InputLabel,
-  TextField,
+  LinearProgress,
   MenuItem,
   Stack,
-  LinearProgress,
-  Icon,
+  styled,
 } from '@mui/material'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { fetchCampGrounds } from 'app/apis/feed/feed.service'
+import { getServiceDetail } from 'app/apis/services/services.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { MuiButton } from 'app/components/common/MuiButton'
+import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import {
-  ICampArea,
+  useCreateService,
+  useUpdateService,
+} from 'app/hooks/queries/useServicesData'
+import { useUploadFiles } from 'app/hooks/useFilesUpload'
+import { IMediaOverall } from 'app/models'
+import {
   ICampAreaResponse,
   ICampGround,
   ICampGroundResponse,
 } from 'app/models/camp'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
+import { DetailService, WeekdayPrices } from 'app/models/service'
+import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import { messages } from 'app/utils/messages'
+import * as React from 'react'
+import { useState } from 'react'
 import {
   FormProvider,
   SubmitHandler,
   useFieldArray,
   useForm,
 } from 'react-hook-form'
-import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useState } from 'react'
-import * as Yup from 'yup'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
-import { ApprovalRounded, CancelSharp, HelpOutline } from '@mui/icons-material'
-import { MuiButton } from 'app/components/common/MuiButton'
-import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
-import { IMediaOverall } from 'app/models'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
-import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
-import { MuiTypography } from 'app/components/common/MuiTypography'
-import FormInputText from 'app/components/common/MuiRHFInputText'
-import { DetailService, WeekdayPrices } from 'app/models/service'
-import { getServiceDetail } from 'app/apis/services/services.service'
 import { useNavigate, useParams } from 'react-router-dom'
-import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
-import { messages } from 'app/utils/messages'
-import { toastSuccess } from 'app/helpers/toastNofication'
-import {
-  useCreateService,
-  useUpdateService,
-} from 'app/hooks/queries/useServicesData'
-import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
-import ca from 'date-fns/esm/locale/ca/index.js'
-import { any } from 'prop-types'
-import UploadImage from 'app/components/common/uploadImage'
+import * as Yup from 'yup'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -328,19 +322,19 @@ export default function ServiceDetail(props: Props) {
   const convertToDay = (day?: number) => {
     switch (day) {
       case 1:
-        return 'Chủ nhật:'
+        return 'Chủ nhật'
       case 2:
-        return 'Thứ 2:'
+        return 'Thứ 2'
       case 3:
-        return 'Thứ 3:'
+        return 'Thứ 3'
       case 4:
-        return 'Thứ 4:'
+        return 'Thứ 4'
       case 5:
-        return 'Thứ 5:'
+        return 'Thứ 5'
       case 6:
-        return 'Thứ 6:'
+        return 'Thứ 6'
       case 7:
-        return 'Thứ 7:'
+        return 'Thứ 7'
     }
   }
 
@@ -349,186 +343,128 @@ export default function ServiceDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Chi tiết dịch vụ' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
+      >
+        <MuiButton
+          title="Lưu"
+          variant="contained"
+          color="primary"
+          onClick={methods.handleSubmit(onSubmitHandler)}
+          startIcon={<Icon>done</Icon>}
+        />
+
+        <MuiButton
+          onClick={() => methods.reset()}
+          title="Huỷ"
+          variant="contained"
+          color="warning"
+          startIcon={<Icon>cached</Icon>}
+        />
+
+        <MuiButton
+          title="Quay lại"
+          variant="contained"
+          color="inherit"
+          onClick={() => navigate(-1)}
+          startIcon={<Icon>keyboard_return</Icon>}
+        />
+      </Stack>
       <SimpleCard>
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
           <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={3} xs={3}>
-                <MuiButton
-                  title="Lưu"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<ApprovalRounded />}
-                />
-              </Grid>
-
-              <Grid item sm={3} xs={3}>
-                <MuiButton
-                  onClick={() => methods.reset()}
-                  title="Huỷ"
-                  variant="outlined"
-                  color="secondary"
-                  sx={{ width: '100%' }}
-                  startIcon={<CancelSharp />}
-                />
-              </Grid>
-
-              <Grid item sm={3} xs={3}>
-                <MuiButton
-                  title="Quay lại"
-                  variant="contained"
-                  color="inherit"
-                  onClick={() => navigate(-1)}
-                  sx={{ width: '100%' }}
-                  startIcon={<Icon>keyboard_return</Icon>}
-                />
-              </Grid>
-            </Grid>
             {loading && <LinearProgress sx={{ mt: 0.5 }} />}
-            <Grid
-              container
-              sx={{ marginLeft: '8px', marginTop: '10px ' }}
-              rowSpacing={1}
-            >
-              <Grid
-                item
-                xs={9}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginTop: 2,
-                  marginBottom: 1,
-                }}
-              >
-                <MuiRHFAutoComplete
-                  label="Địa điểm camp"
-                  name="camp"
-                  options={campGrounds?.content ?? []}
-                  optionProperty="name"
-                  getOptionLabel={option => option.name ?? ''}
-                  defaultValue=""
-                  required
-                />
-              </Grid>
+            <Grid container spacing={6}>
+              <Grid item sm={6} xs={12}>
+                <Stack gap={3}>
+                  <MuiRHFAutoComplete
+                    label="Địa điểm camp"
+                    name="camp"
+                    options={campGrounds?.content ?? []}
+                    optionProperty="name"
+                    getOptionLabel={option => option.name ?? ''}
+                    defaultValue=""
+                    required
+                  />
 
-              <Grid
-                item
-                xs={9}
-                sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
-              >
-                <SelectDropDown name="rentalType" label="Loại dịch vụ" required>
-                  <MenuItem value="1">Gói dịch vụ</MenuItem>
-                  <MenuItem value="2">Gói lưu trú</MenuItem>
-                  <MenuItem value="3">Khác</MenuItem>
-                </SelectDropDown>
-              </Grid>
+                  <SelectDropDown
+                    name="rentalType"
+                    label="Loại dịch vụ"
+                    required
+                  >
+                    <MenuItem value="1">Gói dịch vụ</MenuItem>
+                    <MenuItem value="2">Gói lưu trú</MenuItem>
+                    <MenuItem value="3">Khác</MenuItem>
+                  </SelectDropDown>
 
-              <Grid
-                item
-                xs={9}
-                sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
-              >
-                <MuiRHFNumericFormatInput
-                  type="text"
-                  name="capacity"
-                  label="Áp dụng"
-                  placeholder=""
-                  iconEnd={
-                    <MuiTypography variant="subtitle2">Người</MuiTypography>
-                  }
-                  required
-                />
-              </Grid>
+                  <MuiRHFNumericFormatInput
+                    type="text"
+                    name="capacity"
+                    label="Áp dụng"
+                    placeholder=""
+                    iconEnd={
+                      <MuiTypography variant="subtitle2">Người</MuiTypography>
+                    }
+                    required
+                    fullWidth
+                  />
 
-              <Grid
-                item
-                xs={9}
-                sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
-              >
-                <FormInputText
-                  type="text"
-                  name="name"
-                  label={'Tên dịch vụ'}
-                  defaultValue=""
-                  placeholder=""
-                  sx={{ width: '50%' }}
-                  required
-                />
-              </Grid>
+                  <FormInputText
+                    type="text"
+                    name="name"
+                    label={'Tên dịch vụ'}
+                    defaultValue=""
+                    placeholder=""
+                    required
+                    fullWidth
+                  />
 
-              <Grid
-                item
-                xs={9}
-                sx={{ display: 'flex', alignItems: 'center', marginBottom: 1 }}
-              >
-                <SelectDropDown
-                  name="status"
-                  label="Trạng thái"
-                  sx={{ width: '50%' }}
-                  required
-                >
-                  <MenuItem value="1">Hiệu lực</MenuItem>
-                  <MenuItem value="-1">Không hiệu lực</MenuItem>
-                </SelectDropDown>
+                  <SelectDropDown name="status" label="Trạng thái" required>
+                    <MenuItem value="1">Hiệu lực</MenuItem>
+                    <MenuItem value="-1">Không hiệu lực</MenuItem>
+                  </SelectDropDown>
+
+                  <Stack
+                    direction={'row'}
+                    width={{
+                      sx: '100%',
+                    }}
+                  >
+                    <MuiTypography mb={1.5} flex={1}>
+                      Hình ảnh:
+                    </MuiTypography>
+                    <Box flex={1}>
+                      <UploadPreviewer
+                        name="files"
+                        initialMedias={campService?.images ?? []}
+                        fileInfos={fileInfos}
+                        mediasSrcPreviewer={mediasSrcPreviewer}
+                        setMediasSrcPreviewer={setMediasSrcPreviewer}
+                        mediaConfigs={fileConfigs as any}
+                        selectFiles={selectFiles}
+                        uploadFiles={uploadFiles}
+                        removeUploadedFiles={removeUploadedFiles}
+                        cancelUploading={cancelUploading}
+                        uploading={uploading}
+                        progressInfos={progressInfos}
+                      />
+                    </Box>
+                  </Stack>
+                </Stack>
               </Grid>
-              <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                <InputLabel
-                  sx={{
-                    color: 'Black',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                  }}
-                  required
-                >
-                  Giá dịch vụ:
-                </InputLabel>
-              </Grid>
-              <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                <InputLabel
-                  sx={{
-                    color: 'Black',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                  }}
-                  required
-                >
-                  Hình ảnh:
-                </InputLabel>
-              </Grid>
-              <Grid
-                item
-                xs={6}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'column',
-                }}
-              >
-                {(fields as unknown as WeekdayPrices[]).map(
-                  ({ id, day, amount }: any, index) => (
-                    <Grid
-                      container
-                      key={id}
-                      sx={{ display: 'flex', alignItems: 'center' }}
-                    >
-                      <Grid item xs={2}>
-                        <MuiTypography>{convertToDay(day)}</MuiTypography>
-                      </Grid>
-                      <Grid
-                        item
-                        xs={4}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginRight: 3,
-                          marginTop: 2,
-                          marginBottom: 1,
-                        }}
-                      >
+              <Grid item sm={6} xs={12}>
+                <Stack gap={1.5}>
+                  {(fields as unknown as WeekdayPrices[]).map(
+                    ({ id, day, amount }: any, index) => (
+                      <Stack key={id}>
+                        <MuiTypography mb={1.5}>
+                          {convertToDay(day)}
+                        </MuiTypography>
                         <MuiRHFNumericFormatInput
-                          label={''}
+                          label={'Giá'}
+                          required
                           name={`weekdayPrices.${index}.amount`}
                           iconEnd={
                             <MuiTypography variant="subtitle2">
@@ -537,60 +473,19 @@ export default function ServiceDetail(props: Props) {
                           }
                           fullWidth
                         />
-                      </Grid>
-                    </Grid>
-                  ),
-                )}
-              </Grid>
-
-              <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                <Stack
-                  gap={2}
-                  flexDirection={'column'}
-                  alignItems={'center'}
-                  justifyContent={'center'}
-                >
-                  <Box
-                    width={{
-                      sx: '100%',
-                      md: fileConfigs.mediaFormat === 1 ? 300 : 500,
-                    }}
-                    position="relative"
-                  >
-                    <UploadPreviewer
-                      name="files"
-                      initialMedias={campService?.images ?? []}
-                      fileInfos={fileInfos}
-                      mediasSrcPreviewer={mediasSrcPreviewer}
-                      setMediasSrcPreviewer={setMediasSrcPreviewer}
-                      mediaConfigs={fileConfigs as any}
-                      selectFiles={selectFiles}
-                      uploadFiles={uploadFiles}
-                      removeUploadedFiles={removeUploadedFiles}
-                      cancelUploading={cancelUploading}
-                      uploading={uploading}
-                      progressInfos={progressInfos}
-                    />
-                  </Box>
+                      </Stack>
+                    ),
+                  )}
                 </Stack>
               </Grid>
-
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
-                <InputLabel
-                  sx={{
-                    color: 'Black',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                  }}
-                  required
-                >
-                  Mô tả
-                </InputLabel>
-              </Grid>
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
-                <RHFWYSIWYGEditor name="description" />
-              </Grid>
             </Grid>
+
+            <Stack gap={1} mt={3}>
+              <InputLabel sx={{ fontWeight: 500 }} required>
+                Mô tả
+              </InputLabel>
+              <RHFWYSIWYGEditor name="description" />
+            </Stack>
           </FormProvider>
         </form>
       </SimpleCard>

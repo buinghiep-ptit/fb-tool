@@ -13,6 +13,7 @@ import {
   customerSystemDefault,
   fetchCustomers,
 } from 'app/apis/accounts/customer.service'
+import { fetchAudios } from 'app/apis/audio/audio.service'
 import {
   fetchCampAreas,
   fetchCampGrounds,
@@ -30,7 +31,11 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import { useCreateFeed, useUpdateFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  useCreateFeed,
+  useDeleteFeed,
+  useUpdateFeed,
+} from 'app/hooks/queries/useFeedsData'
 import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import {
   ICustomer,
@@ -41,6 +46,7 @@ import {
   IMediaOverall,
   ITags,
 } from 'app/models'
+import { IAudioOverall } from 'app/models/audio'
 import {
   ICampArea,
   ICampAreaResponse,
@@ -48,15 +54,17 @@ import {
 } from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
 type SchemaType = {
   type?: 1 | 2 | number
+  audio?: IAudioOverall
   cusType?: number | string
   customer?: any // idCustomer
   idSrcType?: number | string
@@ -82,17 +90,20 @@ export default function CreateFeed(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
+  const audioRef = useRef() as any
+
   const { feedId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: EMediaFormat.IMAGE,
     accept: 'image/*',
     multiple: true,
     mediaType: EMediaType.POST,
+    isLimitFiles: true,
   })
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
     cusType: '',
-    idSrcType: '',
+    idSrcType: 0,
     hashtag: [],
     customer: [
       {
@@ -108,8 +119,16 @@ export default function CreateFeed(props: Props) {
   })
   const [filters, setFilters] = useState({ cusType: 1 })
 
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+
   const validationSchema = Yup.object().shape(
     {
+      type: Yup.string(),
       cusType: Yup.string().required(messages.MSG1),
       customer: Yup.object()
         .nullable()
@@ -121,20 +140,30 @@ export default function CreateFeed(props: Props) {
       camp: Yup.object()
         .nullable()
         .when(['idSrcType'], {
-          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) !== 4,
+          is: (idSrcType: any) =>
+            !!idSrcType && Number(idSrcType) !== 4 && idSrcType != 0,
           then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
+        })
+        .nullable(),
+      audio: Yup.object()
+        .when('type', {
+          is: (type: string) => Number(type) == 2,
+          then: Yup.object().required(messages.MSG1),
         })
         .nullable(),
       webUrl: Yup.string()
         .nullable()
         .when(['idSrcType'], {
-          is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 4,
+          is: (idSrcType: any) =>
+            !!idSrcType && Number(idSrcType) === 4 && idSrcType != 0,
           then: Yup.string().required(messages.MSG1).nullable(),
         }),
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
           const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-            media => media.mediaFormat === fileConfigs.mediaFormat,
+            media =>
+              media.mediaFormat === fileConfigs.mediaFormat &&
+              media.mediaType === 3,
           )
           if (files && files.length) {
             return true
@@ -149,6 +178,9 @@ export default function CreateFeed(props: Props) {
             : 'Dung lượng ảnh tối đa 10MB/ảnh',
           files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
         ),
+      content: Yup.string()
+        .required(messages.MSG1)
+        .max(2200, 'Nội dung tối đa 2200 ký tự'),
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
     },
     [['files', 'files']],
@@ -166,6 +198,13 @@ export default function CreateFeed(props: Props) {
   >(['feed', feedId], () => fetchFeedDetail(Number(feedId ?? 0)), {
     enabled: !!feedId,
     staleTime: 5 * 60 * 1000,
+  })
+
+  const { data: audios }: UseQueryResult<ICampAreaResponse, Error> = useQuery<
+    ICampAreaResponse,
+    Error
+  >(['audios'], () => fetchAudios({ size: 200, page: 0, status: 1 }), {
+    enabled: true,
   })
 
   const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
@@ -214,7 +253,12 @@ export default function CreateFeed(props: Props) {
   }, [feed])
 
   useEffect(() => {
-    if (!feed) return
+    if (!feed) {
+      if (methods.watch('type') == 1) {
+        methods.setValue('audio', { name: 'Âm thanh của video' })
+      }
+      return
+    }
     if (feed.customerInfo?.type && feed.customerInfo?.type === 1) {
       methods.setValue('customer', customerCampdi ?? undefined)
     } else {
@@ -237,6 +281,17 @@ export default function CreateFeed(props: Props) {
         }
       }
     }
+    if (audios && audios.content) {
+      const audio = audios.content.find(a => a.id == feed.idAudio)
+      methods.setValue(
+        'audio',
+        audio
+          ? audio
+          : methods.watch('type') == 1
+          ? { name: 'Âm thanh của video' }
+          : undefined,
+      )
+    }
     if (campGrounds && campGrounds.content) {
       const campGround = campGrounds.content.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campGround ?? undefined)
@@ -244,13 +299,13 @@ export default function CreateFeed(props: Props) {
       const campArea = campAreas.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campArea ?? undefined)
     }
-  }, [feed, customers, campGrounds, campAreas])
+  }, [feed, audios, customers, campGrounds, campAreas, methods.watch('type')])
 
   const initDefaultValues = (feed?: IFeedDetail) => {
     if (feed) {
       defaultValues.type = feed.type ?? 0
       defaultValues.cusType = feed.customerInfo?.type // check lai
-      defaultValues.idSrcType = feed.idSrcType
+      defaultValues.idSrcType = feed.idSrcType ?? 0
       defaultValues.content = feed.content
       defaultValues.hashtag = feed.tags
       defaultValues.webUrl = feed.webUrl ?? ''
@@ -274,14 +329,30 @@ export default function CreateFeed(props: Props) {
           multiple: false,
         }))
       }
-      setMediasSrcPreviewer((feed.video && [feed.video]) ?? feed.images ?? [])
-      setInitialFileInfos((feed.video && [feed.video]) ?? feed.images ?? [])
+      setMediasSrcPreviewer(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
+      setInitialFileInfos(
+        (feed.video && [feed.video]) ??
+          feed.images?.filter(f => f.mediaType === 3) ??
+          [],
+      )
     } else {
       setMediasSrcPreviewer([])
     }
 
     methods.reset({ ...defaultValues })
   }
+
+  useEffect(() => {
+    if (audioRef.current && methods.watch('audio')?.urlAudio) {
+      audioRef.current.pause()
+      audioRef.current.load()
+      audioRef.current.play()
+    }
+  }, [methods.watch('audio')])
 
   useEffect(() => {
     let accounts: any[] = []
@@ -322,31 +393,80 @@ export default function CreateFeed(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const files = (fileInfos as IMediaOverall[])
-      .filter((f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat)
+      .filter(
+        (f: IMediaOverall) =>
+          f.mediaFormat === fileConfigs.mediaFormat &&
+          !f.thumbnail &&
+          f.mediaType === 3,
+      )
       .map((file: IMediaOverall) => ({
         mediaType: EMediaType.POST,
         mediaFormat: fileConfigs.mediaFormat,
         url: file.url,
+        detail: file.detail ?? null,
       }))
+
+    let thumbnails = (fileInfos as IMediaOverall[]).filter(
+      (f: IMediaOverall) => f.thumbnail,
+    )
+
+    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
+      thumbnails = thumbnails
+        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
+        .map((file: IMediaOverall) => ({
+          mediaType: EMediaType.COVER,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: file.url,
+        }))
+    }
 
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
-      idSrcType: Number(values.idSrcType ?? 0),
-      idSrc: Number(values.camp?.id ?? 0),
-      webUrl: values.webUrl ?? null,
+      idSrcType: values.idSrcType != 0 ? Number(values.idSrcType) : null,
+      idSrc:
+        values.idSrcType != 4 && values.idSrcType != 0
+          ? Number(values.camp?.id)
+          : null,
+      webUrl: values.idSrcType == 4 ? values.webUrl : null,
       idCustomer:
         Number(values.cusType) === 1
           ? customerCampdi && (customerCampdi as any)?.id
           : values.customer.customerId,
       content: values.content,
-      video: fileConfigs.mediaFormat === EMediaFormat.VIDEO ? files[0] : {},
-      images: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? files : [],
-      idAudio: 1,
+      video:
+        fileConfigs.mediaFormat === EMediaFormat.VIDEO
+          ? {
+              ...files[files.length - 1],
+              detail:
+                thumbnails && thumbnails.length
+                  ? {
+                      ...files[files.length - 1].detail,
+                      coverImgUrl: thumbnails[thumbnails.length - 1].url,
+                    }
+                  : null,
+            }
+          : {},
+      images:
+        fileConfigs.mediaFormat === EMediaFormat.IMAGE
+          ? thumbnails && thumbnails.length
+            ? [thumbnails[0], ...files]
+            : files
+          : [],
+      idAudio: values.audio?.id ?? null,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
       status: 1,
     }
+
     if (feedId) {
       edit({ ...payload, id: Number(feedId) })
     } else {
@@ -367,6 +487,24 @@ export default function CreateFeed(props: Props) {
   const { mutate: edit, isLoading: editLoading } = useUpdateFeed(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
+
+  const { mutate: deletedFeed } = useDeleteFeed(() =>
+    onRowUpdateSuccess(null, 'Xoá bài thành công'),
+  )
+
+  const onDeleteFeed = () => {
+    if (feedId) deletedFeed(Number(feedId))
+  }
+
+  const openDeleteDialog = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá bài feed',
+      message: 'Bạn có chắc chắn muốn xoá bài feed này?',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+  }
 
   useEffect(() => {
     if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
@@ -422,7 +560,11 @@ export default function CreateFeed(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Post bài Feed' }]} />
+        <Breadcrumb
+          routeSegments={[
+            { name: feedId ? 'Chỉnh sửa Feed' : 'Thêm mới Feed' },
+          ]}
+        />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -439,17 +581,28 @@ export default function CreateFeed(props: Props) {
           startIcon={<Icon>done</Icon>}
         />
         <MuiButton
-          title="Xoá"
+          title="Huỷ"
           disabled={uploading}
           variant="contained"
           color="warning"
           onClick={() => {
             setMediasSrcPreviewer([])
-            removeUploadedFiles()
-            methods.reset()
+            removeUploadedFiles(undefined, fileConfigs.mediaFormat)
+
+            initDefaultValues(feed)
           }}
-          startIcon={<Icon>clear</Icon>}
+          startIcon={<Icon>cached</Icon>}
         />
+        {feedId && (
+          <MuiButton
+            disabled={uploading}
+            title="Xoá"
+            variant="contained"
+            color="error"
+            onClick={openDeleteDialog}
+            startIcon={<Icon>delete</Icon>}
+          />
+        )}
         <MuiButton
           title="Quay lại"
           variant="contained"
@@ -474,6 +627,42 @@ export default function CreateFeed(props: Props) {
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
                   </Stack>
+
+                  <Stack gap={1.5} justifyContent="center">
+                    <MuiRHFAutoComplete
+                      name="audio"
+                      label="Nhạc nền"
+                      options={
+                        methods.watch('type') == 1
+                          ? [
+                              { name: 'Âm thanh của video' },
+                              ...(audios?.content ?? []),
+                            ]
+                          : audios?.content ?? []
+                      }
+                      optionProperty="name"
+                      getOptionLabel={option => option.name ?? ''}
+                      defaultValue=""
+                    />
+                    {methods.watch('audio')?.urlAudio && (
+                      <Stack flexDirection={'row'}>
+                        <MuiTypography
+                          fontSize="12px"
+                          fontStyle="italic"
+                          flex={1}
+                        >
+                          Âm thanh:
+                        </MuiTypography>
+                        <audio controls autoPlay ref={audioRef}>
+                          <source
+                            src={methods.watch('audio')?.urlAudio}
+                            type="audio/mpeg"
+                          />
+                        </audio>
+                      </Stack>
+                    )}
+                  </Stack>
+
                   <Stack>
                     <SelectDropDown name="cusType" label="Loại tài khoản*">
                       <MenuItem value="1">Campdi</MenuItem>
@@ -493,11 +682,6 @@ export default function CreateFeed(props: Props) {
                           Tài khoản post*
                         </MuiTypography>
                         <Box sx={{ flex: 1 }}>
-                          {/* <MuiAutoComplete
-                        itemList={accountList}
-                        name="customer"
-                        disabled={Number(methods.getValues('cusType')) === 0}
-                      /> */}
                           <MuiRHFAutoComplete
                             name="customer"
                             label="Tài khoản post"
@@ -512,53 +696,55 @@ export default function CreateFeed(props: Props) {
 
                   <Stack>
                     <SelectDropDown name="idSrcType" label="Liên kết với">
+                      <MenuItem value="0">Không liên kết</MenuItem>
                       <MenuItem value="1">Địa danh</MenuItem>
                       <MenuItem value="2">Điểm Camp</MenuItem>
                       <MenuItem value="4">Sản phẩm</MenuItem>
                     </SelectDropDown>
                   </Stack>
-                  {!!methods.watch('idSrcType') && (
-                    <Stack
-                      flexDirection={'row'}
-                      gap={1.5}
-                      justifyContent="center"
-                    >
-                      <MuiTypography fontSize="12px" fontStyle="italic">
-                        {getTitleLinked(Number(methods.watch('idSrcType')))} *
-                      </MuiTypography>
+                  {!!methods.watch('idSrcType') &&
+                    methods.watch('idSrcType') != 0 && (
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1.5}
+                        justifyContent="center"
+                      >
+                        <MuiTypography fontSize="12px" fontStyle="italic">
+                          {getTitleLinked(Number(methods.watch('idSrcType')))} *
+                        </MuiTypography>
 
-                      <Box sx={{ flex: 1 }}>
-                        {Number(methods.watch('idSrcType')) !== 4 ? (
-                          <MuiRHFAutoComplete
-                            name="camp"
-                            options={
-                              Number(methods.watch('idSrcType')) === 1
-                                ? campAreas ?? []
-                                : campGrounds?.content ?? []
-                            }
-                            optionProperty="name"
-                            getOptionLabel={option => option.name ?? ''}
-                            defaultValue=""
-                          />
-                        ) : (
-                          <FormInputText
-                            type="text"
-                            name="webUrl"
-                            placeholder="Chèn link"
-                            size="small"
-                            fullWidth
-                            defaultValue=""
-                          />
-                        )}
-                      </Box>
-                    </Stack>
-                  )}
+                        <Box sx={{ flex: 1 }}>
+                          {Number(methods.watch('idSrcType')) !== 4 ? (
+                            <MuiRHFAutoComplete
+                              name="camp"
+                              options={
+                                Number(methods.watch('idSrcType')) === 1
+                                  ? campAreas ?? []
+                                  : campGrounds?.content ?? []
+                              }
+                              optionProperty="name"
+                              getOptionLabel={option => option.name ?? ''}
+                              defaultValue=""
+                            />
+                          ) : (
+                            <FormInputText
+                              type="text"
+                              name="webUrl"
+                              placeholder="Chèn link"
+                              size="small"
+                              fullWidth
+                              defaultValue=""
+                            />
+                          )}
+                        </Box>
+                      </Stack>
+                    )}
 
                   <Stack>
                     <FormTextArea
                       name="content"
                       defaultValue={''}
-                      placeholder="Nội dung"
+                      placeholder="Nội dung (tối đa 2200 ký tự)"
                     />
                   </Stack>
                   <Stack>
@@ -614,6 +800,20 @@ export default function CreateFeed(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onDeleteFeed}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

@@ -12,10 +12,11 @@ export type FileInfoProgress = {
   index?: number
   percentage?: number
   fileName?: string
+  cancel?: any
 }
 
 export const useUploadFiles = () => {
-  const abortController = useRef(null) as any
+  const abortControllerRef = useRef([]) as any
 
   const [uploading, setUploading] = useState<boolean>(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -37,8 +38,15 @@ export const useUploadFiles = () => {
     setProgressInfos({ val: [] })
   }
 
-  const upload = (file: any, idx: number, mediaFormat?: 1 | 2) => {
-    abortController.current = new AbortController()
+  const upload = (
+    file: any,
+    idx: number,
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => {
+    const abortController = new AbortController()
+
+    abortControllerRef.current.push(abortController)
 
     if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
@@ -47,19 +55,25 @@ export const useUploadFiles = () => {
       mediaFormat,
       file,
       (event: any) => {
+        if (thumbnail) return
         _progressInfos[idx].percentage = Math.round(
           (100 * event.loaded) / event.total,
         )
         setProgressInfos({ val: _progressInfos as any })
       },
-      abortController.current,
+      abortController,
     )
-      .then(files => {
+      .then(fileResult => {
         setMessage(prevMessage => [
           ...prevMessage,
           'Uploaded the file successfully: ' + file.name,
         ])
-        return { ...files, mediaFormat }
+        return {
+          ...fileResult,
+          mediaFormat,
+          thumbnail: thumbnail ? thumbnail : null,
+          mediaType: thumbnail ? 2 : 3,
+        }
       })
       .catch(() => {
         _progressInfos[idx].percentage = 0
@@ -72,20 +86,28 @@ export const useUploadFiles = () => {
       })
   }
 
-  const uploadFiles = async (files?: File[], mediaFormat?: 1 | 2) => {
+  const uploadFiles = async (
+    files?: File[],
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => {
+    // remove progress when is thumbnail
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
-    const _progressInfos = selectedFilesToArr.map(file => ({
-      percentage: 0,
-      fileName: file.name,
-    }))
 
-    progressInfosRef.current = {
-      val: _progressInfos,
+    if (!thumbnail) {
+      const _progressInfos = selectedFilesToArr.map(file => ({
+        percentage: 0,
+        fileName: file.name,
+      }))
+
+      progressInfosRef.current = {
+        val: _progressInfos,
+      }
     }
 
     const uploadPromises = selectedFilesToArr.map((file, index) =>
-      upload(file, index, mediaFormat),
+      upload(file, index, mediaFormat, thumbnail),
     )
 
     const filesResult = await Promise.all(uploadPromises)
@@ -95,12 +117,16 @@ export const useUploadFiles = () => {
   }
 
   const cancelUploading = () => {
-    abortController.current && abortController.current.abort()
+    abortControllerRef?.current &&
+      abortControllerRef.current.length &&
+      abortControllerRef.current.forEach((aborted: any) => {
+        aborted.abort()
+      })
     setProgressInfos({ val: [] })
     setUploading(false)
   }
 
-  const removeUploadedFiles = (index?: number, mediaFormat?: 1 | 2) => {
+  const removeUploadedFiles = (index?: number, mediaFormat?: number) => {
     if (index !== undefined) {
       fileInfos.splice(index, 1)
       setFileInfos([...fileInfos])
@@ -115,8 +141,12 @@ export const useUploadFiles = () => {
 
   return [
     (files?: File[]) => selectFiles(files),
-    (files?: File[], mediaFormat?: 1 | 2) => uploadFiles(files, mediaFormat),
-    (index?: number, mediaFormat?: 1 | 2) =>
+    (
+      files?: File[],
+      mediaFormat?: number,
+      thumbnail?: { type: 'video' | 'image' },
+    ) => uploadFiles(files, mediaFormat, thumbnail),
+    (index?: number, mediaFormat?: number) =>
       removeUploadedFiles(index, mediaFormat),
     cancelUploading,
     uploading,

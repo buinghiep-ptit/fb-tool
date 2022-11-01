@@ -186,22 +186,16 @@ export default function CustomerDetail(props: Props) {
         customer.data?.otpCount && customer.data?.otpCount[0].type
       defaultValues.type = customer.data.type ?? 1
 
-      setMediasSrcPreviewer([
-        {
-          mediaType: EMediaType.AVATAR,
-          mediaFormat: EMediaFormat.IMAGE,
-          url:
-            customer.data.avatar ?? '/assets/images/avatars/avatar-duck.jpeg',
-        },
-      ])
-      setInitialFileInfos([
-        {
-          mediaType: EMediaType.AVATAR,
-          mediaFormat: EMediaFormat.IMAGE,
-          url:
-            customer.data.avatar ?? '/assets/images/avatars/avatar-duck.jpeg',
-        },
-      ])
+      if (customer.data.avatar) {
+        setMediasSrcPreviewer([
+          {
+            mediaType: EMediaType.AVATAR,
+            mediaFormat: EMediaFormat.IMAGE,
+            url: customer.data.avatar,
+          },
+        ])
+      }
+
       methods.reset({ ...defaultValues })
     }
   }, [customer.data])
@@ -313,16 +307,18 @@ export default function CustomerDetail(props: Props) {
               variant="contained"
               color="warning"
               onClick={() => {
-                removeUploadedFiles()
-                setMediasSrcPreviewer([
-                  {
-                    mediaType: EMediaType.AVATAR,
-                    mediaFormat: EMediaFormat.IMAGE,
-                    url:
-                      customer?.data?.avatar ??
-                      '/assets/images/avatars/avatar-duck.jpeg',
-                  },
-                ])
+                removeUploadedFiles(undefined, fileConfigs.mediaFormat)
+                setMediasSrcPreviewer(
+                  customer?.data?.avatar
+                    ? [
+                        {
+                          mediaType: EMediaType.AVATAR,
+                          mediaFormat: EMediaFormat.IMAGE,
+                          url: customer?.data?.avatar,
+                        },
+                      ]
+                    : [],
+                )
                 methods.reset()
               }}
               startIcon={<Icon>clear</Icon>}
@@ -350,7 +346,7 @@ export default function CustomerDetail(props: Props) {
                     placeholder="Nhập Email"
                     fullWidth
                     defaultValue=""
-                    disabled
+                    disabled={!!customer.data?.email ?? false}
                     clearIcon={false}
                   />
                   <FormInputText
@@ -471,17 +467,7 @@ export default function CustomerDetail(props: Props) {
                     <>
                       <UploadPreviewer
                         name="files"
-                        initialMedias={
-                          [
-                            {
-                              mediaType: EMediaType.AVATAR,
-                              mediaFormat: EMediaFormat.IMAGE,
-                              url:
-                                customer?.data?.avatar ??
-                                '/assets/images/avatars/avatar-duck.jpeg',
-                            },
-                          ] as IMediaOverall[]
-                        }
+                        initialMedias={[]}
                         fileInfos={fileInfos}
                         mediasSrcPreviewer={mediasSrcPreviewer}
                         setMediasSrcPreviewer={setMediasSrcPreviewer}
@@ -512,16 +498,21 @@ export default function CustomerDetail(props: Props) {
                             onClick={() => {
                               methods.clearErrors('files')
                               methods.setValue('files', null)
-                              removeUploadedFiles()
-                              setMediasSrcPreviewer([
-                                {
-                                  mediaType: EMediaType.AVATAR,
-                                  mediaFormat: EMediaFormat.IMAGE,
-                                  url:
-                                    (customer.data && customer.data.avatar) ??
-                                    '/assets/images/avatars/avatar-duck.jpeg',
-                                },
-                              ])
+                              removeUploadedFiles(
+                                undefined,
+                                fileConfigs.mediaFormat,
+                              )
+                              setMediasSrcPreviewer(
+                                customer?.data?.avatar
+                                  ? [
+                                      {
+                                        mediaType: EMediaType.AVATAR,
+                                        mediaFormat: EMediaFormat.IMAGE,
+                                        url: customer?.data?.avatar,
+                                      },
+                                    ]
+                                  : [],
+                              )
                             }}
                           >
                             <ClearSharp color="error" />

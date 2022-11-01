@@ -1,15 +1,12 @@
 import Loadable from 'app/components/Loadable'
 import { navCustomerDetail } from 'app/utils/navbars'
 import { lazy } from 'react'
-// import { LayoutCustomer } from './accounts/customers/LayoutCustomerDetail'
 import CreateMerchant from './managerMerchant/CreactMerchant'
 import { Navigate, Outlet } from 'react-router-dom'
 import { LayoutWithNavTabs } from './layoutWithTabs/LayoutWithNavTabs'
 import { ROLES } from 'app/utils/enums/roles'
 import AvailablePayment from './orders/details/ButtonsLink/AvailablePayment'
 import UnAvailableOrder from './orders/details/ButtonsLink/UnAvailableOrder'
-import OrderDetail from './orders/OrderDetail'
-import OrdersHistory from './orders/OrdersHistory'
 
 const AdminAccounts = Loadable(
   lazy(() => import('./accounts/ManagementAdminAccounts')),
@@ -43,6 +40,8 @@ const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
 const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
+const ListAudios = Loadable(lazy(() => import('./audios/ListAudios')))
+const AddAudio = Loadable(lazy(() => import('./audios/AddAudio')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 
@@ -66,6 +65,24 @@ const CreatePlace = Loadable(lazy(() => import('./managerPlace/CreactPlace')))
 const UpdateMerchant = Loadable(
   lazy(() => import('./managerMerchant/updateMerchant')),
 )
+const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
+const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
+const PaymentConfirm = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/PaymentConfirm')),
+)
+const CancelBooking = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/CancelBooking')),
+)
+const CancelOrder = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/CancelOrder')),
+)
+const RefundOrder = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/RefundOrder')),
+)
+const Reassign = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/Reassign')),
+)
+const Note = Loadable(lazy(() => import('./orders/details/ButtonsLink/Note')))
 
 const ManagementRoutes = [
   {
@@ -185,6 +202,26 @@ const ManagementRoutes = [
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
   {
+    path: '/quan-ly-audios',
+    element: (
+      <>
+        <ListAudios />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':audioId/chi-tiet',
+        element: <AddAudio title="Chi tiết bài hát" />,
+      },
+      {
+        path: 'them-moi',
+        element: <AddAudio title="Thêm bài hát" />,
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  },
+  {
     path: '/quan-ly-su-kien',
     element: <ManagerEvents />,
   },
@@ -216,6 +253,30 @@ const ManagementRoutes = [
           </>
         ),
         children: [
+          {
+            path: 'xac-nhan-thanh-toan',
+            element: <PaymentConfirm title="Xác nhận thanh toán" />,
+          },
+          {
+            path: 'yeu-cau-huy-dat-cho',
+            element: <CancelBooking title="Tạo yêu cầu huỷ" />,
+          },
+          {
+            path: 'huy-don-hang',
+            element: <CancelOrder title="Huỷ đơn hàng" />,
+          },
+          {
+            path: 'hoan-tien',
+            element: <RefundOrder title="Hoàn tiền" />,
+          },
+          {
+            path: 'chuyen-tiep',
+            element: <Reassign title="Chuyển tiếp" />,
+          },
+          {
+            path: 'ghi-chu',
+            element: <Note title="Ghi chú" />,
+          },
           {
             path: 'het-cho',
             element: <UnAvailableOrder title="Chi tiết đơn hàng (Hết chỗ)" />,

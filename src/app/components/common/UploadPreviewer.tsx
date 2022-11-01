@@ -1,35 +1,74 @@
 import { UploadFile } from '@mui/icons-material'
 import {
   FormHelperText,
+  Grid,
   Icon,
   IconButton,
   LinearProgress,
   Stack,
+  styled,
+  Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { Image, IMediaOverall } from 'app/models'
+import {
+  compressImageFile,
+  generateVideoThumbnails,
+} from 'app/helpers/extractThumbnailVideo'
+import { toastWarning } from 'app/helpers/toastNofication'
+import { IMediaOverall } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useFormContext } from 'react-hook-form'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import { CircularProgressWithLabel, ImageListView } from './ImageListCustomize'
 import MediaPlayer from './MediaPlayer'
-import { ModalFullScreen } from './ModalFullScreen'
 import { MuiButton } from './MuiButton'
+import MuiStyledDialogEditor from './MuiStyledDialogEditor'
 import { MuiTypography } from './MuiTypography'
+
+export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
+  ({ aspectRatio }) => ({
+    position: 'relative',
+    aspectRatio: aspectRatio,
+    background: 'rgba(22, 24, 35, 0.03)',
+    borderRadius: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    border: '2px dashed rgba(22, 24 , 35, 0.2)',
+    '&:hover': {
+      border: '2px dashed #2F9B42',
+    },
+  }),
+)
+
+const PreviewerViewport = styled(Box)(() => ({
+  position: 'relative',
+  borderRadius: 1.5,
+  overflow: 'hidden',
+  cursor: 'pointer',
+}))
+
 interface Props {
   name: string
   mediaConfigs: {
-    mediaFormat: 1 | 2
+    mediaFormat: number
     accept: string
     multiple: boolean
     mediaType?: number
+    isLimitFiles?: boolean
   }
   mode?: 'append' | 'update' | undefined
+  isFileDialogOpen?: boolean
+  setIsFileDialogOpen?: (isOpen: boolean) => void
   selectFiles: (files: any) => void
-  uploadFiles: (files: any, mediaFormat?: 1 | 2, controller?: any) => void
-  removeUploadedFiles?: (index?: number, mediaFormat?: 1 | 2) => void
+  uploadFiles: (
+    files: any,
+    mediaFormat?: number,
+    thumbnail?: { type: 'video' | 'image' },
+  ) => void
+  removeUploadedFiles?: (index?: number, mediaFormat?: number) => void
   cancelUploading?: () => void
   uploading?: boolean
   progressInfos: any
@@ -46,23 +85,25 @@ export function UploadPreviewer({
     accept: 'video/*',
     multiple: false,
     mediaType: EMediaType.POST,
+    isLimitFiles: false,
   },
   mode = 'append',
+  isFileDialogOpen,
+  setIsFileDialogOpen,
   uploadFiles,
   removeUploadedFiles,
   cancelUploading,
   uploading,
   progressInfos,
-  initialMedias = [],
   mediasSrcPreviewer,
   fileInfos,
   setMediasSrcPreviewer,
 }: Props) {
-  const { mediaFormat, mediaType, multiple, accept } = mediaConfigs
+  const { mediaFormat, mediaType, multiple, accept, isLimitFiles } =
+    mediaConfigs
   const [durationVideo, setDurationVideo] = useState(0)
   const _mediasSrcRef = useRef<{ val: IMediaOverall[] }>({ val: [] })
-  const [openSlider, setOpenSlider] = useState(false)
-  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const [openDialog, setOpenDialog] = useState(false)
 
   const {
     register,
@@ -85,17 +126,19 @@ export function UploadPreviewer({
 
   useEffect(() => {
     if (mediaType === EMediaType.AVATAR) return
-    setValue('files', null)
-    clearErrors('files')
+    setValue(name, null)
+    clearErrors(name)
     cancelUploading && cancelUploading()
     setMediasSrcPreviewer(
-      (fileInfos ?? []).filter(file => file.mediaFormat === mediaFormat),
+      (fileInfos ?? []).filter(
+        file => file.mediaFormat === mediaFormat && !file.thumbnail,
+      ),
     )
   }, [mediaFormat])
 
   useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
-    if (durationVideo && mediaFormat === 1 && fileVideo) {
+    if (durationVideo && mediaFormat === EMediaFormat.VIDEO && fileVideo) {
       const newFiles = Object.assign(fileVideo, {
         duration: durationVideo,
         mediaFormat,
@@ -110,37 +153,32 @@ export function UploadPreviewer({
     }
   }, [durationVideo, files])
 
-  const handleCloseSlider = () => {
-    setOpenSlider(false)
-  }
-  const onShowMediaDetail = (imgIndex?: number) => {
-    setInitialIndexSlider(imgIndex ?? 0)
-    setOpenSlider(true)
-  }
   const handleRemoveMedia = (mediaIndex?: number) => {
     mediasSrcPreviewer.splice(mediaIndex ?? 0, 1)
     setMediasSrcPreviewer([...mediasSrcPreviewer])
 
+    if (!mediasSrcPreviewer.length) {
+      setOpenDialog(false)
+    }
     if (files) {
-      if (mediaIndex ?? 0 <= files.length ?? 0 - 1) {
+      if (mediaIndex !== -1) {
         files.splice(mediaIndex ?? 0, 1)
-
-        setValue('files', [...files])
+        setValue(name, [...files])
       }
-    } else setValue('files', null)
+    } else setValue(name, null)
 
     removeUploadedFiles && removeUploadedFiles(mediaIndex)
   }
 
   const handleRemoveAllMedias = () => {
     setMediasSrcPreviewer([])
-    setValue('files', null)
-    clearErrors('files')
+    setValue(name, null)
+    clearErrors(name)
 
     removeUploadedFiles && removeUploadedFiles(undefined, mediaFormat)
   }
 
-  const extractDroppedFiles = (old: File[], dropped: File[]): File[] => {
+  const extractUnixDroppedFiles = (old: File[], dropped: File[]): File[] => {
     const newFiles = dropped.reduce((prev: File[], file: File) => {
       const fo = Object.entries(file)
       if (
@@ -160,64 +198,109 @@ export function UploadPreviewer({
     return newFiles
   }
 
+  const blobToFile = (theBlob: Blob, fileName: string): File => {
+    return new File(
+      [theBlob as any], // cast as any
+      fileName,
+      {
+        lastModified: new Date().getTime(),
+        type: theBlob.type,
+      },
+    )
+  }
+
+  const getThumbnailsFromVideo = async (file: File) => {
+    const thumbnails = await generateVideoThumbnails(file, 1)
+    const blob = await fetch(thumbnails[0]).then(res => res.blob())
+
+    const myFile = blobToFile(blob, 'thumbnail.jpeg')
+    uploadFiles([myFile] as File[], EMediaFormat.IMAGE, { type: 'video' })
+  }
+
+  const getThumbnailsFromImage = async (file: File) => {
+    uploadFiles([file] as File[], EMediaFormat.IMAGE, { type: 'image' })
+  }
+
   const onDrop = useCallback(
-    (droppedFiles: File[]) => {
-      const extractFiles = extractDroppedFiles(
+    async (droppedFiles: File[]) => {
+      if (isFileDialogOpen && setIsFileDialogOpen) setIsFileDialogOpen(false)
+
+      let extractUnixFiles = extractUnixDroppedFiles(
         [...(files || [])],
         [...droppedFiles],
       )
-      if (!extractFiles.length) return
+      if (!extractUnixFiles.length) return
 
-      if (mediaFormat === EMediaFormat.VIDEO || mediaType === EMediaType.AVATAR)
-        setMediasSrcPreviewer([{ url: URL.createObjectURL(extractFiles[0]) }])
-      else if (mediaFormat === EMediaFormat.IMAGE) {
-        const newImages = [...extractFiles].map((originalFile: File) =>
-          // deep clone
-          Object.assign(
-            new File([originalFile], originalFile.name, {
-              type: originalFile.type,
-            }),
-            {
-              url: URL.createObjectURL(originalFile),
-            },
-          ),
-        )
-        setMediasSrcPreviewer((prev: any) => [...prev, ...newImages] as any)
+      if (isLimitFiles) {
+        if (mediasSrcPreviewer.length >= 15) {
+          toastWarning({ message: 'Số lượng ảnh của bài đã đạt tối đa' })
+          return
+        } else {
+          extractUnixFiles = extractUnixFiles.slice(
+            0,
+            15 - mediasSrcPreviewer.length,
+          )
+        }
       }
+
       _mediasSrcRef.current = {
         val: mediasSrcPreviewer,
       }
 
-      const newSelectedFiles: File[] =
-        mediaFormat === EMediaFormat.VIDEO
-          ? [...extractFiles]
-          : [...(files || []), ...extractFiles]
-      setValue(name, newSelectedFiles, {
+      if (!multiple) {
+        setMediasSrcPreviewer([
+          { url: URL.createObjectURL(extractUnixFiles[0]), mediaFormat },
+        ])
+        if (mediaFormat === EMediaFormat.VIDEO)
+          getThumbnailsFromVideo(extractUnixFiles[0])
+      } else {
+        await compressImageFile(extractUnixFiles[0]).then(file => {
+          getThumbnailsFromImage(file)
+        })
+        const newSrcPreviewer = [...extractUnixFiles].map(
+          (originalFile: File) =>
+            Object.assign(
+              new File([originalFile], originalFile.name, {
+                type: originalFile.type,
+              }),
+              {
+                url: URL.createObjectURL(originalFile),
+                mediaFormat,
+              },
+            ),
+        )
+        setMediasSrcPreviewer(
+          (prev: any) => [...prev, ...newSrcPreviewer] as any,
+        )
+      }
+
+      const currentSelectedFiles: File[] = !multiple
+        ? [...extractUnixFiles]
+        : [...(files || []), ...extractUnixFiles]
+      setValue(name, currentSelectedFiles, {
         shouldValidate: true,
       })
 
-      uploadFiles(extractFiles, mediaFormat)
+      uploadFiles(extractUnixFiles, mediaFormat)
     },
-    [setValue, name, mode, files, mediaFormat, mediasSrcPreviewer],
+    [setValue, name, mode, files, mediaConfigs, mediasSrcPreviewer],
   )
 
   const { getRootProps, getInputProps, open } = useDropzone({
-    noClick: !!mediasSrcPreviewer.length,
+    // noClick: !!mediasSrcPreviewer.length,
     noDrag: uploading,
     multiple: multiple,
-    accept:
-      mediaFormat === EMediaFormat.VIDEO
-        ? {
-            'video/*': ['.mp4', '.webm', '.ogg'],
-          }
-        : {
-            'image/png': ['.png'],
-            'image/jpeg': ['.jpg', '.jpeg'],
-          },
+    accept: getFilesType(mediaFormat) as any,
     onDrop,
     maxFiles: 15,
     maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 10 * 1024 * 1024,
   })
+
+  useEffect(() => {
+    if (isFileDialogOpen) {
+      open()
+    }
+  }, [isFileDialogOpen])
 
   useEffect(() => {
     return () =>
@@ -226,169 +309,228 @@ export function UploadPreviewer({
       )
   }, [])
 
+  const thumbs = mediasSrcPreviewer.map((media, index) => (
+    <Grid
+      key={index}
+      item
+      md={
+        mediasSrcPreviewer.length <= 2
+          ? 12
+          : mediasSrcPreviewer.length <= 4
+          ? 6
+          : 4
+      }
+      xs={12}
+    >
+      <Box
+        sx={{
+          position: 'relative',
+          aspectRatio: 'auto 16 / 9',
+          borderRadius: 1,
+          overflow: 'hidden',
+          boxShadow: 'rgb(0 0 0 / 12%) 0px 0.5rem 1.25rem',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundImage: `url(${media.url})`,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundAttachment: 'fixed',
+            color: 'whitesmoke',
+            filter: 'blur(8px)',
+            transform: 'scale(1.2, 1.2)',
+          }}
+        />
+        <img
+          src={media.url}
+          alt={'thumb'}
+          style={{
+            position: 'absolute',
+            objectFit: 'contain',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+          }}
+        />
+        {true && (
+          <Tooltip arrow title={'Xóa'}>
+            <IconButton
+              sx={{
+                position: 'absolute',
+                top: '4px',
+                right: '4px',
+                bgcolor: '#303030',
+                borderRadius: 1,
+              }}
+              onClick={() => handleRemoveMedia(index)}
+            >
+              <Icon sx={{ color: 'white' }}>delete</Icon>
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    </Grid>
+  ))
+
   return (
-    <Box {...getRootProps({ className: 'dropzone' })} position={'relative'}>
-      {mediaType !== EMediaType.AVATAR ? (
-        <Box
+    <React.Fragment>
+      <Box {...getRootProps({ className: 'dropzone' })} position={'relative'}>
+        <input {...getInputProps()} />
+
+        {mediaType !== EMediaType.AVATAR ? (
+          <DropWrapper
+            sx={{
+              aspectRatio:
+                mediaFormat === EMediaFormat.VIDEO
+                  ? 'auto 9 / 16'
+                  : 'auto 1 / 1',
+              borderRadius: 1.5,
+              display: !!mediasSrcPreviewer.length
+                ? mediasSrcPreviewer[0].mediaFormat !== mediaFormat
+                  ? 'flex'
+                  : 'none'
+                : 'flex',
+            }}
+          >
+            <Stack flexDirection={'column'} alignItems="center" gap={1}>
+              <MuiTypography fontSize={'1.125rem'}>
+                {mediaFormat === EMediaFormat.VIDEO && 'Chọn video để tải lên'}
+                {mediaFormat === EMediaFormat.IMAGE && 'Chọn ảnh để tải lên'}
+                {mediaFormat === EMediaFormat.OFFICE && 'Chọn tệp đính kèm'}
+              </MuiTypography>
+              <MuiTypography variant="body2">
+                Hoặc kéo và thả tập tin
+              </MuiTypography>
+              <UploadFile fontSize="medium" />
+              {mediaFormat === EMediaFormat.VIDEO && (
+                <>
+                  <MuiTypography variant="body2">MP4 hoặc WebM</MuiTypography>
+                  <MuiTypography variant="body2">tối đa 3 phút</MuiTypography>
+                </>
+              )}
+              {mediaFormat === EMediaFormat.IMAGE && (
+                <>
+                  <MuiTypography variant="body2">
+                    PNG / JPEG hoặc JPG
+                  </MuiTypography>
+                  <MuiTypography variant="body2">
+                    nhỏ hơn 10MB/ảnh
+                  </MuiTypography>
+                  <MuiTypography variant="body2">
+                    {isLimitFiles ? 'tối đa 15 ảnh' : 'tối đa 15 ảnh/lần chọn'}
+                  </MuiTypography>
+                </>
+              )}
+              {mediaFormat === EMediaFormat.OFFICE && (
+                <>
+                  <MuiTypography variant="body2">
+                    *.pdf , *.xlsx hoặc *.docx
+                  </MuiTypography>
+                </>
+              )}
+
+              <MuiButton
+                title="Chọn tập tin"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2 }}
+              />
+            </Stack>
+          </DropWrapper>
+        ) : (
+          <AvatarChoose mediasSrcPreviewer={mediasSrcPreviewer} open={open} />
+        )}
+      </Box>
+
+      {mediaType !== EMediaType.AVATAR && !!mediasSrcPreviewer.length && (
+        <PreviewerViewport
           sx={{
-            position: 'relative',
             aspectRatio:
               mediaFormat === EMediaFormat.VIDEO ? 'auto 9 / 16' : 'auto 1 / 1',
-            background: 'rgba(22, 24, 35, 0.03)',
             borderRadius: 1.5,
-            display: !!mediasSrcPreviewer.length
-              ? mediasSrcPreviewer[0].mediaFormat !== mediaFormat &&
-                !checkIsMatchMediaFormat(files, mediaFormat)
-                ? 'flex'
-                : 'none'
-              : 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer',
-            border: '2px dashed rgba(22, 24, 35, 0.2)',
-            '&:hover': {
-              border: '2px dashed #2F9B42',
-            },
           }}
         >
-          <input {...getInputProps()} />
-          <Stack flexDirection={'column'} alignItems="center" gap={1}>
-            <MuiTypography fontSize={'1.125rem'}>
-              {mediaFormat === EMediaFormat.VIDEO
-                ? 'Chọn video để tải lên'
-                : 'Chọn ảnh để tải lên'}
-            </MuiTypography>
-            <MuiTypography variant="body2">
-              Hoặc kéo và thả tập tin
-            </MuiTypography>
-            <UploadFile fontSize="medium" />
-            {mediaFormat === EMediaFormat.VIDEO ? (
-              <>
-                <MuiTypography variant="body2">MP4 hoặc WebM</MuiTypography>
-                <MuiTypography variant="body2">tối đa 3 phút</MuiTypography>
-              </>
-            ) : (
-              <>
-                <MuiTypography variant="body2">
-                  PNG / JPEG hoặc JPG
-                </MuiTypography>
-                <MuiTypography variant="body2">nhỏ hơn 10MB/ảnh</MuiTypography>
-                <MuiTypography variant="body2">
-                  tối đa 15 ảnh/lần chọn
-                </MuiTypography>
-              </>
-            )}
-
-            <MuiButton
-              title="Chọn tập tin"
-              variant="contained"
-              color="primary"
-              sx={{ mt: 2 }}
-            />
-          </Stack>
-        </Box>
-      ) : (
-        <AvatarChoose
-          mediasSrcPreviewer={mediasSrcPreviewer}
-          getInputProps={getInputProps}
-          open={open}
-        />
-      )}
-      {mediaType !== EMediaType.AVATAR && (
-        <>
-          {' '}
-          {!!mediasSrcPreviewer.length &&
-            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.IMAGE ||
-              checkIsMatchMediaFormat(files, mediaFormat)) &&
-            mediaFormat === EMediaFormat.IMAGE && (
-              <Box mt={-2} position="relative">
-                <ImageListView
-                  medias={[...mediasSrcPreviewer] as any}
-                  oldMedias={_mediasSrcRef.current.val}
-                  progressInfos={progressInfos}
-                  onClickMedia={onShowMediaDetail}
-                />
-                <ModalFullScreen
-                  mode="edit"
-                  data={mediasSrcPreviewer as Image[]}
-                  open={openSlider}
-                  onCloseModal={handleCloseSlider}
-                  onSubmit={handleRemoveMedia}
-                  initialIndexSlider={initialIndexSlider}
-                />
-                {!uploading && (
-                  <>
-                    <CustomIconButton
-                      handleClick={open}
-                      iconName={'add_circle_outlined'}
-                      title={'Thêm ảnh'}
-                      position={{ top: '16px', left: '16px' }}
+          {mediaFormat === EMediaFormat.IMAGE && (
+            <>
+              <ImageListView
+                medias={[...mediasSrcPreviewer] as any}
+                oldMedias={_mediasSrcRef.current.val}
+                progressInfos={progressInfos}
+              />
+            </>
+          )}
+          {mediasSrcPreviewer[0].url && mediaFormat === EMediaFormat.VIDEO && (
+            <>
+              <MediaPlayer
+                url={mediasSrcPreviewer[0].url}
+                setDuration={setDurationVideo}
+              />
+              {uploading &&
+                progressInfos?.val &&
+                progressInfos.val[0] &&
+                (progressInfos.val[0].percentage ?? 0) < 100 && (
+                  <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
+                    <CircularProgressWithLabel
+                      value={progressInfos.val[0].percentage ?? 0}
                     />
-                    <CustomIconButton
-                      handleClick={handleRemoveAllMedias}
-                      iconName={'delete'}
-                      title={'Xoá tất cả'}
-                      position={{ top: '16px', right: '16px' }}
-                    />
-                  </>
+                  </AbsoluteFillObject>
                 )}
-              </Box>
-            )}
-          {!!mediasSrcPreviewer.length &&
-            mediasSrcPreviewer[0].url &&
-            (mediasSrcPreviewer[0].mediaFormat === EMediaFormat.VIDEO ||
-              checkIsMatchMediaFormat(files, mediaFormat)) &&
-            mediaFormat === EMediaFormat.VIDEO && (
-              <Box
-                sx={{
-                  position: 'relative',
-                  aspectRatio: 'auto 9 / 16',
-                  borderRadius: 1.5,
-                  overflow: 'hidden',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <>
-                  <MediaPlayer
-                    url={mediasSrcPreviewer[0].url}
-                    setDuration={setDurationVideo}
-                  />
-                  {!uploading && (
-                    <>
-                      <CustomIconButton
-                        handleClick={open}
-                        iconName={'cached'}
-                        title={'Chọn lại'}
-                        position={{ top: '16px', left: '16px' }}
-                      />
-                      <CustomIconButton
-                        handleClick={handleRemoveAllMedias}
-                        iconName={'delete'}
-                        title={'Xoá'}
-                        position={{ top: '16px', right: '16px' }}
-                      />
-                    </>
-                  )}
-                </>
-                {uploading &&
-                  progressInfos?.val &&
-                  progressInfos.val[0] &&
-                  (progressInfos.val[0].percentage ?? 0) < 100 && (
-                    <AbsoluteFillObject bgcolor="rgba(0, 0, 0, 0.7)">
-                      <CircularProgressWithLabel
-                        value={progressInfos.val[0].percentage ?? 0}
-                      />
-                    </AbsoluteFillObject>
-                  )}
-              </Box>
-            )}
-        </>
-      )}
+            </>
+          )}
 
+          {!uploading && (
+            <Stack
+              flexDirection={'row'}
+              gap={1.5}
+              sx={{
+                position: 'absolute',
+                width: '100%',
+                top: 0,
+                left: 0,
+                py: 3,
+                px: 1,
+                zIndex: 1,
+                justifyContent: 'flex-end',
+              }}
+            >
+              <CustomIconButton
+                handleClick={open}
+                iconName={
+                  mediaFormat === EMediaFormat.VIDEO
+                    ? 'cached'
+                    : 'add_circle_outlined'
+                }
+                title={
+                  mediaFormat === EMediaFormat.VIDEO ? 'Chọn lại' : 'Thêm ảnh'
+                }
+              />
+              {mediaFormat === EMediaFormat.IMAGE && (
+                <CustomIconButton
+                  handleClick={() => setOpenDialog(true)}
+                  iconName={'edit'}
+                  title={'Chỉnh sửa'}
+                />
+              )}
+
+              <CustomIconButton
+                handleClick={handleRemoveAllMedias}
+                iconName={'delete'}
+                title={
+                  mediaFormat === EMediaFormat.VIDEO ? 'Xoá' : 'Xoá tất cả'
+                }
+              />
+            </Stack>
+          )}
+        </PreviewerViewport>
+      )}
       <Box px={1.5} my={1.5}>
-        {files && files.length && uploading && (
+        {uploading && (
           <Stack direction={'row'} gap={1.5} alignItems="center">
             {mediaFormat === EMediaFormat.VIDEO && (
               <IconButton
@@ -423,64 +565,98 @@ export function UploadPreviewer({
           </FormHelperText>
         )}
       </Box>
-    </Box>
+
+      <MuiStyledDialogEditor
+        title={'Chỉnh sửa ảnh/video'}
+        open={openDialog}
+        maxWidth={
+          mediasSrcPreviewer.length <= 2
+            ? 'sm'
+            : mediasSrcPreviewer.length <= 4
+            ? 'md'
+            : 'lg'
+        }
+        onCloseModal={() => setOpenDialog(false)}
+        isLoading={false}
+        onSubmit={() => setOpenDialog(false)}
+        submitText="Xong"
+        cancelText="Đóng"
+      >
+        <Grid container spacing={1.5}>
+          {thumbs}
+        </Grid>
+      </MuiStyledDialogEditor>
+    </React.Fragment>
   )
 }
 
-const checkIsMatchMediaFormat = (
-  files?: File[],
-  mediaFormat?: number,
-): boolean => {
-  if (!files || !files.length) return false
-  if (mediaFormat && mediaFormat === 1) {
-    if (files[0].type.includes('video')) {
-      return true
-    } else return false
-  } else if (mediaFormat && mediaFormat === 2) {
-    if (files[0].type.includes('image')) {
-      return true
-    } else return false
-  }
+const getFilesType = (formatType?: number) => {
+  switch (formatType) {
+    case EMediaFormat.VIDEO:
+      return {
+        'video/*': ['.mp4', '.webm', '.ogg'],
+      }
+    case EMediaFormat.AUDIO:
+      return {
+        'audio/*': ['.mp3', '.wav', '.ogg', '.aac'],
+      }
+    case EMediaFormat.IMAGE:
+      return {
+        'image/png': ['.png'],
+        'image/jpeg': ['.jpg', '.jpeg'],
+      }
+    case EMediaFormat.OFFICE:
+      return {
+        'text/*': ['.xlsx', '.xls', '.csv', '.pdf', '.pptx', '.pptm', '.ppt'],
+      }
+    case EMediaFormat.ALL:
+      return {
+        'video/*': [],
+        'audio/*': [],
+        'image/*': [],
+        'text/*': [],
+      }
 
-  return false
+    default:
+      return {
+        'video/*': [],
+        'audio/*': [],
+        'image/*': [],
+        'text/*': [],
+      }
+  }
 }
 
 type ButtonProps = {
   handleClick: () => void
   iconName: string
   title: string
-  position?: any
+  style?: any
 }
 
 const CustomIconButton = ({
   iconName,
   title,
-  position,
+  style,
   handleClick,
 }: ButtonProps) => {
   return (
-    <IconButton
-      sx={{
-        ...position,
-        position: 'absolute',
-        bgcolor: '#303030',
-        borderRadius: 1,
-      }}
-      onClick={() => handleClick && handleClick()}
-    >
-      <Icon sx={{ color: 'white' }}>{iconName}</Icon>
-      <MuiTypography sx={{ fontWeight: 500, color: 'white', px: 0.5 }}>
-        {title}
-      </MuiTypography>
-    </IconButton>
+    <Tooltip arrow title={title}>
+      <IconButton
+        sx={{
+          ...style,
+          bgcolor: '#303030',
+          borderRadius: 1,
+        }}
+        onClick={() => handleClick && handleClick()}
+      >
+        <Icon sx={{ color: 'white' }}>{iconName}</Icon>
+      </IconButton>
+    </Tooltip>
   )
 }
 
-export const AvatarChoose = ({
-  mediasSrcPreviewer,
-  getInputProps,
-  open,
-}: any) => {
+export const AvatarChoose = ({ mediasSrcPreviewer, open }: any) => {
   return (
     <Box
       sx={{
@@ -494,13 +670,13 @@ export const AvatarChoose = ({
           '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
 
         backgroundImage: `url(${
-          mediasSrcPreviewer[0] && mediasSrcPreviewer[0].url
+          (mediasSrcPreviewer[0] && mediasSrcPreviewer[0].url) ??
+          '/assets/images/avatars/avatar-duck.jpeg'
         })`,
       }}
     >
-      <input {...getInputProps()} />
       <IconButton
-        onClick={open}
+        // onClick={open}
         sx={{ position: 'absolute', bottom: 0, left: 8 }}
       >
         <Icon sx={{ fontSize: '32px !important' }}>local_see</Icon>

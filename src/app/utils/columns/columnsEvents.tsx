@@ -1,19 +1,27 @@
-import { DeleteSharp, EditOutlined } from '@mui/icons-material'
-import { Chip, Icon, IconButton, Typography } from '@mui/material'
+import { Chip, Icon, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
-import {
-  DDMMYYYYFormatter,
-  ISODateTimeFormatter,
-} from '../formatters/dateTimeFormatters'
 
 export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 40,
+    maxWidth: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
   {
     id: 'mediaUrl',
     label: 'Ảnh/Video',
-    minWidth: 150,
+    minWidth: 100,
+    align: 'center',
     media: (value: string) => (
       <Box
         sx={{
@@ -24,6 +32,10 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          border: '1px solid #D9D9D9',
+          backgroundColor: '#EEEEEE',
+          p: 0.25,
+          ml: 1,
         }}
       >
         <img
@@ -34,7 +46,8 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'scale-down',
+            objectFit: 'cover',
+            borderRadius: 4,
           }}
           loading="lazy"
           alt="bg"
@@ -45,10 +58,13 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'name',
     label: 'Tên sự kiện',
-    minWidth: 170,
+    minWidth: 200,
     align: 'left',
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
+      <Typography
+        color={'primary'}
+        sx={{ textDecorationLine: 'underline', pl: 1 }}
+      >
         {value}
       </Typography>
     ),
@@ -62,7 +78,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'tags',
     label: 'Hashtag',
-    minWidth: 170,
+    minWidth: 250,
     align: 'left',
     format: (values: any) => {
       return (
@@ -91,27 +107,33 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'status',
     label: 'Trạng thái',
-    minWidth: 100,
+    minWidth: 75,
     align: 'center',
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'flex-end' }}
+        sx={{ justifyContent: 'center', fontSize: '16px!important' }}
       />
     ),
+    // sticky: {
+    //   position: 'sticky',
+    //   right: 80,
+    //   background: 'white',
+    //   boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+    //   clipPath: 'inset(0px 0px 0px -15px)',
+    // },
   },
   {
-    id: 'edit',
-    label: '',
-    minWidth: 50,
-    align: 'right',
-    action: (value: any) => <Icon color="secondary">edit_calendar</Icon>,
-  },
-  {
-    id: 'delete',
-    label: '',
-    minWidth: 50,
-    align: 'right',
-    action: (value: any) => <Icon color="error">delete</Icon>,
+    id: 'actions',
+    label: 'Hành động',
+    minWidth: 60,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]

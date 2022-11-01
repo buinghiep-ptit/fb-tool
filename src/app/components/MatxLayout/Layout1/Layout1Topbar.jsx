@@ -97,7 +97,7 @@ const Layout1Topbar = () => {
     if (isMdScreen) {
       mode = layout1Settings.leftSidebar.mode === 'close' ? 'mobile' : 'close'
     } else {
-      mode = layout1Settings.leftSidebar.mode === 'full' ? 'close' : 'full'
+      mode = layout1Settings.leftSidebar.mode === 'full' ? 'compact' : 'full'
     }
     updateSidebarMode({ mode })
   }

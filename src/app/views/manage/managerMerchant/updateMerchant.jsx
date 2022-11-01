@@ -150,7 +150,6 @@ export default function UpdateMerchant(props) {
   }
 
   const fetchDetailMerchant = async () => {
-    console.log(params.id)
     const res = await getDetailMerchant(params.id)
     if (res) {
       setStatusMerchant(res.status)

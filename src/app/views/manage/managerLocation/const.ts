@@ -18,7 +18,7 @@ export const tableModel = {
     },
     {
       name: 'Liên hệ',
-      width: 250,
+      width: 200,
     },
     {
       name: 'Địa danh',
@@ -26,7 +26,7 @@ export const tableModel = {
     },
     {
       name: 'Địa chỉ',
-      width: 250,
+      width: 200,
     },
     {
       name: 'Dịch vụ',
@@ -166,4 +166,5 @@ export const VEHICLES = {
   1: { name: 'bus' },
   2: { name: 'car' },
   3: { name: 'motobike' },
+  4: { name: 'boat' },
 }

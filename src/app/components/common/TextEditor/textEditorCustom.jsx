@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import {
   EditorState,
   convertToRaw,
@@ -27,6 +28,33 @@ class EditorConvertToHTML extends Component {
     this.setState({
       editorState,
     })
+    this.props.setDescription(
+      draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    )
+    return onChange(draftToHtml(convertToRaw(editorState.getCurrentContent())))
+  }
+
+  uploadImageCallBack = async file => {
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const token = window.localStorage.getItem('accessToken')
+      const res = await axios({
+        method: 'post',
+        url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (res) {
+        console.log(res)
+        return { data: { link: res.data.url } }
+      }
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   render() {
@@ -38,6 +66,17 @@ class EditorConvertToHTML extends Component {
           wrapperClassName="demo-wrapper"
           editorClassName="demo-editor"
           onEditorStateChange={this.onEditorStateChange}
+          toolbar={{
+            image: {
+              urlEnabled: true,
+              uploadEnabled: true,
+              alignmentEnabled: true,
+              uploadCallback: this.uploadImageCallBack,
+              previewImage: true,
+              inputAccept: 'image/gif,image/jpeg,image/jpg,image/png,image/svg',
+              alt: { present: true, mandatory: false },
+            },
+          }}
         />
       </div>
     )

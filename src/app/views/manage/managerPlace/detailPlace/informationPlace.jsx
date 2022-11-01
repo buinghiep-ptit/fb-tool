@@ -5,12 +5,19 @@ import {
   Button,
   Stack,
   Icon,
+  FormHelperText,
 } from '@mui/material'
 import UploadImage from 'app/components/common/uploadImage'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import { getDetailPlace, updateDetailPlace } from 'app/apis/place/place.service'
+import {
+  deletePlace,
+  getDetailPlace,
+  updateDetailPlace,
+} from 'app/apis/place/place.service'
 import { useNavigate, useParams } from 'react-router-dom'
+import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
+import { messages } from 'app/utils/messages'
 import {
   getDistricts,
   getProvinces,
@@ -52,8 +59,8 @@ export default function InformationPlace(props) {
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      district: yup.object().required(),
-      description: yup.string().required('Vui lòng nhập mô tả').trim(),
+      description: yup.string().required(messages.MSG1),
+      hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
 
@@ -62,6 +69,8 @@ export default function InformationPlace(props) {
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -78,7 +87,16 @@ export default function InformationPlace(props) {
   })
 
   const addHashTag = e => {
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      if (e.target.value && e.target.value.charAt(0) !== '#') {
+        setError('hashtag', {
+          type: 'required',
+          message: 'Hashtag phải bắt đầu bằng #',
+        })
+        e.preventDefault()
+        return
+      }
+      clearErrors(['hashtag'])
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
     }
@@ -141,44 +159,104 @@ export default function InformationPlace(props) {
 
   const handleDataImageUpload = async () => {
     const introData = uploadImageRef.current.getFiles()
-    const fileUpload = [...introData].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+
+    const fileUploadImage = [...introData].map(file => {
+      if (file.type.startsWith('image/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
       }
     })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    const fileUploadVideo = [...introData].map(file => {
+      if (file.type.startsWith('video/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    })
+
+    const responseImage = await Promise.all(fileUploadImage)
+    const responseVideo = await Promise.all(fileUploadVideo)
+    const listUrl = new Object()
+    if (responseImage && responseVideo) {
+      if (responseImage.length > 0)
+        listUrl.image = responseImage.map(item => item?.data.url)
+      if (responseVideo.length > 0)
+        listUrl.video = responseVideo.map(item => item?.data.url)
+    }
+    return listUrl
+  }
+
+  const handleDeletePlace = async () => {
+    const res = await deletePlace(params.id)
+    if (res) {
+      toastSuccess({ message: 'Xóa điểm dia danh thành công' })
+      navigate('/quan-ly-thong-tin-dia-danh')
+    }
   }
 
   const onSubmit = async data => {
-    const listUrlImage = await handleDataImageUpload()
-
-    const mediasUpdate = listUrlImage.map(url => {
-      const media = new Object()
-      media.srcType = 2
-      media.mediaType = 1
-      media.mediaFormat = 2
-      media.url = url
-      return media
-    })
+    const listUrl = await handleDataImageUpload()
+    let mediasUpdateImage = []
+    if (listUrl?.image && listUrl?.image.length > 0) {
+      mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 2
+          media.url = url
+          return media
+        }
+      })
+    }
+    let mediasUpdateVideo = []
+    if (listUrl?.video && listUrl?.video.length > 0) {
+      mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 1
+          media.url = url
+          return media
+        }
+      })
+    }
 
     const paramDetail = {
-      medias: [...medias, ...mediasUpdate],
+      medias: [...medias, ...mediasUpdateImage, ...mediasUpdateVideo].filter(
+        item => !!item,
+      ),
       id: params.id,
       name: data.namePlace,
       description: data.description,
@@ -187,7 +265,7 @@ export default function InformationPlace(props) {
       idDistrict: data?.district?.id || null,
       longitude: createDegrees.lng,
       latitude: createDegrees.lat,
-      address: data.address,
+      address: data.address === '' ? null : data.address,
       tags: data.hashtag,
       imgUrl: '',
       status: 1,
@@ -320,21 +398,18 @@ export default function InformationPlace(props) {
               name="address"
               render={({ field }) => (
                 <TextField
-                  error={errors.address}
+                  error={!!errors.address}
                   helperText={errors.address?.message}
                   {...field}
-                  label="Địa danh"
+                  label="Địa chỉ"
                   variant="outlined"
                   margin="normal"
                 />
               )}
             />
           </Grid>
-          {/* <Grid item xs={12}>
-            <MapCustom ref={mapRef} center={createDegrees} />
-          </Grid> */}
           <Grid item xs={12} md={12}>
-            <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+            <Typography mt={2}>Vị trí trên bản đồ*:</Typography>
             <Stack
               direction="row"
               spacing={2}
@@ -382,8 +457,6 @@ export default function InformationPlace(props) {
                   renderInput={params => (
                     <TextField
                       {...params}
-                      // error={errors.namePlace}
-                      // helperText={errors.namePlace?.message}
                       variant="outlined"
                       label="Loại hình"
                       placeholder="Loại hình"
@@ -416,6 +489,10 @@ export default function InformationPlace(props) {
                   renderInput={params => (
                     <TextField
                       {...params}
+                      error={!!errors.hashtag}
+                      helperText={
+                        !!errors.hashtag ? errors.hashtag.message : ''
+                      }
                       variant="outlined"
                       label="Hashtag"
                       placeholder="Hashtag"
@@ -430,26 +507,22 @@ export default function InformationPlace(props) {
           </Grid>
 
           <Grid item xs={12} md={12}>
+            Mô tả*:
             <Controller
-              control={control}
+              render={({ field }) => <WYSIWYGEditor {...field} />}
               name="description"
-              render={({ field }) => (
-                <TextField
-                  error={errors.description}
-                  helperText={errors.description?.message}
-                  {...field}
-                  label="Mô tả"
-                  margin="normal"
-                  multiline
-                  rows={10}
-                  fullWidth
-                />
-              )}
+              control={control}
+              defaultValue=""
             />
+            {errors.description && (
+              <FormHelperText error>
+                {errors.description?.message}
+              </FormHelperText>
+            )}
           </Grid>
         </Grid>
 
-        <Typography>Ảnh:</Typography>
+        <Typography>Ảnh*:</Typography>
         <UploadImage
           ref={uploadImageRef}
           medias={medias}
@@ -457,6 +530,24 @@ export default function InformationPlace(props) {
         ></UploadImage>
         <Button color="primary" type="submit" variant="contained">
           Lưu
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => handleDeletePlace()}
+          style={{ marginLeft: '10px' }}
+        >
+          Xóa
+        </Button>
+        <Button
+          color="primary"
+          variant="contained"
+          style={{ marginLeft: '10px' }}
+          onClick={() => {
+            navigate('/quan-ly-thong-tin-dia-danh')
+          }}
+        >
+          Quay lại
         </Button>
       </form>
       <DialogCustom

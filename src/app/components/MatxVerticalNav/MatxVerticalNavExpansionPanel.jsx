@@ -42,11 +42,12 @@ const BaseButton = styled(ButtonBase)(({ theme }) => ({
   color: theme.palette.text.primary,
   '&:hover': { background: 'rgba(255, 255, 255, 0.08)' },
   '& .icon': {
-    width: 36,
     fontSize: '18px',
-    paddingLeft: '16px',
-    paddingRight: '16px',
+    paddingLeft: '4px', // 16px
+    paddingRight: '8px', // '16px'
     verticalAlign: 'middle',
+    display: 'flex',
+    alignItems: 'center',
   },
 }))
 
@@ -64,7 +65,7 @@ const BulletIcon = styled('div')(({ theme }) => ({
 
 const ItemText = styled('span')(() => ({
   fontSize: '0.875rem',
-  paddingLeft: '0.8rem',
+  // paddingLeft: '0.8rem',
   verticalAlign: 'middle',
 }))
 

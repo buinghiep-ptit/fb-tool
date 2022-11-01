@@ -37,8 +37,17 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
             </Grid>
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
-                [{order?.customer?.fullName}] - [{order?.customer?.mobilePhone}]
-                - [{order?.customer?.email}]
+                {`${
+                  order?.customer?.fullName
+                    ? order?.customer?.fullName + '-'
+                    : ''
+                }`}
+                {`${
+                  order?.customer?.mobilePhone
+                    ? order?.customer?.mobilePhone + '-'
+                    : ''
+                }`}
+                {order?.customer?.email}
               </MuiTypography>
             </Grid>
           </Grid>

@@ -53,7 +53,7 @@ const MapCustom = React.forwardRef(({ center }, ref) => {
   return (
     // Important! Always set the container height explicitly
     <div style={{ height: '50vh', width: '100%', margin: '25px 0 60px' }}>
-      <div>Vị trí trên bản đồ:</div>
+      <div>Vị trí trên bản đồ*:</div>
       {center && (
         <>
           <GoogleMapReact

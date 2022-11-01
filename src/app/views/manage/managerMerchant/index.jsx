@@ -65,7 +65,7 @@ export default function ManagerMerchant(props) {
   React.useEffect(() => {
     const param = {
       page: 0,
-      size: 5,
+      size: 20,
     }
     fetchListMerchant(param)
   }, [])
@@ -139,7 +139,7 @@ export default function ManagerMerchant(props) {
                   status: statusFilter,
                   merchantType: merchantType,
                   page: 0,
-                  size: 5,
+                  size: 20,
                 })
               }}
             >

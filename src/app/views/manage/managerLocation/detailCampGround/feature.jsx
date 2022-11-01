@@ -1,7 +1,16 @@
 import * as React from 'react'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-import { Grid, Icon, Box, Chip, Button, TextField, Stack } from '@mui/material'
+import {
+  Grid,
+  Icon,
+  Box,
+  Chip,
+  Button,
+  TextField,
+  Stack,
+  FormHelperText,
+} from '@mui/material'
 import { Controller } from 'react-hook-form'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
@@ -15,7 +24,7 @@ import {
 } from 'app/apis/campGround/ground.service'
 import { useParams } from 'react-router-dom'
 import FormGroup from '@mui/material/FormGroup'
-import { cloneDeep, remove, set } from 'lodash'
+import { cloneDeep, remove } from 'lodash'
 
 export default function Feature({
   control,
@@ -24,6 +33,9 @@ export default function Feature({
   action,
   updateFeature,
   getValues,
+  disabledInternet,
+  setValue,
+  setDisabledInternet,
 }) {
   const dialogCustomRef = React.useRef(null)
   const params = useParams()
@@ -118,6 +130,22 @@ export default function Feature({
               />
             )}
           />
+          <Controller
+            name="boat"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                {...field}
+                control={<Checkbox checked={getValues('boat')} />}
+                label={
+                  <span style={{ color: 'black', display: 'flex' }}>
+                    Thuyền bè
+                    <Icon style={{ color: 'black' }}>sailing_icon</Icon>
+                  </span>
+                }
+              />
+            )}
+          />
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>
           Tình trạng mạng:
@@ -137,7 +165,16 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     control={
-                      <Checkbox checked={getValues('viettel')} {...field} />
+                      <Checkbox
+                        checked={getValues('viettel')}
+                        {...field}
+                        onChange={e => {
+                          setValue('viettel', !getValues('viettel'))
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.viettel = !newObj.viettel
+                          setDisabledInternet(newObj)
+                        }}
+                      />
                     }
                     label="Viettel"
                   />
@@ -149,6 +186,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledInternet.viettel}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -175,7 +213,17 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('mobiphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('mobiphone')}
+                        onChange={e => {
+                          setValue('mobiphone', !getValues('mobiphone'))
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.mobiphone = !newObj.mobiphone
+                          setDisabledInternet(newObj)
+                        }}
+                      />
+                    }
                     label="Mobiphone"
                   />
                 )}
@@ -186,14 +234,13 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledInternet.mobiphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                     >
-                      <MenuItem value={0}>Không có sóng</MenuItem>
                       <MenuItem value={1}>Sóng yếu </MenuItem>
-                      <MenuItem value={2}>Sóng trung bình</MenuItem>
-                      <MenuItem value={3}>Sóng mạnh</MenuItem>
+                      <MenuItem value={3}>Sóng khỏe</MenuItem>
                     </Select>
                   </FormControl>
                 )}
@@ -216,7 +263,17 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vinaphone')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vinaphone')}
+                        onChange={e => {
+                          setValue('vinaphone', !getValues('vinaphone'))
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.vinaphone = !newObj.vinaphone
+                          setDisabledInternet(newObj)
+                        }}
+                      />
+                    }
                     label="Vinaphone"
                   />
                 )}
@@ -227,6 +284,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledInternet.vinaphone}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -253,7 +311,17 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControlLabel
                     {...field}
-                    control={<Checkbox checked={getValues('vietnamMobile')} />}
+                    control={
+                      <Checkbox
+                        checked={getValues('vietnamMobile')}
+                        onChange={e => {
+                          setValue('vietnamMobile', !getValues('vietnamMobile'))
+                          const newObj = cloneDeep(disabledInternet)
+                          newObj.vietnamMobile = !newObj.vietnamMobile
+                          setDisabledInternet(newObj)
+                        }}
+                      />
+                    }
                     label="VietnamMobile"
                   />
                 )}
@@ -264,6 +332,7 @@ export default function Feature({
                 render={({ field }) => (
                   <FormControl style={{ width: '150px' }}>
                     <Select
+                      disabled={disabledInternet.vietnamMobile}
                       {...field}
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
@@ -380,12 +449,14 @@ export default function Feature({
             control={control}
             name="status"
             render={({ field }) => (
-              <FormControl style={{ width: '150px' }}>
+              <FormControl style={{ width: '150px' }} error={!!errors?.status}>
                 <Select {...field} labelId="status-label" id="status">
                   <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={0}>Lưu nháp </MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
                 </Select>
+                {!!errors?.status?.message && (
+                  <FormHelperText>{errors?.status.message}</FormHelperText>
+                )}
               </FormControl>
             )}
           />

@@ -91,7 +91,7 @@ export default function ListCampHandBook(props) {
       dialogCustomRef.current.handleClose()
       fetchListHandBookLinked({
         page: 0,
-        size: 5,
+        size: 20,
       })
     }
   }
@@ -99,7 +99,7 @@ export default function ListCampHandBook(props) {
   React.useEffect(() => {
     const param = {
       page: 0,
-      size: 5,
+      size: 20,
     }
     fetchListHandBookLinked(param)
   }, [])
@@ -125,7 +125,7 @@ export default function ListCampHandBook(props) {
             onClick={() => {
               const params = {
                 page: 0,
-                size: 5,
+                size: 20,
               }
               fetchListHandBookUnLinked(params)
               dialogCustomRef.current.handleClickOpen()
@@ -178,7 +178,7 @@ export default function ListCampHandBook(props) {
               onClick={() => {
                 const param = {
                   page: 0,
-                  size: 5,
+                  size: 20,
                   title: filterHandBook,
                 }
                 fetchListHandBookUnLinked(param)

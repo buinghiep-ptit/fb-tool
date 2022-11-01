@@ -7,15 +7,16 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
 import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
+import useAuth from 'app/hooks/useAuth'
+import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
-import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
-import { DiagLogConfirm } from './details/ButtonsLink/DialogConfirm'
 import { CampgroundInfo } from './details/CampgroundInfo'
+import { CancelOrderInfo } from './details/CancelOrderInfo'
 import { CustomerInfo } from './details/CustomerInfo'
 import { OrderProcesses } from './details/OrderProcesses'
 import { OrderServices } from './details/OrderServices'
@@ -30,6 +31,27 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
+const getBreadCrumbDetailName = (slug?: string) => {
+  switch (slug) {
+    case 'xu-ly':
+      return 'Cần xử lý'
+    case 'tat-ca':
+      return 'Tất cả'
+    case 'yeu-cau-huy':
+      return 'Yêu cầu huỷ'
+
+    default:
+      return 'Tất cả'
+  }
+}
+
+export const isExpiredReceiveUser = (expiredTimeISO: string) => {
+  const NOW_IN_MS = new Date().getTime()
+  const EXP_IN_MS = new Date(expiredTimeISO).getTime()
+
+  return EXP_IN_MS <= NOW_IN_MS
+}
+
 type SchemaType = {
   dateStart?: string
   dateEnd?: string
@@ -43,10 +65,10 @@ type SchemaType = {
 export interface Props {}
 
 export default function OrderDetail(props: Props) {
+  const { user } = useAuth()
+
   const navigate = useNavigate()
-  const [titleDialog, setTitleDialog] = useState('')
-  const [openDialog, setOpenDialog] = useState(false)
-  const { orderId } = useParams()
+  const { source, orderId } = useParams()
   const {
     data: order,
     isLoading,
@@ -96,15 +118,6 @@ export default function OrderDetail(props: Props) {
     edit({ ...payload, id: Number(orderId ?? 0) })
   }
 
-  const onSuccess = (data?: any) => {
-    toastSuccess({ message: 'Huỷ thành công' })
-    setOpenDialog(false)
-  }
-
-  const cancelOrderConfirm = () => {
-    onSuccess()
-  }
-
   if (isLoading) return <MuiLoading />
 
   if (isError)
@@ -119,8 +132,9 @@ export default function OrderDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý đặt chỗ', path: '/quan-ly-don-hang' },
+            { name: 'Quản lý đơn hàng', path: '/quan-ly-don-hang' },
             { name: 'Chi tiết' },
+            { name: getBreadCrumbDetailName(source ?? '') },
           ]}
         />
       </Box>
@@ -129,23 +143,30 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        <MuiButton
-          title="Lưu"
-          variant="contained"
-          color="primary"
-          type="submit"
-          disabled={editLoading}
-          loading={editLoading}
-          onClick={methods.handleSubmit(onSubmitHandler)}
-          startIcon={<Icon>done</Icon>}
-        />
-        <MuiButton
-          title="Huỷ"
-          variant="contained"
-          color="secondary"
-          onClick={() => methods.reset()}
-          startIcon={<Icon>clear</Icon>}
-        />
+        {!isExpiredReceiveUser(order.handleExpireTime ?? '') &&
+          order.status !== 4 && (
+            <>
+              <MuiButton
+                title="Lưu"
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={editLoading}
+                loading={editLoading}
+                onClick={methods.handleSubmit(onSubmitHandler)}
+                startIcon={<Icon>done</Icon>}
+              />
+              <MuiButton
+                title="Huỷ"
+                variant="contained"
+                color="warning"
+                disabled={editLoading}
+                onClick={() => methods.reset()}
+                startIcon={<Icon>clear</Icon>}
+              />
+            </>
+          )}
+
         <MuiButton
           title="Quay lại"
           variant="contained"
@@ -159,22 +180,16 @@ export default function OrderDetail(props: Props) {
         justifyContent="space-between"
         alignItems={'center'}
       >
-        {false ? (
-          <MuiButton
-            title="Huỷ chỗ, hoàn tiền"
-            variant="outlined"
-            color="error"
-            onClick={() => {
-              setTitleDialog('Hoàn tiền')
-              setOpenDialog(true)
-            }}
-            startIcon={<Icon>clear</Icon>}
-          />
-        ) : (
-          <ButtonsActions order={order} />
-        )}
+        <ButtonsActions
+          order={order}
+          currentUser={user as unknown as IUserProfile}
+        />
         <Chip
-          label={getOrderStatusSpec(1, order?.status).title}
+          label={
+            order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
+              : getOrderStatusSpec(order?.status ?? 0, 2).title
+          }
           size="medium"
           color={'default'}
         />
@@ -187,6 +202,11 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
+            {order.cancelRequest && (
+              <Stack>
+                <CancelOrderInfo order={order} />
+              </Stack>
+            )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <CustomerInfo order={order} />
@@ -207,12 +227,6 @@ export default function OrderDetail(props: Props) {
           </Stack>
         </FormProvider>
       </form>
-      <DiagLogConfirm
-        title={titleDialog}
-        open={openDialog}
-        setOpen={setOpenDialog}
-        onSubmit={cancelOrderConfirm}
-      />
     </Container>
   )
 }

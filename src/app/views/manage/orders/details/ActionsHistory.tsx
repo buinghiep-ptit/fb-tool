@@ -66,6 +66,8 @@ export function ActionsHistory({ orderId }: IActionsHistoryProps) {
         <MuiStyledTable
           rows={logs?.content as any}
           columns={columnsLogsOrderDetail as any}
+          rowsPerPage={size}
+          page={page}
           onClickRow={() => {}}
           isFetching={isFetching}
         />

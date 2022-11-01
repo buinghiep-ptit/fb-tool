@@ -33,7 +33,8 @@ const StyledTable = styled(Table)(({ theme }) => ({
   '& tbody': {
     '& tr': {
       '& td': {
-        paddingLeft: 0,
+        paddingLeft: 10,
+        paddingRight: 10,
         textTransform: 'capitalize',
       },
     },
@@ -54,8 +55,12 @@ const TableCustom = ({
 }) => {
   const dialogConfirm = React.useRef()
   const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [filterTable, setFilterTable] = useState({ name: '', size: 5, page: 0 })
+  const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [filterTable, setFilterTable] = useState({
+    name: '',
+    size: 20,
+    page: 0,
+  })
   const idDelete = React.useRef()
   const navigate = useNavigate()
   const handleChangePage = (_, newPage) => {
@@ -79,7 +84,7 @@ const TableCustom = ({
     const res = await onDeleteData(id)
     if (res) {
       toastSuccess({ message: 'Đã được xóa' })
-      fetchDataTable({ ...filterTable })
+      fetchDataTable(filter)
     }
   }
 
@@ -87,7 +92,7 @@ const TableCustom = ({
     const res = await onAddData(id)
     if (res) {
       toastSuccess({ message: 'Liên kết thành công' })
-      fetchDataTable({ ...filterTable })
+      fetchDataTable(filter)
     }
   }
 
@@ -120,7 +125,7 @@ const TableCustom = ({
 
           <TableBody>
             {(dataTable || []).map((data, index) => (
-              <TableRow key={data.id}>
+              <TableRow key={data.id} style={{ wordbreak: 'normal' }}>
                 {tableModel.bodyCell.map((element, id) => {
                   switch (element) {
                     case 'image':
@@ -198,7 +203,6 @@ const TableCustom = ({
                                 <IconButton
                                   key={indexType}
                                   onClick={() => {
-                                    console.log(data.linkDetail.path)
                                     navigate(
                                       `${data.linkDetail.path}${data.id}`,
                                     )
@@ -219,15 +223,41 @@ const TableCustom = ({
                       )
                     case 'linkDetail':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
-                          <Link to={`${data[element].path}${data.id}`}>
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
+                          <Link
+                            to={`${data[element].path}${data.id}`}
+                            style={{ textDecoration: 'underline' }}
+                          >
                             {data[element].link}
+                          </Link>
+                        </TableCell>
+                      )
+                    case 'contact':
+                      return (
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
+                          <Link
+                            style={{ textDecoration: 'underline' }}
+                            to={`/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`}
+                          >
+                            {data[element]}
                           </Link>
                         </TableCell>
                       )
                     case 'eventPlace':
                       return (
-                        <TableCell align="center" key={`${element}${id}`}>
+                        <TableCell
+                          align="center"
+                          key={`${element}${id}`}
+                          style={{ wordBreak: 'normal' }}
+                        >
                           <span style={{ color: '#217f32' }}>
                             {data[element].active} -
                           </span>{' '}
@@ -239,7 +269,20 @@ const TableCustom = ({
                     default:
                       return (
                         <TableCell align="center" key={`${element}${id}`}>
-                          {data[element]}
+                          <div
+                            style={{
+                              wordBreak: 'normal',
+                              // whiteSpace: 'nowrap',
+                              width: '200px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              webkitLineClamp: '2',
+                              display: '-webkit-box',
+                              webkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {data[element]}
+                          </div>
                         </TableCell>
                       )
                   }
@@ -256,7 +299,8 @@ const TableCustom = ({
             rowsPerPage={rowsPerPage}
             count={totalData || 0}
             onPageChange={handleChangePage}
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
             onRowsPerPageChange={handleChangeRowsPerPage}
             nextIconButtonProps={{ 'aria-label': 'Next Page' }}
             backIconButtonProps={{ 'aria-label': 'Previous Page' }}

@@ -22,15 +22,17 @@ import {
   createCampGround,
   getListMerchant,
   deleteCampGround,
+  updateCampGroundStatus,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
 import Feature from './feature'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { object } from 'prop-types'
 
 export default function InformationCampGround({ action }) {
   const [hashtag, setHashtag] = React.useState([])
@@ -41,14 +43,36 @@ export default function InformationCampGround({ action }) {
   const [campAreas, setCampAreas] = React.useState([])
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState('')
+  // const [statusCamp, setStatusCamp] = React.useState(null)
   const [listMerchant, setListMerchant] = React.useState([])
-  const [detailPolicy, setDetailPolicy] = React.useState()
+  const [disabledInternet, setDisabledInternet] = React.useState({
+    viettel: true,
+    mobiphone: true,
+    vinaphone: true,
+    vietnamMobile: true,
+  })
+
+  const [detailPolicy, setDetailPolicy] = React.useState({
+    id: 1,
+    name: 'Default Deposit Policy',
+    scope: 1,
+    scaleAmount: 50.0,
+    minAmount: 200000,
+    maxAmount: 2000000,
+  })
   const params = useParams()
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
     lng: 105.78872657468659,
   })
   const introductionRef = React.useRef()
+  const [listContact, setListContact] = React.useState([
+    {
+      name: '',
+      web: '',
+      phone: '',
+    },
+  ])
 
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
@@ -58,6 +82,14 @@ export default function InformationCampGround({ action }) {
     { label: 'Trekking', id: 5 },
     { label: 'Leo núi', id: 6 },
   ]
+
+  const arrInternet = [
+    { provider: 'viettel', speed: 'speedViettel' },
+    { provider: 'vinaphone', speed: 'speedVinaphone' },
+    { provider: 'mobiphone', speed: 'speedMobiphone' },
+    { provider: 'vietnamMobile', speed: 'speedVietnamMobile' },
+  ]
+
   const navigate = useNavigate()
 
   const schema = yup
@@ -69,6 +101,9 @@ export default function InformationCampGround({ action }) {
         .trim(),
       province: yup.object().required('Vui lòng chọn thành tỉnh/phố'),
       district: yup.object().required('Vui lòng chọn quận/huyện'),
+      status: yup.string().required('Vui lòng chọn trạng thái'),
+      campTypes: yup.array().min(1, ''),
+      hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
     })
     .required()
 
@@ -77,6 +112,8 @@ export default function InformationCampGround({ action }) {
     handleSubmit,
     setValue,
     getValues,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -106,14 +143,16 @@ export default function InformationCampGround({ action }) {
       bus: false,
       car: false,
       motobike: false,
+      boat: false,
       campAreas: [],
       campTypes: [],
-      isSupportBooking: 1,
+      isSupportBooking: '1',
       idMerchant: null,
       latitude: 21.027161210811197,
       longitude: 105.78872657468659,
       note: '',
-      policy: '',
+      policy: 1,
+      topographic: 1,
     },
   })
 
@@ -123,52 +162,108 @@ export default function InformationCampGround({ action }) {
 
   const handleDataImageUpload = async () => {
     const introData = introductionRef.current.getIntro()
-    const fileUpload = [...introData].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+    const fileUploadImage = [...introData].map(file => {
+      if (file.type.startsWith('image/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
       }
     })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    const handleDeleteCampGround = async () => {
+      const res = await deleteCampGround(params.id)
+      if (res) {
+        toastSuccess({ message: 'Xóa điểm camp thành công' })
+        navigate('/quan-ly-thong-tin-diem-camp')
+      }
+    }
+
+    const fileUploadVideo = [...introData].map(file => {
+      if (file.type.startsWith('video/')) {
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+          const token = window.localStorage.getItem('accessToken')
+          const res = axios({
+            method: 'post',
+            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          return res
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    })
+
+    const responseImage = await Promise.all(fileUploadImage)
+    const responseVideo = await Promise.all(fileUploadVideo)
+    const listUrl = new Object()
+    if (responseImage && responseVideo) {
+      if (responseImage.length > 0)
+        listUrl.image = responseImage.map(item => item?.data.url)
+      if (responseVideo.length > 0)
+        listUrl.video = responseVideo.map(item => item?.data.url)
+    }
+    return listUrl
   }
 
   const onSubmit = async data => {
-    const listUrlImage = await handleDataImageUpload()
-
-    const mediasUpdate = listUrlImage.map((url, index) => {
-      const media = new Object()
-      media.mediaType = 1
-      media.srcType = 2
-      media.mediaFormat = 2
-      media.url = url
-      return media
-    })
+    const listUrl = await handleDataImageUpload()
+    let mediasUpdateImage = []
+    if (listUrl?.image && listUrl?.image.length > 0) {
+      mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 2
+          media.url = url
+          return media
+        }
+      })
+    }
+    let mediasUpdateVideo = []
+    if (listUrl?.video && listUrl?.video.length > 0) {
+      mediasUpdateVideo = (listUrl?.video || []).map((url, index) => {
+        if (url) {
+          const media = new Object()
+          media.mediaType = 1
+          media.srcType = 2
+          media.mediaFormat = 1
+          media.url = url
+          return media
+        }
+      })
+    }
 
     const dataUpdate = new Object()
-    dataUpdate.medias = [...medias, ...mediasUpdate]
+    dataUpdate.medias = [
+      ...medias,
+      ...mediasUpdateImage,
+      ...mediasUpdateVideo,
+    ].filter(item => !!item)
     dataUpdate.description = introductionRef.current.getValueEditor()
     dataUpdate.campGroundInternets = []
-    const arrInternet = [
-      { provider: 'viettel', speed: 'speedViettel' },
-      { provider: 'vinaphone', speed: 'speedVinaphone' },
-      { provider: 'mobilephone', speed: 'speedMobiphone' },
-      { provider: 'vietnamMobile', speed: 'speedVietnamMobile' },
-    ]
+
     arrInternet.forEach((item, index) => {
       if (data[item.provider]) {
         dataUpdate.campGroundInternets.push({
@@ -187,14 +282,23 @@ export default function InformationCampGround({ action }) {
     dataUpdate.idProvince = data.province?.id
     dataUpdate.idDistrict = data.district?.id
     dataUpdate.isSupportBooking = parseInt(data.isSupportBooking)
-    dataUpdate.contact = data.contact
+    if (parseInt(data.isSupportBooking) === 1) {
+      dataUpdate.idMerchant = data.idMerchant?.id || null
+      dataUpdate.contact = []
+    } else {
+      dataUpdate.contact = (listContact || []).map(
+        contact => `${contact?.name},${contact?.web},${contact?.phone}`,
+      )
+      dataUpdate.idMerchant = null
+    }
+
     dataUpdate.idWard = data.ward?.id
     dataUpdate.openTime = data.openTime
     dataUpdate.closeTime = data.closeTime
-    dataUpdate.address = data.address
+    dataUpdate.address = data.address || null
     dataUpdate.capacity = data.capacity
-    dataUpdate.latitude = data.latitude
-    dataUpdate.longitude = data.longitude
+    dataUpdate.latitude = createDegrees.lat
+    dataUpdate.longitude = createDegrees.lng
     dataUpdate.isPopular = 0
     dataUpdate.noteTopography = data.note
     dataUpdate.status = data.status
@@ -215,6 +319,7 @@ export default function InformationCampGround({ action }) {
     if (data.bus) dataUpdate.campGroundVehicles.push(1)
     if (data.car) dataUpdate.campGroundVehicles.push(2)
     if (data.motobike) dataUpdate.campGroundVehicles.push(3)
+    if (data.boat) dataUpdate.campGroundVehicles.push(4)
     dataUpdate.freeParking = true
 
     if (action === 'create') {
@@ -246,14 +351,12 @@ export default function InformationCampGround({ action }) {
       if (action === 'edit') {
         getDetailCampGround(params.id)
           .then(data => {
-            setValue(
-              'idMerchant',
-              merchants.filter(merchant => merchant.id == data.idMerchant)[0],
-            )
             setCreateDegrees({
               lat: data.latitude,
               lng: data.longitude,
             })
+            setValue('latitude', data.latitude)
+            setValue('longitude', data.longitude)
             setValue(
               'campTypes',
               data.campTypes.map(type => typeCamp[type - 1]),
@@ -266,13 +369,13 @@ export default function InformationCampGround({ action }) {
             setValue('campAreas', data.campAreas)
             setValue('hashtag', data.tags)
             setValue('nameCampground', data.name)
-
             setValue(
               'province',
               res.find(province => province.id === data.idProvince),
             )
+
             setValue('policy', data.depositPolicy.id)
-            setValue('contact', data.contact)
+            // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
             setFeature({ utility: data.campGroundUtilities })
@@ -285,10 +388,31 @@ export default function InformationCampGround({ action }) {
             setValue('topographic', data.idTopography)
             setValue('capacity', data.capacity)
             setValue('status', data.status)
+            // setStatusCamp(data.status)
+            setValue('isSupportBooking', data.isSupportBooking.toString())
+            if (data.isSupportBooking === 1) {
+              setValue(
+                'idMerchant',
+                merchants.filter(merchant => merchant.id == data.idMerchant)[0],
+              )
+            } else {
+              const newListContact = (data.contact || []).map(item => {
+                const arr = item.split(',')
+                return {
+                  name: arr[0],
+                  web: arr[1],
+                  phone: arr[2],
+                }
+              })
+              setListContact(newListContact)
+            }
+            const newObj = cloneDeep(disabledInternet)
             data.campGroundInternets.forEach(item => {
               setValue(INTERNET[item.idInternet].name, true)
+              newObj[INTERNET[item.idInternet].name] = false
               setValue(INTERNET[item.idInternet].speed, item.signalQuality)
             })
+            setDisabledInternet(newObj)
             data.campGroundVehicles.forEach(item => {
               setValue(VEHICLES[item]?.name, true)
             })
@@ -297,7 +421,7 @@ export default function InformationCampGround({ action }) {
                 setDistricts(dataDistrict)
                 setValue(
                   'district',
-                  dataDistrict.find(district => district.id == data.idProvince),
+                  dataDistrict.find(district => district.id == data.idDistrict),
                 )
               })
               .catch(err => console.log(err))
@@ -307,7 +431,7 @@ export default function InformationCampGround({ action }) {
                   setWards(dataWard)
                   setValue(
                     'ward',
-                    dataWard.find(ward => ward.id == data.idDistrict),
+                    dataWard.find(ward => ward.id == data.idWard),
                   )
                 })
                 .catch(err => console.log(err))
@@ -316,6 +440,19 @@ export default function InformationCampGround({ action }) {
           .catch(err => console.log(err))
       } else {
         setFeature({ utility: [] })
+        for (const property in VEHICLES) {
+          setValue(VEHICLES[property].name, true)
+        }
+        for (const property in INTERNET) {
+          setValue(INTERNET[property].name, true)
+          setValue(INTERNET[property].speed, 1)
+        }
+        setDisabledInternet({
+          viettel: false,
+          mobiphone: false,
+          vinaphone: false,
+          vietnamMobile: false,
+        })
       }
     }
   }
@@ -323,9 +460,9 @@ export default function InformationCampGround({ action }) {
   const handleDeleteCampGround = async () => {
     const res = await deleteCampGround(params.id)
     if (res) {
+      toastSuccess({ message: 'Xóa điểm camp thành công' })
       navigate('/quan-ly-thong-tin-diem-camp')
     }
-    navigate('/quan-ly-thong-tin-diem-camp')
   }
 
   const fetchDistricts = provinceId => {
@@ -368,6 +505,8 @@ export default function InformationCampGround({ action }) {
             fetchDistricts={fetchDistricts}
             control={control}
             errors={errors}
+            setError={setError}
+            clearErrors={clearErrors}
             provinces={provinces}
             districts={districts}
             wards={wards}
@@ -392,10 +531,13 @@ export default function InformationCampGround({ action }) {
         <AccordionDetails>
           <InformationBooking
             control={control}
+            listContact={listContact}
+            setListContact={setListContact}
             errors={errors}
             getValues={getValues}
             setValue={setValue}
             listMerchant={listMerchant}
+            defaultCheck={getValues('isSupportBooking')}
           />
         </AccordionDetails>
       </Accordion>
@@ -432,8 +574,11 @@ export default function InformationCampGround({ action }) {
             control={control}
             errors={errors}
             getValues={getValues}
+            setValue={setValue}
             feature={feature}
             updateFeature={updateFeature}
+            disabledInternet={disabledInternet}
+            setDisabledInternet={setDisabledInternet}
           />
         </AccordionDetails>
       </Accordion>
@@ -450,25 +595,89 @@ export default function InformationCampGround({ action }) {
             setValue={setValue}
             action={action}
             detailPolicy={detailPolicy}
+            setDetailPolicy={setDetailPolicy}
           />
         </AccordionDetails>
       </Accordion>
       <div style={{ marginTop: '50px' }}>
-        <Button
-          color="primary"
-          type="submit"
-          variant="contained"
-          style={{ marginRight: '10px' }}
-        >
-          Lưu
-        </Button>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => handleDeleteCampGround()}
-        >
-          Xóa
-        </Button>
+        {action === 'create' ? (
+          <>
+            {/* <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                setValue('status', 0)
+              }}
+            >
+              Lưu Nháp
+            </Button> */}
+            <Button
+              color="primary"
+              type="submit"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+            >
+              Lưu
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                navigate('/quan-ly-thong-tin-diem-camp')
+              }}
+            >
+              Quay lại
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* {statusCamp === 0 && (
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={async () => {
+                  const res = await updateCampGroundStatus(params.id, 0)
+                  if (res) {
+                    toastSuccess({ message: 'Lưu nháp thành công' })
+                    navigate('/quan-ly-thong-tin-diem-camp')
+                  }
+                }}
+              >
+                Lưu Nháp
+              </Button>
+            )} */}
+            <Button
+              color="primary"
+              type="submit"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+            >
+              Lưu
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleDeleteCampGround()}
+              style={{ marginRight: '10px' }}
+            >
+              Xóa
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                navigate('/quan-ly-thong-tin-diem-camp')
+              }}
+            >
+              Quay lại
+            </Button>
+          </>
+        )}
       </div>
     </form>
   )

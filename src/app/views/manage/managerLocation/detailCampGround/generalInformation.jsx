@@ -24,12 +24,23 @@ export default function GeneralInformation({
   getValues,
   setValue,
   hashtag,
+  setError,
+  clearErrors,
   campAreas,
   createDegrees,
   setCreateDegrees,
 }) {
   const addHashTag = e => {
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 || e.keyCode === 32) {
+      if (e.target.value && e.target.value.charAt(0) !== '#') {
+        setError('hashtag', {
+          type: 'required',
+          message: 'Hashtag phải bắt đầu bằng #',
+        })
+        e.preventDefault()
+        return
+      }
+      clearErrors(['hashtag'])
       setValue('hashtag', [...getValues('hashtag'), { value: e.target.value }])
       e.preventDefault()
     }
@@ -59,7 +70,7 @@ export default function GeneralInformation({
                 {...field}
                 label="Tên điểm camp*"
                 variant="outlined"
-                error={errors.nameCampground}
+                error={!!errors.nameCampground}
                 helperText={errors.nameCampground?.message}
               />
             )}
@@ -111,7 +122,7 @@ export default function GeneralInformation({
                 }}
                 renderInput={params => (
                   <TextField
-                    error={errors.province}
+                    error={!!errors.province}
                     helperText={
                       errors.province ? 'Vui lòng chọn tỉnh/thành' : ''
                     }
@@ -143,7 +154,7 @@ export default function GeneralInformation({
                     {...params}
                     label="Quận huyện"
                     margin="normal"
-                    error={errors.district}
+                    error={!!errors.district}
                     helperText={
                       errors.district ? 'Vui lòng chọn quận/huyện' : ''
                     }
@@ -175,7 +186,7 @@ export default function GeneralInformation({
             name="address"
             render={({ field }) => (
               <TextField
-                error={errors.address}
+                error={!!errors.address}
                 helperText={errors.address?.message}
                 {...field}
                 label="Địa chỉ"
@@ -186,7 +197,7 @@ export default function GeneralInformation({
           />
         </Grid>
         <Grid item xs={12} md={12}>
-          <Typography mt={2}>Vị trí trên bản đồ:</Typography>
+          <Typography mt={2}>Vị trí trên bản đồ*:</Typography>
           <Stack
             direction="row"
             spacing={2}
@@ -218,7 +229,7 @@ export default function GeneralInformation({
             name="note"
             render={({ field }) => (
               <TextField
-                error={errors.address}
+                error={!!errors.address}
                 helperText={errors.address?.message}
                 {...field}
                 placeholder="Nhập mô tả lưu ý về địa hình nếu có"
@@ -239,20 +250,22 @@ export default function GeneralInformation({
                 multiple
                 {...field}
                 options={[...typeCamp]}
-                getOptionLabel={option => option.label}
+                getOptionLabel={option => option?.label || ''}
                 filterSelectedOptions
                 onChange={(_, data) => field.onChange(data)}
                 sx={{ width: 400, marginRight: 5 }}
                 renderInput={params => (
                   <TextField
                     {...params}
-                    // error={errors.namePlace}
-                    // helperText={errors.namePlace?.message}
                     variant="outlined"
                     label="Loại hình"
                     placeholder="Loại hình"
                     fullWidth
                     margin="normal"
+                    error={!!errors.campTypes}
+                    helperText={
+                      !!errors.campTypes ? 'Vui lòng chọn loại hình' : ''
+                    }
                   />
                 )}
               />
@@ -305,6 +318,8 @@ export default function GeneralInformation({
                 renderInput={params => (
                   <TextField
                     {...params}
+                    error={!!errors.hashtag}
+                    helperText={!!errors.hashtag ? errors.hashtag.message : ''}
                     variant="outlined"
                     label="Hashtag"
                     placeholder="Hashtag"

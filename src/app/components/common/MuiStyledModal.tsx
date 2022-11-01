@@ -117,7 +117,7 @@ export default function MuiStyledModal({
               variant="contained"
               color="primary"
               type="submit"
-              sx={{ width: '100%', flex: 1 }}
+              sx={{ flex: 1 }}
               startIcon={<ApprovalRounded />}
               onClick={() => onSubmit()}
               loading={isLoading}
@@ -130,7 +130,7 @@ export default function MuiStyledModal({
               variant="outlined"
               color="secondary"
               type="submit"
-              sx={{ width: '100%', flex: 1 }}
+              sx={{ flex: 1, float: 'right' }}
               startIcon={<CancelOutlined />}
               onClick={onCloseModal}
             />

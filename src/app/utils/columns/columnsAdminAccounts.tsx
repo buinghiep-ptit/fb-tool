@@ -6,7 +6,18 @@ import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 40,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
   {
     id: 'email',
     label: 'Email',
@@ -16,6 +27,12 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
         {value}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      left: 40,
+      background: 'white',
+      zIndex: 9,
+    },
   },
   {
     id: 'role',
@@ -53,13 +70,20 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
   {
     id: 'action',
     label: '',
-    minWidth: 85,
-    align: 'right',
+    minWidth: 50,
+    align: 'center',
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'flex-end' }}
+        sx={{ justifyContent: 'center' }}
       />
     ),
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]

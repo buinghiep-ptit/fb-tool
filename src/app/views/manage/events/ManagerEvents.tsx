@@ -64,11 +64,15 @@ export default function ManagerEvents(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
-  const [defaultValues] = useState<ISearchFilters>({})
-  const [filters, setFilters] = useState<ISearchFilters>({
-    page,
-    size,
+  const [defaultValues] = useState<ISearchFilters>({
+    areaNameOrAddress: queryParams.areaNameOrAddress ?? '',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 20,
   })
+
+  const [filters, setFilters] = useState<ISearchFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
 
   const [dialogData, setDialogData] = useState<{
     title?: string
@@ -101,7 +105,7 @@ export default function ManagerEvents(props: Props) {
     () => fetchEvents(filters),
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       keepPreviousData: true,
       enabled: !!filters,
     },
@@ -177,34 +181,36 @@ export default function ManagerEvents(props: Props) {
     } as any)
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
+  }
+
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá sự kiện',
+      message: 'Bạn có chắc chắn muốn xoá sự kiện',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (cell.id === 'name') {
-        navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
-      } else if (cell.id === 'status') {
-        setDialogData(prev => ({
-          ...prev,
-          title: row.status === 1 ? 'Ẩn sự kiện' : 'Mở sự kiện',
-          message:
-            row.status === 1
-              ? 'Bạn có chắc chắn muốn ẩn sự kiện'
-              : 'Bạn có đồng ý mở lại sự kiện',
-          type: 'toggle-status',
-        }))
-        setOpenDialog(true)
-        setRow(row)
-      } else if (cell.id === 'edit') {
-        navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
-      } else if (cell.id === 'delete') {
-        setDialogData(prev => ({
-          ...prev,
-          title: 'Xoá sự kiện',
-          message: 'Bạn có chắc chắn muốn xoá sự kiện',
-          type: 'delete',
-        }))
-        setOpenDialog(true)
-        setRow(row)
-      }
+    if (cell.id === 'name') {
+      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+    } else if (cell.id === 'status') {
+      setDialogData(prev => ({
+        ...prev,
+        title: row.status === 1 ? 'Ẩn sự kiện' : 'Mở sự kiện',
+        message:
+          row.status === 1
+            ? 'Bạn có chắc chắn muốn ẩn sự kiện'
+            : 'Bạn có đồng ý mở lại sự kiện',
+        type: 'toggle-status',
+      }))
+      setOpenDialog(true)
+      setRow(row)
     }
   }
 
@@ -270,6 +276,20 @@ export default function ManagerEvents(props: Props) {
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
+            actions={[
+              {
+                icon: 'edit',
+                color: 'warning',
+                tooltip: 'Chi tiết',
+                onClick: onRowUpdate,
+              },
+              {
+                icon: 'delete',
+                color: 'error',
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"
@@ -288,6 +308,8 @@ export default function ManagerEvents(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

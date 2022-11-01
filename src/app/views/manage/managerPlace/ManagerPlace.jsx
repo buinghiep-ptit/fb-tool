@@ -50,7 +50,7 @@ export default function ManagerPlace(props) {
             inactive: place.eventInactiveAmount,
           }
           convertPlace.address = place.address
-          convertPlace.type = typeAreas[place.campType]
+          convertPlace.type = place.campType
           convertPlace.status = place.status === 1 ? true : false
           convertPlace.action = ['edit', 'delete']
           return convertPlace
@@ -58,6 +58,7 @@ export default function ManagerPlace(props) {
 
         setListPlace(newList)
         setTotalPlace(data.totalElements)
+        return data.content
       })
       .catch(err => console.log(err))
   }
@@ -66,7 +67,7 @@ export default function ManagerPlace(props) {
     const param = {
       name: inputNamePlace,
       page: 0,
-      size: 5,
+      size: 20,
     }
     fetchListPlace(param)
   }, [])
@@ -118,13 +119,18 @@ export default function ManagerPlace(props) {
               color="primary"
               variant="contained"
               type="button"
-              onClick={() => {
-                fetchListPlace({
+              onClick={async () => {
+                const res = fetchListPlace({
                   name: inputNamePlace,
                   page: 0,
-                  size: 5,
+                  size: 20,
                   status: statusFilter === 0 ? null : statusFilter,
                 })
+                if (res.length === 0) {
+                  toastWarning({
+                    message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
+                  })
+                }
               }}
             >
               <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}

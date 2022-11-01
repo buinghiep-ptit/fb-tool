@@ -15,7 +15,7 @@ export const toastError = (error: {
 }) => {
   let message = null
   if (error.data) {
-    message = error.data.errorDescription ?? ''
+    message = error.data.errorDescription ?? error.data.error ?? ''
   } else if (error.code) {
     if (error.code === 'ECONNABORTED')
       message = 'Không có phản hồi phía máy chủ'

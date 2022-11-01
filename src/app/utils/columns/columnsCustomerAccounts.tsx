@@ -1,5 +1,5 @@
 import { EditOutlined } from '@mui/icons-material'
-import { Avatar, Chip, styled, Typography } from '@mui/material'
+import { Avatar, Chip, styled, Tooltip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
@@ -16,14 +16,17 @@ const StyledAvatar = styled(Avatar)(() => ({
 }))
 
 export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
   {
-    id: 'avatar',
-    label: '',
+    id: 'order',
+    label: 'STT',
     minWidth: 40,
-    media: (value: string) => (
-      <StyledAvatar src={value ?? '/assets/images/avatars/avatar-duck.jpeg'} />
-    ),
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
   },
   {
     id: 'mobilePhone',
@@ -34,6 +37,12 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
         {value}
       </Typography>
     ),
+    sticky: {
+      position: 'sticky',
+      left: 40,
+      background: 'white',
+      zIndex: 9,
+    },
   },
   {
     id: 'email',
@@ -96,12 +105,23 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
         }}
       />
     ),
+    sticky: {
+      position: 'sticky',
+      right: 50,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
   {
-    id: 'action',
+    id: 'actions',
     label: '',
     minWidth: 50,
-    align: 'right',
-    action: (value: any) => <EditOutlined />,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+    },
   },
 ]

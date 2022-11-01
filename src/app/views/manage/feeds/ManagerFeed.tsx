@@ -67,7 +67,7 @@ export default function ManagerFeed(props: Props) {
   const [defaultValues] = useState<IFeedsFilters>({
     status: queryParams.status ?? 'all',
     isCampdi: queryParams.isCampdi ? true : false,
-    isReported: queryParams.isReported ? true : false,
+    // isReported: queryParams.isReported ? true : false,
     search: queryParams.search ?? '',
     hashtag: queryParams.hashtag ?? '',
     page: queryParams.page ? +queryParams.page : 0,
@@ -173,7 +173,7 @@ export default function ManagerFeed(props: Props) {
     methods.reset({
       status: 'all',
       isCampdi: false,
-      isReported: false,
+      // isReported: false,
       search: '',
       hashtag: '',
       page: 0,
@@ -207,19 +207,24 @@ export default function ManagerFeed(props: Props) {
     approve(feedId)
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.feedId}`, {})
+  }
+
+  const onRowApprove = (cell: any, row: any) => {
+    setTitleDialog('Duyệt bài đăng')
+    setFeedId(row.feedId)
+    setOpenDialog(true)
+  }
+  const onRowReport = (cell: any, row: any) => {
+    navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
+      state: { modal: true },
+    })
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (['edit', 'account'].includes(cell.id)) {
-        navigation(`${row.feedId}`, {})
-      } else if (cell.id === 'approve' && ![1, -3].includes(row.status)) {
-        setTitleDialog('Duyệt bài đăng')
-        setFeedId(row.feedId)
-        setOpenDialog(true)
-      } else if (cell.id === 'violate' && ![-1, -3].includes(row.status)) {
-        navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
-          state: { modal: true },
-        })
-      }
+    if (cell.id === 'account') {
+      navigation(`${row.feedId}`, {})
     }
   }
 
@@ -301,7 +306,7 @@ export default function ManagerFeed(props: Props) {
               </Grid>
               <Grid item sm={4} xs={12} pt={2}>
                 <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
+                {/* <MuiCheckBox name="isReported" label="Báo cáo vi phạm" /> */}
               </Grid>
             </FormProvider>
 
@@ -372,6 +377,30 @@ export default function ManagerFeed(props: Props) {
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
+            actions={[
+              {
+                icon: 'edit',
+                color: 'warning',
+                tooltip: 'Chi tiết',
+                onClick: onRowUpdate,
+              },
+              {
+                icon: 'verified',
+                color: 'primary',
+                tooltip: 'Duyệt bài',
+                onClick: onRowApprove,
+                disableActions: (status?: number) =>
+                  [1, -3].includes(status ?? 0),
+              },
+              {
+                icon: 'warning_amber',
+                color: 'error',
+                tooltip: 'Báo cáo vi phạm',
+                onClick: onRowReport,
+                disableActions: (status?: number) =>
+                  [-1, -3].includes(status ?? 0),
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"

@@ -63,7 +63,7 @@ export default function ListAudios(props: Props) {
   const [defaultValues] = useState<IAudiosFilters>({
     search: queryParams.search ?? '',
     status: queryParams.status ?? 'all',
-    // isDefault: queryParams.isDefault ?? 'all',
+    isDefault: queryParams.isDefault ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -322,7 +322,7 @@ export default function ListAudios(props: Props) {
                 </Grid>
 
                 <Grid item sm={4} xs={12}>
-                  <SelectDropDown name="status" label="Thể loại">
+                  <SelectDropDown name="isDefault" label="Thể loại">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Nhạc hay</MenuItem>
                     <MenuItem value="0">Nhạc thường</MenuItem>

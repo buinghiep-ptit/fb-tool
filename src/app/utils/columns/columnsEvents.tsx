@@ -20,7 +20,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'mediaUrl',
     label: 'Ảnh/Video',
-    minWidth: 100,
+    minWidth: 80,
     align: 'center',
     media: (value: string) => (
       <Box

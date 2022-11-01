@@ -22,7 +22,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'urlImage',
     label: 'Hình',
-    minWidth: 100,
+    minWidth: 80,
     align: 'center',
     media: (value: string) => (
       <Box
@@ -41,7 +41,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
         }}
       >
         <img
-          src={value ?? '/assets/images/app/image-default.png'}
+          src={value ?? '/assets/images/app/audio-image.jpeg'}
           style={{
             width: '100%',
             height: '100%',
@@ -59,7 +59,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Tên bài hát',
     minWidth: 200,
     action: (value: any) => (
-      <Tooltip arrow title={value}>
+      <Tooltip placement="bottom-start" arrow title={value}>
         <Typography
           sx={{
             overflow: 'hidden',

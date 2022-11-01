@@ -128,6 +128,7 @@ export default function CreateFeed(props: Props) {
 
   const validationSchema = Yup.object().shape(
     {
+      type: Yup.string(),
       cusType: Yup.string().required(messages.MSG1),
       customer: Yup.object()
         .nullable()
@@ -144,7 +145,12 @@ export default function CreateFeed(props: Props) {
           then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
         })
         .nullable(),
-      audio: Yup.object().required(messages.MSG1).nullable(),
+      audio: Yup.object()
+        .when('type', {
+          is: (type: string) => Number(type) == 2,
+          then: Yup.object().required(messages.MSG1),
+        })
+        .nullable(),
       webUrl: Yup.string()
         .nullable()
         .when(['idSrcType'], {
@@ -346,13 +352,7 @@ export default function CreateFeed(props: Props) {
       audioRef.current.load()
       audioRef.current.play()
     }
-    if (methods.watch('type') == 1) {
-      if (!methods.watch('audio')) {
-        methods.setValue('audio', { name: 'Âm thanh của video' })
-      }
-      methods.clearErrors('audio')
-    }
-  }, [methods.watch('audio'), methods.watch('type')])
+  }, [methods.watch('audio')])
 
   useEffect(() => {
     let accounts: any[] = []

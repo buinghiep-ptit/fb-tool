@@ -278,7 +278,7 @@ export default function ManagerEvents(props: Props) {
             error={isError ? error : null}
             actions={[
               {
-                icon: 'edit_calendar',
+                icon: 'edit',
                 color: 'warning',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,

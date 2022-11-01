@@ -19,6 +19,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { DropWrapper } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useCreateAudio, useUpdateAudio } from 'app/hooks/queries/useAudiosData'
+import { getReturnValues } from 'app/hooks/useCountDown'
 import { IMediaOverall } from 'app/models'
 import { IAudioOverall } from 'app/models/audio'
 import { EMediaFormat } from 'app/utils/enums/medias'
@@ -60,6 +61,8 @@ export default function AddAudio({ title }: Props) {
   )
 
   const [audioDur, setAudioDur] = useState<number>(0)
+  const [labelDur, setLabelDur] = useState<string>('')
+
   const audioRef = useRef() as any
 
   const dropzoneImgRef = useRef(null) as any
@@ -140,6 +143,18 @@ export default function AddAudio({ title }: Props) {
   const onLoadedMetadata = () => {
     if (audioRef.current) {
       setAudioDur(audioRef.current.duration)
+      const times = getReturnValues(audioRef.current.duration * 1000 ?? 0)
+      const minutes = times[2]
+        ? times[2] < 10
+          ? '0' + times[2]
+          : times[2]
+        : '00'
+      const seconds = times[3]
+        ? times[3] < 10
+          ? '0' + times[3]
+          : times[3]
+        : '00'
+      setLabelDur(minutes + ':' + seconds)
     }
   }
 
@@ -164,7 +179,7 @@ export default function AddAudio({ title }: Props) {
       isDefault: values.isDefault ? 1 : 0,
       urlAudio: audData ? audData.url : audio.urlAudio,
       urlImage: imgData ? imgData.url : audio.urlImage,
-      duration: audioDur ? audioDur : audio.duration,
+      duration: audioDur ? Math.floor(audioDur) : audio.duration,
       author: values.author,
       performer: values.performer,
       status: Number(values.status ?? 0),
@@ -339,7 +354,7 @@ export default function AddAudio({ title }: Props) {
 
                 <Stack flexDirection={'row'} gap={1} my={1}>
                   <MuiTypography variant="body2">
-                    Thời lượng: {audioDur}
+                    Thời lượng: {labelDur}
                   </MuiTypography>
                 </Stack>
 

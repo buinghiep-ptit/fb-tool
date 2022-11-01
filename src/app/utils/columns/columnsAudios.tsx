@@ -2,6 +2,7 @@ import { Icon, IconButton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { getReturnValues } from 'app/hooks/useCountDown'
 import { TableColumn } from 'app/models'
 import { TitleAudios } from 'app/models/audio'
 
@@ -76,7 +77,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     id: 'performer',
     label: 'Người thể hiện',
     minWidth: 150,
-    align: 'center',
+    align: 'left',
     format: (value: number) => (
       <Typography
         sx={{
@@ -95,7 +96,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     id: 'author',
     label: 'Tác giả',
     minWidth: 150,
-    align: 'center',
+    align: 'left',
     format: (value: number) => (
       <Typography
         sx={{
@@ -111,13 +112,28 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     ),
   },
   {
-    id: 'dateCreated',
+    id: 'duration',
     label: 'Thời lượng',
     minWidth: 120,
     align: 'center',
-    format: (value: string) => (
-      <MuiTypography fontWeight={500}>{value}</MuiTypography>
-    ),
+    format: (value: string) => {
+      const times = getReturnValues(Number(value) * 1000 ?? 0)
+      const minutes = times[2]
+        ? times[2] < 10
+          ? '0' + times[2]
+          : times[2]
+        : '00'
+      const seconds = times[3]
+        ? times[3] < 10
+          ? '0' + times[3]
+          : times[3]
+        : '00'
+      return (
+        <MuiTypography fontWeight={500}>
+          {minutes + ':' + seconds}
+        </MuiTypography>
+      )
+    },
   },
   {
     id: 'status',

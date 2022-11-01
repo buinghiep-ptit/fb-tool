@@ -18,6 +18,9 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
           overflow: 'hidden',
           aspectRatio: 'auto 16 / 9',
           borderRadius: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <img
@@ -29,6 +32,7 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            borderRadius: 4,
           }}
           loading="lazy"
           alt="bg"

@@ -281,11 +281,13 @@ export default function ServiceSetting(props: Props) {
             columns={columnsServices}
             onClickRow={onClickRow}
             isFetching={isFetching}
+            rowsPerPage={size}
+            page={page}
           />
           <MuiStyledPagination
             component="div"
             rowsPerPageOptions={[20, 50, 100]}
-            count={data?.totalElements as number}
+            count={data ? (data?.totalElements as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}

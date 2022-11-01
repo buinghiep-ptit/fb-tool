@@ -1,4 +1,4 @@
-import { Icon, IconButton, Typography } from '@mui/material'
+import { Icon, IconButton, Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -59,24 +59,26 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Tên bài hát',
     minWidth: 200,
     action: (value: any) => (
-      <Typography
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: '1',
-          WebkitBoxOrient: 'vertical',
-          pl: 1,
-        }}
-      >
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            px: 1,
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
     id: 'performer',
     label: 'Người thể hiện',
-    minWidth: 150,
+    minWidth: 120,
     align: 'left',
     format: (value: number) => (
       <Typography
@@ -95,7 +97,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'author',
     label: 'Tác giả',
-    minWidth: 150,
+    minWidth: 120,
     align: 'left',
     format: (value: number) => (
       <Typography
@@ -114,7 +116,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'duration',
     label: 'Thời lượng',
-    minWidth: 120,
+    minWidth: 100,
     align: 'center',
     format: (value: string) => {
       const times = getReturnValues(Number(value) * 1000 ?? 0)

@@ -70,7 +70,7 @@ export default function AddAudio({ title }: Props) {
 
   const [defaultValues] = useState<SchemaType>({
     status: 1,
-    isDefault: true,
+    isDefault: false,
   })
 
   useEffect(() => {

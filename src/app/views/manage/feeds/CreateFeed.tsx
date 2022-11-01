@@ -13,6 +13,7 @@ import {
   customerSystemDefault,
   fetchCustomers,
 } from 'app/apis/accounts/customer.service'
+import { fetchAudios } from 'app/apis/audio/audio.service'
 import {
   fetchCampAreas,
   fetchCampGrounds,
@@ -45,6 +46,7 @@ import {
   IMediaOverall,
   ITags,
 } from 'app/models'
+import { IAudioOverall } from 'app/models/audio'
 import {
   ICampArea,
   ICampAreaResponse,
@@ -52,7 +54,7 @@ import {
 } from 'app/models/camp'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -62,6 +64,7 @@ export interface Props {}
 
 type SchemaType = {
   type?: 1 | 2 | number
+  audio?: IAudioOverall
   cusType?: number | string
   customer?: any // idCustomer
   idSrcType?: number | string
@@ -87,6 +90,8 @@ export default function CreateFeed(props: Props) {
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
+  const audioRef = useRef() as any
+
   const { feedId } = useParams()
   const [fileConfigs, setFileConfigs] = useState({
     mediaFormat: EMediaFormat.IMAGE,
@@ -139,6 +144,7 @@ export default function CreateFeed(props: Props) {
           then: Yup.object().required(messages.MSG1).nullable(), // when camp selected empty
         })
         .nullable(),
+      audio: Yup.object().required(messages.MSG1).nullable(),
       webUrl: Yup.string()
         .nullable()
         .when(['idSrcType'], {
@@ -188,6 +194,13 @@ export default function CreateFeed(props: Props) {
     staleTime: 5 * 60 * 1000,
   })
 
+  const { data: audios }: UseQueryResult<ICampAreaResponse, Error> = useQuery<
+    ICampAreaResponse,
+    Error
+  >(['audios'], () => fetchAudios({ size: 200, page: 0, status: 1 }), {
+    enabled: true,
+  })
+
   const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
     ICampArea[],
     Error
@@ -234,7 +247,12 @@ export default function CreateFeed(props: Props) {
   }, [feed])
 
   useEffect(() => {
-    if (!feed) return
+    if (!feed) {
+      if (methods.watch('type') == 1) {
+        methods.setValue('audio', { name: 'Âm thanh của video' })
+      }
+      return
+    }
     if (feed.customerInfo?.type && feed.customerInfo?.type === 1) {
       methods.setValue('customer', customerCampdi ?? undefined)
     } else {
@@ -257,6 +275,17 @@ export default function CreateFeed(props: Props) {
         }
       }
     }
+    if (audios && audios.content) {
+      const audio = audios.content.find(a => a.id == feed.idAudio)
+      methods.setValue(
+        'audio',
+        audio
+          ? audio
+          : methods.watch('type') == 1
+          ? { name: 'Âm thanh của video' }
+          : undefined,
+      )
+    }
     if (campGrounds && campGrounds.content) {
       const campGround = campGrounds.content.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campGround ?? undefined)
@@ -264,7 +293,7 @@ export default function CreateFeed(props: Props) {
       const campArea = campAreas.find(c => c.id == feed.idSrc)
       methods.setValue('camp', campArea ?? undefined)
     }
-  }, [feed, customers, campGrounds, campAreas])
+  }, [feed, audios, customers, campGrounds, campAreas, methods.watch('type')])
 
   const initDefaultValues = (feed?: IFeedDetail) => {
     if (feed) {
@@ -310,6 +339,20 @@ export default function CreateFeed(props: Props) {
 
     methods.reset({ ...defaultValues })
   }
+
+  useEffect(() => {
+    if (audioRef.current && methods.watch('audio')?.urlAudio) {
+      audioRef.current.pause()
+      audioRef.current.load()
+      audioRef.current.play()
+    }
+    if (methods.watch('type') == 1) {
+      if (!methods.watch('audio')) {
+        methods.setValue('audio', { name: 'Âm thanh của video' })
+      }
+      methods.clearErrors('audio')
+    }
+  }, [methods.watch('audio'), methods.watch('type')])
 
   useEffect(() => {
     let accounts: any[] = []
@@ -417,7 +460,7 @@ export default function CreateFeed(props: Props) {
             ? [thumbnails[0], ...files]
             : files
           : [],
-      idAudio: fileConfigs.mediaFormat === EMediaFormat.IMAGE ? 1 : null,
+      idAudio: values.audio?.id ?? null,
       tags: values.hashtag ?? [],
       viewScope: 1,
       isAllowComment: 1,
@@ -584,6 +627,42 @@ export default function CreateFeed(props: Props) {
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
                   </Stack>
+
+                  <Stack gap={1.5} justifyContent="center">
+                    <MuiRHFAutoComplete
+                      name="audio"
+                      label="Nhạc nền"
+                      options={
+                        methods.watch('type') == 1
+                          ? [
+                              { name: 'Âm thanh của video' },
+                              ...(audios?.content ?? []),
+                            ]
+                          : audios?.content ?? []
+                      }
+                      optionProperty="name"
+                      getOptionLabel={option => option.name ?? ''}
+                      defaultValue=""
+                    />
+                    {methods.watch('audio')?.urlAudio && (
+                      <Stack flexDirection={'row'}>
+                        <MuiTypography
+                          fontSize="12px"
+                          fontStyle="italic"
+                          flex={1}
+                        >
+                          Âm thanh:
+                        </MuiTypography>
+                        <audio controls autoPlay ref={audioRef}>
+                          <source
+                            src={methods.watch('audio')?.urlAudio}
+                            type="audio/mpeg"
+                          />
+                        </audio>
+                      </Stack>
+                    )}
+                  </Stack>
+
                   <Stack>
                     <SelectDropDown name="cusType" label="Loại tài khoản*">
                       <MenuItem value="1">Campdi</MenuItem>
@@ -603,11 +682,6 @@ export default function CreateFeed(props: Props) {
                           Tài khoản post*
                         </MuiTypography>
                         <Box sx={{ flex: 1 }}>
-                          {/* <MuiAutoComplete
-                        itemList={accountList}
-                        name="customer"
-                        disabled={Number(methods.getValues('cusType')) === 0}
-                      /> */}
                           <MuiRHFAutoComplete
                             name="customer"
                             label="Tài khoản post"

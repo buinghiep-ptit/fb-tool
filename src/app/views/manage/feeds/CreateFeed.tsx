@@ -148,7 +148,7 @@ export default function CreateFeed(props: Props) {
       audio: Yup.object()
         .when('type', {
           is: (type: string) => Number(type) == 2,
-          then: Yup.object().required(messages.MSG1),
+          then: Yup.object().required(messages.MSG1).nullable(),
         })
         .nullable(),
       webUrl: Yup.string()
@@ -607,7 +607,10 @@ export default function CreateFeed(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigate('/quan-ly-feeds', {})}
+          onClick={() => {
+            if (feedId) navigate(-1)
+            else navigate('/quan-ly-feeds', {})
+          }}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>

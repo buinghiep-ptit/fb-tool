@@ -389,6 +389,7 @@ export default function ManagerFeed(props: Props) {
                 color: 'primary',
                 tooltip: 'Duyệt bài',
                 onClick: onRowApprove,
+                disableKey: 'status',
                 disableActions: (status?: number) =>
                   [1, -3].includes(status ?? 0),
               },
@@ -397,6 +398,7 @@ export default function ManagerFeed(props: Props) {
                 color: 'error',
                 tooltip: 'Báo cáo vi phạm',
                 onClick: onRowReport,
+                disableKey: 'status',
                 disableActions: (status?: number) =>
                   [-1, -3].includes(status ?? 0),
               },

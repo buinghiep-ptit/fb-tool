@@ -70,16 +70,16 @@ export default function AddAudio({ title }: Props) {
 
   const [defaultValues] = useState<SchemaType>({
     status: 1,
-    isDefault: true,
+    isDefault: false,
   })
 
   useEffect(() => {
     if (audio && !!Object.keys(audio).length) {
       defaultValues.name = audio.name
-      defaultValues.performer = audio.performer
-      defaultValues.author = audio.author
+      defaultValues.performer = audio.performer ?? ''
+      defaultValues.author = audio.author ?? ''
       defaultValues.isDefault = audio.isDefault === 1 ? true : false
-      defaultValues.duration = audio.duration
+      defaultValues.duration = audio.duration ?? 0
 
       if (audio.urlAudio) {
         setAudioPreviewer({
@@ -177,11 +177,11 @@ export default function AddAudio({ title }: Props) {
     const payload: IAudioOverall = {
       name: values.name,
       isDefault: values.isDefault ? 1 : 0,
-      urlAudio: audData ? audData.url : audio.urlAudio,
-      urlImage: imgData ? imgData.url : audio.urlImage,
+      urlAudio: audData ? audData.url : audio.urlAudio ?? null,
+      urlImage: imgData ? imgData.url : audio.urlImage || null,
       duration: audioDur ? Math.floor(audioDur) : audio.duration,
-      author: values.author,
-      performer: values.performer,
+      author: values.author || null,
+      performer: values.performer || null,
       status: Number(values.status ?? 0),
     }
 

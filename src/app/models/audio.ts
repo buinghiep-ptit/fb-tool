@@ -8,10 +8,10 @@ export interface IAudioOverall {
   id?: number
   isDefault?: 0 | 1
   urlAudio?: string
-  duration?: number
-  urlImage?: string
-  author?: string
-  performer?: string
+  duration?: number | null
+  urlImage?: string | null
+  author?: string | null
+  performer?: string | null
   status?: number
 }
 

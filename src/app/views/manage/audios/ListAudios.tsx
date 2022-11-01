@@ -39,6 +39,7 @@ const Container = styled('div')<Props>(({ theme }) => ({
 export interface IAudiosFilters {
   search?: string
   status?: 0 | 1 | 'all' | string | undefined //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
+  isDefault?: 0 | 1 | 'all' | string | undefined //
   page?: number | 0
   size?: number | 20
   sort?: string
@@ -62,6 +63,7 @@ export default function ListAudios(props: Props) {
   const [defaultValues] = useState<IAudiosFilters>({
     search: queryParams.search ?? '',
     status: queryParams.status ?? 'all',
+    isDefault: queryParams.isDefault ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -274,7 +276,7 @@ export default function ListAudios(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý Âm nhạc' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -299,7 +301,7 @@ export default function ListAudios(props: Props) {
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Tến bài hát/Người thể hiện/Tác giả'}
                     type="text"
@@ -311,11 +313,19 @@ export default function ListAudios(props: Props) {
                   />
                 </Grid>
 
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hoạt động</MenuItem>
                     <MenuItem value="0">Không hoạt động</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="isDefault" label="Thể loại">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Nhạc hay</MenuItem>
+                    <MenuItem value="0">Nhạc thường</MenuItem>
                   </SelectDropDown>
                 </Grid>
 

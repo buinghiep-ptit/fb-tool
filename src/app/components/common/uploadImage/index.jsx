@@ -5,7 +5,7 @@ import * as React from 'react'
 import './upload.css'
 
 const UploadImage = React.forwardRef(
-  ({ medias, setMedias, control, errors }, ref) => {
+  ({ medias, setMedias, register, errors, setValue }, ref) => {
     const [files, setFiles] = React.useState([])
 
     React.useImperativeHandle(ref, () => ({
@@ -43,6 +43,7 @@ const UploadImage = React.forwardRef(
                 return newFiles.find(a => a.name === name)
               })
               setFiles(uniqueFiles)
+              setValue('file', uniqueFiles)
             }}
           />
 
@@ -114,6 +115,11 @@ const UploadImage = React.forwardRef(
               </div>
             </div>
           </Grid>
+          {errors?.file && (
+            <FormHelperText error={true}>
+              {errors.file?.message || 'acb'}
+            </FormHelperText>
+          )}
         </Grid>
       </>
     )

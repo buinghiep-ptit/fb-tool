@@ -71,12 +71,16 @@ export default function CreatePlace(props) {
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       description: yup.string().required(messages.MSG1),
-      file: yup
-        .mixed()
-        .required('Vui long thêm ảnh')
-        .test('fileSize', 'Dung lượng file quá lớn', value => {
-          return value && value[0].size <= 100000
-        }),
+      // file: yup
+      //   .mixed()
+      //   .required('Vui long thêm ảnh')
+      //   .test('fileSize', 'Dung lượng file quá lớn', value => {
+      //     console.log(value, errors)
+      //     if (!value || value.length < 1) {
+      //       return false
+      //     }
+      //     return value && value[0].size <= 100
+      //   }),
     })
     .required()
 
@@ -264,7 +268,7 @@ export default function CreatePlace(props) {
   React.useEffect(() => {
     fetchGetProvinces()
   }, [])
-
+  console.log(errors)
   return (
     <Container>
       <Box className="breadcrumb">
@@ -503,7 +507,11 @@ export default function CreatePlace(props) {
           </Grid>
 
           <Typography>Ảnh*:</Typography>
-          <UploadImage ref={uploadImageRef}></UploadImage>
+          <UploadImage
+            ref={uploadImageRef}
+            setValue={setValue}
+            register={register}
+          ></UploadImage>
 
           <Button color="primary" type="submit" variant="contained">
             Lưu

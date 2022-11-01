@@ -607,7 +607,10 @@ export default function CreateFeed(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigate('/quan-ly-feeds', {})}
+          onClick={() => {
+            if (feedId) navigate(-1)
+            else navigate('/quan-ly-feeds', {})
+          }}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>

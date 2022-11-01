@@ -55,7 +55,8 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
       | 'success'
       | 'warning'
     onClick?: (col: any, row?: any) => void
-    disableActions?: (status?: number) => boolean
+    disableKey?: string
+    disableActions?: (key?: number) => boolean
   }[]
 }
 
@@ -169,7 +170,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                               {actions.map((action, index) => {
                                 if (
                                   action.disableActions &&
-                                  action.disableActions(row.status)
+                                  action.disableActions(
+                                    row[action?.disableKey ?? 'status'],
+                                  )
                                 ) {
                                   return <Icon key={index}></Icon>
                                 }

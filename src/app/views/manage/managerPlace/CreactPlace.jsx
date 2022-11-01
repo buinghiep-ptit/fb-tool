@@ -45,7 +45,6 @@ export default function CreatePlace(props) {
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
-  const [description, setDescription] = React.useState('')
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
     lng: 105.78872657468659,
@@ -72,6 +71,12 @@ export default function CreatePlace(props) {
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       description: yup.string().required(messages.MSG1),
+      file: yup
+        .mixed()
+        .required('Vui long thêm ảnh')
+        .test('fileSize', 'Dung lượng file quá lớn', value => {
+          return value && value[0].size <= 100000
+        }),
     })
     .required()
 
@@ -80,6 +85,7 @@ export default function CreatePlace(props) {
     handleSubmit,
     setValue,
     getValues,
+    register,
     setError,
     clearErrors,
     formState: { errors },
@@ -498,6 +504,7 @@ export default function CreatePlace(props) {
 
           <Typography>Ảnh*:</Typography>
           <UploadImage ref={uploadImageRef}></UploadImage>
+
           <Button color="primary" type="submit" variant="contained">
             Lưu
           </Button>

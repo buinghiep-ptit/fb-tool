@@ -29,29 +29,22 @@ const UploadImage = React.forwardRef(
     return (
       <>
         <Grid container>
-          <Controller
-            name="image"
-            control={control}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="file"
-                id="inputFile"
-                accept=".png, .jpg, .jpeg, .mp4, .webm"
-                style={{ display: 'none' }}
-                multiple
-                onChange={event => {
-                  const newFiles = [...files, ...event.target.files]
-                  const uniqueFiles = Array.from(
-                    new Set(newFiles.map(a => a.name)),
-                  ).map(name => {
-                    return newFiles.find(a => a.name === name)
-                  })
-                  setFiles(uniqueFiles)
-                }}
-              />
-            )}
-          ></Controller>
+          <input
+            type="file"
+            id="inputFile"
+            accept=".png, .jpg, .jpeg, .mp4, .webm"
+            style={{ display: 'none' }}
+            multiple
+            onChange={event => {
+              const newFiles = [...files, ...event.target.files]
+              const uniqueFiles = Array.from(
+                new Set(newFiles.map(a => a.name)),
+              ).map(name => {
+                return newFiles.find(a => a.name === name)
+              })
+              setFiles(uniqueFiles)
+            }}
+          />
 
           {(medias || []).map((file, index) => {
             return (
@@ -120,9 +113,6 @@ const UploadImage = React.forwardRef(
                 </Icon>
               </div>
             </div>
-            {errors?.file && (
-              <FormHelperText error>{errors?.file?.message}</FormHelperText>
-            )}
           </Grid>
         </Grid>
       </>

@@ -148,7 +148,7 @@ export default function CreateFeed(props: Props) {
       audio: Yup.object()
         .when('type', {
           is: (type: string) => Number(type) == 2,
-          then: Yup.object().required(messages.MSG1),
+          then: Yup.object().required(messages.MSG1).nullable(),
         })
         .nullable(),
       webUrl: Yup.string()

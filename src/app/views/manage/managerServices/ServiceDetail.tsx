@@ -454,7 +454,7 @@ export default function ServiceDetail(props: Props) {
                   <MenuItem value="-1">Không hiệu lực</MenuItem>
                 </SelectDropDown>
               </Grid>
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
                 <InputLabel
                   sx={{
                     color: 'Black',
@@ -464,6 +464,18 @@ export default function ServiceDetail(props: Props) {
                   required
                 >
                   Giá dịch vụ:
+                </InputLabel>
+              </Grid>
+              <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                <InputLabel
+                  sx={{
+                    color: 'Black',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                  }}
+                  required
+                >
+                  Hình ảnh:
                 </InputLabel>
               </Grid>
               <Grid
@@ -512,34 +524,7 @@ export default function ServiceDetail(props: Props) {
                 )}
               </Grid>
 
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
-                <InputLabel
-                  sx={{
-                    color: 'Black',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                  }}
-                  required
-                >
-                  Mô tả
-                </InputLabel>
-              </Grid>
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
-                <RHFWYSIWYGEditor name="description" />
-              </Grid>
               <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
-                <InputLabel
-                  sx={{
-                    color: 'Black',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                  }}
-                  required
-                >
-                  Hình ảnh:
-                </InputLabel>
-              </Grid>
-              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
                 <Stack
                   gap={2}
                   flexDirection={'column'}
@@ -569,6 +554,22 @@ export default function ServiceDetail(props: Props) {
                     />
                   </Box>
                 </Stack>
+              </Grid>
+
+              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
+                <InputLabel
+                  sx={{
+                    color: 'Black',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                  }}
+                  required
+                >
+                  Mô tả
+                </InputLabel>
+              </Grid>
+              <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center' }}>
+                <RHFWYSIWYGEditor name="description" />
               </Grid>
             </Grid>
           </FormProvider>

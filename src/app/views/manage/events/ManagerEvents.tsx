@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, Stack, styled } from '@mui/material'
+import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchEvents } from 'app/apis/events/event.service'
@@ -214,11 +214,48 @@ export default function ManagerEvents(props: Props) {
     }
   }
 
+  const onResetFilters = () => {
+    methods.reset({
+      areaNameOrAddress: '',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý sự kiện' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Tạo mới sự kiện"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() =>
+            navigation(`them-moi-su-kien`, { state: { mode: 'add' } })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
           <form
@@ -228,7 +265,7 @@ export default function ManagerEvents(props: Props) {
           >
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Tên sự kiện'}
                     type="text"
@@ -238,7 +275,7 @@ export default function ManagerEvents(props: Props) {
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -248,16 +285,14 @@ export default function ManagerEvents(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
-                    onClick={() =>
-                      navigation(`them-moi-su-kien`, { state: { mode: 'add' } })
-                    }
-                    title="Tạo mới sự kiện"
-                    variant="contained"
+                    title="Làm mới"
+                    variant="outlined"
                     color="primary"
+                    onClick={onResetFilters}
                     sx={{ width: '100%' }}
-                    startIcon={<AddBoxSharp />}
+                    startIcon={<Icon>cached</Icon>}
                   />
                 </Grid>
               </Grid>

@@ -168,6 +168,7 @@ export default function ListAudios(props: Props) {
     setIsReset(true)
     methods.reset({
       status: 'all',
+      isDefault: 'all',
       search: '',
       page: 0,
       size: 20,
@@ -329,7 +330,7 @@ export default function ListAudios(props: Props) {
                   </SelectDropDown>
                 </Grid>
 
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     loading={!isReset && isFetching}
                     title="Tìm kiếm"
@@ -340,7 +341,7 @@ export default function ListAudios(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     loading={isReset && isFetching}
                     title="Làm mới"

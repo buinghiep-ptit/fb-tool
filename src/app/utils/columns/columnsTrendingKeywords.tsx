@@ -1,10 +1,9 @@
-import { Chip, Tooltip, Typography } from '@mui/material'
+import { Tooltip, Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
-import { TitlePolicies } from 'app/models/policy'
-import { CurrencyFormatter } from '../formatters/currencyFormatter'
+import { TitleKeywords } from 'app/models/keyword'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
-export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
+export const columnsTrendingKeywords: readonly TableColumn<TitleKeywords>[] = [
   {
     id: 'order',
     label: 'STT',
@@ -19,9 +18,10 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     },
   },
   {
-    id: 'name',
-    label: 'Tên chính sách',
+    id: 'word',
+    label: 'Từ khoá',
     minWidth: 150,
+    align: 'center',
     action: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -40,41 +40,24 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     ),
   },
   {
-    id: 'scope',
-    label: 'Phạm vi',
-    minWidth: 80,
+    id: 'dateUpdated',
+    label: 'Thời gian thêm',
+    minWidth: 170,
     align: 'center',
-    status: (value: any) => (
-      <Chip
-        label={value === 1 ? 'Riêng' : 'Chung'}
-        size="medium"
-        color={value === 1 ? 'primary' : 'warning'}
-      />
-    ),
+    format: (value: string) => ISODateTimeFormatter(value),
   },
   {
-    id: 'amount',
-    label: 'Giá trị',
-    minWidth: 100,
-    align: 'center',
-    format: (value: number) =>
-      value ? (
-        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-      ) : (
-        <></>
-      ),
-  },
-  {
-    id: 'campGroundNames',
-    label: 'Camps áp dụng',
+    id: 'createdBy',
+    label: 'Người đăng',
     minWidth: 200,
+    align: 'center',
     format: (value: number) => (
       <Typography
         sx={{
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           display: '-webkit-box',
-          WebkitLineClamp: '2',
+          WebkitLineClamp: '1',
           WebkitBoxOrient: 'vertical',
           pl: 1,
         }}
@@ -83,13 +66,7 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
       </Typography>
     ),
   },
-  {
-    id: 'dateUpdated',
-    label: 'Thời gian',
-    minWidth: 170,
-    align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
-  },
+
   {
     id: 'actions',
     label: 'Hành động',

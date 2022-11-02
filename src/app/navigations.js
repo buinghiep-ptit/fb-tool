@@ -93,26 +93,26 @@ export const navigations = [
     icon: 'stars',
   },
   // { label: 'PAGES', type: 'label' },
-  {
-    name: 'Session/Auth',
-    icon: 'shield',
-    children: [
-      // { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
-      // { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
-      {
-        name: 'Quên mật khẩu',
-        iconText: 'FP',
-        path: '/session/forgot-password',
-      },
-      // { name: 'Error', iconText: '404', path: '/session/404' },
-    ],
-  },
+  // {
+  //   name: 'Session/Auth',
+  //   icon: 'shield',
+  //   children: [
+  //     { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
+  //     { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
+  //     {
+  //       name: 'Quên mật khẩu',
+  //       iconText: 'FP',
+  //       path: '/session/forgot-password',
+  //     },
+  //     { name: 'Error', iconText: '404', path: '/session/404' },
+  //   ],
+  // },
   // { label: 'Components', type: 'label' },
-  {
-    name: 'Biểu đồ / Thống kê',
-    icon: 'trending_up',
-    children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
-  },
+  // {
+  //   name: 'Biểu đồ / Thống kê',
+  //   icon: 'trending_up',
+  //   children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
+  // },
   // {
   //   name: 'MUI-Components',
   //   icon: 'favorite',

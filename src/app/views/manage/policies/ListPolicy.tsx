@@ -174,14 +174,14 @@ export default function ListPolicy(props: Props) {
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
+    navigation(`${row.id}/chi-tiet`, { state: { modal: true, mode: 'update' } })
   }
 
   const onRowDelete = (cell: any, row: any) => {
     setDialogData(prev => ({
       ...prev,
-      title: 'Xoá sự kiện',
-      message: 'Bạn có chắc chắn muốn xoá sự kiện',
+      title: 'Xoá chính sách',
+      message: 'Bạn có chắc chắn muốn xoá chính sách',
       type: 'delete',
     }))
     setOpenDialog(true)
@@ -191,18 +191,6 @@ export default function ListPolicy(props: Props) {
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'name') {
       navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
-    } else if (cell.id === 'status') {
-      setDialogData(prev => ({
-        ...prev,
-        title: row.status === 1 ? 'Ẩn sự kiện' : 'Mở sự kiện',
-        message:
-          row.status === 1
-            ? 'Bạn có chắc chắn muốn ẩn sự kiện'
-            : 'Bạn có đồng ý mở lại sự kiện',
-        type: 'toggle-status',
-      }))
-      setOpenDialog(true)
-      setRow(row)
     }
   }
 
@@ -242,8 +230,8 @@ export default function ListPolicy(props: Props) {
           variant="contained"
           color="primary"
           onClick={() =>
-            navigation(`them-moi-su-chinh-sach-rieng`, {
-              state: { mode: 'add' },
+            navigation(`them-moi`, {
+              state: { modal: true },
             })
           }
           startIcon={<Icon>control_point</Icon>}

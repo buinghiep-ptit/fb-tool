@@ -1,4 +1,4 @@
-import { Tooltip, Typography } from '@mui/material'
+import { Chip, Tooltip, Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
 import { TitlePolicies } from 'app/models/policy'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
@@ -44,6 +44,13 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     label: 'Phạm vi',
     minWidth: 80,
     align: 'center',
+    status: (value: any) => (
+      <Chip
+        label={value === 1 ? 'Riêng' : 'Chung'}
+        size="medium"
+        color={value === 1 ? 'primary' : 'warning'}
+      />
+    ),
   },
   {
     id: 'amount',

@@ -45,6 +45,7 @@ const AddAudio = Loadable(lazy(() => import('./audios/AddAudio')))
 const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 const ListPolicy = Loadable(lazy(() => import('./policies/ListPolicy')))
+const AddPolicy = Loadable(lazy(() => import('./policies/AddPolicy')))
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -296,7 +297,22 @@ const ManagementRoutes = [
 
   {
     path: '/quan-ly-chinh-sach',
-    element: <ListPolicy />,
+    element: (
+      <>
+        <ListPolicy />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':policyId/chi-tiet',
+        element: <AddPolicy title="Chi tiết chính sách" />,
+      },
+      {
+        path: 'them-moi',
+        element: <AddPolicy title="Thêm mới chính sách riêng" />,
+      },
+    ],
     auth: [ROLES.ADMIN, ROLES.CS],
   },
 

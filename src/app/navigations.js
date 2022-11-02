@@ -20,12 +20,12 @@ export const navigations = [
     icon: 'feed',
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
-  {
-    name: 'Thêm mới Feed',
-    path: '/them-moi-feed',
-    icon: 'event_note',
-    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
-  },
+  // {
+  //   name: 'Thêm mới Feed',
+  //   path: '/them-moi-feed',
+  //   icon: 'event_note',
+  //   auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  // },
   {
     name: 'Quản lý âm nhạc',
     path: '/quan-ly-audios',

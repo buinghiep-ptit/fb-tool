@@ -1,39 +1,36 @@
-import * as React from 'react'
-import { Grid, MenuItem, styled } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { Breadcrumb, SimpleCard } from 'app/components'
-import * as Yup from 'yup'
-import { values } from 'lodash'
+import * as React from 'react'
 import { useEffect, useState } from 'react'
+import * as Yup from 'yup'
 // import StatusSelect from './StatusSelect'
 // import TypeSelect from './TypeSelect'
-import { NavLink, useSearchParams } from 'react-router-dom'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { SearchSharp } from '@mui/icons-material'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { ServicesFilters } from 'app/models'
-import {
-  getListServices,
-  ToggleStatus,
-} from 'app/apis/services/services.service'
-import { toastSuccess } from 'app/helpers/toastNofication'
-import FormInputText from 'app/components/common/MuiRHFInputText'
+import { getListServices } from 'app/apis/services/services.service'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
-import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { columnsServices } from 'app/utils/columns/columnsServices'
-import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { MuiTypography } from 'app/components/common/MuiTypography'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
+import MuiStyledTable from 'app/components/common/MuiStyledTable'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useDeleteService,
   useUpdateService,
   useUpdateStatusService,
 } from 'app/hooks/queries/useServicesData'
+import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { ServicesFilters } from 'app/models'
 import { ServiceResponse, TitleService } from 'app/models/service'
+import { columnsServices } from 'app/utils/columns/columnsServices'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -58,6 +55,7 @@ export interface Props {}
 
 export default function ServiceSetting(props: Props) {
   const navigate = useNavigateParams()
+  const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
@@ -73,6 +71,16 @@ export default function ServiceSetting(props: Props) {
   const [filters, setFilters] = useState<ServicesFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
+
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+  const [row, setRow] = useState<any>({})
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
@@ -118,13 +126,19 @@ export default function ServiceSetting(props: Props) {
     },
   )
 
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: 'Cập nhật thành công' })
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({
+      message: message ?? '',
+    })
+    setOpenDialog(false)
   }
   const { mutate: updateService } = useUpdateService(onRowUpdateSuccess)
-  const { mutate: deleteService } = useDeleteService(onRowUpdateSuccess)
-  const { mutate: updateStatusService } =
-    useUpdateStatusService(onRowUpdateSuccess)
+  const { mutate: deleteService } = useDeleteService(() =>
+    onRowUpdateSuccess(null, 'Xoá dịch vụ thành công'),
+  )
+  const { mutate: updateStatusService } = useUpdateStatusService(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
 
   const onSubmitHandler: SubmitHandler<ServicesFilters> = (
     values: ServicesFilters,
@@ -148,22 +162,51 @@ export default function ServiceSetting(props: Props) {
     })
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id}/chinh-sua`, { state: { mode: 'update' } })
+  }
+
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá dịch vụ',
+      message: 'Bạn có chắc chắn muốn xoá dịch vụ',
+      type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
+  const onSubmitDialog = () => {
+    if (dialogData.type === 'toggle-status') {
+      updateStatusService({
+        serviceId: row.id,
+        status: row.status * -1,
+      })
+    } else {
+      deleteService(row.id)
+    }
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (cell.id === 'name') {
-        navigate(`${row.id}/chi-tiet`, {})
-      } else if (cell.id === 'status') {
-        console.log('status')
-        updateStatusService({
-          serviceId: row.id,
-          status: row.status * -1,
-        })
-      } else if (cell.id === 'edit') {
-        navigate(`${row.id}/chinh-sua`, {})
-        console.log('edit')
-      } else if (cell.id === 'delete') {
-        deleteService(row.id)
-      }
+    if (cell.id === 'name') {
+      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+    } else if (cell.id === 'status') {
+      setDialogData(prev => ({
+        ...prev,
+        title: row.status === 1 ? 'Ẩn dich vụ' : 'Mở dịch vụ',
+        message:
+          row.status === 1
+            ? 'Bạn có chắc chắn muốn ẩn dịch vụ'
+            : 'Bạn có đồng ý mở lại dịch vụ',
+        type: 'toggle-status',
+        submitText: 'Xác nhận',
+        cancelText: 'Huỷ',
+      }))
+      setOpenDialog(true)
+      setRow(row)
     }
   }
 
@@ -215,6 +258,21 @@ export default function ServiceSetting(props: Props) {
         <Breadcrumb routeSegments={[{ name: 'Quản lý dịch vụ ' }]} />
       </Box>
 
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm mới dịch vụ"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() => navigation(`chi-tiet-dich-vu`, {})}
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
+
       <SimpleCard>
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -249,7 +307,7 @@ export default function ServiceSetting(props: Props) {
                 </SelectDropDown>
               </Grid>
 
-              <Grid item sm={2} xs={12}>
+              <Grid item sm={3} xs={12}>
                 <MuiButton
                   title="Tìm kiếm"
                   variant="contained"
@@ -257,18 +315,6 @@ export default function ServiceSetting(props: Props) {
                   type="submit"
                   sx={{ width: '100%' }}
                   startIcon={<SearchSharp />}
-                />
-              </Grid>
-              <Grid item sm={7} xs={12}></Grid>
-
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  onClick={() => navigate(`chi-tiet-dich-vu`, {})}
-                  title="Thêm mới dịch vụ"
-                  variant="contained"
-                  color="primary"
-                  sx={{ width: '100%' }}
-                  startIcon={<AddBoxSharp />}
                 />
               </Grid>
             </Grid>
@@ -281,11 +327,27 @@ export default function ServiceSetting(props: Props) {
             columns={columnsServices}
             onClickRow={onClickRow}
             isFetching={isFetching}
+            rowsPerPage={size}
+            page={page}
+            actions={[
+              {
+                icon: 'edit',
+                color: 'warning',
+                tooltip: 'Chi tiết',
+                onClick: onRowUpdate,
+              },
+              {
+                icon: 'delete',
+                color: 'error',
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"
             rowsPerPageOptions={[20, 50, 100]}
-            count={data?.totalElements as number}
+            count={data ? (data?.totalElements as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
@@ -293,6 +355,23 @@ export default function ServiceSetting(props: Props) {
           />
         </Box>
       </SimpleCard>
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onSubmitDialog}
+        submitText={dialogData.submitText ?? 'Xác nhận'}
+        cancelText={dialogData.cancelText ?? 'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+          <MuiTypography variant="subtitle1" color="primary">
+            {row.name}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

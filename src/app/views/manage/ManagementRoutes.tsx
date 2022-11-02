@@ -198,7 +198,7 @@ const ManagementRoutes = [
     ],
   },
   {
-    path: '/them-moi-feed',
+    path: 'quan-ly-feeds/them-moi-feed',
     element: <CreateFeed />,
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },

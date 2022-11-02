@@ -4,7 +4,7 @@ import {
   PersonAddAltSharp,
   SearchSharp,
 } from '@mui/icons-material'
-import { Grid, MenuItem, Stack, styled } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { Breadcrumb, SimpleCard } from 'app/components'
@@ -209,6 +209,24 @@ export default function AdminAccounts(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm tài khoản"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() =>
+            navigation(`them-moi`, {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard title="">
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
@@ -245,7 +263,7 @@ export default function AdminAccounts(props: Props) {
 
               <Box mt={2}>
                 <Grid container spacing={2}>
-                  <Grid item sm={3} xs={6}>
+                  <Grid item sm={2} xs={6}>
                     <MuiButton
                       loading={isFetching}
                       title="Tìm kiếm"
@@ -256,7 +274,7 @@ export default function AdminAccounts(props: Props) {
                       startIcon={<SearchSharp />}
                     />
                   </Grid>
-                  <Grid item sm={3} xs={6}>
+                  <Grid item sm={2} xs={6}>
                     <MuiButton
                       title="Làm mới"
                       variant="outlined"
@@ -267,20 +285,6 @@ export default function AdminAccounts(props: Props) {
                     />
                   </Grid>
                   <Grid item sm={3} xs={6}></Grid>
-                  <Grid item sm={3} xs={6}>
-                    <MuiButton
-                      onClick={() =>
-                        navigation(`them-moi`, {
-                          state: { modal: true },
-                        })
-                      }
-                      title="Thêm người dùng"
-                      variant="contained"
-                      color="primary"
-                      sx={{ width: '100%' }}
-                      startIcon={<PersonAddAltSharp />}
-                    />
-                  </Grid>
                 </Grid>
               </Box>
             </FormProvider>

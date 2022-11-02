@@ -168,6 +168,7 @@ export default function ListAudios(props: Props) {
     setIsReset(true)
     methods.reset({
       status: 'all',
+      isDefault: 'all',
       search: '',
       page: 0,
       size: 20,

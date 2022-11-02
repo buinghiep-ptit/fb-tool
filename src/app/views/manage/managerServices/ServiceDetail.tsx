@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Box,
+  FormHelperText,
   Grid,
   Icon,
   InputLabel,
@@ -17,6 +18,7 @@ import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
@@ -92,7 +94,7 @@ export default function ServiceDetail(props: Props) {
   })
   const [defaultValues] = useState<TypeElement>({
     status: '',
-    rentalType: '',
+    rentalType: 1,
     description: '',
   })
 
@@ -102,6 +104,7 @@ export default function ServiceDetail(props: Props) {
     capacity: Yup.string().required(messages.MSG1),
     name: Yup.string().required(messages.MSG1),
     status: Yup.string().required(messages.MSG1),
+    description: Yup.string().required(messages.MSG1),
     files: Yup.mixed()
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
@@ -398,18 +401,34 @@ export default function ServiceDetail(props: Props) {
                     <MenuItem value="2">Gói lưu trú</MenuItem>
                     <MenuItem value="3">Khác</MenuItem>
                   </SelectDropDown>
-
-                  <MuiRHFNumericFormatInput
-                    type="text"
-                    name="capacity"
-                    label="Áp dụng"
-                    placeholder=""
-                    iconEnd={
-                      <MuiTypography variant="subtitle2">Người</MuiTypography>
-                    }
-                    required
-                    fullWidth
-                  />
+                  {methods.watch('rentalType') &&
+                  Number(methods.watch('rentalType') ?? 0) !== 3 ? (
+                    <MuiRHFNumericFormatInput
+                      type="text"
+                      name="capacity"
+                      label="Áp dụng"
+                      placeholder=""
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">Người</MuiTypography>
+                      }
+                      required
+                      fullWidth
+                    />
+                  ) : (
+                    <MuiRHFNumericFormatInput
+                      type="text"
+                      name="capacity"
+                      label="Áp dụng"
+                      placeholder=""
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">
+                          Sản phẩm
+                        </MuiTypography>
+                      }
+                      required
+                      fullWidth
+                    />
+                  )}
 
                   <FormInputText
                     type="text"
@@ -473,6 +492,17 @@ export default function ServiceDetail(props: Props) {
                           }
                           fullWidth
                         />
+                        {methods.formState.errors.weekdayPrices &&
+                          methods.formState.errors.weekdayPrices.length &&
+                          methods.formState.errors.weekdayPrices[index]?.amount
+                            ?.message && (
+                            <FormHelperText error>
+                              {
+                                methods.formState.errors.weekdayPrices[index]
+                                  ?.amount?.message
+                              }
+                            </FormHelperText>
+                          )}
                       </Stack>
                     ),
                   )}
@@ -482,7 +512,11 @@ export default function ServiceDetail(props: Props) {
 
             <Stack gap={1} mt={3}>
               <InputLabel sx={{ fontWeight: 500 }}>Mô tả</InputLabel>
-              <RHFWYSIWYGEditor name="description" />
+              <FormTextArea
+                name="description"
+                defaultValue={''}
+                placeholder="Nội dung (tối đa 1000 ký tự)"
+              />
             </Stack>
           </FormProvider>
         </form>

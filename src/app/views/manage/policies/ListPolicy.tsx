@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, Stack, styled } from '@mui/material'
+import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchPolicies } from 'app/apis/policy/policy.service'
@@ -43,15 +43,6 @@ type ISearchFilters = {
   page?: number
   size?: number
   sort?: string
-}
-
-const newEvents = (events: IEventOverall[]) => {
-  return events.map(event => ({
-    ...event,
-    dateActive: `${DDMMYYYYFormatter(
-      event.startDate ?? '',
-    )} - ${DDMMYYYYFormatter(event.endDate ?? '')}`,
-  }))
 }
 
 export default function ListPolicy(props: Props) {
@@ -215,11 +206,49 @@ export default function ListPolicy(props: Props) {
     }
   }
 
+  const onResetFilters = () => {
+    methods.reset({
+      name: '',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý chính sách' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm mới chính sách riêng"
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            navigation(`them-moi-su-chinh-sach-rieng`, {
+              state: { mode: 'add' },
+            })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
           <form
@@ -229,17 +258,17 @@ export default function ListPolicy(props: Props) {
           >
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={4} xs={12}>
                   <FormInputText
                     label={'Tên chính sách'}
                     type="text"
-                    name="areaNameOrAddress"
+                    name="name"
                     defaultValue=""
                     placeholder="Nhập tên chính sách"
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -249,18 +278,14 @@ export default function ListPolicy(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
-                    onClick={() =>
-                      navigation(`them-moi-su-chinh-sach-rieng`, {
-                        state: { mode: 'add' },
-                      })
-                    }
-                    title="Thêm mới chính sách riêng"
-                    variant="contained"
+                    title="Làm mới"
+                    variant="outlined"
                     color="primary"
+                    onClick={onResetFilters}
                     sx={{ width: '100%' }}
-                    startIcon={<AddBoxSharp />}
+                    startIcon={<Icon>cached</Icon>}
                   />
                 </Grid>
               </Grid>

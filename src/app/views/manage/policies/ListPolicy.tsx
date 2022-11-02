@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { AddBoxSharp, SearchSharp } from '@mui/icons-material'
+import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
@@ -11,16 +11,11 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import {
-  useDeleteEvent,
-  useUpdateStatusEvent,
-} from 'app/hooks/queries/useEventsData'
+import { useDeletePolicy } from 'app/hooks/queries/usePoliciesData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IEventOverall } from 'app/models'
 import { IPolicyOverall, IPolicyResponse } from 'app/models/policy'
 import { columnsPolicies } from 'app/utils/columns/columnsPolicies'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { DDMMYYYYFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -102,22 +97,16 @@ export default function ListPolicy(props: Props) {
       enabled: !!filters,
     },
   )
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({ message: `${dialogData.title ?? ''} thành công` })
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
     setOpenDialog(false)
   }
-  const { mutate: updateStatus } = useUpdateStatusEvent(onRowUpdateSuccess)
-  const { mutate: deleteEvent } = useDeleteEvent(onRowUpdateSuccess)
+  const { mutate: deletePolicy } = useDeletePolicy(() =>
+    onRowUpdateSuccess(null, 'Xoá thành công'),
+  )
 
   const onSubmitDialog = () => {
-    if (dialogData.type === 'toggle-status') {
-      updateStatus({
-        eventId: row.id,
-        status: row.status * -1,
-      })
-    } else {
-      deleteEvent(row.id)
-    }
+    deletePolicy(row.id)
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {

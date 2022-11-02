@@ -30,3 +30,5 @@ export interface ICampGround {
   idMerchant?: number
   status?: number
 }
+
+export type TitleCampgrounds = keyof ICampGround | 'order' | 'action'

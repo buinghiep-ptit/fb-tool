@@ -26,6 +26,7 @@ import React, { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import ListCampgroundsPolicy from './ListCampgroundsPolicy'
 
 type Props = {
   title: string
@@ -45,6 +46,15 @@ export default function AddPolicy({ title }: Props) {
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
   const { policyId } = useParams()
+
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
 
   const [defaultValues] = useState<SchemaType>({
     scope: 1,
@@ -82,7 +92,7 @@ export default function AddPolicy({ title }: Props) {
       .required(messages.MSG1),
     scaleAmount: Yup.string()
       .max(11, 'Chỉ được nhập tối đa 9 ký tự')
-      .nullable(),
+      .required(messages.MSG1),
     minAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
     maxAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
   })
@@ -130,6 +140,15 @@ export default function AddPolicy({ title }: Props) {
     navigate(-1)
   }
 
+  const onOpenCampgrounds = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Điểm camp sử dụng',
+      cancelText: 'Huỷ',
+    }))
+    setOpenDialog(true)
+  }
+
   const getContent = () => {
     return (
       <BoxWrapperDialog>
@@ -171,21 +190,25 @@ export default function AddPolicy({ title }: Props) {
                   }
                 />
               </Stack>
-
-              <IconButton>
-                <Tooltip arrow title="Xem danh sách điểm camp đã được liên kết">
-                  <Stack direction={'row'} alignItems="center">
-                    <MuiTypography
-                      color={'primary'}
-                      sx={{ textDecorationLine: 'underline', mr: 1 }}
-                      variant="subtitle2"
-                    >
-                      6 điểm Camp liên kết
-                    </MuiTypography>
-                    <Icon color="primary">double_arrow</Icon>
-                  </Stack>
-                </Tooltip>
-              </IconButton>
+              {policy?.scope === 1 && (
+                <IconButton onClick={onOpenCampgrounds}>
+                  <Tooltip
+                    arrow
+                    title="Xem danh sách điểm camp đã được liên kết"
+                  >
+                    <Stack direction={'row'} alignItems="center">
+                      <MuiTypography
+                        color={'primary'}
+                        sx={{ textDecorationLine: 'underline', mr: 1 }}
+                        variant="subtitle2"
+                      >
+                        6 điểm Camp liên kết
+                      </MuiTypography>
+                      <Icon color="primary">double_arrow</Icon>
+                    </Stack>
+                  </Tooltip>
+                </IconButton>
+              )}
             </Stack>
 
             <MuiRHFNumericFormatInput
@@ -225,13 +248,15 @@ export default function AddPolicy({ title }: Props) {
                 defaultValue={''}
                 placeholder="Nhập nội dung"
               />
-              <MuiTypography
-                sx={{ fontStyle: 'italic', fontSize: '0.875rem', mt: 1 }}
-                variant="subtitle2"
-              >
-                Lưu ý: Sau khi cập nhật, chính sách mới sẽ được áp dụng cho toàn
-                bộ các điểm Camp liên quan.
-              </MuiTypography>
+              {(!policy || policy.scope === 1) && (
+                <MuiTypography
+                  sx={{ fontStyle: 'italic', fontSize: '0.875rem', mt: 1 }}
+                  variant="subtitle2"
+                >
+                  Lưu ý: Sau khi cập nhật, chính sách mới sẽ được áp dụng cho
+                  toàn bộ các điểm Camp liên quan.
+                </MuiTypography>
+              )}
             </Stack>
           </Stack>
           {createLoading || (updateLoading && <LinearProgress />)}
@@ -253,6 +278,19 @@ export default function AddPolicy({ title }: Props) {
       >
         {getContent()}
       </MuiStyledModal>
+
+      {policyId && (
+        <MuiStyledModal
+          title={dialogData.title ?? ''}
+          open={openDialog}
+          maxWidth="md"
+          onCloseModal={() => setOpenDialog(false)}
+          isLoading={createLoading || updateLoading}
+          cancelText="Quay lại"
+        >
+          <ListCampgroundsPolicy policyId={Number(policyId)} />
+        </MuiStyledModal>
+      )}
     </React.Fragment>
   )
 }

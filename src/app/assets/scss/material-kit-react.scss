@@ -49,6 +49,7 @@ body {
 .editor {
   min-height: 500px;
   border: 1px solid rgb(215, 215, 215);
+  width: 100%;
 
   .rdw-editor-main {
     padding: 0 20px 10px;
@@ -94,4 +95,9 @@ body {
   height: 100vh;
   width: 100vw;
   object-fit: contain;
+}
+
+textarea {
+  font-family: Inter, sans-serif;
+  color: rgba(52, 49, 76, 1);
 }

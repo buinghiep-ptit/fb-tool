@@ -30,16 +30,24 @@ export const navigations = [
     name: 'Quản lý âm nhạc',
     path: '/quan-ly-audios',
     icon: 'library_music',
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý đơn hàng',
     path: '/quan-ly-don-hang',
     icon: 'fact_check',
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+  {
+    name: 'Quản lý chính sách',
+    path: '/quan-ly-chinh-sach',
+    icon: 'security',
     auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
@@ -73,11 +81,6 @@ export const navigations = [
     name: 'Quản lý cẩm nang',
     path: '/quan-ly-cam-nang',
     icon: 'menu_book',
-  },
-  {
-    name: 'Quản lý chính sách',
-    path: '/quan-ly-chinh-sach',
-    icon: 'security',
   },
   {
     name: 'Quản lý  đánh giá',

@@ -73,6 +73,11 @@ export const navigations = [
     auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
+    name: 'Quản lý từ khoá yêu thích',
+    path: '/quan-ly-tu-khoa-yeu-thich',
+    icon: 'travel_explore',
+  },
+  {
     name: 'Quản lý từ cấm',
     path: '/quan-ly-tu-cam',
     icon: 'comments_disabled',
@@ -86,11 +91,6 @@ export const navigations = [
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
-  },
-  {
-    name: 'Quản lý từ khoá yêu thích',
-    path: '/quan-ly-tu-khoa-yeu-thich',
-    icon: 'travel_explore',
   },
   // { label: 'PAGES', type: 'label' },
   {

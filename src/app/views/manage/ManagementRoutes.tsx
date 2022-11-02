@@ -46,6 +46,10 @@ const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 const ListPolicy = Loadable(lazy(() => import('./policies/ListPolicy')))
 const AddPolicy = Loadable(lazy(() => import('./policies/AddPolicy')))
+const ListTrendingKeyword = Loadable(
+  lazy(() => import('./keywords/ListTrendingKeyword')),
+)
+const AddKeyword = Loadable(lazy(() => import('./keywords/AddKeyword')))
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -311,6 +315,22 @@ const ManagementRoutes = [
       {
         path: 'them-moi',
         element: <AddPolicy title="Thêm mới chính sách riêng" />,
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+  {
+    path: '/quan-ly-tu-khoa-yeu-thich',
+    element: (
+      <>
+        <ListTrendingKeyword />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: 'them-moi',
+        element: <AddKeyword title="Thêm từ khoá" />,
       },
     ],
     auth: [ROLES.ADMIN, ROLES.CS],

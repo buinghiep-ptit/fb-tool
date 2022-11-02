@@ -5,6 +5,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { getReturnValues } from 'app/hooks/useCountDown'
 import { TableColumn } from 'app/models'
 import { TitleAudios } from 'app/models/audio'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
@@ -136,6 +137,13 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
         </MuiTypography>
       )
     },
+  },
+  {
+    id: 'dateUpdated',
+    label: 'Thời gian cập nhật',
+    minWidth: 170,
+    align: 'center',
+    format: (value: string) => (value ? ISODateTimeFormatter(value) : null),
   },
   {
     id: 'status',

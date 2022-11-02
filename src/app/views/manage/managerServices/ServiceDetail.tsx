@@ -64,7 +64,6 @@ type TypeElement = {
   capacity?: number
   name?: string
   status?: number | string
-  amount?: WeekdayPrices[]
   weekdayPrices?: WeekdayPrices[]
 }
 export default function ServiceDetail(props: Props) {
@@ -98,8 +97,11 @@ export default function ServiceDetail(props: Props) {
   })
 
   const validationSchema = Yup.object().shape({
+    camp: Yup.object().nullable().required(messages.MSG1),
+    rentalType: Yup.string().required(messages.MSG1),
+    capacity: Yup.string().required(messages.MSG1),
     name: Yup.string().required(messages.MSG1),
-    description: Yup.string().nullable(),
+    status: Yup.string().required(messages.MSG1),
     files: Yup.mixed()
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
@@ -125,7 +127,7 @@ export default function ServiceDetail(props: Props) {
       ),
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
-        Yup.object().shape({
+        Yup.object({
           amount: Yup.string().required(messages.MSG1),
         }),
       ),
@@ -176,7 +178,6 @@ export default function ServiceDetail(props: Props) {
         amount: Number(item.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0),
       })) as any
     }
-    console.log(values)
 
     const files = (fileInfos as IMediaOverall[])
       .filter(
@@ -308,7 +309,6 @@ export default function ServiceDetail(props: Props) {
         remove(i - 1)
       }
     }
-    console.log(calendar)
   }, [campService?.weekdayPrices, fields])
   if (isError)
     return (
@@ -481,9 +481,7 @@ export default function ServiceDetail(props: Props) {
             </Grid>
 
             <Stack gap={1} mt={3}>
-              <InputLabel sx={{ fontWeight: 500 }} required>
-                Mô tả
-              </InputLabel>
+              <InputLabel sx={{ fontWeight: 500 }}>Mô tả</InputLabel>
               <RHFWYSIWYGEditor name="description" />
             </Stack>
           </FormProvider>

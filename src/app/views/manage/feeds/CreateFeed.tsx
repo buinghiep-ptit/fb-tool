@@ -256,6 +256,8 @@ export default function CreateFeed(props: Props) {
     if (!feed) {
       if (methods.watch('type') == 1) {
         methods.setValue('audio', { name: 'Âm thanh của video' })
+      } else {
+        methods.setValue('audio', undefined)
       }
       return
     }

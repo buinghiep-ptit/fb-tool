@@ -101,10 +101,16 @@ export default function ServiceDetail(props: Props) {
   const validationSchema = Yup.object().shape({
     camp: Yup.object().nullable().required(messages.MSG1),
     rentalType: Yup.string().required(messages.MSG1),
-    capacity: Yup.string().required(messages.MSG1),
-    name: Yup.string().required(messages.MSG1),
+    capacity: Yup.string()
+      .max(4, 'Chỉ được nhập tối đa 4 ký tự')
+      .required(messages.MSG1),
+    name: Yup.string()
+      .max(255, 'Chỉ được nhập tối đa 255 ký tự')
+      .required(messages.MSG1),
     status: Yup.string().required(messages.MSG1),
-    description: Yup.string().required(messages.MSG1),
+    description: Yup.string()
+      .max(1000, 'Chỉ được nhập tối đa 1000 ký tự')
+      .required(messages.MSG1),
     files: Yup.mixed()
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
@@ -128,13 +134,6 @@ export default function ServiceDetail(props: Props) {
           : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
-    weekdayPrices: Yup.lazy(() =>
-      Yup.array().of(
-        Yup.object({
-          amount: Yup.string().required(messages.MSG1),
-        }),
-      ),
-    ),
   })
 
   const methods = useForm<TypeElement>({
@@ -175,6 +174,9 @@ export default function ServiceDetail(props: Props) {
   )
 
   const onSubmitHandler: SubmitHandler<TypeElement> = (values: TypeElement) => {
+    const capacity =
+      values?.capacity?.toString().replace(/,(?=\d{3})/g, '') ?? 0
+
     if (values.weekdayPrices && values.weekdayPrices.length) {
       values.weekdayPrices = values.weekdayPrices.map(item => ({
         ...item,
@@ -241,7 +243,7 @@ export default function ServiceDetail(props: Props) {
       name: values.name,
       campGroundId: values.camp?.id,
       rentalType: Number(values.rentalType),
-      capacity: values.capacity,
+      capacity: Number(capacity),
       description: values.description ?? '',
       images: medias,
       status: Number(values.status ?? -1),
@@ -344,7 +346,11 @@ export default function ServiceDetail(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Chi tiết dịch vụ' }]} />
+        <Breadcrumb
+          routeSegments={[
+            { name: serviceId ? 'Chi tiết dịch vụ' : 'Thêm mới dịch vụ' },
+          ]}
+        />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -421,7 +427,10 @@ export default function ServiceDetail(props: Props) {
                       label="Áp dụng"
                       placeholder=""
                       iconEnd={
-                        <MuiTypography variant="subtitle2">
+                        <MuiTypography
+                          sx={{ width: '70px' }}
+                          variant="subtitle2"
+                        >
                           Sản phẩm
                         </MuiTypography>
                       }

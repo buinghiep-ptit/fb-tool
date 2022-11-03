@@ -102,7 +102,7 @@ export default function ServiceDetail(props: Props) {
     camp: Yup.object().nullable().required(messages.MSG1),
     rentalType: Yup.string().required(messages.MSG1),
     capacity: Yup.string()
-      .max(11, 'Chỉ được nhập tối đa 9 ký tự')
+      .max(4, 'Chỉ được nhập tối đa 4 ký tự')
       .required(messages.MSG1),
     name: Yup.string()
       .max(255, 'Chỉ được nhập tối đa 255 ký tự')
@@ -134,6 +134,16 @@ export default function ServiceDetail(props: Props) {
           : 'Dung lượng ảnh tối đa 10MB/ảnh',
         files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
       ),
+    weekdayPrices: Yup.lazy(() =>
+      Yup.array().of(
+        Yup.object().shape({
+          amount: Yup.string().max(
+            11,
+            'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ',
+          ),
+        }),
+      ),
+    ),
   })
 
   const methods = useForm<TypeElement>({

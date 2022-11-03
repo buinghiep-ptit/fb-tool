@@ -20,26 +20,34 @@ export const navigations = [
     icon: 'feed',
     auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
   },
-  {
-    name: 'Thêm mới Feed',
-    path: '/them-moi-feed',
-    icon: 'event_note',
-    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
-  },
+  // {
+  //   name: 'Thêm mới Feed',
+  //   path: '/them-moi-feed',
+  //   icon: 'event_note',
+  //   auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+  // },
   {
     name: 'Quản lý âm nhạc',
     path: '/quan-ly-audios',
     icon: 'library_music',
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
+    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý đơn hàng',
     path: '/quan-ly-don-hang',
     icon: 'fact_check',
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+  {
+    name: 'Quản lý chính sách',
+    path: '/quan-ly-chinh-sach',
+    icon: 'security',
     auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
@@ -65,6 +73,11 @@ export const navigations = [
     auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
+    name: 'Quản lý từ khoá yêu thích',
+    path: '/quan-ly-tu-khoa-yeu-thich',
+    icon: 'travel_explore',
+  },
+  {
     name: 'Quản lý từ cấm',
     path: '/quan-ly-tu-cam',
     icon: 'comments_disabled',
@@ -75,41 +88,31 @@ export const navigations = [
     icon: 'menu_book',
   },
   {
-    name: 'Quản lý chính sách',
-    path: '/quan-ly-chinh-sach',
-    icon: 'security',
-  },
-  {
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
   },
-  {
-    name: 'Quản lý từ khoá yêu thích',
-    path: '/quan-ly-tu-khoa-yeu-thich',
-    icon: 'travel_explore',
-  },
   // { label: 'PAGES', type: 'label' },
-  {
-    name: 'Session/Auth',
-    icon: 'shield',
-    children: [
-      // { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
-      // { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
-      {
-        name: 'Quên mật khẩu',
-        iconText: 'FP',
-        path: '/session/forgot-password',
-      },
-      // { name: 'Error', iconText: '404', path: '/session/404' },
-    ],
-  },
+  // {
+  //   name: 'Session/Auth',
+  //   icon: 'shield',
+  //   children: [
+  //     { name: 'Sign in', iconText: 'SI', path: '/session/signin' },
+  //     { name: 'Sign up', iconText: 'SU', path: '/session/signup' },
+  //     {
+  //       name: 'Quên mật khẩu',
+  //       iconText: 'FP',
+  //       path: '/session/forgot-password',
+  //     },
+  //     { name: 'Error', iconText: '404', path: '/session/404' },
+  //   ],
+  // },
   // { label: 'Components', type: 'label' },
-  {
-    name: 'Biểu đồ / Thống kê',
-    icon: 'trending_up',
-    children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
-  },
+  // {
+  //   name: 'Biểu đồ / Thống kê',
+  //   icon: 'trending_up',
+  //   children: [{ name: 'Echarts', path: '/charts/echarts', iconText: 'E' }],
+  // },
   // {
   //   name: 'MUI-Components',
   //   icon: 'favorite',

@@ -10,6 +10,7 @@ import {
   Divider,
   FormControl,
   Grid,
+  Icon,
   IconButton,
   InputLabel,
   MenuItem,
@@ -233,6 +234,20 @@ export default function ManagerFeed(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm mới feed campdi"
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={() => navigation(`them-moi-feed`, {})}
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
@@ -379,7 +394,7 @@ export default function ManagerFeed(props: Props) {
             error={isError ? error : null}
             actions={[
               {
-                icon: 'edit_calendar',
+                icon: 'edit',
                 color: 'warning',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
@@ -389,6 +404,7 @@ export default function ManagerFeed(props: Props) {
                 color: 'primary',
                 tooltip: 'Duyệt bài',
                 onClick: onRowApprove,
+                disableKey: 'status',
                 disableActions: (status?: number) =>
                   [1, -3].includes(status ?? 0),
               },
@@ -397,6 +413,7 @@ export default function ManagerFeed(props: Props) {
                 color: 'error',
                 tooltip: 'Báo cáo vi phạm',
                 onClick: onRowReport,
+                disableKey: 'status',
                 disableActions: (status?: number) =>
                   [-1, -3].includes(status ?? 0),
               },

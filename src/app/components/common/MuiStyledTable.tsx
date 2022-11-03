@@ -55,7 +55,12 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
       | 'success'
       | 'warning'
     onClick?: (col: any, row?: any) => void
-    disableActions?: (status?: number) => boolean
+    contrastIcon?: {
+      icon?: React.ReactElement
+      tooltip?: string
+    }
+    disableKey?: string
+    disableActions?: (key?: number) => boolean
   }[]
 }
 
@@ -169,8 +174,31 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                               {actions.map((action, index) => {
                                 if (
                                   action.disableActions &&
-                                  action.disableActions(row.status)
+                                  action.disableActions(
+                                    row[action?.disableKey ?? 'status'],
+                                  )
                                 ) {
+                                  if (action?.contrastIcon?.icon) {
+                                    return (
+                                      <Tooltip
+                                        key={index}
+                                        arrow
+                                        title={
+                                          action.contrastIcon.tooltip ?? ''
+                                        }
+                                      >
+                                        <IconButton
+                                          size="small"
+                                          onClick={() =>
+                                            action.onClick &&
+                                            action.onClick(column, row)
+                                          }
+                                        >
+                                          {action?.contrastIcon?.icon}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )
+                                  }
                                   return <Icon key={index}></Icon>
                                 }
                                 return (

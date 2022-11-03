@@ -1,26 +1,24 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  ChangeCircleSharp,
-  PersonAddAltSharp,
-  SearchSharp,
-} from '@mui/icons-material'
-import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
+import { SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { UseQueryResult } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { fetchKeywords } from 'app/apis/keyword/keyword.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useUpdateUserData, useUsersData } from 'app/hooks/queries/useUsersData'
+import {
+  useDeleteKeyword,
+  useTogglePinKeyword,
+} from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IUser, IUserResponse } from 'app/models/account'
-import { columnsAdminAccounts } from 'app/utils/columns/columnsAdminAccounts'
+import { IKeyword, IKeywordResponse } from 'app/models/keyword'
+import { columnsTrendingKeywords } from 'app/utils/columns/columnsTrendingKeywords'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { messages } from 'app/utils/messages'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -36,20 +34,18 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
+export interface Props {}
+
 type ISearchFilters = {
-  email?: string
-  role?: string
-  status?: string
+  search?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export interface Props {}
-
-export default function AdminAccounts(props: Props) {
-  const navigation = useNavigate()
+export default function ListTrendingKeyword(props: Props) {
   const navigate = useNavigateParams()
+  const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(
@@ -58,13 +54,8 @@ export default function AdminAccounts(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
-  const [titleDialog, setTitleDialog] = useState('')
-  const [openDialog, setOpenDialog] = useState(false)
-  const [row, setRow] = useState<any>({})
   const [defaultValues] = useState<ISearchFilters>({
-    role: queryParams.role ?? 'all',
-    status: queryParams.status ?? 'all',
-    email: queryParams.email ?? '',
+    search: queryParams.search ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -73,28 +64,20 @@ export default function AdminAccounts(props: Props) {
     extractMergeFiltersObject(defaultValues, {}),
   )
 
-  const onRowUpdateSuccess = (data: any) => {
-    toastSuccess({
-      message: row.status === 1 ? messages.MSG31 : messages.MSG32,
-    })
-    setOpenDialog(false)
-  }
-  const { mutate: editUser } = useUpdateUserData(onRowUpdateSuccess)
-
-  const changeStatusUser = () => {
-    editUser({
-      ...row,
-      status: row.status * -1,
-    })
-  }
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+  const [row, setRow] = useState<any>({})
 
   const validationSchema = Yup.object().shape({
-    account: Yup.string()
+    search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    email: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(255, 'email must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 255 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -109,7 +92,42 @@ export default function AdminAccounts(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IUserResponse, Error> = useUsersData(filters)
+  }: UseQueryResult<IKeywordResponse, Error> = useQuery<
+    IKeywordResponse,
+    Error
+  >(['keywords', filters], () => fetchKeywords(filters), {
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    keepPreviousData: true,
+    enabled: !!filters,
+  })
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
+    setOpenDialog(false)
+  }
+
+  const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
+    () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
+  const { mutate: deleteKeyword } = useDeleteKeyword(() =>
+    onRowUpdateSuccess(null, 'Xoá thành công'),
+  )
+
+  const onSubmitDialog = () => {
+    switch (dialogData.type) {
+      case 'toggle-pin':
+        togglePin(row.id)
+        break
+
+      case 'delete':
+        deleteKeyword(row.id)
+        break
+        break
+
+      default:
+        break
+    }
+  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -149,7 +167,6 @@ export default function AdminAccounts(props: Props) {
   ) => {
     setPage(0)
     setSize(20)
-
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
@@ -165,27 +182,42 @@ export default function AdminAccounts(props: Props) {
     } as any)
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: row.isRequired === 1 ? 'Bỏ ghim từ khoá' : 'Ghim từ khoá',
+      message:
+        row.isRequired === 1
+          ? 'Bạn có chắc chắn muốn bỏ ghim từ khoá?'
+          : 'Bạn có chắc chắn muốn ghim từ khoá?',
+      type: 'toggle-pin',
+      submitText: row.isRequired === 1 ? 'Bỏ ghim' : 'Ghim',
+      cancelText: 'Huỷ',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá từ khoá',
+      message: 'Bạn có chắc chắn muốn xoá từ khoá',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      if (cell.id === 'email') {
-        navigation(`${row.userId}/chi-tiet`, {
-          state: { modal: true, data: row },
-        })
-      } else if (cell.id === 'action') {
-        setTitleDialog(
-          row.status === 1 ? 'Khoá tài khoản' : 'Mở khoá tài khoản',
-        )
-        setOpenDialog(true)
-        setRow(row)
-      }
+    if (cell.id === 'word') {
+      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     }
   }
 
   const onResetFilters = () => {
     methods.reset({
-      email: '',
-      role: 'all',
-      status: 'all',
+      search: '',
       page: 0,
       size: 20,
     })
@@ -207,7 +239,7 @@ export default function AdminAccounts(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản Admin' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý từ khoá yêu thích' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -215,10 +247,9 @@ export default function AdminAccounts(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm tài khoản"
+          title="Thêm từ khoá"
           variant="contained"
           color="primary"
-          type="submit"
           onClick={() =>
             navigation(`them-moi`, {
               state: { modal: true },
@@ -228,77 +259,91 @@ export default function AdminAccounts(props: Props) {
         />
       </Stack>
       <Stack gap={3}>
-        <SimpleCard title="">
-          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+        <SimpleCard>
+          <form
+            onSubmit={methods.handleSubmit(onSubmitHandler)}
+            noValidate
+            autoComplete="off"
+          >
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Email'}
+                    label={'Từ khoá'}
                     type="text"
-                    name="email"
+                    name="search"
                     defaultValue=""
-                    placeholder="Nhập Email"
-                    size="small"
+                    placeholder="Nhập từ khoá"
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={4} xs={12}>
-                  <SelectDropDown name="role" label="Quyền">
-                    <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Admin</MenuItem>
-                    <MenuItem value="2">CS</MenuItem>
-                    <MenuItem value="3">Sale</MenuItem>
-                    <MenuItem value="4">MKT</MenuItem>
-                  </SelectDropDown>
+                <Grid item sm={2} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
                 </Grid>
-                <Grid item sm={4} xs={12}>
-                  <SelectDropDown name="status" label="Trạng thái">
-                    <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Hoạt động</MenuItem>
-                    <MenuItem value="-1">Không hoạt động</MenuItem>
-                  </SelectDropDown>
+                <Grid item sm={2} xs={12}>
+                  <MuiButton
+                    title="Làm mới"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<Icon>cached</Icon>}
+                  />
                 </Grid>
               </Grid>
-
-              <Box mt={2}>
-                <Grid container spacing={2}>
-                  <Grid item sm={2} xs={6}>
-                    <MuiButton
-                      loading={isFetching}
-                      title="Tìm kiếm"
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{ width: '100%' }}
-                      startIcon={<SearchSharp />}
-                    />
-                  </Grid>
-                  <Grid item sm={2} xs={6}>
-                    <MuiButton
-                      title="Làm mới"
-                      variant="outlined"
-                      color="primary"
-                      onClick={onResetFilters}
-                      sx={{ width: '100%' }}
-                      startIcon={<ChangeCircleSharp />}
-                    />
-                  </Grid>
-                  <Grid item sm={3} xs={6}></Grid>
-                </Grid>
-              </Box>
             </FormProvider>
           </form>
         </SimpleCard>
+
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as IUser[]) : []}
-            columns={columnsAdminAccounts}
+            rows={(data?.content as IKeyword[]) ?? []}
+            columns={columnsTrendingKeywords}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
+            actions={[
+              {
+                icon: 'push_pin',
+                color: 'warning',
+                tooltip: 'Ghim',
+                onClick: onRowUpdate,
+                disableKey: 'isRequired',
+                disableActions: (isRequired?: number) => !!isRequired,
+                contrastIcon: {
+                  icon: (
+                    <img
+                      src={'/assets/images/app/pin_off_icon.svg'}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        color: '#FFB020',
+                        filter:
+                          'invert(85%) sepia(53%) saturate(5926%) hue-rotate(339deg) brightness(100%) contrast(103%)',
+                      }}
+                      loading="lazy"
+                      alt="icon"
+                    />
+                  ),
+                  tooltip: 'Bỏ ghim',
+                },
+              },
+              {
+                icon: 'delete',
+                color: 'error',
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
+              },
+            ]}
           />
           <MuiStyledPagination
             component="div"
@@ -313,19 +358,19 @@ export default function AdminAccounts(props: Props) {
       </Stack>
 
       <DiagLogConfirm
-        title={titleDialog}
+        title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={changeStatusUser}
+        onSubmit={onSubmitDialog}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">
-            {row.status === 1
-              ? 'Bạn có chắc chắn muốn khoá tài khoản'
-              : 'Bạn có đồng ý mở khoá cho tài khoản'}
+            {dialogData.message ?? ''}
           </MuiTypography>
           <MuiTypography variant="subtitle1" color="primary">
-            {row.email}
+            {row.name}
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

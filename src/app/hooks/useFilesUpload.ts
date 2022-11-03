@@ -12,10 +12,11 @@ export type FileInfoProgress = {
   index?: number
   percentage?: number
   fileName?: string
+  cancel?: any
 }
 
 export const useUploadFiles = () => {
-  const abortController = useRef(null) as any
+  const abortControllerRef = useRef([]) as any
 
   const [uploading, setUploading] = useState<boolean>(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -43,7 +44,9 @@ export const useUploadFiles = () => {
     mediaFormat?: number,
     thumbnail?: { type: 'video' | 'image' },
   ) => {
-    abortController.current = new AbortController()
+    const abortController = new AbortController()
+
+    abortControllerRef.current.push(abortController)
 
     if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
@@ -52,12 +55,13 @@ export const useUploadFiles = () => {
       mediaFormat,
       file,
       (event: any) => {
+        if (thumbnail) return
         _progressInfos[idx].percentage = Math.round(
           (100 * event.loaded) / event.total,
         )
         setProgressInfos({ val: _progressInfos as any })
       },
-      abortController.current,
+      abortController,
     )
       .then(fileResult => {
         setMessage(prevMessage => [
@@ -87,15 +91,19 @@ export const useUploadFiles = () => {
     mediaFormat?: number,
     thumbnail?: { type: 'video' | 'image' },
   ) => {
+    // remove progress when is thumbnail
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
-    const _progressInfos = selectedFilesToArr.map(file => ({
-      percentage: 0,
-      fileName: file.name,
-    }))
 
-    progressInfosRef.current = {
-      val: _progressInfos,
+    if (!thumbnail) {
+      const _progressInfos = selectedFilesToArr.map(file => ({
+        percentage: 0,
+        fileName: file.name,
+      }))
+
+      progressInfosRef.current = {
+        val: _progressInfos,
+      }
     }
 
     const uploadPromises = selectedFilesToArr.map((file, index) =>
@@ -109,7 +117,11 @@ export const useUploadFiles = () => {
   }
 
   const cancelUploading = () => {
-    abortController.current && abortController.current.abort()
+    abortControllerRef?.current &&
+      abortControllerRef.current.length &&
+      abortControllerRef.current.forEach((aborted: any) => {
+        aborted.abort()
+      })
     setProgressInfos({ val: [] })
     setUploading(false)
   }

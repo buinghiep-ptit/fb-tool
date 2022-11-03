@@ -1,23 +1,26 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, Stack, styled } from '@mui/material'
+import { SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchCustomers } from 'app/apis/accounts/customer.service'
+import { fetchPolicies } from 'app/apis/policy/policy.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import { useDeletePolicy } from 'app/hooks/queries/usePoliciesData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { ICustomer, ICustomerResponse } from 'app/models/account'
-import { columnCustomerAccounts } from 'app/utils/columns/columnsCustomerAccounts'
+import { IPolicyOverall, IPolicyResponse } from 'app/models/policy'
+import { columnsPolicies } from 'app/utils/columns/columnsPolicies'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -31,16 +34,15 @@ const Container = styled('div')<Props>(({ theme }) => ({
 export interface Props {}
 
 type ISearchFilters = {
-  search?: string
-  cusType?: number | string
-  status?: number | string
+  name?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function CustomerAccounts(props: Props) {
+export default function ListPolicy(props: Props) {
   const navigate = useNavigateParams()
+  const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(
@@ -49,29 +51,28 @@ export default function CustomerAccounts(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
-
-  const [isSubmitted, setIsSubmitted] = useState(false)
-
   const [defaultValues] = useState<ISearchFilters>({
-    search: queryParams.search ?? '',
-    cusType: queryParams.cusType ?? 'all',
-    status: queryParams.status ?? 'all',
+    name: queryParams.name ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
-    sort: 'dateCreated,desc',
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
 
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+  }>({})
+  const [openDialog, setOpenDialog] = useState(false)
+  const [row, setRow] = useState<any>({})
+
   const validationSchema = Yup.object().shape({
-    account: Yup.string()
+    name: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    email: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(255, 'email must be at almost 256 characters'),
+      .max(255, 'hashtag must be at almost 255 characters'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -86,14 +87,27 @@ export default function CustomerAccounts(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<ICustomerResponse, Error> = useQuery<
-    ICustomerResponse,
-    Error
-  >(['customers', filters], () => fetchCustomers(filters), {
-    refetchOnWindowFocus: false,
-    keepPreviousData: true,
-    enabled: !!filters && isSubmitted,
-  })
+  }: UseQueryResult<IPolicyResponse, Error> = useQuery<IPolicyResponse, Error>(
+    ['policies', filters],
+    () => fetchPolicies(filters),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      keepPreviousData: true,
+      enabled: !!filters,
+    },
+  )
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
+    setOpenDialog(false)
+  }
+  const { mutate: deletePolicy } = useDeletePolicy(() =>
+    onRowUpdateSuccess(null, 'Xoá thành công'),
+  )
+
+  const onSubmitDialog = () => {
+    deletePolicy(row.id)
+  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -131,48 +145,47 @@ export default function CustomerAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    setIsSubmitted(true)
     setPage(0)
     setSize(20)
-
     setFilters(prevFilters => {
       return {
-        ...extractMergeFiltersObject(prevFilters, {
-          ...values,
-          search: values.search ? values.search?.trim() : '',
-        }),
+        ...extractMergeFiltersObject(prevFilters, values),
         page: 0,
         size: 20,
       }
     })
 
     navigate('', {
-      ...extractMergeFiltersObject(filters, {
-        ...values,
-        search: values.search ? values.search?.trim() : '',
-      }),
+      ...extractMergeFiltersObject(filters, values),
       page: 0,
       size: 20,
     } as any)
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigate(`${row.customerId}/thong-tin`, {})
+    navigation(`${row.id}/chi-tiet`, { state: { modal: true, mode: 'update' } })
+  }
+
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá chính sách',
+      message: 'Bạn có chắc chắn muốn xoá chính sách',
+      type: 'delete',
+    }))
+    setOpenDialog(true)
+    setRow(row)
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action || cell.link) {
-      navigate(`${row.customerId}/thong-tin`, {})
+    if (cell.id === 'name') {
+      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     }
   }
 
   const onResetFilters = () => {
-    setIsSubmitted(false)
-
     methods.reset({
-      search: '',
-      cusType: 'all',
-      status: 'all',
+      name: '',
       page: 0,
       size: 20,
     })
@@ -194,41 +207,45 @@ export default function CustomerAccounts(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý tài khoản end-user' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý chính sách' }]} />
       </Box>
+      <Stack
+        flexDirection={'row'}
+        gap={2}
+        sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
+      >
+        <MuiButton
+          title="Thêm mới chính sách riêng"
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            navigation(`them-moi`, {
+              state: { modal: true },
+            })
+          }
+          startIcon={<Icon>control_point</Icon>}
+        />
+      </Stack>
       <Stack gap={3}>
         <SimpleCard>
-          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+          <form
+            onSubmit={methods.handleSubmit(onSubmitHandler)}
+            noValidate
+            autoComplete="off"
+          >
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Email, SĐT, Tên hiển thị'}
+                    label={'Tên chính sách'}
                     type="text"
-                    name="search"
-                    size="small"
+                    name="name"
                     defaultValue=""
-                    placeholder="Nhập Email, SĐT, Tên hiển thị"
+                    placeholder="Nhập tên chính sách"
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={4} xs={12}>
-                  <SelectDropDown name="cusType" label="Loại tài khoản">
-                    <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value={1}>Thường</MenuItem>
-                    <MenuItem value={2}>KOL</MenuItem>
-                  </SelectDropDown>
-                </Grid>
-                <Grid item sm={4} xs={12}>
-                  <SelectDropDown name="status" label="Trạng thái">
-                    <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value={1}>Hoạt động</MenuItem>
-                    <MenuItem value={-1}>Xoá</MenuItem>
-                    <MenuItem value={-2}>Khoá</MenuItem>
-                    <MenuItem value={-3}>Khoá tạm thời</MenuItem>
-                  </SelectDropDown>
-                </Grid>
-                <Grid item sm={2} xs={6}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -238,24 +255,25 @@ export default function CustomerAccounts(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={2} xs={6}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}
                     sx={{ width: '100%' }}
-                    startIcon={<ChangeCircleSharp />}
+                    startIcon={<Icon>cached</Icon>}
                   />
                 </Grid>
               </Grid>
             </FormProvider>
           </form>
         </SimpleCard>
+
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as ICustomer[]) : []}
-            columns={columnCustomerAccounts}
+            rows={(data?.content as IPolicyOverall[]) ?? []}
+            columns={columnsPolicies}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -267,6 +285,14 @@ export default function CustomerAccounts(props: Props) {
                 color: 'warning',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
+              },
+              {
+                icon: 'delete',
+                color: 'error',
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
+                disableKey: 'scope',
+                disableActions: (scope?: number) => scope === 2,
               },
             ]}
           />
@@ -281,6 +307,24 @@ export default function CustomerAccounts(props: Props) {
           />
         </SimpleCard>
       </Stack>
+
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onSubmitDialog}
+        submitText={'Xoá'}
+        cancelText={'Huỷ'}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {dialogData.message ?? ''}
+          </MuiTypography>
+          <MuiTypography variant="subtitle1" color="primary">
+            {row.name}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </Container>
   )
 }

@@ -1,16 +1,27 @@
 import { DeleteSharp, EditOutlined } from '@mui/icons-material'
-import { Typography } from '@mui/material'
+import { Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleServices } from 'app/models'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnsServices: readonly TableColumn<TitleServices>[] = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  {
+    id: 'order',
+    label: 'STT',
+    minWidth: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
   {
     id: 'image',
     label: 'Hình ảnh',
-    minWidth: 150,
+    minWidth: 80,
     media: (value: string) => (
       <Box
         sx={{
@@ -18,17 +29,22 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
           overflow: 'hidden',
           aspectRatio: 'auto 16 / 9',
           borderRadius: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          border: '1px solid #D9D9D9',
+          backgroundColor: '#EEEEEE',
+          p: 0.25,
+          ml: 1,
         }}
       >
         <img
-          src={
-            value ??
-            'https://i.pinimg.com/originals/14/db/30/14db306602b53cf9ccca3a2a1031e7f7.jpg'
-          }
+          src={value ?? '/assets/images/app/image-default.png'}
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            borderRadius: 4,
           }}
           loading="lazy"
           alt="bg"
@@ -39,12 +55,24 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
   {
     id: 'name',
     label: 'Tên dịch vụ',
-    minWidth: 170,
+    minWidth: 200,
     align: 'left',
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -57,13 +85,13 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
   {
     id: 'campGroundName',
     label: 'Địa điểm Camp',
-    minWidth: 170,
-    align: 'center',
+    minWidth: 200,
+    align: 'left',
   },
   {
     id: 'capacity',
     label: 'Áp dụng',
-    minWidth: 170,
+    minWidth: 80,
     align: 'center',
   },
 
@@ -75,22 +103,21 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
     action: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'flex-end' }}
+        sx={{ justifyContent: 'center' }}
       />
     ),
   },
   {
-    id: 'edit',
-    label: '',
-    minWidth: 50,
-    align: 'right',
-    action: (value: any) => <EditOutlined />,
-  },
-  {
-    id: 'delete',
-    label: '',
-    minWidth: 50,
-    align: 'right',
-    action: (value: any) => <DeleteSharp />,
+    id: 'actions',
+    label: 'Hành động',
+    minWidth: 60,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
   },
 ]

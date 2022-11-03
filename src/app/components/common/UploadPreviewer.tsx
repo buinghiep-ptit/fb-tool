@@ -15,21 +15,19 @@ import {
   generateVideoThumbnails,
 } from 'app/helpers/extractThumbnailVideo'
 import { toastWarning } from 'app/helpers/toastNofication'
-import { Image, IMediaOverall } from 'app/models'
+import { IMediaOverall } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
-import is from 'date-fns/esm/locale/is/index.js'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useFormContext } from 'react-hook-form'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import { CircularProgressWithLabel, ImageListView } from './ImageListCustomize'
 import MediaPlayer from './MediaPlayer'
-import { ModalFullScreen } from './ModalFullScreen'
 import { MuiButton } from './MuiButton'
 import MuiStyledDialogEditor from './MuiStyledDialogEditor'
 import { MuiTypography } from './MuiTypography'
 
-const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
+export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
   ({ aspectRatio }) => ({
     position: 'relative',
     aspectRatio: aspectRatio,
@@ -105,9 +103,6 @@ export function UploadPreviewer({
     mediaConfigs
   const [durationVideo, setDurationVideo] = useState(0)
   const _mediasSrcRef = useRef<{ val: IMediaOverall[] }>({ val: [] })
-  const [openSlider, setOpenSlider] = useState(false)
-  const [initialIndexSlider, setInitialIndexSlider] = useState(0)
-
   const [openDialog, setOpenDialog] = useState(false)
 
   const {
@@ -131,8 +126,8 @@ export function UploadPreviewer({
 
   useEffect(() => {
     if (mediaType === EMediaType.AVATAR) return
-    setValue('files', null)
-    clearErrors('files')
+    setValue(name, null)
+    clearErrors(name)
     cancelUploading && cancelUploading()
     setMediasSrcPreviewer(
       (fileInfos ?? []).filter(
@@ -158,31 +153,27 @@ export function UploadPreviewer({
     }
   }, [durationVideo, files])
 
-  const handleCloseSlider = () => {
-    setOpenSlider(false)
-  }
-  const onShowMediaDetail = (imgIndex?: number) => {
-    setInitialIndexSlider(imgIndex ?? 0)
-    setOpenSlider(true)
-  }
   const handleRemoveMedia = (mediaIndex?: number) => {
     mediasSrcPreviewer.splice(mediaIndex ?? 0, 1)
     setMediasSrcPreviewer([...mediasSrcPreviewer])
 
+    if (!mediasSrcPreviewer.length) {
+      setOpenDialog(false)
+    }
     if (files) {
       if (mediaIndex !== -1) {
         files.splice(mediaIndex ?? 0, 1)
-        setValue('files', [...files])
+        setValue(name, [...files])
       }
-    } else setValue('files', null)
+    } else setValue(name, null)
 
     removeUploadedFiles && removeUploadedFiles(mediaIndex)
   }
 
   const handleRemoveAllMedias = () => {
     setMediasSrcPreviewer([])
-    setValue('files', null)
-    clearErrors('files')
+    setValue(name, null)
+    clearErrors(name)
 
     removeUploadedFiles && removeUploadedFiles(undefined, mediaFormat)
   }
@@ -232,7 +223,6 @@ export function UploadPreviewer({
 
   const onDrop = useCallback(
     async (droppedFiles: File[]) => {
-      console.log('onDrop')
       if (isFileDialogOpen && setIsFileDialogOpen) setIsFileDialogOpen(false)
 
       let extractUnixFiles = extractUnixDroppedFiles(
@@ -472,16 +462,7 @@ export function UploadPreviewer({
                 medias={[...mediasSrcPreviewer] as any}
                 oldMedias={_mediasSrcRef.current.val}
                 progressInfos={progressInfos}
-                onClickMedia={onShowMediaDetail}
               />
-              {/* <ModalFullScreen
-                mode="edit"
-                data={mediasSrcPreviewer as Image[]}
-                open={openSlider}
-                onCloseModal={handleCloseSlider}
-                onSubmit={handleRemoveMedia}
-                initialIndexSlider={initialIndexSlider}
-              /> */}
             </>
           )}
           {mediasSrcPreviewer[0].url && mediaFormat === EMediaFormat.VIDEO && (
@@ -503,26 +484,6 @@ export function UploadPreviewer({
             </>
           )}
 
-          {/* {files && !!files.length && mediaFormat === EMediaFormat.OFFICE && (
-            <AbsoluteFillObject bgcolor="white">
-              <Box sx={{ width: '100%', height: '100%', marginTop: 7 }}>
-                {[...mediasSrcPreviewer].map((media, index) => (
-                  <Stack key={index} flexDirection={'row'} alignItems="center">
-                    <MuiTypography
-                      variant="body2"
-                      fontSize="0.75rem"
-                      sx={{ whiteSpace: 'pre-line' }}
-                    >
-                      {(media as any).name}
-                    </MuiTypography>
-                    <IconButton onClick={() => handleRemoveMedia(index)}>
-                      <Icon color="error">clear</Icon>
-                    </IconButton>
-                  </Stack>
-                ))}
-              </Box>
-            </AbsoluteFillObject>
-          )} */}
           {!uploading && (
             <Stack
               flexDirection={'row'}

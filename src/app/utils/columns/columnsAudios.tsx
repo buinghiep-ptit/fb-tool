@@ -1,9 +1,11 @@
-import { Icon, IconButton, Typography } from '@mui/material'
+import { Icon, IconButton, Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { getReturnValues } from 'app/hooks/useCountDown'
 import { TableColumn } from 'app/models'
 import { TitleAudios } from 'app/models/audio'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
@@ -21,7 +23,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'urlImage',
     label: 'Hình',
-    minWidth: 100,
+    minWidth: 80,
     align: 'center',
     media: (value: string) => (
       <Box
@@ -40,7 +42,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
         }}
       >
         <img
-          src={value ?? '/assets/images/app/image-default.png'}
+          src={value ?? '/assets/images/app/audio-image.jpeg'}
           style={{
             width: '100%',
             height: '100%',
@@ -58,25 +60,27 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Tên bài hát',
     minWidth: 200,
     action: (value: any) => (
-      <Typography
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: '1',
-          WebkitBoxOrient: 'vertical',
-          pl: 1,
-        }}
-      >
-        {value}
-      </Typography>
+      <Tooltip placement="bottom-start" arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            px: 1,
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
     id: 'performer',
     label: 'Người thể hiện',
-    minWidth: 150,
-    align: 'center',
+    minWidth: 120,
+    align: 'left',
     format: (value: number) => (
       <Typography
         sx={{
@@ -94,8 +98,8 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'author',
     label: 'Tác giả',
-    minWidth: 150,
-    align: 'center',
+    minWidth: 120,
+    align: 'left',
     format: (value: number) => (
       <Typography
         sx={{
@@ -111,20 +115,42 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     ),
   },
   {
-    id: 'dateCreated',
+    id: 'duration',
     label: 'Thời lượng',
-    minWidth: 120,
+    minWidth: 100,
     align: 'center',
-    format: (value: string) => (
-      <MuiTypography fontWeight={500}>{value}</MuiTypography>
-    ),
+    format: (value: string) => {
+      const times = getReturnValues(Number(value) * 1000 ?? 0)
+      const minutes = times[2]
+        ? times[2] < 10
+          ? '0' + times[2]
+          : times[2]
+        : '00'
+      const seconds = times[3]
+        ? times[3] < 10
+          ? '0' + times[3]
+          : times[3]
+        : '00'
+      return (
+        <MuiTypography fontWeight={500}>
+          {minutes + ':' + seconds}
+        </MuiTypography>
+      )
+    },
+  },
+  {
+    id: 'dateUpdated',
+    label: 'Thời gian cập nhật',
+    minWidth: 170,
+    align: 'center',
+    format: (value: string) => (value ? ISODateTimeFormatter(value) : null),
   },
   {
     id: 'status',
     label: 'Trạng thái',
     minWidth: 80,
     align: 'center',
-    action: (value: any) => (
+    status: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
         sx={{ justifyContent: 'center', fontSize: '16px!important' }}
@@ -136,7 +162,7 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
     label: 'Nhạc hay',
     minWidth: 80,
     align: 'center',
-    action: (value: any) => (
+    status: (value: any) => (
       <MuiSwitch
         checked={value === 1 ? true : false}
         sx={{ justifyContent: 'center', fontSize: '16px!important' }}

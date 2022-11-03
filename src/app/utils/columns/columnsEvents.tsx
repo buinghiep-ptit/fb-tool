@@ -1,4 +1,4 @@
-import { Chip, Icon, Typography } from '@mui/material'
+import { Chip, Icon, Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
@@ -20,7 +20,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
     id: 'mediaUrl',
     label: 'Ảnh/Video',
-    minWidth: 100,
+    minWidth: 80,
     align: 'center',
     media: (value: string) => (
       <Box
@@ -61,12 +61,21 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     minWidth: 200,
     align: 'left',
     action: (value: any) => (
-      <Typography
-        color={'primary'}
-        sx={{ textDecorationLine: 'underline', pl: 1 }}
-      >
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {

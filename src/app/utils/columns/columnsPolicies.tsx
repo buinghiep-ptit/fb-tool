@@ -46,9 +46,9 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 1 ? 'Riêng' : 'Chung'}
+        label={value === 2 ? 'Riêng' : 'Chung'}
         size="medium"
-        color={value === 1 ? 'primary' : 'warning'}
+        color={value === 2 ? 'primary' : 'warning'}
       />
     ),
   },

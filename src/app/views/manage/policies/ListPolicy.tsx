@@ -292,7 +292,7 @@ export default function ListPolicy(props: Props) {
                 tooltip: 'Xoá',
                 onClick: onRowDelete,
                 disableKey: 'scope',
-                disableActions: (scope?: number) => scope === 2,
+                disableActions: (scope?: number) => scope === 1,
               },
             ]}
           />

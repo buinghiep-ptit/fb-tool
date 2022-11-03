@@ -57,7 +57,7 @@ export default function AddPolicy({ title }: Props) {
   const [openDialog, setOpenDialog] = useState(false)
 
   const [defaultValues] = useState<SchemaType>({
-    scope: 1,
+    scope: 2,
   })
 
   const { data: policy }: UseQueryResult<IPolicyOverall, Error> = useQuery<
@@ -178,19 +178,19 @@ export default function AddPolicy({ title }: Props) {
                 <Chip
                   sx={{ minWidth: 80 }}
                   label={
-                    policy ? (policy.scope == 1 ? 'Riêng' : 'Chung') : 'Riêng'
+                    policy ? (policy.scope == 2 ? 'Riêng' : 'Chung') : 'Riêng'
                   }
                   size="medium"
                   color={
                     policy
-                      ? policy.scope == 1
+                      ? policy.scope == 2
                         ? 'primary'
                         : 'warning'
                       : 'primary'
                   }
                 />
               </Stack>
-              {policy?.scope === 1 && (
+              {policy?.scope === 2 && (
                 <IconButton onClick={onOpenCampgrounds}>
                   <Tooltip
                     arrow
@@ -248,7 +248,7 @@ export default function AddPolicy({ title }: Props) {
                 defaultValue={''}
                 placeholder="Nhập nội dung"
               />
-              {(!policy || policy.scope === 1) && (
+              {(!policy || policy.scope === 2) && (
                 <MuiTypography
                   sx={{ fontStyle: 'italic', fontSize: '0.875rem', mt: 1 }}
                   variant="subtitle2"

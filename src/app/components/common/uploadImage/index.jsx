@@ -1,5 +1,4 @@
 import { FormHelperText, Grid, Icon } from '@mui/material'
-import { Controller } from 'react-hook-form'
 import * as React from 'react'
 
 import './upload.css'
@@ -26,6 +25,10 @@ const UploadImage = React.forwardRef(
       setMedias(mediasCopy)
     }
 
+    React.useEffect(() => {
+      setValue('file', files)
+    }, [files])
+
     return (
       <>
         <Grid container>
@@ -43,7 +46,7 @@ const UploadImage = React.forwardRef(
                 return newFiles.find(a => a.name === name)
               })
               setFiles(uniqueFiles)
-              setValue('file', uniqueFiles)
+              document.getElementById('inputFile').value = null
             }}
           />
 
@@ -115,11 +118,6 @@ const UploadImage = React.forwardRef(
               </div>
             </div>
           </Grid>
-          {errors?.file && (
-            <FormHelperText error={true}>
-              {errors.file?.message || 'acb'}
-            </FormHelperText>
-          )}
         </Grid>
       </>
     )

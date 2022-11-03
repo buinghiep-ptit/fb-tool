@@ -1,4 +1,12 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Grid,
+  Icon,
+  styled,
+  TextField,
+  Autocomplete,
+} from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { cloneDeep } from 'lodash'
@@ -16,6 +24,7 @@ import {
 } from 'app/apis/place/place.service'
 import { tableModel, typeAreas } from './const'
 import { useNavigate } from 'react-router-dom'
+import { getProvinces } from 'app/apis/common/common.service'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -31,6 +40,8 @@ export default function ManagerPlace(props) {
   const [totalPlace, setTotalPlace] = useState()
   const [inputNamePlace, setInputNamePlace] = useState('')
   const [statusFilter, setStatusFilter] = useState(0)
+  const [provinces, setProvinces] = useState()
+  const [provinceId, setProvinceId] = useState(null)
   const navigate = useNavigate()
 
   const fetchListPlace = async param => {
@@ -63,13 +74,35 @@ export default function ManagerPlace(props) {
       .catch(err => console.log(err))
   }
 
+  const handleSearch = async () => {
+    const res = fetchListPlace({
+      name: inputNamePlace,
+      page: 0,
+      size: 20,
+      status: statusFilter === 0 ? null : statusFilter,
+      idProvince: provinceId,
+    })
+    if (res.length === 0) {
+      toastWarning({
+        message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
+      })
+    }
+  }
+
+  const fetchProvinces = async () => {
+    const res = await getProvinces()
+    setProvinces(res)
+  }
+
   React.useEffect(() => {
     const param = {
       name: inputNamePlace,
       page: 0,
       size: 20,
+      idProvince: provinceId,
     }
     fetchListPlace(param)
+    fetchProvinces()
   }, [])
 
   return (
@@ -79,12 +112,10 @@ export default function ManagerPlace(props) {
       </Box>
       <SimpleCard>
         <Grid container>
-          <Grid item sm={6} xs={6}>
+          <Grid item sm={12} xs={12}>
             <div style={{ display: 'flex' }}>
               <TextField
-                style={{ marginRight: '50px' }}
                 id="namePlace"
-                fullWidth
                 size="medium"
                 type="text"
                 name="namePlace"
@@ -94,8 +125,13 @@ export default function ManagerPlace(props) {
                 onChange={e => {
                   setInputNamePlace(e.target.value)
                 }}
+                onKeyDown={async e => {
+                  if (e.keyCode === 13) {
+                    handleSearch()
+                  }
+                }}
               />
-              <FormControl fullWidth>
+              <FormControl sx={{ minWidth: 200, ml: 10 }}>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
                 </InputLabel>
@@ -113,24 +149,27 @@ export default function ManagerPlace(props) {
                   <MenuItem value={0}>Tất cả</MenuItem>
                 </Select>
               </FormControl>
+              <Autocomplete
+                disablePortal
+                sx={{ minWidth: 200, ml: 10 }}
+                options={provinces}
+                getOptionLabel={option => option.name}
+                onChange={(_, data) => {
+                  console.log(data)
+                  setProvinceId(data.id)
+                }}
+                renderInput={params => (
+                  <TextField {...params} fullWidth label="Tỉnh/thành phố" />
+                )}
+              />
             </div>
 
             <Button
               color="primary"
               variant="contained"
               type="button"
-              onClick={async () => {
-                const res = fetchListPlace({
-                  name: inputNamePlace,
-                  page: 0,
-                  size: 20,
-                  status: statusFilter === 0 ? null : statusFilter,
-                })
-                if (res.length === 0) {
-                  toastWarning({
-                    message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
-                  })
-                }
+              onClick={() => {
+                handleSearch()
               }}
             >
               <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}
@@ -183,6 +222,9 @@ export default function ManagerPlace(props) {
           filter={{
             name: inputNamePlace,
             status: statusFilter === 0 ? null : statusFilter,
+            idProvince: provinceId,
+            page: 0,
+            size: 20,
           }}
         />
       </SimpleCard>

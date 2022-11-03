@@ -29,7 +29,7 @@ import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
 import { messages } from 'app/utils/messages'
-import { isEmpty } from 'lodash'
+import { formatFile } from 'app/utils/constant'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -82,6 +82,22 @@ export default function CreatePlace(props) {
             for (let i = 0; i < value.length; i++) {
               if (value[i].size > 10000000) return false
             }
+            return true
+          }
+        })
+        .test('fileFormat', 'Định dạng file không hợp lệ', value => {
+          console.log(value)
+          if (!value?.length) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              const checkList = formatFile.filter(item => {
+                if (value[i].name.search(item) > -1) {
+                  return item
+                }
+              })
+              if (checkList.length < 1) return false
+            }
+
             return true
           }
         }),

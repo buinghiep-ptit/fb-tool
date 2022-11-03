@@ -5,6 +5,7 @@ import {
   FormHelperText,
   styled,
   TextField,
+  Icon,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
@@ -23,6 +24,7 @@ import { generate } from 'generate-password'
 
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { set } from 'lodash'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -35,6 +37,9 @@ const Container = styled('div')(({ theme }) => ({
 
 export default function CreateMerchant(props) {
   const navigate = useNavigate()
+  const [contractList, setContractList] = React.useState([])
+  const [documentList, setDocumentList] = React.useState([])
+
   const schema = yup
     .object({
       nameMerchant: yup
@@ -54,11 +59,8 @@ export default function CreateMerchant(props) {
         .min(8, 'Có ít nhất 8 ký tự')
         .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
         .max(254, 'Đã đạt số ký tự tối đa'),
-      mobilePhone: yup
-        .string()
-        .required('Vui nhập số điện thoại')
-        .min(1)
-        .max(20),
+      mobilePhone: yup.string().required('Vui nhập số điện thoại'),
+      status: yup.string().required('Vui lòng chọn trạng thái'),
       website: yup.string().url().max(100, 'Đã đạt số ký tự tối đa'),
       taxCode: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
       businessModel: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
@@ -90,42 +92,63 @@ export default function CreateMerchant(props) {
     },
   })
 
-  const uploadFile = async files => {
-    const fileUpload = [...files].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
-      }
-    })
+  const uploadFile = async file => {
+    // const fileUpload = [...files].map(file => {
+    //   const formData = new FormData()
+    //   formData.append('file', file)
+    //   try {
+    //     const token = window.localStorage.getItem('accessToken')
+    //     const res = axios({
+    //       method: 'post',
+    //       url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+    //       data: formData,
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     })
+    //     return res
+    //   } catch (e) {
+    //     console.log(e)
+    //   }
+    // })
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+    // const response = await Promise.all(fileUpload)
+    // if (response) return response.map(item => item.data.url)
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const token = window.localStorage.getItem('accessToken')
+      const res = axios({
+        method: 'post',
+        url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (res) {
+        return res.data
+      }
+      return []
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const onSubmit = async data => {
-    const contracts = await uploadFile(
-      document.getElementById('upload-contract').files,
-    )
-    const documents = await uploadFile(
-      document.getElementById('upload-document').files,
-    )
+    // const contracts = await uploadFile(
+    //   document.getElementById('upload-contract').files,
+    // )
+    // const documents = await uploadFile(
+    //   document.getElementById('upload-document').files,
+    // )
     const newData = new Object()
     newData.name = data.nameMerchant
     newData.merchantType = data.merchantType
     newData.email = data.email
+    newData.status = parseInt(data.status)
     newData.password = data.password
     newData.mobilePhone = data.mobilePhone
     newData.website = data.website || null
@@ -389,9 +412,25 @@ export default function CreateMerchant(props) {
               <input
                 type="file"
                 id="upload-document"
-                multiple
+                onChange={async e => {
+                  console.log(document.getElementById('upload-document').files)
+                  const list = await uploadFile(
+                    document.getElementById('upload-document').files[0],
+                  )
+                  console.log(list)
+                  setDocumentList(list)
+                }}
                 style={{ display: 'none' }}
               />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <a
+                  href="#"
+                  style={{ textDecoration: 'underline', color: '#07bc0c' }}
+                >
+                  abc
+                </a>
+                <Icon color="error">delete</Icon>
+              </div>
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller
@@ -411,10 +450,48 @@ export default function CreateMerchant(props) {
                 )}
               />
             </Grid>
+            <Grid item xs={12} md={12}>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <FormControl
+                    sx={{ minWidth: 200, mb: 5, mt: 1 }}
+                    error={!!errors?.status}
+                  >
+                    <InputLabel id="demo-simple-select-label">
+                      Trạng thái
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Trạng thái"
+                    >
+                      <MenuItem value={1}>Hoạt động</MenuItem>
+                      <MenuItem value={-2}>Không hoạt động</MenuItem>
+                    </Select>
+                    {!!errors?.status?.message && (
+                      <FormHelperText>{errors?.status.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
           </Grid>
 
           <Button color="primary" type="submit" variant="contained">
             Lưu
+          </Button>
+          <Button
+            sx={{ ml: 2 }}
+            color="primary"
+            variant="contained"
+            onClick={() => {
+              navigate('/quan-ly-thong-tin-doi-tac')
+            }}
+          >
+            Hủy
           </Button>
         </form>
       </SimpleCard>

@@ -46,6 +46,7 @@ export default function UpdateMerchant(props) {
       businessModel: '',
       address: yup.string().required(),
       representative: yup.string().required(),
+      status: yup.string().required('Vui lòng chọn trạng thái'),
     })
     .required()
 
@@ -71,6 +72,7 @@ export default function UpdateMerchant(props) {
       businessModel: '',
       address: '',
       representative: '',
+      status: '',
     },
   })
 
@@ -104,6 +106,7 @@ export default function UpdateMerchant(props) {
     const filesDocument = document.getElementById('upload-document').files
 
     const newData = new Object()
+    newData.status = parseInt(data.status)
     newData.name = data.nameMerchant
     newData.merchantType = data.merchantType
     newData.email = data.email
@@ -162,6 +165,7 @@ export default function UpdateMerchant(props) {
       setValue('mobilePhone', res.mobilePhone)
       setValue('representative', res.represent)
       setValue('website', res.website)
+      setValue('status', res.status)
     }
   }
 
@@ -204,7 +208,7 @@ export default function UpdateMerchant(props) {
                 <Button variant="contained">Hoạt động</Button>
               ) : (
                 <Button variant="contained" disabled>
-                  Khóa
+                  Không hoạt động
                 </Button>
               )}
             </Grid>
@@ -393,6 +397,34 @@ export default function UpdateMerchant(props) {
                 )}
               />
             </Grid>
+            <Grid item xs={12} md={12}>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <FormControl
+                    sx={{ minWidth: 200, mb: 5, mt: 1 }}
+                    error={!!errors?.status}
+                  >
+                    <InputLabel id="demo-simple-select-label">
+                      Trạng thái
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Trạng thái"
+                    >
+                      <MenuItem value={1}>Hoạt động</MenuItem>
+                      <MenuItem value={-2}>Không hoạt động</MenuItem>
+                    </Select>
+                    {!!errors?.status?.message && (
+                      <FormHelperText>{errors?.status.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </Grid>
             <Grid item xs={12} md={12} style={{ marginTop: '50px' }}>
               <Button
                 color="primary"
@@ -406,23 +438,18 @@ export default function UpdateMerchant(props) {
                 color="primary"
                 variant="contained"
                 style={{ marginRight: '15px' }}
-                disabled={statusMerchant !== 1}
-                onClick={async () => {
-                  const res = await updateMerchantStatus(params.id)
-                  if (res) {
-                    setStatusMerchant(0)
-                    toastSuccess({ message: 'Đã khóa đối tác' })
-                  }
-                }}
               >
-                Khóa
+                Đổi mật khẩu
               </Button>
               <Button
                 color="primary"
                 variant="contained"
                 style={{ marginRight: '15px' }}
+                onClick={() => {
+                  navigate('/quan-ly-thong-tin-doi-tac')
+                }}
               >
-                Đổi mật khẩu
+                Quay lại
               </Button>
             </Grid>
           </Grid>

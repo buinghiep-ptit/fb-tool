@@ -57,7 +57,7 @@ export default function ManagerLocation(props) {
           if (convertCampGround.status !== 0) {
             convertCampGround.status = campGround.status === 1 ? true : false
           }
-          convertCampGround.action = ['edit', 'delete']
+          convertCampGround.action = ['edit']
           return convertCampGround
         })
 

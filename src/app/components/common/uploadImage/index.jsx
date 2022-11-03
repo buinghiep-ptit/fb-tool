@@ -82,7 +82,7 @@ const UploadImage = React.forwardRef(
                     className="uploader__icon-delete"
                     onClick={() => deleteItemImage(index)}
                   >
-                    clear
+                    delete
                   </Icon>
                   {file.type.startsWith('image/') && (
                     <img

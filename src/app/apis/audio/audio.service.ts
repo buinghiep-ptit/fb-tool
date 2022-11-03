@@ -39,3 +39,13 @@ export const deleteAudio = async (audioId?: number): Promise<any> => {
   const { data } = await http.delete<any>(`/api/common-audios/${audioId}`)
   return data
 }
+
+export const checkExistedName = async (payload?: {
+  nameAudios?: string
+}): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/common-audios/check-name`,
+    payload,
+  )
+  return data
+}

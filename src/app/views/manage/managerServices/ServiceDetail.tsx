@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Box,
+  FormHelperText,
   Grid,
   Icon,
   InputLabel,
@@ -17,6 +18,7 @@ import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
@@ -64,7 +66,6 @@ type TypeElement = {
   capacity?: number
   name?: string
   status?: number | string
-  amount?: WeekdayPrices[]
   weekdayPrices?: WeekdayPrices[]
 }
 export default function ServiceDetail(props: Props) {
@@ -93,13 +94,17 @@ export default function ServiceDetail(props: Props) {
   })
   const [defaultValues] = useState<TypeElement>({
     status: '',
-    rentalType: '',
+    rentalType: 1,
     description: '',
   })
 
   const validationSchema = Yup.object().shape({
+    camp: Yup.object().nullable().required(messages.MSG1),
+    rentalType: Yup.string().required(messages.MSG1),
+    capacity: Yup.string().required(messages.MSG1),
     name: Yup.string().required(messages.MSG1),
-    description: Yup.string().nullable(),
+    status: Yup.string().required(messages.MSG1),
+    description: Yup.string().required(messages.MSG1),
     files: Yup.mixed()
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
@@ -125,7 +130,7 @@ export default function ServiceDetail(props: Props) {
       ),
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
-        Yup.object().shape({
+        Yup.object({
           amount: Yup.string().required(messages.MSG1),
         }),
       ),
@@ -176,7 +181,6 @@ export default function ServiceDetail(props: Props) {
         amount: Number(item.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0),
       })) as any
     }
-    console.log(values)
 
     const files = (fileInfos as IMediaOverall[])
       .filter(
@@ -308,7 +312,6 @@ export default function ServiceDetail(props: Props) {
         remove(i - 1)
       }
     }
-    console.log(calendar)
   }, [campService?.weekdayPrices, fields])
   if (isError)
     return (
@@ -398,18 +401,34 @@ export default function ServiceDetail(props: Props) {
                     <MenuItem value="2">Gói lưu trú</MenuItem>
                     <MenuItem value="3">Khác</MenuItem>
                   </SelectDropDown>
-
-                  <MuiRHFNumericFormatInput
-                    type="text"
-                    name="capacity"
-                    label="Áp dụng"
-                    placeholder=""
-                    iconEnd={
-                      <MuiTypography variant="subtitle2">Người</MuiTypography>
-                    }
-                    required
-                    fullWidth
-                  />
+                  {methods.watch('rentalType') &&
+                  Number(methods.watch('rentalType') ?? 0) !== 3 ? (
+                    <MuiRHFNumericFormatInput
+                      type="text"
+                      name="capacity"
+                      label="Áp dụng"
+                      placeholder=""
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">Người</MuiTypography>
+                      }
+                      required
+                      fullWidth
+                    />
+                  ) : (
+                    <MuiRHFNumericFormatInput
+                      type="text"
+                      name="capacity"
+                      label="Áp dụng"
+                      placeholder=""
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">
+                          Sản phẩm
+                        </MuiTypography>
+                      }
+                      required
+                      fullWidth
+                    />
+                  )}
 
                   <FormInputText
                     type="text"
@@ -473,6 +492,17 @@ export default function ServiceDetail(props: Props) {
                           }
                           fullWidth
                         />
+                        {methods.formState.errors.weekdayPrices &&
+                          methods.formState.errors.weekdayPrices.length &&
+                          methods.formState.errors.weekdayPrices[index]?.amount
+                            ?.message && (
+                            <FormHelperText error>
+                              {
+                                methods.formState.errors.weekdayPrices[index]
+                                  ?.amount?.message
+                              }
+                            </FormHelperText>
+                          )}
                       </Stack>
                     ),
                   )}
@@ -481,10 +511,12 @@ export default function ServiceDetail(props: Props) {
             </Grid>
 
             <Stack gap={1} mt={3}>
-              <InputLabel sx={{ fontWeight: 500 }} required>
-                Mô tả
-              </InputLabel>
-              <RHFWYSIWYGEditor name="description" />
+              <InputLabel sx={{ fontWeight: 500 }}>Mô tả</InputLabel>
+              <FormTextArea
+                name="description"
+                defaultValue={''}
+                placeholder="Nội dung (tối đa 1000 ký tự)"
+              />
             </Stack>
           </FormProvider>
         </form>

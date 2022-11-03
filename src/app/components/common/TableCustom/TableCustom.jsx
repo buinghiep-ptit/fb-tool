@@ -13,7 +13,7 @@ import {
   Button,
   Typography,
 } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SimpleCard } from 'app/components'
 import { Link, useNavigate } from 'react-router-dom'
 import { cloneDeep } from 'lodash'
@@ -138,8 +138,8 @@ const TableCustom = ({
                                 border: '1px solid #ddd',
                                 borderRadius: '4px',
                                 padding: '5px',
-                                width: '120px',
-                                height: '90px',
+                                width: '100px',
+                                height: '60px',
                                 objectFit: 'cover',
                               }}
                             />
@@ -149,7 +149,7 @@ const TableCustom = ({
                     case 'index':
                       return (
                         <TableCell align="center" key={`${element}${id}`}>
-                          {index + 1}
+                          {page * rowsPerPage + index + 1}
                         </TableCell>
                       )
                     case 'status':
@@ -230,7 +230,10 @@ const TableCustom = ({
                         >
                           <Link
                             to={`${data[element].path}${data.id}`}
-                            style={{ textDecoration: 'underline' }}
+                            style={{
+                              textDecoration: 'underline',
+                              color: '#07bc0c',
+                            }}
                           >
                             {data[element].link}
                           </Link>
@@ -241,7 +244,7 @@ const TableCustom = ({
                         <TableCell
                           align="center"
                           key={`${element}${id}`}
-                          style={{ wordBreak: 'normal' }}
+                          style={{ wordBreak: 'normal', color: '#07bc0c' }}
                         >
                           <Link
                             style={{ textDecoration: 'underline' }}

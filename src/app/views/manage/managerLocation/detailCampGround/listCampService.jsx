@@ -15,7 +15,7 @@ import {
   updateCampGroundServiceStatus,
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export default function ListCampService(props) {
   const [inputFilter, setInputFilter] = useState('')
@@ -23,7 +23,7 @@ export default function ListCampService(props) {
   const [typeFilter, setTypeFilter] = useState(null)
   const [listCampGroundService, setListCampGroundService] = useState([])
   const [totalListCampGroundService, setTotalListCampgroundService] = useState()
-
+  const navigate = useNavigate()
   const params = useParams()
 
   const fetchListCampGroundService = async param => {
@@ -156,6 +156,9 @@ export default function ListCampService(props) {
             children={undefined}
             className={undefined}
             ellipsis={undefined}
+            onClick={() => {
+              navigate('/quan-ly-dich-vu/chi-tiet-dich-vu')
+            }}
           >
             Thêm dịch vụ
           </Paragraph>

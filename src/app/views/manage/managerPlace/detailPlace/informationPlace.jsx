@@ -30,7 +30,7 @@ import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import DialogCustom from 'app/components/common/DialogCustom'
-
+import { formatFile } from 'app/utils/constant'
 export default function InformationPlace(props) {
   const [hashtag, setHashtag] = React.useState([])
   const [provinceId, setProvinceId] = React.useState(null)
@@ -61,6 +61,39 @@ export default function InformationPlace(props) {
       province: yup.object().required(),
       description: yup.string().required(messages.MSG1),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
+      file: yup
+        .mixed()
+        .test('required', 'Vui lòng thêm ảnh/video', value => {
+          if (medias.length > 0) return true
+          return value.length > 0
+        })
+        .test('fileSize', 'Dung lượng file quá lớn', value => {
+          console.log(value)
+          if (medias.length > 0 && value.length === 0) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              if (value[i].size > 10000000) return false
+            }
+            return true
+          }
+        })
+        .test('fileFormat', 'Định dạng file không hợp lệ', value => {
+          console.log(value)
+          if (medias.length > 0 && value.length === 0) return true
+          if (!value?.length) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              const checkList = formatFile.filter(item => {
+                if (value[i].name.search(item) > -1) {
+                  return item
+                }
+              })
+              if (checkList.length < 1) return false
+            }
+
+            return true
+          }
+        }),
     })
     .required()
 
@@ -83,6 +116,7 @@ export default function InformationPlace(props) {
       description: '',
       hashtag: [],
       campAreaTypes: [],
+      file: [],
     },
   })
 
@@ -527,7 +561,11 @@ export default function InformationPlace(props) {
           ref={uploadImageRef}
           medias={medias}
           setMedias={setMedias}
+          setValue={setValue}
         ></UploadImage>
+        {errors?.file && (
+          <FormHelperText error={true}>{errors.file?.message}</FormHelperText>
+        )}
         <Button color="primary" type="submit" variant="contained">
           Lưu
         </Button>

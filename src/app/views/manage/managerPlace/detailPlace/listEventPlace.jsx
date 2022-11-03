@@ -9,9 +9,8 @@ import {
   linkEvent,
   removeEventOnPlace,
 } from 'app/apis/place/place.service'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { cloneDeep } from 'lodash'
-
 const tableModel = {
   headCell: [
     {
@@ -49,7 +48,7 @@ const tableModelEventUnlinked = {
       width: null,
     },
     {
-      name: 'Địa chỉ',
+      name: 'Thời gian diễn ra sự kiện',
       width: null,
     },
     {
@@ -61,7 +60,7 @@ const tableModelEventUnlinked = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'name', 'address', 'des-status', 'action'],
+  bodyCell: ['index', 'name', 'time', 'des-status', 'action'],
 }
 
 const param = {
@@ -93,7 +92,7 @@ export default function ListEventPlace(props) {
           convertEvent.name = event.name
           convertEvent.time = `${event.startDate} - ${event.endDate}`
           convertEvent['des-status'] =
-            event.status === 1 ? 'Đang diễn ra' : 'Chưa diễn ra'
+            event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
           convertEvent.action = ['delete']
           return convertEvent
         })
@@ -111,9 +110,9 @@ export default function ListEventPlace(props) {
           const convertEvent = {}
           convertEvent.id = event.id
           convertEvent.name = event.name
-          convertEvent.address = event.address
+          convertEvent.time = `${event.startDate} - ${event.endDate}`
           convertEvent['des-status'] =
-            event.status === 1 ? 'Đang diễn ra' : 'Chưa diễn ra'
+            event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
           convertEvent.action = ['add']
           return convertEvent
         })
@@ -167,6 +166,22 @@ export default function ListEventPlace(props) {
           >
             Liên kết sự kiện
           </Paragraph>
+        </Grid>
+        <Grid
+          item
+          sm={6}
+          xs={6}
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'center',
+            color: '#07bc0c',
+            textDecoration: 'underline',
+          }}
+        >
+          <Link to="/quan-ly-su-kien/them-moi-su-kien" target="_blank">
+            Thêm sự kiện
+          </Link>
         </Grid>
       </Grid>
       <TableCustom

@@ -46,6 +46,12 @@ const ManagerEvents = Loadable(lazy(() => import('./events/ManagerEvents')))
 const AddEvent = Loadable(lazy(() => import('./events/AddEvent')))
 const ListPolicy = Loadable(lazy(() => import('./policies/ListPolicy')))
 const AddPolicy = Loadable(lazy(() => import('./policies/AddPolicy')))
+const ListTrendingKeyword = Loadable(
+  lazy(() => import('./keywords/ListTrendingKeyword')),
+)
+const AddKeyword = Loadable(lazy(() => import('./keywords/AddKeyword')))
+const ListHandbook = Loadable(lazy(() => import('./handbooks/ListHandbook')))
+const AddHandbook = Loadable(lazy(() => import('./handbooks/AddHandbook')))
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -315,7 +321,58 @@ const ManagementRoutes = [
     ],
     auth: [ROLES.ADMIN, ROLES.CS],
   },
-
+  {
+    path: '/quan-ly-tu-khoa-yeu-thich',
+    element: (
+      <>
+        <ListTrendingKeyword />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: 'them-moi',
+        element: <AddKeyword title="Thêm từ khoá" />,
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+  {
+    path: '/quan-ly-cam-nang',
+    element: (
+      <>
+        <ListHandbook />
+        <Outlet />
+      </>
+    ),
+    children: [
+      // {
+      //   path: 'them-moi',
+      //   element: <AddHandbook title="Thêm cẩm nang" />,
+      // },
+    ],
+    auth: [ROLES.ADMIN, ROLES.CS],
+  },
+  {
+    path: '/quan-ly-cam-nang/them-moi',
+    element: <AddHandbook />,
+    children: [
+      // {
+      //   path: 'them-moi',
+      //   element: <AddHandbook title="Thêm cẩm nang" />,
+      // },
+    ],
+  },
+  {
+    path: '/quan-ly-cam-nang/:handbookId/chi-tiet',
+    element: <AddHandbook />,
+    children: [
+      // {
+      //   path: 'them-moi',
+      //   element: <AddHandbook title="Thêm cẩm nang" />,
+      // },
+    ],
+  },
   {
     path: '/quan-ly-thong-tin-dia-danh',
     element: <ManagerPlace />,

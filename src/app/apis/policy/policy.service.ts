@@ -1,4 +1,5 @@
 import { http } from 'app/helpers/http-config'
+import { ICampGroundResponse } from 'app/models/camp'
 import { IPolicyOverall, IPolicyResponse } from 'app/models/policy'
 
 export const fetchPolicies = async (params: any): Promise<IPolicyResponse> => {
@@ -28,5 +29,19 @@ export const updatePolicy = async (
     `/api/policies/${policyId}`,
     payload,
   )
+  return data
+}
+
+export const deletePolicy = async (policyId?: number): Promise<any> => {
+  const { data } = await http.delete<any>(`/api/policies/${policyId}`)
+  return data
+}
+
+export const fetchCampGroundsPolicy = async (
+  params: any,
+): Promise<ICampGroundResponse> => {
+  const { data } = await http.get<ICampGroundResponse>(`/api/camp-grounds`, {
+    params,
+  })
   return data
 }

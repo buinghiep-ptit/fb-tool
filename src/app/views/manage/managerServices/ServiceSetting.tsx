@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 // import StatusSelect from './StatusSelect'
 // import TypeSelect from './TypeSelect'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { SearchSharp } from '@mui/icons-material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { getListServices } from 'app/apis/services/services.service'
 import { MuiButton } from 'app/components/common/MuiButton'
@@ -252,6 +252,30 @@ export default function ServiceSetting(props: Props) {
       size: parseInt(event.target.value, 10),
     } as any)
   }
+
+  const onResetFilters = () => {
+    methods.reset({
+      search: '',
+      rentalType: 'all',
+      status: 'all',
+      page: 0,
+      size: 20,
+    })
+
+    setPage(0)
+    setSize(20)
+
+    setFilters({
+      page: 0,
+      size: 20,
+    })
+
+    navigate('', {
+      page: 0,
+      size: 20,
+    } as any)
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
@@ -307,7 +331,7 @@ export default function ServiceSetting(props: Props) {
                 </SelectDropDown>
               </Grid>
 
-              <Grid item sm={3} xs={12}>
+              <Grid item sm={2} xs={12}>
                 <MuiButton
                   title="Tìm kiếm"
                   variant="contained"
@@ -315,6 +339,16 @@ export default function ServiceSetting(props: Props) {
                   type="submit"
                   sx={{ width: '100%' }}
                   startIcon={<SearchSharp />}
+                />
+              </Grid>
+              <Grid item sm={2} xs={12}>
+                <MuiButton
+                  title="Làm mới"
+                  variant="outlined"
+                  color="primary"
+                  onClick={onResetFilters}
+                  sx={{ width: '100%' }}
+                  startIcon={<ChangeCircleSharp />}
                 />
               </Grid>
             </Grid>

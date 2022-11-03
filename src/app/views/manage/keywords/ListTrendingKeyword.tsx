@@ -3,7 +3,7 @@ import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchPolicies } from 'app/apis/policy/policy.service'
+import { fetchKeywords } from 'app/apis/keyword/keyword.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -11,10 +11,13 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useDeletePolicy } from 'app/hooks/queries/usePoliciesData'
+import {
+  useDeleteKeyword,
+  useTogglePinKeyword,
+} from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IPolicyOverall, IPolicyResponse } from 'app/models/policy'
-import { columnsPolicies } from 'app/utils/columns/columnsPolicies'
+import { IKeyword, IKeywordResponse } from 'app/models/keyword'
+import { columnsTrendingKeywords } from 'app/utils/columns/columnsTrendingKeywords'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -34,13 +37,13 @@ const Container = styled('div')<Props>(({ theme }) => ({
 export interface Props {}
 
 type ISearchFilters = {
-  name?: string
+  search?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function ListPolicy(props: Props) {
+export default function ListTrendingKeyword(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -52,7 +55,7 @@ export default function ListPolicy(props: Props) {
     queryParams.size ? +queryParams.size : 20,
   )
   const [defaultValues] = useState<ISearchFilters>({
-    name: queryParams.name ?? '',
+    search: queryParams.search ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -65,12 +68,14 @@ export default function ListPolicy(props: Props) {
     title?: string
     message?: string
     type?: string
+    submitText?: string
+    cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
+    search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
       .max(255, 'hashtag must be at almost 255 characters'),
   })
@@ -87,26 +92,41 @@ export default function ListPolicy(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IPolicyResponse, Error> = useQuery<IPolicyResponse, Error>(
-    ['policies', filters],
-    () => fetchPolicies(filters),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
-      keepPreviousData: true,
-      enabled: !!filters,
-    },
-  )
+  }: UseQueryResult<IKeywordResponse, Error> = useQuery<
+    IKeywordResponse,
+    Error
+  >(['keywords', filters], () => fetchKeywords(filters), {
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    keepPreviousData: true,
+    enabled: !!filters,
+  })
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
     setOpenDialog(false)
   }
-  const { mutate: deletePolicy } = useDeletePolicy(() =>
+
+  const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
+    () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
+  const { mutate: deleteKeyword } = useDeleteKeyword(() =>
     onRowUpdateSuccess(null, 'Xoá thành công'),
   )
 
   const onSubmitDialog = () => {
-    deletePolicy(row.id)
+    switch (dialogData.type) {
+      case 'toggle-pin':
+        togglePin(row.id)
+        break
+
+      case 'delete':
+        deleteKeyword(row.id)
+        break
+        break
+
+      default:
+        break
+    }
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -163,14 +183,26 @@ export default function ListPolicy(props: Props) {
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.id}/chi-tiet`, { state: { modal: true, mode: 'update' } })
+    setDialogData(prev => ({
+      ...prev,
+      title: row.isRequired === 1 ? 'Bỏ ghim từ khoá' : 'Ghim từ khoá',
+      message:
+        row.isRequired === 1
+          ? 'Bạn có chắc chắn muốn bỏ ghim từ khoá?'
+          : 'Bạn có chắc chắn muốn ghim từ khoá?',
+      type: 'toggle-pin',
+      submitText: row.isRequired === 1 ? 'Bỏ ghim' : 'Ghim',
+      cancelText: 'Huỷ',
+    }))
+    setOpenDialog(true)
+    setRow(row)
   }
 
   const onRowDelete = (cell: any, row: any) => {
     setDialogData(prev => ({
       ...prev,
-      title: 'Xoá chính sách',
-      message: 'Bạn có chắc chắn muốn xoá chính sách',
+      title: 'Xoá từ khoá',
+      message: 'Bạn có chắc chắn muốn xoá từ khoá',
       type: 'delete',
     }))
     setOpenDialog(true)
@@ -178,14 +210,14 @@ export default function ListPolicy(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'name') {
+    if (cell.id === 'word') {
       navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     }
   }
 
   const onResetFilters = () => {
     methods.reset({
-      name: '',
+      search: '',
       page: 0,
       size: 20,
     })
@@ -207,7 +239,7 @@ export default function ListPolicy(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý chính sách' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý từ khoá yêu thích' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -215,7 +247,7 @@ export default function ListPolicy(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm mới chính sách riêng"
+          title="Thêm từ khoá"
           variant="contained"
           color="primary"
           onClick={() =>
@@ -237,11 +269,11 @@ export default function ListPolicy(props: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Tên chính sách'}
+                    label={'Từ khoá'}
                     type="text"
-                    name="name"
+                    name="search"
                     defaultValue=""
-                    placeholder="Nhập tên chính sách"
+                    placeholder="Nhập từ khoá"
                     fullWidth
                   />
                 </Grid>
@@ -272,8 +304,8 @@ export default function ListPolicy(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={(data?.content as IPolicyOverall[]) ?? []}
-            columns={columnsPolicies}
+            rows={(data?.content as IKeyword[]) ?? []}
+            columns={columnsTrendingKeywords}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -281,18 +313,35 @@ export default function ListPolicy(props: Props) {
             error={isError ? error : null}
             actions={[
               {
-                icon: 'edit',
+                icon: 'push_pin',
                 color: 'warning',
-                tooltip: 'Chi tiết',
+                tooltip: 'Ghim',
                 onClick: onRowUpdate,
+                disableKey: 'isRequired',
+                disableActions: (isRequired?: number) => !!isRequired,
+                contrastIcon: {
+                  icon: (
+                    <img
+                      src={'/assets/images/app/pin_off_icon.svg'}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        color: '#FFB020',
+                        filter:
+                          'invert(85%) sepia(53%) saturate(5926%) hue-rotate(339deg) brightness(100%) contrast(103%)',
+                      }}
+                      loading="lazy"
+                      alt="icon"
+                    />
+                  ),
+                  tooltip: 'Bỏ ghim',
+                },
               },
               {
                 icon: 'delete',
                 color: 'error',
                 tooltip: 'Xoá',
                 onClick: onRowDelete,
-                disableKey: 'scope',
-                disableActions: (scope?: number) => scope === 2,
               },
             ]}
           />
@@ -313,8 +362,8 @@ export default function ListPolicy(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
-        submitText={'Xoá'}
-        cancelText={'Huỷ'}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

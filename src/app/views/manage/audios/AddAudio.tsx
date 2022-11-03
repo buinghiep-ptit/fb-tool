@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { checkExistedName } from 'app/apis/audio/audio.service'
 import { uploadAudio, uploadImage } from 'app/apis/uploads/upload.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
@@ -20,11 +21,12 @@ import { DropWrapper } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useCreateAudio, useUpdateAudio } from 'app/hooks/queries/useAudiosData'
 import { getReturnValues } from 'app/hooks/useCountDown'
+import useDebounce from 'app/hooks/useDebounce.'
 import { IMediaOverall } from 'app/models'
 import { IAudioOverall } from 'app/models/audio'
 import { EMediaFormat } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -62,6 +64,8 @@ export default function AddAudio({ title }: Props) {
 
   const [audioDur, setAudioDur] = useState<number>(0)
   const [labelDur, setLabelDur] = useState<string>('')
+
+  const [isExistedName, setIsExistedName] = useState(false)
 
   const audioRef = useRef() as any
 
@@ -108,7 +112,8 @@ export default function AddAudio({ title }: Props) {
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .max(255, 'Nội dung không được vượt quá 255 ký tự')
-      .required(messages.MSG1),
+      .required(messages.MSG1)
+      .test('existed', 'Tên bài hát đã tồn tại', () => !isExistedName),
     audioFile: Yup.mixed().test('empty', messages.MSG1, () => {
       return !!audioPreviewer
     }),
@@ -165,6 +170,31 @@ export default function AddAudio({ title }: Props) {
   const { mutate: update, isLoading: isLoading } = useUpdateAudio(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
+
+  const debouncedSearchQuery = useDebounce(methods.watch('name') ?? '', 500)
+
+  // const { data: checkName } = useCheckExistedName(debouncedSearchQuery)
+
+  const checkName = async (nameAudios: string) => {
+    try {
+      const result = await checkExistedName({
+        nameAudios,
+      })
+      if (result) {
+        setIsExistedName(result.used)
+        if (result.used) {
+          methods.setError('name', { message: 'Tên bài hát đã tồn tại' })
+        } else {
+          methods.clearErrors('name')
+        }
+      }
+    } catch (error) {}
+  }
+
+  useEffect(() => {
+    if (!debouncedSearchQuery) return
+    checkName(debouncedSearchQuery.trim())
+  }, [debouncedSearchQuery])
 
   const onSubmitHandler: SubmitHandler<SchemaType> = async (
     values: SchemaType,
@@ -251,6 +281,7 @@ export default function AddAudio({ title }: Props) {
                       url: URL.createObjectURL(acceptedFiles[0]),
                     })
                     methods.setValue('audioFile', acceptedFiles[0])
+                    methods.clearErrors('audioFile')
                   }}
                   accept={{ 'audio/*': [] }}
                   multiple={false}

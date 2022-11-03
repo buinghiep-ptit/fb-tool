@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import GeneralInformation from './generalInformation'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import { Button } from '@mui/material'
+import { Button, FormHelperText } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import {
@@ -33,6 +33,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { object } from 'prop-types'
+import { formatFile } from 'app/utils/constant'
 
 export default function InformationCampGround({ action }) {
   const [hashtag, setHashtag] = React.useState([])
@@ -104,6 +105,37 @@ export default function InformationCampGround({ action }) {
       status: yup.string().required('Vui lòng chọn trạng thái'),
       campTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
+      file: yup
+        .mixed()
+        .test('required', 'Vui lòng thêm ảnh/video', value => {
+          if (medias.length > 0) return true
+          return value.length > 0
+        })
+        .test('fileSize', 'Dung lượng file quá lớn', value => {
+          if (!value?.length) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              if (value[i].size > 10000000) return false
+            }
+            return true
+          }
+        })
+        .test('fileFormat', 'Định dạng file không hợp lệ', value => {
+          console.log(value)
+          if (!value?.length) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              const checkList = formatFile.filter(item => {
+                if (value[i].type.search(item) > -1) {
+                  return item
+                }
+              })
+              if (checkList.length > 0) return true
+            }
+
+            return true
+          }
+        }),
     })
     .required()
 
@@ -183,14 +215,6 @@ export default function InformationCampGround({ action }) {
         }
       }
     })
-
-    const handleDeleteCampGround = async () => {
-      const res = await deleteCampGround(params.id)
-      if (res) {
-        toastSuccess({ message: 'Xóa điểm camp thành công' })
-        navigate('/quan-ly-thong-tin-diem-camp')
-      }
-    }
 
     const fileUploadVideo = [...introData].map(file => {
       if (file.type.startsWith('video/')) {
@@ -557,7 +581,11 @@ export default function InformationCampGround({ action }) {
             action={action}
             description={description}
             setMedias={setMedias}
+            setValue={setValue}
           />
+          {errors?.file && (
+            <FormHelperText error={true}>{errors.file?.message}</FormHelperText>
+          )}
         </AccordionDetails>
       </Accordion>
       <Accordion>

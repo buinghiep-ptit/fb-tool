@@ -6,7 +6,7 @@ export const tableModel = {
     },
     {
       name: 'Ảnh',
-      width: 200,
+      width: 120,
     },
     {
       name: 'Tên địa điểm Camping',
@@ -63,7 +63,7 @@ export const tableModelSevrvice = {
     },
     {
       name: 'Ảnh',
-      width: 200,
+      width: 120,
     },
     {
       name: 'Tên dịch vụ',

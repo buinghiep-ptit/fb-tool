@@ -26,19 +26,19 @@ export const tableModel = {
     },
     {
       name: 'Địa chỉ',
-      width: 200,
-    },
-    {
-      name: 'Dịch vụ',
       width: 150,
     },
     {
+      name: 'Dịch vụ',
+      width: 50,
+    },
+    {
       name: 'Trạng thái',
-      width: 100,
+      width: 60,
     },
     {
       name: '',
-      width: 100,
+      width: 60,
     },
   ],
   bodyCell: [

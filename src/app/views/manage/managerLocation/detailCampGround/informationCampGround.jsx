@@ -126,11 +126,11 @@ export default function InformationCampGround({ action }) {
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
               const checkList = formatFile.filter(item => {
-                if (value[i].type.search(item) > -1) {
+                if (value[i].name.search(item) > -1) {
                   return item
                 }
               })
-              if (checkList.length > 0) return true
+              if (checkList.length < 1) return false
             }
 
             return true
@@ -686,14 +686,14 @@ export default function InformationCampGround({ action }) {
             >
               Lưu
             </Button>
-            <Button
+            {/* <Button
               color="primary"
               variant="contained"
               onClick={() => handleDeleteCampGround()}
               style={{ marginRight: '10px' }}
             >
               Xóa
-            </Button>
+            </Button> */}
             <Button
               color="primary"
               variant="contained"

@@ -8,7 +8,10 @@ import {
   Tooltip,
 } from '@mui/material'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { getPolicyDetail } from 'app/apis/policy/policy.service'
+import {
+  fetchLinkedCampgrounds,
+  getPolicyDetail,
+} from 'app/apis/policy/policy.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
@@ -20,6 +23,7 @@ import {
   useCreatePolicy,
   useUpdatePolicy,
 } from 'app/hooks/queries/usePoliciesData'
+import { IUnlinkedCampgroundsResponse } from 'app/models/camp'
 import { IPolicyOverall } from 'app/models/policy'
 import { messages } from 'app/utils/messages'
 import React, { useEffect, useState } from 'react'
@@ -66,6 +70,22 @@ export default function AddPolicy({ title }: Props) {
   >(['policy', policyId], () => getPolicyDetail(Number(policyId ?? 0)), {
     enabled: !!policyId,
   })
+
+  const {
+    data: campGrounds,
+  }: UseQueryResult<IUnlinkedCampgroundsResponse, Error> = useQuery<
+    IUnlinkedCampgroundsResponse,
+    Error
+  >(
+    ['linked-campgrounds', policyId],
+    () => fetchLinkedCampgrounds(Number(policyId ?? 0)),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      keepPreviousData: true,
+      enabled: !!policyId,
+    },
+  )
 
   useEffect(() => {
     if (policy && !!Object.keys(policy).length) {
@@ -190,24 +210,36 @@ export default function AddPolicy({ title }: Props) {
                   }
                 />
               </Stack>
-              {policy?.scope === 2 && (
-                <IconButton onClick={onOpenCampgrounds}>
-                  <Tooltip
-                    arrow
-                    title="Xem danh sách điểm camp đã được liên kết"
-                  >
-                    <Stack direction={'row'} alignItems="center">
-                      <MuiTypography
-                        color={'primary'}
-                        sx={{ textDecorationLine: 'underline', mr: 1 }}
-                        variant="subtitle2"
+              {policy && (
+                <>
+                  {campGrounds && campGrounds.totalElements ? (
+                    <IconButton onClick={onOpenCampgrounds}>
+                      <Tooltip
+                        arrow
+                        title="Xem danh sách điểm camp đã được liên kết"
                       >
-                        6 điểm Camp liên kết
-                      </MuiTypography>
-                      <Icon color="primary">double_arrow</Icon>
-                    </Stack>
-                  </Tooltip>
-                </IconButton>
+                        <Stack direction={'row'} alignItems="center">
+                          <MuiTypography
+                            color={'primary'}
+                            sx={{ textDecorationLine: 'underline', mr: 1 }}
+                            variant="subtitle2"
+                          >
+                            {campGrounds.totalElements} điểm Camp liên kết
+                          </MuiTypography>
+                          <Icon color="primary">double_arrow</Icon>
+                        </Stack>
+                      </Tooltip>
+                    </IconButton>
+                  ) : (
+                    <MuiTypography
+                      color={'secondary'}
+                      sx={{ mr: 1 }}
+                      variant="subtitle2"
+                    >
+                      Chưa liên kết điểm Camp nào
+                    </MuiTypography>
+                  )}
+                </>
               )}
             </Stack>
 

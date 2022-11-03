@@ -1,4 +1,4 @@
-import { Tooltip, Typography } from '@mui/material'
+import { Chip, Tooltip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCampgrounds } from 'app/models/camp'
@@ -65,9 +65,10 @@ export const columnsCampgroundsPolicy: readonly TableColumn<TitleCampgrounds>[] 
       minWidth: 80,
       align: 'center',
       status: (value: any) => (
-        <MuiSwitch
-          checked={value === 1 ? true : false}
-          sx={{ justifyContent: 'center', fontSize: '16px!important' }}
+        <Chip
+          label={value === 1 ? 'Hoạt động' : 'Không hoạt động'}
+          size="medium"
+          color={value === 1 ? 'primary' : 'default'}
         />
       ),
     },

@@ -68,7 +68,7 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     id: 'campGroundNames',
     label: 'Camps áp dụng',
     minWidth: 200,
-    format: (value: number) => (
+    action: (value: number) => (
       <Typography
         sx={{
           overflow: 'hidden',
@@ -77,7 +77,9 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
           WebkitLineClamp: '2',
           WebkitBoxOrient: 'vertical',
           pl: 1,
+          textDecorationLine: 'underline',
         }}
+        color={'primary'}
       >
         {value}
       </Typography>

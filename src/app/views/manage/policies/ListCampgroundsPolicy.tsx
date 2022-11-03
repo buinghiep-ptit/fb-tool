@@ -2,13 +2,13 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack } from '@mui/material'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchCampGroundsPolicy } from 'app/apis/policy/policy.service'
+import { fetchLinkedCampgrounds } from 'app/apis/policy/policy.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { ICampGround, ICampGroundResponse } from 'app/models/camp'
+import { ICampGround, IUnlinkedCampgroundsResponse } from 'app/models/camp'
 import { columnsCampgroundsPolicy } from 'app/utils/columns/columnsCampgroundsPolicy'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
@@ -58,21 +58,24 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
   const {
     data: campGrounds,
     isFetching,
     isError,
     error,
-  }: UseQueryResult<ICampGroundResponse, Error> = useQuery<
-    ICampGroundResponse,
+  }: UseQueryResult<IUnlinkedCampgroundsResponse, Error> = useQuery<
+    IUnlinkedCampgroundsResponse,
     Error
-  >(['camp-grounds-policy', filters], () => fetchCampGroundsPolicy(filters), {
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    keepPreviousData: true,
-    enabled: !!filters,
-  })
+  >(
+    ['linked-campgrounds', policyId, filters],
+    () => fetchLinkedCampgrounds(Number(policyId ?? 0), filters),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      keepPreviousData: true,
+      enabled: !!filters && !!policyId,
+    },
+  )
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)

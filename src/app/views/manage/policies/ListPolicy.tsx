@@ -7,6 +7,7 @@ import { fetchPolicies } from 'app/apis/policy/policy.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -21,6 +22,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import ListCampgroundsPolicy from './ListCampgroundsPolicy'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -178,8 +180,14 @@ export default function ListPolicy(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'name') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+    if (cell.id === 'campGroundNames') {
+      setDialogData(prev => ({
+        ...prev,
+        title: 'Điểm camp sử dụng',
+        type: 'linked-camps',
+      }))
+      setOpenDialog(true)
+      setRow(row)
     }
   }
 
@@ -325,6 +333,17 @@ export default function ListPolicy(props: Props) {
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>
+      {row.id && dialogData.type === 'linked-camps' && (
+        <MuiStyledModal
+          title={dialogData.title ?? ''}
+          open={openDialog}
+          maxWidth="md"
+          onCloseModal={() => setOpenDialog(false)}
+          cancelText="Quay lại"
+        >
+          <ListCampgroundsPolicy policyId={Number(row.id)} />
+        </MuiStyledModal>
+      )}
     </Container>
   )
 }

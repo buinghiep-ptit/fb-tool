@@ -40,7 +40,7 @@ export const columnsTrendingKeywords: readonly TableColumn<TitleKeywords>[] = [
     ),
   },
   {
-    id: 'dateUpdated',
+    id: 'dateCreated',
     label: 'Thời gian thêm',
     minWidth: 170,
     align: 'center',

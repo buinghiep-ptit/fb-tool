@@ -228,7 +228,7 @@ export default function CustomerAccounts(props: Props) {
                     <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                <Grid item sm={3} xs={6}>
+                <Grid item sm={2} xs={6}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -238,7 +238,7 @@ export default function CustomerAccounts(props: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={6}>
+                <Grid item sm={2} xs={6}>
                   <MuiButton
                     title="Làm mới"
                     variant="outlined"

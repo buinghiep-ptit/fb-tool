@@ -10,8 +10,8 @@ export interface IPolicyOverall {
   campGroundNames?: string
   dateUpdated?: string
   scaleAmount?: number
-  minAmount?: number
-  maxAmount?: number
+  minAmount?: number | null
+  maxAmount?: number | null
   scope?: number
 }
 

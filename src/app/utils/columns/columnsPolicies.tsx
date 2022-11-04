@@ -46,9 +46,9 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 1 ? 'Riêng' : 'Chung'}
+        label={value === 2 ? 'Riêng' : 'Chung'}
         size="medium"
-        color={value === 1 ? 'primary' : 'warning'}
+        color={value === 2 ? 'primary' : 'warning'}
       />
     ),
   },
@@ -68,7 +68,7 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     id: 'campGroundNames',
     label: 'Camps áp dụng',
     minWidth: 200,
-    format: (value: number) => (
+    action: (value: number) => (
       <Typography
         sx={{
           overflow: 'hidden',
@@ -77,7 +77,9 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
           WebkitLineClamp: '2',
           WebkitBoxOrient: 'vertical',
           pl: 1,
+          textDecorationLine: 'underline',
         }}
+        color={'primary'}
       >
         {value}
       </Typography>

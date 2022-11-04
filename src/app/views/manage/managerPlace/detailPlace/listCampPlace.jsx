@@ -9,7 +9,7 @@ import {
   linkCamp,
   removeCampOnPlace,
 } from 'app/apis/place/place.service'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { cloneDeep } from 'lodash'
 
 const tableModel = {
@@ -93,7 +93,7 @@ export default function ListCampPlace(props) {
           convertCamp.name = camp.name
           convertCamp.address = camp.address
           convertCamp['des-status'] =
-            camp.status === 1 ? 'Đang diễn ra' : 'Chưa diễn ra'
+            camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'
           convertCamp.action = ['delete']
           return convertCamp
         })
@@ -167,6 +167,22 @@ export default function ListCampPlace(props) {
           >
             Liên kết điểm camp
           </Paragraph>
+        </Grid>
+        <Grid
+          item
+          sm={6}
+          xs={6}
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+            alignItems: 'center',
+            color: '#07bc0c',
+            textDecoration: 'underline',
+          }}
+        >
+          <Link to="/them-diem-camp" target="_blank">
+            Thêm điểm camp
+          </Link>
         </Grid>
       </Grid>
       <TableCustom

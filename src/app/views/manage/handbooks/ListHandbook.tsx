@@ -3,26 +3,32 @@ import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchPolicies } from 'app/apis/policy/policy.service'
+import { fetchHandbooks } from 'app/apis/handbook/handbook.service'
+import { fetchKeywords } from 'app/apis/keyword/keyword.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useDeletePolicy } from 'app/hooks/queries/usePoliciesData'
+import { useDeleteHandbook } from 'app/hooks/queries/useHandbooksData'
+import {
+  useDeleteKeyword,
+  useTogglePinKeyword,
+} from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IPolicyOverall, IPolicyResponse } from 'app/models/policy'
-import { columnsPolicies } from 'app/utils/columns/columnsPolicies'
+import { IHandbookOverall, IHandbookResponse } from 'app/models/handbook'
+import { IKeyword, IKeywordResponse } from 'app/models/keyword'
+import { columnsHandbooks } from 'app/utils/columns/columnsHandbooks'
+import { columnsTrendingKeywords } from 'app/utils/columns/columnsTrendingKeywords'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
-import ListCampgroundsPolicy from './ListCampgroundsPolicy'
+import UnlinkedCampgrounds from './UnlinkedCampgrounds'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -36,13 +42,13 @@ const Container = styled('div')<Props>(({ theme }) => ({
 export interface Props {}
 
 type ISearchFilters = {
-  name?: string
+  title?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function ListPolicy(props: Props) {
+export default function ListHandbook(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -54,7 +60,7 @@ export default function ListPolicy(props: Props) {
     queryParams.size ? +queryParams.size : 20,
   )
   const [defaultValues] = useState<ISearchFilters>({
-    name: queryParams.name ?? '',
+    title: queryParams.title ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -67,12 +73,14 @@ export default function ListPolicy(props: Props) {
     title?: string
     message?: string
     type?: string
+    submitText?: string
+    cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
+    title: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
       .max(255, 'hashtag must be at almost 255 characters'),
   })
@@ -89,26 +97,45 @@ export default function ListPolicy(props: Props) {
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IPolicyResponse, Error> = useQuery<IPolicyResponse, Error>(
-    ['policies', filters],
-    () => fetchPolicies(filters),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
-      keepPreviousData: true,
-      enabled: !!filters,
-    },
-  )
+  }: UseQueryResult<IHandbookResponse, Error> = useQuery<
+    IHandbookResponse,
+    Error
+  >(['handbooks', filters], () => fetchHandbooks(filters), {
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    keepPreviousData: true,
+    enabled: !!filters,
+  })
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
     setOpenDialog(false)
   }
-  const { mutate: deletePolicy } = useDeletePolicy(() =>
+
+  const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
+    () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
+  const { mutate: deleteHandbook } = useDeleteHandbook(() =>
     onRowUpdateSuccess(null, 'Xoá thành công'),
   )
 
   const onSubmitDialog = () => {
-    deletePolicy(row.id)
+    switch (dialogData.type) {
+      case 'add':
+        deleteHandbook(row.id)
+        break
+        break
+      case 'toggle-pin':
+        togglePin(row.id)
+        break
+
+      case 'delete':
+        deleteHandbook(row.id)
+        break
+        break
+
+      default:
+        break
+    }
   }
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -164,36 +191,44 @@ export default function ListPolicy(props: Props) {
     } as any)
   }
 
-  const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.id}/chi-tiet`, { state: { modal: true, mode: 'update' } })
-  }
-
-  const onRowDelete = (cell: any, row: any) => {
+  const onRowAdd = (cell: any, row: any) => {
     setDialogData(prev => ({
       ...prev,
-      title: 'Xoá chính sách',
-      message: 'Bạn có chắc chắn muốn xoá chính sách',
-      type: 'delete',
+      title: 'Thêm cẩm nang vào điểm camping',
+      type: 'add',
+      submitText: 'Lưu',
+      cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
     setRow(row)
   }
 
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá cẩm nang',
+      message: 'Bạn có chắc chắn muốn xoá cẩm nang',
+      type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'campGroundNames') {
-      setDialogData(prev => ({
-        ...prev,
-        title: 'Điểm camp sử dụng',
-        type: 'linked-camps',
-      }))
-      setOpenDialog(true)
-      setRow(row)
+    if (cell.id === 'word') {
+      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     }
   }
 
   const onResetFilters = () => {
     methods.reset({
-      name: '',
+      title: '',
       page: 0,
       size: 20,
     })
@@ -215,7 +250,7 @@ export default function ListPolicy(props: Props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý chính sách' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý cẩm nang' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -223,14 +258,10 @@ export default function ListPolicy(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm mới chính sách riêng"
+          title="Thêm mới cẩm nang"
           variant="contained"
           color="primary"
-          onClick={() =>
-            navigation(`them-moi`, {
-              state: { modal: true },
-            })
-          }
+          onClick={() => navigation(`them-moi`, {})}
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
@@ -245,11 +276,11 @@ export default function ListPolicy(props: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Tên chính sách'}
+                    label={'Tiêu đề'}
                     type="text"
-                    name="name"
+                    name="title"
                     defaultValue=""
-                    placeholder="Nhập tên chính sách"
+                    placeholder="Nhập tiêu đề"
                     fullWidth
                   />
                 </Grid>
@@ -280,14 +311,20 @@ export default function ListPolicy(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={(data?.content as IPolicyOverall[]) ?? []}
-            columns={columnsPolicies}
+            rows={(data?.content as IHandbookOverall[]) ?? []}
+            columns={columnsHandbooks}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
             isFetching={isFetching}
             error={isError ? error : null}
             actions={[
+              {
+                icon: 'data_saver_on',
+                color: 'primary',
+                tooltip: 'Thêm cẩm nang vào điểm camp',
+                onClick: onRowAdd,
+              },
               {
                 icon: 'edit',
                 color: 'warning',
@@ -299,8 +336,6 @@ export default function ListPolicy(props: Props) {
                 color: 'error',
                 tooltip: 'Xoá',
                 onClick: onRowDelete,
-                disableKey: 'scope',
-                disableActions: (scope?: number) => scope === 1,
               },
             ]}
           />
@@ -321,29 +356,36 @@ export default function ListPolicy(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
-        submitText={'Xoá'}
-        cancelText={'Huỷ'}
+        maxWidth={dialogData.type === 'add' ? 'md' : 'sm'}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
       >
-        <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
-          </MuiTypography>
-          <MuiTypography variant="subtitle1" color="primary">
-            {row.name}
-          </MuiTypography>
-        </Stack>
+        {dialogData.type === 'add' ? (
+          <UnlinkedCampgrounds handbook={row} />
+        ) : (
+          <Stack py={5} justifyContent={'center'} alignItems="center">
+            <MuiTypography variant="subtitle1">
+              {dialogData.message ?? ''}
+            </MuiTypography>
+            <MuiTypography variant="subtitle1" color="primary">
+              {row.name}
+            </MuiTypography>
+          </Stack>
+        )}
       </DiagLogConfirm>
-      {row.id && dialogData.type === 'linked-camps' && (
+      {/* 
+      {policyId && (
         <MuiStyledModal
           title={dialogData.title ?? ''}
           open={openDialog}
           maxWidth="md"
           onCloseModal={() => setOpenDialog(false)}
+          isLoading={createLoading || updateLoading}
           cancelText="Quay lại"
         >
-          <ListCampgroundsPolicy policyId={Number(row.id)} />
+          <UnlinkedCampgrounds handbookId={}={Number(policyId)} />
         </MuiStyledModal>
-      )}
+      )} */}
     </Container>
   )
 }

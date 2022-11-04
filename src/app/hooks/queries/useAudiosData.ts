@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   changeAudioIsDefault,
   changeAudioStatus,
+  checkExistedName,
   createAudio,
   deleteAudio,
   updateAudio,
@@ -61,3 +62,15 @@ export const useDeleteAudio = (onSuccess?: any, onError?: any) => {
     onSuccess,
   })
 }
+
+// export const useCheckExistedName = (nameAudios?: string) => {
+//   return useQuery(
+//     ['check-name', nameAudios],
+//     () => checkExistedName({ nameAudios }),
+//     {
+//       enabled: !!nameAudios,
+//       staleTime: 0,
+//       cacheTime: 0,
+//     },
+//   )
+// }

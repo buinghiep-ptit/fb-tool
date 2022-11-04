@@ -7,6 +7,9 @@ export interface ICampAreaResponse extends IPagingResponse {
 export interface ICampGroundResponse extends IPagingResponse {
   content?: ICampGround[]
 }
+export interface IUnlinkedCampgroundsResponse extends IPagingResponse {
+  content?: IUnlinkedCampgrounds[]
+}
 export interface ICampArea {
   id?: number
   name?: string
@@ -31,4 +34,10 @@ export interface ICampGround {
   status?: number
 }
 
+export interface IUnlinkedCampgrounds extends ICampGround, ICampArea {}
+
 export type TitleCampgrounds = keyof ICampGround | 'order' | 'action'
+export type TitleUnlinkedCampgrounds =
+  | keyof IUnlinkedCampgrounds
+  | 'order'
+  | 'action'

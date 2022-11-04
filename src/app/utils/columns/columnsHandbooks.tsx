@@ -1,10 +1,10 @@
 import { Chip, Tooltip, Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
-import { TitlePolicies } from 'app/models/policy'
+import { TitleHandbooks } from 'app/models/handbook'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
-export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
+export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
   {
     id: 'order',
     label: 'STT',
@@ -19,9 +19,10 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     },
   },
   {
-    id: 'name',
-    label: 'Tên chính sách',
-    minWidth: 150,
+    id: 'title',
+    label: 'Tiêu đề',
+    minWidth: 200,
+    align: 'center',
     action: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -40,22 +41,42 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     ),
   },
   {
-    id: 'scope',
-    label: 'Phạm vi',
-    minWidth: 80,
+    id: 'userName',
+    label: 'Người đăng',
+    minWidth: 200,
+    align: 'center',
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          pl: 1,
+        }}
+      >
+        {value}
+      </Typography>
+    ),
+  },
+  {
+    id: 'status',
+    label: 'Trạng thái',
+    minWidth: 60,
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 2 ? 'Riêng' : 'Chung'}
-        size="medium"
-        color={value === 2 ? 'primary' : 'warning'}
+        label={value === 1 ? 'Hoạt động' : 'Khoá'}
+        size="small"
+        color={value === 1 ? 'primary' : 'error'}
       />
     ),
   },
   {
-    id: 'amount',
-    label: 'Giá trị',
-    minWidth: 100,
+    id: 'amountLinkedCampGround',
+    label: 'Số lượng điểm camp',
+    minWidth: 200,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -63,34 +84,6 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
       ) : (
         <></>
       ),
-  },
-  {
-    id: 'campGroundNames',
-    label: 'Camps áp dụng',
-    minWidth: 200,
-    action: (value: number) => (
-      <Typography
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: '2',
-          WebkitBoxOrient: 'vertical',
-          pl: 1,
-          textDecorationLine: 'underline',
-        }}
-        color={'primary'}
-      >
-        {value}
-      </Typography>
-    ),
-  },
-  {
-    id: 'dateUpdated',
-    label: 'Thời gian',
-    minWidth: 170,
-    align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
   },
   {
     id: 'actions',

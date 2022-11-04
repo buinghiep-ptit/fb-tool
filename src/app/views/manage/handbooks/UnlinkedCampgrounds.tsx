@@ -2,14 +2,19 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack } from '@mui/material'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchLinkedCampgrounds } from 'app/apis/policy/policy.service'
+import { fetchUnlinkedCampgrounds } from 'app/apis/handbook/handbook.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { ICampGround, IUnlinkedCampgroundsResponse } from 'app/models/camp'
-import { columnsCampgroundsPolicy } from 'app/utils/columns/columnsCampgroundsPolicy'
+import { MuiTypography } from 'app/components/common/MuiTypography'
+import {
+  IUnlinkedCampgrounds,
+  IUnlinkedCampgroundsResponse,
+} from 'app/models/camp'
+import { IHandbookOverall } from 'app/models/handbook'
+import { columnsUnlinkedCampgrounds } from 'app/utils/columns/columnsUnlinkedCampgrounds'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -17,17 +22,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {
-  policyId?: number
+  handbook?: IHandbookOverall
 }
 
 type ISearchFilters = {
-  name?: string
+  search?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function ListCampgroundsPolicy({ policyId }: Props) {
+export default function UnlinkedCampgrounds({ handbook }: Props) {
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -38,7 +43,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
     queryParams.size ? +queryParams.size : 20,
   )
   const [defaultValues] = useState<ISearchFilters>({
-    name: queryParams.name ?? '',
+    search: queryParams.search ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -48,7 +53,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
   )
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
+    search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
       .max(255, 'hashtag must be at almost 255 characters'),
   })
@@ -58,6 +63,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
   const {
     data: campGrounds,
     isFetching,
@@ -67,13 +73,13 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
     IUnlinkedCampgroundsResponse,
     Error
   >(
-    ['linked-campgrounds', policyId, filters],
-    () => fetchLinkedCampgrounds(Number(policyId ?? 0), filters),
+    ['unlinked-campgrounds', handbook, filters],
+    () => fetchUnlinkedCampgrounds(Number(handbook?.id ?? 0), filters),
     {
       refetchOnWindowFocus: false,
       refetchOnMount: true,
       keepPreviousData: true,
-      enabled: !!filters && !!policyId,
+      enabled: !!filters && !!handbook,
     },
   )
 
@@ -127,7 +133,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
   const onResetFilters = () => {
     methods.reset({
-      name: '',
+      search: '',
       page: 0,
       size: 20,
     })
@@ -143,6 +149,8 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
   return (
     <Stack gap={3}>
+      <MuiTypography variant="h6">{handbook?.title}</MuiTypography>
+
       <SimpleCard>
         <form
           onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -153,11 +161,11 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
             <Grid container spacing={2}>
               <Grid item sm={6} xs={12}>
                 <FormInputText
-                  label={'Tên điểm camp'}
+                  label={'Địa điêm camping, địa danh'}
                   type="text"
-                  name="name"
+                  name="search"
                   defaultValue=""
-                  placeholder="Nhập tên điểm camp"
+                  placeholder="Nhập tên địa điểm camping, địa danh..."
                   fullWidth
                 />
               </Grid>
@@ -188,8 +196,8 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
       <SimpleCard>
         <MuiStyledTable
-          rows={(campGrounds?.content as ICampGround[]) ?? []}
-          columns={columnsCampgroundsPolicy}
+          rows={(campGrounds?.content as IUnlinkedCampgrounds[]) ?? []}
+          columns={columnsUnlinkedCampgrounds}
           rowsPerPage={size}
           page={page}
           onClickRow={onClickRow}
@@ -197,9 +205,9 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
           error={isError ? error : null}
           actions={[
             {
-              icon: 'edit',
-              color: 'warning',
-              tooltip: 'Chi tiết',
+              icon: 'data_saver_on',
+              color: 'primary',
+              tooltip: 'Thêm',
               onClick: onRowDetail,
             },
           ]}

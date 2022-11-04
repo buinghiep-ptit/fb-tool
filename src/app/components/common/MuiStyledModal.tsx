@@ -1,5 +1,6 @@
 import { ApprovalRounded, CancelOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
+import { Icon } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -107,6 +108,7 @@ export default function MuiStyledModal({
             },
           }}
           direction={'row'}
+          justifyContent="center"
           width={'100%'}
           gap={2}
         >
@@ -117,8 +119,8 @@ export default function MuiStyledModal({
               variant="contained"
               color="primary"
               type="submit"
-              sx={{ flex: 1 }}
-              startIcon={<ApprovalRounded />}
+              sx={{ flex: !!onCloseModal ? 1 : null, minWidth: 200 }}
+              startIcon={<Icon>save</Icon>}
               onClick={() => onSubmit()}
               loading={isLoading}
             />
@@ -130,8 +132,8 @@ export default function MuiStyledModal({
               variant="outlined"
               color="secondary"
               type="submit"
-              sx={{ flex: 1, float: 'right' }}
-              startIcon={<CancelOutlined />}
+              sx={{ flex: onSubmit ? 1 : null, minWidth: 200 }}
+              startIcon={<Icon>cancel</Icon>}
               onClick={onCloseModal}
             />
           )}

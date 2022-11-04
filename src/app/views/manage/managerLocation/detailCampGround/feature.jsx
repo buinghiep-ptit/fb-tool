@@ -405,7 +405,7 @@ export default function Feature({
               borderRadius: '5px',
               padding: '8px',
               marginRight: '20px',
-              height: '60px',
+              minHeight: '60px',
             }}
           >
             {feature?.utility?.map(utility => (

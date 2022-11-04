@@ -29,6 +29,7 @@ import MapCustom from 'app/components/common/MapCustom/MapCustom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
 import { messages } from 'app/utils/messages'
+import { formatFile } from 'app/utils/constant'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -67,20 +68,39 @@ export default function CreatePlace(props) {
   const schema = yup
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
-      province: yup.object().required(),
+      province: yup.object().required('Vui lòng chọn tỉnh thành phố'),
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       description: yup.string().required(messages.MSG1),
-      // file: yup
-      //   .mixed()
-      //   .required('Vui long thêm ảnh')
-      //   .test('fileSize', 'Dung lượng file quá lớn', value => {
-      //     console.log(value, errors)
-      //     if (!value || value.length < 1) {
-      //       return false
-      //     }
-      //     return value && value[0].size <= 100
-      //   }),
+      file: yup
+        .mixed()
+        .test('required', 'Vui lòng thêm ảnh/video', value => {
+          return value.length > 0
+        })
+        .test('fileSize', 'Dung lượng file quá lớn', value => {
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              if (value[i].size > 10000000) return false
+            }
+            return true
+          }
+        })
+        .test('fileFormat', 'Định dạng file không hợp lệ', value => {
+          console.log(value)
+          if (!value?.length) return true
+          if (value.length > 0) {
+            for (let i = 0; i < value.length; i++) {
+              const checkList = formatFile.filter(item => {
+                if (value[i].name.search(item) > -1) {
+                  return item
+                }
+              })
+              if (checkList.length < 1) return false
+            }
+
+            return true
+          }
+        }),
     })
     .required()
 
@@ -104,6 +124,7 @@ export default function CreatePlace(props) {
       description: '',
       hashtag: [],
       campAreaTypes: [],
+      file: [],
     },
   })
 
@@ -228,7 +249,7 @@ export default function CreatePlace(props) {
       idDistrict: data?.district?.id || null,
       longitude: createDegrees.lng,
       latitude: createDegrees.lat,
-      address: data.address.trim(),
+      address: data.address || null,
       tags: data.hashtag,
       imgUrl: '',
       status: 1,
@@ -288,7 +309,7 @@ export default function CreatePlace(props) {
                 control={control}
                 render={({ field }) => (
                   <TextField
-                    error={errors.namePlace}
+                    error={!!errors.namePlace}
                     helperText={errors.namePlace?.message}
                     {...field}
                     label="Tên địa danh*"
@@ -314,7 +335,7 @@ export default function CreatePlace(props) {
                     }}
                     renderInput={params => (
                       <TextField
-                        error={errors.province}
+                        error={!!errors.province}
                         helperText={
                           errors.province ? 'Vui lòng chọn tỉnh/thành' : ''
                         }
@@ -343,7 +364,7 @@ export default function CreatePlace(props) {
                     sx={{ width: 200, marginRight: 5 }}
                     renderInput={params => (
                       <TextField
-                        error={errors.district}
+                        error={!!errors.district}
                         helperText={
                           errors.district ? 'Vui lòng chọn quận/huyện' : ''
                         }
@@ -383,7 +404,7 @@ export default function CreatePlace(props) {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    error={errors.address}
+                    error={!!errors.address}
                     helperText={errors.address?.message}
                     label="Địa chỉ"
                     variant="outlined"
@@ -507,12 +528,12 @@ export default function CreatePlace(props) {
           </Grid>
 
           <Typography>Ảnh*:</Typography>
-          <UploadImage
-            ref={uploadImageRef}
-            setValue={setValue}
-            register={register}
-          ></UploadImage>
-
+          <UploadImage ref={uploadImageRef} setValue={setValue}></UploadImage>
+          {errors?.file && (
+            <FormHelperText error={true}>
+              {errors.file?.message || 'acb'}
+            </FormHelperText>
+          )}
           <Button color="primary" type="submit" variant="contained">
             Lưu
           </Button>

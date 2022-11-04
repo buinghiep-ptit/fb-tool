@@ -14,6 +14,7 @@ export type Props = {
   iconEnd?: React.ReactElement
   name: string
   label?: string
+  isAllowDot?: boolean
   defaultValue?: string
   inputProps?: InputProps
   disabled?: boolean
@@ -26,6 +27,7 @@ const MIN_LIMIT = 0
 const MuiRHFNumericFormatInput: FC<Props> = ({
   name,
   label = '',
+  isAllowDot = false,
   defaultValue,
   iconStart,
   iconEnd,
@@ -50,7 +52,13 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
           label={label}
           isAllowed={(values: any) => {
             const { value } = values
-            return !value || (value && value > MIN_LIMIT)
+            return (
+              !value ||
+              (value &&
+                value > MIN_LIMIT &&
+                ((!isAllowDot && !value.toString().includes('.')) ||
+                  isAllowDot))
+            )
           }}
           disabled={disabled}
           onChange={onChange}

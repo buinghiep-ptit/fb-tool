@@ -5,7 +5,7 @@ export interface IDiagLogConfirmProps {
   title?: string
   open?: boolean
   setOpen?: (open: boolean) => void
-  onSubmit: () => void
+  onSubmit?: () => void
   children?: React.ReactElement
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false | string
   submitText?: string

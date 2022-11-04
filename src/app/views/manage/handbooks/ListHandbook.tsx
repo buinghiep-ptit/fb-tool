@@ -120,7 +120,7 @@ export default function ListHandbook(props: Props) {
 
   const onSubmitDialog = () => {
     switch (dialogData.type) {
-      case 'add':
+      case 'camps':
         deleteHandbook(row.id)
         break
         break
@@ -194,8 +194,8 @@ export default function ListHandbook(props: Props) {
   const onRowAdd = (cell: any, row: any) => {
     setDialogData(prev => ({
       ...prev,
-      title: 'Thêm cẩm nang vào điểm camping',
-      type: 'add',
+      title: 'Điểm camping đã liên kết',
+      type: 'camps',
       submitText: 'Lưu',
       cancelText: 'Huỷ',
     }))
@@ -322,7 +322,7 @@ export default function ListHandbook(props: Props) {
               {
                 icon: 'data_saver_on',
                 color: 'primary',
-                tooltip: 'Thêm cẩm nang vào điểm camp',
+                tooltip: 'Điểm camping đã liên kết',
                 onClick: onRowAdd,
               },
               {
@@ -355,13 +355,15 @@ export default function ListHandbook(props: Props) {
         title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={onSubmitDialog}
-        maxWidth={dialogData.type === 'add' ? 'md' : 'sm'}
-        submitText={dialogData.submitText}
+        onSubmit={dialogData.type === 'camps' ? undefined : onSubmitDialog}
+        maxWidth={dialogData.type === 'camps' ? 'md' : 'sm'}
+        submitText={
+          dialogData.type === 'camps' ? undefined : dialogData.submitText
+        }
         cancelText={dialogData.cancelText}
       >
-        {dialogData.type === 'add' ? (
-          <UnlinkedCampgrounds handbook={row} />
+        {dialogData.type === 'camps' ? (
+          <UnlinkedCampgrounds handbook={row} isLinked={true} />
         ) : (
           <Stack py={5} justifyContent={'center'} alignItems="center">
             <MuiTypography variant="subtitle1">

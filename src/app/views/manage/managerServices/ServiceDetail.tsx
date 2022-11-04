@@ -102,7 +102,7 @@ export default function ServiceDetail(props: Props) {
     camp: Yup.object().nullable().required(messages.MSG1),
     rentalType: Yup.string().required(messages.MSG1),
     capacity: Yup.string()
-      .max(4, 'Chỉ được nhập tối đa 4 ký tự')
+      .max(5, 'Chỉ được nhập tối đa 4 chữ số')
       .required(messages.MSG1),
     name: Yup.string()
       .max(255, 'Chỉ được nhập tối đa 255 ký tự')

@@ -35,6 +35,7 @@ export const StyledTableRow = styled(TableRow)`
 type MuiPagingTableProps<T extends Record<string, any>> = {
   columns: readonly TableColumn<keyof T | 'action' | 'order' | 'something'>[]
   rows: T[]
+  maxHeight?: number | null
   onClickRow?: (cell: any, row: any) => void
   isFetching: boolean
   error?: { message?: string } | undefined | null
@@ -67,6 +68,7 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
 export default function MuiPagingTable<T extends Record<string, any>>({
   columns,
   rows,
+  maxHeight,
   onClickRow,
   isFetching,
   error,
@@ -101,7 +103,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
 
   return (
     <>
-      <TableContainer sx={{ maxHeight: 600 }}>
+      <TableContainer sx={{ maxHeight: maxHeight ?? null }}>
         <Table stickyHeader aria-label="sticky table">
           {!isFetching && (
             <TableHead>

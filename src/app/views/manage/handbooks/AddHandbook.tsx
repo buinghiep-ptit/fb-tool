@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Grid,
   Icon,
+  IconButton,
   LinearProgress,
   MenuItem,
   Stack,
@@ -30,6 +31,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import UnlinkedCampgrounds from './UnlinkedCampgrounds'
 
 export interface Props {}
 
@@ -133,10 +135,6 @@ export default function AddEvent(props: Props) {
     onRowUpdateSuccess(null, 'Xoá thành công'),
   )
 
-  const onDeleteEvent = () => {
-    if (handbookId) deleteHandbook(Number(handbookId))
-  }
-
   const openDeleteDialog = () => {
     setDialogData(prev => ({
       ...prev,
@@ -145,6 +143,44 @@ export default function AddEvent(props: Props) {
       type: 'delete',
     }))
     setOpenDialog(true)
+  }
+
+  const openlinkedCampgrounds = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Điểm camping đã liên kết',
+      type: 'linked',
+    }))
+    setOpenDialog(true)
+  }
+
+  const openUnlinkedCampgrounds = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Thêm điểm camp',
+      type: 'unlinked',
+    }))
+    setOpenDialog(true)
+  }
+
+  const onSubmitDialog = () => {
+    switch (dialogData.type) {
+      case 'linked':
+        // deleteHandbook(row.id)
+        break
+        break
+      case 'toggle-pin':
+        // togglePin(row.id)
+        break
+
+      case 'delete':
+        deleteHandbook(Number(handbookId))
+        break
+        break
+
+      default:
+        break
+    }
   }
 
   if (isLoading && fetchStatus === 'fetching') return <MuiLoading />
@@ -216,7 +252,7 @@ export default function AddEvent(props: Props) {
           <FormProvider {...methods}>
             <Grid container spacing={3}>
               <Grid item sm={6} xs={12}>
-                <Stack gap={3} mb={3}>
+                <Stack gap={3}>
                   {(createLoading || editLoading) && (
                     <LinearProgress sx={{ mt: 0.5 }} />
                   )}
@@ -242,6 +278,15 @@ export default function AddEvent(props: Props) {
                 </SelectDropDown>
               </Grid>
             </Grid>
+            <Box my={1.5} justifyContent="space-between">
+              <MuiButton
+                title="Thêm điểm camping"
+                variant="text"
+                color="primary"
+                onClick={() => openUnlinkedCampgrounds()}
+                startIcon={<Icon>add</Icon>}
+              />
+            </Box>
             <Stack>
               <MuiTypography variant="subtitle2" pb={1}>
                 Nội dung*
@@ -256,18 +301,26 @@ export default function AddEvent(props: Props) {
         title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={onDeleteEvent}
-        submitText={'Xoá'}
+        onSubmit={dialogData.type !== 'delete' ? undefined : onSubmitDialog}
+        maxWidth={dialogData.type !== 'delete' ? 'md' : 'sm'}
+        submitText={dialogData.type !== 'delete' ? undefined : 'Xoá'}
         cancelText={'Huỷ'}
       >
-        <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
-          </MuiTypography>
-          <MuiTypography variant="subtitle1" color="primary">
-            {handbook?.title}
-          </MuiTypography>
-        </Stack>
+        {dialogData.type !== 'delete' ? (
+          <UnlinkedCampgrounds
+            handbook={handbook}
+            isLinked={dialogData.type === 'linked' ? true : false}
+          />
+        ) : (
+          <Stack py={5} justifyContent={'center'} alignItems="center">
+            <MuiTypography variant="subtitle1">
+              {dialogData.message ?? ''}
+            </MuiTypography>
+            <MuiTypography variant="subtitle1" color="primary">
+              {handbook?.title}
+            </MuiTypography>
+          </Stack>
+        )}
       </DiagLogConfirm>
     </Container>
   )

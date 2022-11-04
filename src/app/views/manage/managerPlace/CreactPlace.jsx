@@ -86,18 +86,17 @@ export default function CreatePlace(props) {
           }
         })
         .test('fileFormat', 'Định dạng file không hợp lệ', value => {
-          console.log(value)
-          if (!value?.length) return true
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              const checkList = formatFile.filter(item => {
-                if (value[i].name.search(item) > -1) {
-                  return item
-                }
-              })
-              if (checkList.length < 1) return false
+              const arrString = value[i].name.split('.')
+              const type = arrString[arrString.length - 1]
+              const checkList = formatFile.filter(
+                item => item == type.toLowerCase(),
+              )
+              if (checkList.length < 1) {
+                return false
+              }
             }
-
             return true
           }
         }),

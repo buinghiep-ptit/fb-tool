@@ -24,7 +24,7 @@ import { generate } from 'generate-password'
 
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { set } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -93,33 +93,11 @@ export default function CreateMerchant(props) {
   })
 
   const uploadFile = async file => {
-    // const fileUpload = [...files].map(file => {
-    //   const formData = new FormData()
-    //   formData.append('file', file)
-    //   try {
-    //     const token = window.localStorage.getItem('accessToken')
-    //     const res = axios({
-    //       method: 'post',
-    //       url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
-    //       data: formData,
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     })
-    //     return res
-    //   } catch (e) {
-    //     console.log(e)
-    //   }
-    // })
-
-    // const response = await Promise.all(fileUpload)
-    // if (response) return response.map(item => item.data.url)
     const formData = new FormData()
     formData.append('file', file)
     try {
       const token = window.localStorage.getItem('accessToken')
-      const res = axios({
+      const res = await axios({
         method: 'post',
         url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
         data: formData,
@@ -137,13 +115,41 @@ export default function CreateMerchant(props) {
     }
   }
 
+  const downloadFile = url => {
+    const arr = url.split('.')
+    const type = arr[arr.length - 1]
+    try {
+      const token = window.localStorage.getItem('accessToken')
+      const config = { responseType: 'blob' }
+      axios({
+        method: 'get',
+        url,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      }).then(response => {
+        // create file link in browser's memory
+        const href = URL.createObjectURL(response.data)
+        console.log(response.data)
+        // create "a" HTML element with href to file & click
+        const link = document.createElement('a')
+        link.href = href
+        link.setAttribute('download', `file.${type}`) //or any other extension
+        document.body.appendChild(link)
+        link.click()
+
+        // clean up "a" element & remove ObjectURL
+        document.body.removeChild(link)
+        URL.revokeObjectURL(href)
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const onSubmit = async data => {
-    // const contracts = await uploadFile(
-    //   document.getElementById('upload-contract').files,
-    // )
-    // const documents = await uploadFile(
-    //   document.getElementById('upload-document').files,
-    // )
     const newData = new Object()
     newData.name = data.nameMerchant
     newData.merchantType = data.merchantType
@@ -156,18 +162,18 @@ export default function CreateMerchant(props) {
     newData.businessCode = data.businessModel || null
     newData.represent = data.representative
     newData.address = data.address || null
-    newData.contracts = contracts.map(contract => {
+    newData.contracts = contractList.map(contract => {
       return {
         mediaType: 4,
         mediaFormat: 3,
-        url: contract,
+        url: contract.url,
       }
     })
-    newData.paperWorks = documents.map(document => {
+    newData.paperWorks = documentList.map(document => {
       return {
         mediaType: 5,
         mediaFormat: 3,
-        url: document,
+        url: document.url,
       }
     })
     const res = await createMerchant(newData)
@@ -379,9 +385,50 @@ export default function CreateMerchant(props) {
               <input
                 type="file"
                 id="upload-contract"
-                multiple
+                onChange={async e => {
+                  if (
+                    document.getElementById('upload-contract').files[0].size >
+                    20000000
+                  ) {
+                    console.log(
+                      document.getElementById('upload-contract').files[0].size,
+                    )
+                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                    return
+                  }
+                  const file = await uploadFile(
+                    document.getElementById('upload-contract').files[0],
+                  )
+
+                  setContractList([...contractList, file])
+                }}
                 style={{ display: 'none' }}
               />
+              {contractList.map((contractFile, index) => (
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  key={contractFile.filename}
+                >
+                  <a
+                    href={contractFile.url}
+                    style={{ textDecoration: 'underline', color: '#07bc0c' }}
+                  >
+                    {contractFile.filename}
+                  </a>
+                  <Icon
+                    color="error"
+                    onClick={() => {
+                      const newArr = cloneDeep(contractList)
+                      newArr.splice(index, 1)
+                      setContractList([...newArr])
+
+                      document.getElementById('upload-contract').value = null
+                    }}
+                  >
+                    delete
+                  </Icon>
+                </div>
+              ))}
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller
@@ -413,24 +460,50 @@ export default function CreateMerchant(props) {
                 type="file"
                 id="upload-document"
                 onChange={async e => {
-                  console.log(document.getElementById('upload-document').files)
-                  const list = await uploadFile(
+                  if (
+                    document.getElementById('upload-document').files[0].size >
+                    20000000
+                  ) {
+                    console.log(
+                      document.getElementById('upload-document').files[0].size,
+                    )
+                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                    return
+                  }
+                  const file = await uploadFile(
                     document.getElementById('upload-document').files[0],
                   )
-                  console.log(list)
-                  setDocumentList(list)
+
+                  setDocumentList([...documentList, file])
                 }}
                 style={{ display: 'none' }}
               />
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <a
-                  href="#"
-                  style={{ textDecoration: 'underline', color: '#07bc0c' }}
+              {documentList.map((documentFile, index) => (
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  key={documentFile.filename}
                 >
-                  abc
-                </a>
-                <Icon color="error">delete</Icon>
-              </div>
+                  <p
+                    onClick={() => {
+                      downloadFile(documentFile.url)
+                    }}
+                    style={{ textDecoration: 'underline', color: '#07bc0c' }}
+                  >
+                    {documentFile.filename}
+                  </p>
+                  <Icon
+                    color="error"
+                    onClick={() => {
+                      const newArr = cloneDeep(documentList)
+                      newArr.splice(index, 1)
+                      setDocumentList([...newArr])
+                      document.getElementById('upload-document').value = null
+                    }}
+                  >
+                    delete
+                  </Icon>
+                </div>
+              ))}
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller

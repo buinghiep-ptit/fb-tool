@@ -267,7 +267,8 @@ export default function FeedDetail(props: Props) {
         )}
 
         {(feed.data?.customerInfo?.type === 3 ||
-          feed.data?.customerInfo?.type === 1) &&
+          (feed.data?.customerInfo?.type === 1 &&
+            feed.data?.customerInfo?.id === 0)) &&
           feed.data?.status !== -3 && (
             <MuiButton
               title="Chỉnh sửa"

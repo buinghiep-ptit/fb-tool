@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, Stack, styled } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCustomers } from 'app/apis/accounts/customer.service'
@@ -235,7 +235,7 @@ export default function CustomerAccounts(props: Props) {
                     color="primary"
                     type="submit"
                     sx={{ width: '100%' }}
-                    startIcon={<SearchSharp />}
+                    startIcon={<Icon>person_search</Icon>}
                   />
                 </Grid>
                 <Grid item sm={2} xs={6}>

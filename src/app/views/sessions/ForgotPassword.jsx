@@ -167,9 +167,10 @@ const ForgotPassword = () => {
             <JustifyBox p={4} gap={4}>
               <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
               <img
-                src="/assets/images/login/bg-register.png"
-                width="100%"
+                src="/assets/images/login/bg-login.png"
+                width="50%"
                 alt="forgot password"
+                style={{ objectFit: 'cover' }}
               />
             </JustifyBox>
 

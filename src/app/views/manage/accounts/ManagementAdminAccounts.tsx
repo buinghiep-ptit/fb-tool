@@ -224,7 +224,7 @@ export default function AdminAccounts(props: Props) {
               state: { modal: true },
             })
           }
-          startIcon={<Icon>control_point</Icon>}
+          startIcon={<Icon>person_add</Icon>}
         />
       </Stack>
       <Stack gap={3}>
@@ -271,7 +271,7 @@ export default function AdminAccounts(props: Props) {
                       color="primary"
                       type="submit"
                       sx={{ width: '100%' }}
-                      startIcon={<SearchSharp />}
+                      startIcon={<Icon>person_search</Icon>}
                     />
                   </Grid>
                   <Grid item sm={2} xs={6}>

@@ -2,7 +2,6 @@ import { Chip, Tooltip, Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
 import { TitleHandbooks } from 'app/models/handbook'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
-import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
   {
@@ -22,7 +21,6 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
     id: 'title',
     label: 'Tiêu đề',
     minWidth: 200,
-    align: 'center',
     action: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -77,10 +75,22 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
     id: 'amountLinkedCampGround',
     label: 'Số lượng điểm camp',
     minWidth: 200,
-    align: 'center',
-    format: (value: number) =>
+    align: 'left',
+    action: (value: number) =>
       value ? (
-        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {CurrencyFormatter(value, 2)} điểm camp đã liên kết
+        </Typography>
       ) : (
         <></>
       ),

@@ -12,11 +12,10 @@ export const fetchHandbooks = async (
 }
 
 export const fetchUnlinkedCampgrounds = async (
-  handbookId: number,
   params: any,
 ): Promise<IUnlinkedCampgroundsResponse> => {
   const { data } = await http.get<IUnlinkedCampgroundsResponse>(
-    `/api/handbooks/${handbookId}/unlinked-campgrounds`,
+    `/api/handbooks/campgrounds-list`,
     {
       params,
     },

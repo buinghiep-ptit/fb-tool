@@ -281,8 +281,13 @@ export default function ServiceDetail(props: Props) {
   )
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(['camp-grounds'], () =>
-      fetchCampGrounds({ size: 200, page: 0 }),
+    useQuery<ICampAreaResponse, Error>(
+      ['camp-grounds'],
+      () => fetchCampGrounds({ size: 200, page: 0 }),
+      {
+        refetchOnWindowFocus: false,
+        staleTime: 15 * 60 * 1000,
+      },
     )
 
   React.useEffect(() => {
@@ -373,6 +378,7 @@ export default function ServiceDetail(props: Props) {
           color="primary"
           onClick={methods.handleSubmit(onSubmitHandler)}
           startIcon={<Icon>done</Icon>}
+          disabled={createLoading}
         />
 
         <MuiButton

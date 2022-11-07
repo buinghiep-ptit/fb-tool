@@ -52,6 +52,8 @@ const ListTrendingKeyword = Loadable(
 const AddKeyword = Loadable(lazy(() => import('./keywords/AddKeyword')))
 const ListHandbook = Loadable(lazy(() => import('./handbooks/ListHandbook')))
 const AddHandbook = Loadable(lazy(() => import('./handbooks/AddHandbook')))
+const ListRating = Loadable(lazy(() => import('./rating/ListRating')))
+const RateDetail = Loadable(lazy(() => import('./rating/RateDetail')))
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -372,6 +374,14 @@ const ManagementRoutes = [
       //   element: <AddHandbook title="Thêm cẩm nang" />,
       // },
     ],
+  },
+  {
+    path: '/quan-ly-danh-gia',
+    element: <ListRating />,
+  },
+  {
+    path: '/quan-ly-danh-gia/:rateId/chi-tiet',
+    element: <RateDetail />,
   },
   {
     path: '/quan-ly-thong-tin-dia-danh',

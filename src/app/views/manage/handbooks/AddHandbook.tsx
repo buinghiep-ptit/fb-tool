@@ -58,6 +58,9 @@ export default function AddEvent(props: Props) {
     title?: string
     message?: string
     type?: string
+    isLinked?: number
+    submitText?: string
+    cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
 
@@ -145,11 +148,14 @@ export default function AddEvent(props: Props) {
     setOpenDialog(true)
   }
 
-  const openlinkedCampgrounds = () => {
+  const openLinkedCampgrounds = () => {
     setDialogData(prev => ({
       ...prev,
       title: 'Điểm camping đã liên kết',
       type: 'linked',
+      isLinked: 1,
+      submitText: 'Lưu',
+      cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
   }
@@ -159,6 +165,9 @@ export default function AddEvent(props: Props) {
       ...prev,
       title: 'Thêm điểm camp',
       type: 'unlinked',
+      isLinked: handbook ? 0 : -1,
+      submitText: 'Lưu',
+      cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
   }
@@ -278,7 +287,19 @@ export default function AddEvent(props: Props) {
                 </SelectDropDown>
               </Grid>
             </Grid>
-            <Box my={1.5} justifyContent="space-between">
+            <Stack
+              direction={'row'}
+              my={1.5}
+              gap={1.5}
+              justifyContent="space-between"
+            >
+              <MuiButton
+                title="Xem điểm camping đã liên kết"
+                variant="text"
+                color="primary"
+                onClick={() => openLinkedCampgrounds()}
+                endIcon={<Icon>double_arrow</Icon>}
+              />
               <MuiButton
                 title="Thêm điểm camping"
                 variant="text"
@@ -286,7 +307,7 @@ export default function AddEvent(props: Props) {
                 onClick={() => openUnlinkedCampgrounds()}
                 startIcon={<Icon>add</Icon>}
               />
-            </Box>
+            </Stack>
             <Stack>
               <MuiTypography variant="subtitle2" pb={1}>
                 Nội dung*
@@ -309,7 +330,7 @@ export default function AddEvent(props: Props) {
         {dialogData.type !== 'delete' ? (
           <UnlinkedCampgrounds
             handbook={handbook}
-            isLinked={dialogData.type === 'linked' ? true : false}
+            isLinked={dialogData.isLinked}
           />
         ) : (
           <Stack py={5} justifyContent={'center'} alignItems="center">

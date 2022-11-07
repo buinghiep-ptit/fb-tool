@@ -24,7 +24,7 @@ import * as Yup from 'yup'
 
 export interface Props {
   handbook?: IHandbookOverall
-  isLinked?: boolean
+  isLinked?: number
 }
 
 type ISearchFilters = {
@@ -36,7 +36,7 @@ type ISearchFilters = {
 
 export default function UnlinkedCampgrounds({
   handbook,
-  isLinked = true,
+  isLinked = -1,
 }: Props) {
   console.log(isLinked, handbook)
   const navigation = useNavigate()
@@ -71,7 +71,7 @@ export default function UnlinkedCampgrounds({
   })
 
   const {
-    data: unLinkedCampGrounds,
+    data: campGrounds,
     isFetching,
     isError,
     error,
@@ -79,33 +79,18 @@ export default function UnlinkedCampgrounds({
     IUnlinkedCampgroundsResponse,
     Error
   >(
-    ['unlinked-campgrounds', handbook, filters],
-    () => fetchUnlinkedCampgrounds(Number(handbook?.id ?? 0), filters),
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
-      keepPreviousData: true,
-      enabled: !!filters && !!handbook && !isLinked,
-    },
-  )
-
-  const {
-    data: linkedCampGrounds,
-  }: UseQueryResult<IUnlinkedCampgroundsResponse, Error> = useQuery<
-    IUnlinkedCampgroundsResponse,
-    Error
-  >(
-    ['linked-campgrounds', handbook, filters],
+    ['linked-campgrounds', handbook, filters, isLinked],
     () =>
-      fetchUnlinkedCampgrounds(Number(handbook?.id ?? 0), {
+      fetchUnlinkedCampgrounds({
         ...filters,
-        search: 'test',
+        id: handbook?.id ? Number(handbook?.id) : -1,
+        isLinked: isLinked,
       }),
     {
       refetchOnWindowFocus: false,
       refetchOnMount: true,
       keepPreviousData: true,
-      enabled: !!filters && !!handbook && isLinked,
+      enabled: !!filters,
     },
   )
 
@@ -175,7 +160,9 @@ export default function UnlinkedCampgrounds({
 
   return (
     <Stack gap={3} position="relative">
-      <MuiTypography variant="h6">{handbook?.title}</MuiTypography>
+      {handbook?.title && (
+        <MuiTypography variant="h6">{handbook?.title}</MuiTypography>
+      )}
 
       <Box sx={{ position: 'sticky', top: 0, zIndex: 9999 }}>
         <SimpleCard>
@@ -224,11 +211,7 @@ export default function UnlinkedCampgrounds({
 
       <SimpleCard>
         <MuiStyledTable
-          rows={
-            isLinked
-              ? (linkedCampGrounds?.content as IUnlinkedCampgrounds[]) ?? []
-              : (unLinkedCampGrounds?.content as IUnlinkedCampgrounds[]) ?? []
-          }
+          rows={(campGrounds?.content as IUnlinkedCampgrounds[]) ?? []}
           columns={columnsUnlinkedCampgrounds}
           rowsPerPage={size}
           page={page}
@@ -247,11 +230,7 @@ export default function UnlinkedCampgrounds({
         <MuiStyledPagination
           component="div"
           rowsPerPageOptions={[20, 50, 100]}
-          count={
-            isLinked
-              ? linkedCampGrounds?.totalElements ?? 0
-              : unLinkedCampGrounds?.totalElements ?? 0
-          }
+          count={campGrounds?.totalElements ?? 0}
           rowsPerPage={size}
           page={page}
           onPageChange={handleChangePage}

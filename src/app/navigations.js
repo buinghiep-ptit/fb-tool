@@ -78,11 +78,6 @@ export const navigations = [
     icon: 'travel_explore',
   },
   {
-    name: 'Quản lý từ cấm',
-    path: '/quan-ly-tu-cam',
-    icon: 'comments_disabled',
-  },
-  {
     name: 'Quản lý cẩm nang',
     path: '/quan-ly-cam-nang',
     icon: 'menu_book',
@@ -91,6 +86,11 @@ export const navigations = [
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
+  },
+  {
+    name: 'Quản lý từ cấm',
+    path: '/quan-ly-tu-cam',
+    icon: 'comments_disabled',
   },
   // { label: 'PAGES', type: 'label' },
   // {

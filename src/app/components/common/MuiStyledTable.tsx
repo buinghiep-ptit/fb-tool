@@ -159,7 +159,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                             ...column.sticky,
                             minWidth: column.minWidth,
                             maxWidth: column.maxWidth ?? null,
-                            px: 0.5,
+                            px: 1,
                             cursor:
                               column.action || column.link
                                 ? 'pointer'

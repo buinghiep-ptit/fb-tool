@@ -4,7 +4,6 @@ import { Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchHandbooks } from 'app/apis/handbook/handbook.service'
-import { fetchKeywords } from 'app/apis/keyword/keyword.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -13,15 +12,10 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useDeleteHandbook } from 'app/hooks/queries/useHandbooksData'
-import {
-  useDeleteKeyword,
-  useTogglePinKeyword,
-} from 'app/hooks/queries/useKeywordsData'
+import { useTogglePinKeyword } from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IHandbookOverall, IHandbookResponse } from 'app/models/handbook'
-import { IKeyword, IKeywordResponse } from 'app/models/keyword'
 import { columnsHandbooks } from 'app/utils/columns/columnsHandbooks'
-import { columnsTrendingKeywords } from 'app/utils/columns/columnsTrendingKeywords'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -194,13 +188,13 @@ export default function ListHandbook(props: Props) {
   const onRowAdd = (cell: any, row: any) => {
     setDialogData(prev => ({
       ...prev,
-      title: 'Điểm camping đã liên kết',
+      title: 'Thêm điểm camping',
       type: 'camps',
       submitText: 'Lưu',
       cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
-    setRow(row)
+    // setRow(row)
   }
 
   const onRowDelete = (cell: any, row: any) => {
@@ -223,6 +217,16 @@ export default function ListHandbook(props: Props) {
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'word') {
       navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+    } else if (cell.id === 'amountLinkedCampGround') {
+      setDialogData(prev => ({
+        ...prev,
+        title: 'Điểm camping đã liên kết',
+        type: 'camps',
+        submitText: 'Lưu',
+        cancelText: 'Huỷ',
+      }))
+      setOpenDialog(true)
+      setRow(row)
     }
   }
 
@@ -363,7 +367,7 @@ export default function ListHandbook(props: Props) {
         cancelText={dialogData.cancelText}
       >
         {dialogData.type === 'camps' ? (
-          <UnlinkedCampgrounds handbook={row} isLinked={true} />
+          <UnlinkedCampgrounds handbook={row} isLinked={1} />
         ) : (
           <Stack py={5} justifyContent={'center'} alignItems="center">
             <MuiTypography variant="subtitle1">

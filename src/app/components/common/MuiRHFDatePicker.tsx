@@ -16,6 +16,7 @@ export interface IMuiRHFDatePickerProps {
   label?: string
   inputFormat?: 'DD/MM/YYYY' | 'DD/MM'
   required?: boolean
+  disabled?: boolean
 }
 
 export function MuiRHFDatePicker({
@@ -24,6 +25,7 @@ export function MuiRHFDatePicker({
   label = '',
   inputFormat = 'DD/MM/YYYY',
   required,
+  disabled,
 }: IMuiRHFDatePickerProps) {
   const {
     control,
@@ -39,6 +41,7 @@ export function MuiRHFDatePicker({
         <DatePicker
           {...rest}
           label={label}
+          disabled={disabled}
           disableFuture={false}
           value={value}
           inputFormat={inputFormat}

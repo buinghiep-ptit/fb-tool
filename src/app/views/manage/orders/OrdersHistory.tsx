@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, Stack, styled } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -379,7 +379,7 @@ export default function OrdersHistory() {
                         <MuiRHFDatePicker name="to" label="Ngày kết thúc" />
                       </Grid>
                     </LocalizationProvider>
-                    <Grid item sm={4} xs={12} mt={1}>
+                    <Grid item sm={2} xs={12} mt={1}>
                       <MuiButton
                         loading={isFetching}
                         title="Tìm kiếm"
@@ -388,6 +388,16 @@ export default function OrdersHistory() {
                         type="submit"
                         sx={{ width: '100%' }}
                         startIcon={<SearchSharp />}
+                      />
+                    </Grid>
+                    <Grid item sm={2} xs={12} mt={1}>
+                      <MuiButton
+                        title="Làm mới"
+                        variant="outlined"
+                        color="primary"
+                        onClick={onResetFilters}
+                        sx={{ width: '100%' }}
+                        startIcon={<Icon>cached</Icon>}
                       />
                     </Grid>
                   </Grid>
@@ -493,6 +503,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
 
     case 2:
       return [
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.RECEIVED).value,
+          title: getOrderStatusSpec(OrderStatusEnum.RECEIVED).title,
+        },
         {
           value: getOrderStatusSpec(OrderStatusEnum.WAIT_HANDLE).value,
           title: getOrderStatusSpec(OrderStatusEnum.WAIT_HANDLE).title,

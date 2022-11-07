@@ -9,12 +9,14 @@ import { Controller, useFormContext } from 'react-hook-form'
 export type IFormTextAreaProps = {
   name: string
   defaultValue?: string
+  disabled?: boolean
 } & TextareaAutosizeProps &
   any
 
 const FormTextArea: FC<IFormTextAreaProps> = ({
   name,
   defaultValue,
+  disabled,
   ...otherProps
 }) => {
   const {
@@ -29,6 +31,7 @@ const FormTextArea: FC<IFormTextAreaProps> = ({
       render={({ field }) => (
         <>
           <TextareaAutosize
+            disabled={disabled}
             {...field}
             {...otherProps}
             minRows={5}

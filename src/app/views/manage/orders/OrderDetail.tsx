@@ -52,6 +52,10 @@ export const isExpiredReceiveUser = (expiredTimeISO: string) => {
   return EXP_IN_MS <= NOW_IN_MS
 }
 
+export const isReceiveUser = (order: IOrderDetail, user: any) => {
+  return order.handledBy === (user as any).id
+}
+
 type SchemaType = {
   dateStart?: string
   dateEnd?: string
@@ -144,6 +148,7 @@ export default function OrderDetail(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         {!isExpiredReceiveUser(order.handleExpireTime ?? '') &&
+          isReceiveUser(order, user) &&
           order.status !== 4 && (
             <>
               <MuiButton
@@ -209,14 +214,28 @@ export default function OrderDetail(props: Props) {
             )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <CustomerInfo order={order} />
+                <CustomerInfo
+                  order={order}
+                  isViewer={
+                    isExpiredReceiveUser(order.handleExpireTime ?? '') ||
+                    !isReceiveUser(order, user)
+                  }
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <CampgroundInfo campground={order.campGround} />
               </Grid>
             </Grid>
             <Stack>
-              <OrderServices order={order} fields={fields} methods={methods} />
+              <OrderServices
+                order={order}
+                fields={fields}
+                methods={methods}
+                isViewer={
+                  isExpiredReceiveUser(order.handleExpireTime ?? '') ||
+                  !isReceiveUser(order, user)
+                }
+              />
             </Stack>
             <Stack>
               <OrderProcesses rows={order.orderProcess} />

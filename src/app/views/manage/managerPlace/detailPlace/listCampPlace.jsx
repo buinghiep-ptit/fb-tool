@@ -113,7 +113,7 @@ export default function ListCampPlace(props) {
           convertCamp.name = camp.name
           convertCamp.address = camp.address
           convertCamp['des-status'] =
-            camp.status === 1 ? 'Đang diễn ra' : 'Chưa diễn ra'
+            camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'
           convertCamp.action = ['add']
           return convertCamp
         })

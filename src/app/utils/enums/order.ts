@@ -12,7 +12,8 @@ export enum OrderStatusEnum {
 interface OrderStatusSpec {
   key?: number
   value?: number
-  color?: string
+  textColor?: string | '#FFFFFF'
+  bgColor?: string | '#475985'
   title?: string
   descriptions?: string
 }
@@ -23,44 +24,134 @@ export const getOrderStatusSpec = (
   if (type === 2) {
     switch (status) {
       case OrderStatusEnum.CHECK:
-        return { key: 0, value: 0, title: 'Kiểm tra' }
+        return {
+          key: 0,
+          value: 0,
+          title: 'Kiểm tra',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
       case OrderStatusEnum.RECEIVED:
-        return { key: 1, value: 1, title: 'Tiếp nhận' }
+        return {
+          key: 1,
+          value: 1,
+          title: 'Tiếp nhận',
+          textColor: '#475985',
+          bgColor: '#EFF4FB',
+        }
       case OrderStatusEnum.WAIT_PAY:
-        return { key: 2, value: 2, title: 'Chờ thanh toán' }
+        return {
+          key: 2,
+          value: 2,
+          title: 'Chờ thanh toán',
+          textColor: '#FB7800',
+          bgColor: '#FCF5ED',
+        }
       case OrderStatusEnum.SUCCEEDED:
-        return { key: 3, value: 3, title: 'Đặt thành công' }
+        return {
+          key: 3,
+          value: 3,
+          title: 'Đặt thành công',
+          textColor: '#2F9B42',
+          bgColor: '#EDFDEF',
+        }
       case OrderStatusEnum.COMPLETED:
-        return { key: 4, value: 4, title: 'Đã sử dụng' }
+        return {
+          key: 4,
+          value: 4,
+          title: 'Đã sử dụng',
+          textColor: '#466FFF',
+          bgColor: '#F0F4FF',
+        }
       case OrderStatusEnum.CANCELED:
-        return { key: -1, value: -1, title: 'Đã huỷ' }
+        return {
+          key: -1,
+          value: -1,
+          title: 'Đã huỷ',
+          textColor: '#FF4141',
+          bgColor: '#FFF5F5',
+        }
 
       default:
-        return {}
+        return {
+          key: 0,
+          value: 0,
+          title: 'Kiểm tra',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
     }
   } else if (type === 1) {
     switch (status) {
       case OrderStatusEnum.CHECK:
-        return { key: 0, value: 0, title: 'Kiểm tra' }
+        return {
+          key: 0,
+          value: 0,
+          title: 'Kiểm tra',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
       case OrderStatusEnum.RECEIVED:
-        return { key: 1, value: 1, title: 'Tiếp nhận' }
+        return {
+          key: 1,
+          value: 1,
+          title: 'Tiếp nhận',
+          textColor: '#475985',
+          bgColor: '#EFF4FB',
+        }
       case OrderStatusEnum.WAIT_PAY:
-        return { key: 2, value: 2, title: 'Chờ thanh toán' }
+        return {
+          key: 2,
+          value: 2,
+          title: 'Chờ thanh toán',
+          textColor: '#FB7800',
+          bgColor: '#FCF5ED',
+        }
 
       default:
-        return {}
+        return {
+          key: 0,
+          value: 0,
+          title: 'Kiểm tra',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
     }
   } else {
     switch (status) {
       case OrderStatusEnum.WAIT_HANDLE:
-        return { key: 0, value: 0, title: 'Chờ xử lý' }
+        return {
+          key: 0,
+          value: 0,
+          title: 'Chờ xử lý',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
       case OrderStatusEnum.RECEIVED:
-        return { key: 1, value: 1, title: 'Tiếp nhận' }
+        return {
+          key: 1,
+          value: 1,
+          title: 'Tiếp nhận',
+          textColor: '#475985',
+          bgColor: '#EFF4FB',
+        }
       case OrderStatusEnum.HANDLE_COMPLETED:
-        return { key: 2, value: 2, title: 'Đã xử lý' }
+        return {
+          key: 2,
+          value: 2,
+          title: 'Đã xử lý',
+          textColor: '#466FFF',
+          bgColor: '#F0F4FF',
+        }
 
       default:
-        return {}
+        return {
+          key: 0,
+          value: 0,
+          title: 'Kiểm tra',
+          textColor: '#FFFFFF',
+          bgColor: '#475985',
+        }
     }
   }
 }

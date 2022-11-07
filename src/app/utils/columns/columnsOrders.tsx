@@ -1,4 +1,4 @@
-import { Chip, Stack, Typography } from '@mui/material'
+import { Chip, Stack, Tooltip, Typography } from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn } from 'app/models'
 import { TitleOrders } from 'app/models/order'
@@ -23,11 +23,23 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
-    minWidth: 170,
+    minWidth: 120,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -35,9 +47,21 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     label: 'Tên điểm camp',
     minWidth: 150,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -49,7 +73,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'amount',
     label: 'Tổng thực tế',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -61,7 +85,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'paymentAmnt',
     label: 'Đã thanh toán',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -92,11 +116,14 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     minWidth: 100,
     align: 'center',
     status: (value: any) =>
-      value ? (
+      value !== null ? (
         <Chip
           label={getOrderStatusSpec(value, 2).title}
           size="small"
-          color={'default'}
+          sx={{
+            color: getOrderStatusSpec(value, 2).textColor,
+            bgcolor: getOrderStatusSpec(value, 2).bgColor,
+          }}
         />
       ) : (
         <></>
@@ -112,7 +139,10 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
         <Chip
           label={getOrderStatusSpec(value, 3).title}
           size="small"
-          color={'default'}
+          sx={{
+            color: getOrderStatusSpec(value, 3).textColor,
+            bgcolor: getOrderStatusSpec(value, 3).bgColor,
+          }}
         />
       ) : (
         <></>
@@ -162,11 +192,23 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
-    minWidth: 170,
+    minWidth: 120,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -174,9 +216,21 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     label: 'Tên điểm camp',
     minWidth: 150,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -200,7 +254,7 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'paymentAmnt',
     label: 'Đã thanh toán',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -212,7 +266,7 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'dateCreated',
     label: 'Thời gian đặt',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: string) => (
       <Stack>
@@ -234,7 +288,10 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
       <Chip
         label={getOrderStatusSpec(value, 1).title}
         size="small"
-        color={'default'}
+        sx={{
+          color: getOrderStatusSpec(value, 1).textColor,
+          bgcolor: getOrderStatusSpec(value, 1).bgColor,
+        }}
       />
     ),
   },
@@ -288,11 +345,23 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'cusAccount',
     label: 'Tài khoản đặt',
-    minWidth: 170,
+    minWidth: 120,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -300,9 +369,21 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     label: 'Tên điểm camp',
     minWidth: 150,
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -314,10 +395,10 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'amount',
     label: 'Tổng thực tế',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: number) =>
-      value ? (
+      value !== null ? (
         <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
       ) : (
         <></>
@@ -326,7 +407,7 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   {
     id: 'paymentAmnt',
     label: 'Đã thanh toán',
-    minWidth: 100,
+    minWidth: 120,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -360,7 +441,10 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
       <Chip
         label={getOrderStatusSpec(value, 3).title}
         size="small"
-        color={'default'}
+        sx={{
+          color: getOrderStatusSpec(value, 3).textColor,
+          bgcolor: getOrderStatusSpec(value, 3).bgColor,
+        }}
       />
     ),
   },
@@ -391,7 +475,7 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
 ]
 
 export const columnsOrderProcessesDetail: any = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
   {
     id: 'action',
     label: 'Hành động',
@@ -406,7 +490,7 @@ export const columnsOrderProcessesDetail: any = [
   },
   {
     id: 'status',
-    label: 'Trạng thái xử lý',
+    label: 'Trạng thái đơn hàng',
     minWidth: 120,
     align: 'center',
     status: (value: any) => (
@@ -427,7 +511,7 @@ export const columnsOrderProcessesDetail: any = [
 ]
 
 export const columnsLogsOrderDetail: any = [
-  { id: 'order', label: 'STT', minWidth: 50 },
+  { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
   {
     id: 'processName',
     label: 'Hành động',
@@ -436,13 +520,13 @@ export const columnsLogsOrderDetail: any = [
   },
   {
     id: 'email',
-    label: 'Người xử lý',
+    label: 'Người thực hiện',
     minWidth: 170,
     align: 'center',
   },
   {
     id: 'requestStatus',
-    label: 'Trạng thái xử lý',
+    label: 'Ghi chú',
     minWidth: 120,
     align: 'center',
     status: (value: any) => (

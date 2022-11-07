@@ -17,9 +17,10 @@ import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 
 export interface ICustomerInfoProps {
   order?: IOrderDetail
+  isViewer?: boolean
 }
 
-export function CustomerInfo({ order }: ICustomerInfoProps) {
+export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -63,6 +64,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack flexDirection={'row'} gap={1}>
                     <MuiRHFDatePicker
+                      disabled={isViewer}
                       name="dateStart"
                       label="Từ"
                       required={true}
@@ -70,6 +72,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   </Stack>
                   <Stack flexDirection={'row'} gap={1}>
                     <MuiRHFDatePicker
+                      disabled={isViewer}
                       name="dateEnd"
                       label="Đến"
                       required={true}
@@ -106,6 +109,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="fullName"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
                 <FormInputText
                   label={'Số điện thoại'}
@@ -114,6 +118,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="mobilePhone"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
                 <FormInputText
                   label={'Email'}
@@ -121,6 +126,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="email"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
               </Stack>
             </Grid>
@@ -135,6 +141,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                 name="note"
                 defaultValue={''}
                 placeholder="Ghi chú"
+                disabled={isViewer}
               />
             </Grid>
           </Grid>

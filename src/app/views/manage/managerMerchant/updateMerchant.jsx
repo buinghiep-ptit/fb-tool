@@ -34,19 +34,38 @@ export default function UpdateMerchant(props) {
 
   const schema = yup
     .object({
-      nameMerchant: yup.string().required('Vui lòng nhập tên đối tác').trim(),
-      merchantType: yup.number().required(),
+      nameMerchant: yup
+        .string()
+        .required('Vui lòng nhập tên đối tác')
+        .trim()
+        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
+      merchantType: yup.string().required('Vui lòng chọn loại đối tác'),
       email: yup
         .string()
         .required('Vui lòng nhập email')
-        .email('Vui lòng đúng email'),
-      mobilePhone: yup.string().required('Vui nhập số điện thoại').max(20),
-      website: yup.string().url('Vui lòng nhập đường dẫn website'),
-      taxCode: yup.string().required(),
-      businessModel: '',
-      address: yup.string().required(),
-      representative: yup.string().required(),
+        .email('Vui lòng đúng email')
+        .max(255, 'Email không được vượt quá 255 ký tự'),
+      mobilePhone: yup
+        .string()
+        .required('Vui nhập số điện thoại')
+        .matches(/^[0-9]*$/, 'Chỉ nhập số')
+        .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
+      website: yup
+        .string()
+        .url()
+        .max(255, 'Website không được vượt quá 255 ký tự'),
+      taxCode: yup
+        .string()
+        .max(255, 'Mã số thuế không được vượt quá 255 ký tự'),
+      businessModel: yup
+        .string()
+        .max(500, 'Mô hình kinh doanh không được vượt quá 500 ký tự'),
+      address: yup.string().max(255, 'Địa chỉ không được vượt quá 255 ký tự'),
+      representative: yup
+        .string()
+        .required('Vui lòng nhập người đại diện')
+        .max(255, 'Tên người đại diện không được vượt quá 255 ký tự'),
     })
     .required()
 
@@ -63,7 +82,7 @@ export default function UpdateMerchant(props) {
     resolver: yupResolver(schema),
     defaultValues: {
       nameMerchant: '',
-      merchantType: 0,
+      merchantType: '',
       email: '',
       password: '',
       mobilePhone: '',
@@ -111,11 +130,12 @@ export default function UpdateMerchant(props) {
     newData.merchantType = data.merchantType
     newData.email = data.email
     newData.mobilePhone = data.mobilePhone
-    newData.website = data.website
-    newData.contractNo = data.taxCode
-    newData.businessCode = data.businessModel
+    newData.website = data.website.trim() === '' ? null : data.website.trim()
+    newData.contractNo = data.taxCode.trim() === '' ? null : data.taxCode.trim()
+    newData.businessCode =
+      data.businessModel.trim() === '' ? null : data.businessModel.trim()
     newData.represent = data.representative
-    newData.address = data.address
+    newData.address = data.address.trim() === '' ? null : data.address.trim()
 
     if (filesContract.length > 0) {
       const contracts = await uploadFile(filesContract)
@@ -156,15 +176,15 @@ export default function UpdateMerchant(props) {
     const res = await getDetailMerchant(params.id)
     if (res) {
       setStatusMerchant(res.status)
-      setValue('address', res.address)
-      setValue('businessModel', res.businessCode)
-      setValue('taxCode', res.contractNo)
+      setValue('address', res.address || '')
+      setValue('businessModel', res.businessCode || '')
+      setValue('taxCode', res.contractNo || '')
       setValue('nameMerchant', res.name)
-      setValue('email', res.email)
+      setValue('email', res.email || '')
       setValue('merchantType', res.merchantType)
-      setValue('mobilePhone', res.mobilePhone)
+      setValue('mobilePhone', res.mobilePhone || '')
       setValue('representative', res.represent)
-      setValue('website', res.website)
+      setValue('website', res.website || '')
       setValue('status', res.status)
     }
   }
@@ -319,10 +339,10 @@ export default function UpdateMerchant(props) {
                 render={({ field }) => (
                   <TextField
                     fullWidth
-                    error={errors.businessModel}
-                    helperText={errors.businessModel?.message}
+                    error={!!errors.businessModel}
+                    helperText={errors?.businessModel?.message}
                     {...field}
-                    label="Mô hình kinh doanh*"
+                    label="Mô hình kinh doanh"
                     margin="normal"
                     multiline
                     rows={10}
@@ -356,7 +376,7 @@ export default function UpdateMerchant(props) {
                     error={errors.representative}
                     helperText={errors.representative?.message}
                     {...field}
-                    label="Người đại diện"
+                    label="Người đại diện*"
                     variant="outlined"
                     margin="normal"
                   />
@@ -407,7 +427,7 @@ export default function UpdateMerchant(props) {
                     error={!!errors?.status}
                   >
                     <InputLabel id="demo-simple-select-label">
-                      Trạng thái
+                      Trạng thái*
                     </InputLabel>
                     <Select
                       {...field}

@@ -42,33 +42,44 @@ export default function CreateMerchant(props) {
 
   const schema = yup
     .object({
-      nameMerchant: yup
-        .string()
-        .required('Vui lòng nhập tên đối tác')
-        .trim()
-        .max(254, 'Đã đạt số ký tự tối đa'),
-      merchantType: yup.string().required('Vui lòng chọn loại đối tác'),
-      email: yup
-        .string()
-        .required('Vui lòng nhập email')
-        .email('Vui lòng đúng email')
-        .max(254, 'Đã đạt số ký tự tối đa'),
       password: yup
         .string()
         .required('Vui lòng nhập password')
         .min(8, 'Có ít nhất 8 ký tự')
         .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
         .max(254, 'Đã đạt số ký tự tối đa'),
-      mobilePhone: yup.string().required('Vui nhập số điện thoại'),
+      nameMerchant: yup
+        .string()
+        .required('Vui lòng nhập tên đối tác')
+        .trim()
+        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
+      merchantType: yup.string().required('Vui lòng chọn loại đối tác'),
+      email: yup
+        .string()
+        .required('Vui lòng nhập email')
+        .email('Vui lòng đúng email')
+        .max(255, 'Email không được vượt quá 255 ký tự'),
+      mobilePhone: yup
+        .string()
+        .required('Vui nhập số điện thoại')
+        .matches(/^[0-9]*$/, 'Chỉ nhập số')
+        .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
-      website: yup.string().url().max(100, 'Đã đạt số ký tự tối đa'),
-      taxCode: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
-      businessModel: yup.string().max(100, 'Đã đạt số ký tự tối đa'),
-      address: yup.string().max(254, 'Đã đạt số ký tự tối đa'),
+      website: yup
+        .string()
+        .url()
+        .max(255, 'Website không được vượt quá 255 ký tự'),
+      taxCode: yup
+        .string()
+        .max(255, 'Mã số thuế không được vượt quá 255 ký tự'),
+      businessModel: yup
+        .string()
+        .max(500, 'Mô hình kinh doanh không được vượt quá 500 ký tự'),
+      address: yup.string().max(255, 'Địa chỉ không được vượt quá 255 ký tự'),
       representative: yup
         .string()
         .required('Vui lòng nhập người đại diện')
-        .max(254, 'Đã đạt số ký tự tối đa'),
+        .max(255, 'Tên người đại diện không được vượt quá 255 ký tự'),
     })
     .required()
 

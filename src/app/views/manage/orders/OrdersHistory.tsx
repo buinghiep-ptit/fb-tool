@@ -30,6 +30,7 @@ import {
 } from 'app/utils/columns/columnsOrders'
 import { getOrderStatusSpec, OrderStatusEnum } from 'app/utils/enums/order'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { messages } from 'app/utils/messages'
 import moment from 'moment'
 import React, { useEffect, useRef, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -162,28 +163,39 @@ export default function OrdersHistory() {
     error,
   }: UseQueryResult<any, Error> = useOrdersData(filters, currentTab)
 
-  const validationSchema = Yup.object().shape({
-    search: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    searchHandler: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    from: Yup.date()
-      //   .min(new Date(), 'Tối thiều là hôm nay')
-      .typeError('Sai dịnh dạng.')
-      .nullable(),
-    to: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable(),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      search: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'hashtag must be at almost 255 characters'),
+      searchHandler: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'hashtag must be at almost 255 characters'),
+      from: Yup.date()
+        .when('to', (to, yup) => {
+          if (to && to != 'Invalid Date') {
+            const dayAfter = new Date(to.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      to: Yup.date()
+        .when('from', (from, yup) => {
+          if (from && from != 'Invalid Date') {
+            const dayAfter = new Date(from.getTime())
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+    },
+    [['from', 'to']],
+  )
 
   const methods = useForm<ISearchFilters>({
     defaultValues,
@@ -227,7 +239,6 @@ export default function OrdersHistory() {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    console.log(values)
     setPage(0)
     setSize(20)
     values = {

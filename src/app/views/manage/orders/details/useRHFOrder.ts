@@ -34,49 +34,52 @@ export const useRHFOrder = (order: IOrderDetail) => {
 
   const [defaultValues] = useState<SchemaType>({})
 
-  const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required(messages.MSG1),
-    mobilePhone: Yup.string()
-      .required(messages.MSG1)
-      .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-        const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-        if (!phone) {
-          return true
-        }
-        return regex.test(phone as string)
-      }),
-    dateStart: Yup.date()
-      .when('endDate', (endDate, yup) => {
-        if (endDate && endDate != 'Invalid Date') {
-          const dayAfter = new Date(endDate.getTime())
-          return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable()
-      .required(messages.MSG1),
-    dateEnd: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable()
-      .required(messages.MSG1),
-    services: Yup.lazy(() =>
-      Yup.array().of(
-        Yup.object().shape({
-          quantity: Yup.string()
-            .required(messages.MSG1)
-            .max(11, 'Tối đa 9 ký tự'),
+  const validationSchema = Yup.object().shape(
+    {
+      fullName: Yup.string().required(messages.MSG1),
+      mobilePhone: Yup.string()
+        .required(messages.MSG1)
+        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
+          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+          if (!phone) {
+            return true
+          }
+          return regex.test(phone as string)
         }),
+      dateStart: Yup.date()
+        .when('dateEnd', (dateEnd, yup) => {
+          if (dateEnd && dateEnd != 'Invalid Date') {
+            const dayAfter = new Date(dateEnd.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      dateEnd: Yup.date()
+        .when('dateStart', (dateStart, yup) => {
+          if (dateStart && dateStart != 'Invalid Date') {
+            const dayAfter = new Date(dateStart.getTime() + 0)
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      services: Yup.lazy(() =>
+        Yup.array().of(
+          Yup.object().shape({
+            quantity: Yup.string()
+              .required(messages.MSG1)
+              .max(11, 'Tối đa 9 ký tự'),
+          }),
+        ),
       ),
-    ),
-  })
+    },
+    [['dateStart', 'dateEnd']], // throw error cyclic dependence if have not this params
+  )
 
   const methods = useForm<SchemaType>({
     defaultValues,

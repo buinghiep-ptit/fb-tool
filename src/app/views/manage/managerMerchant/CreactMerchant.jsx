@@ -420,12 +420,18 @@ export default function CreateMerchant(props) {
                   style={{ display: 'flex', alignItems: 'center' }}
                   key={contractFile.filename}
                 >
-                  <a
-                    href={contractFile.url}
-                    style={{ textDecoration: 'underline', color: '#07bc0c' }}
+                  <p
+                    onClick={() => {
+                      downloadFile(contractFile.url, documentFile.filename)
+                    }}
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#07bc0c',
+                      cursor: 'pointer',
+                    }}
                   >
                     {contractFile.filename}
-                  </a>
+                  </p>
                   <Icon
                     color="error"
                     onClick={() => {
@@ -496,9 +502,13 @@ export default function CreateMerchant(props) {
                 >
                   <p
                     onClick={() => {
-                      downloadFile(documentFile.url)
+                      downloadFile(documentFile.url, documentFile.filename)
                     }}
-                    style={{ textDecoration: 'underline', color: '#07bc0c' }}
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#07bc0c',
+                      cursor: 'pointer',
+                    }}
                   >
                     {documentFile.filename}
                   </p>

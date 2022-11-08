@@ -1,7 +1,7 @@
-import { Box, Button, Grid, styled, TextField } from '@mui/material'
+import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
-
+import { cloneDeep } from 'lodash'
 import { useParams, useNavigate } from 'react-router-dom'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
@@ -14,7 +14,6 @@ import * as yup from 'yup'
 import {
   getDetailMerchant,
   updateDetailMerchant,
-  updateMerchantStatus,
 } from 'app/apis/merchant/merchant.service'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 
@@ -31,7 +30,8 @@ const Container = styled('div')(({ theme }) => ({
 
 export default function UpdateMerchant(props) {
   const [statusMerchant, setStatusMerchant] = React.useState()
-
+  const [contractList, setContractList] = React.useState([])
+  const [documentList, setDocumentList] = React.useState([])
   const schema = yup
     .object({
       nameMerchant: yup
@@ -95,35 +95,64 @@ export default function UpdateMerchant(props) {
     },
   })
 
-  const uploadFile = async files => {
-    const fileUpload = [...files].map(file => {
-      const formData = new FormData()
-      formData.append('file', file)
-      try {
-        const token = window.localStorage.getItem('accessToken')
-        const res = axios({
-          method: 'post',
-          url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        return res
-      } catch (e) {
-        console.log(e)
+  const uploadFile = async file => {
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      const token = window.localStorage.getItem('accessToken')
+      const res = await axios({
+        method: 'post',
+        url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (res) {
+        return res.data
       }
-    })
+      return []
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
-    const response = await Promise.all(fileUpload)
-    if (response) return response.map(item => item.data.url)
+  const downloadFile = (url, name) => {
+    const arr = url.split('.')
+    const type = arr[arr.length - 1]
+    try {
+      const token = window.localStorage.getItem('accessToken')
+      const config = { responseType: 'blob' }
+      axios({
+        method: 'get',
+        url,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      }).then(response => {
+        // create file link in browser's memory
+        const href = URL.createObjectURL(response.data)
+        console.log(response.data)
+        // create "a" HTML element with href to file & click
+        const link = document.createElement('a')
+        link.href = href
+        link.setAttribute('download', `${name}.${type}`) //or any other extension
+        document.body.appendChild(link)
+        link.click()
+
+        // clean up "a" element & remove ObjectURL
+        document.body.removeChild(link)
+        URL.revokeObjectURL(href)
+      })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const onSubmit = async data => {
-    const filesContract = document.getElementById('upload-contract').files
-    const filesDocument = document.getElementById('upload-document').files
-
     const newData = new Object()
     newData.status = parseInt(data.status)
     newData.name = data.nameMerchant
@@ -137,31 +166,20 @@ export default function UpdateMerchant(props) {
     newData.represent = data.representative
     newData.address = data.address.trim() === '' ? null : data.address.trim()
 
-    if (filesContract.length > 0) {
-      const contracts = await uploadFile(filesContract)
-      newData.contracts = contracts?.map(contract => {
-        return {
-          mediaType: 4,
-          mediaFormat: 3,
-          url: contract,
-        }
-      })
-    } else {
-      newData.contracts = []
-    }
-
-    if (filesDocument.length > 0) {
-      const documents = await uploadFile(filesDocument)
-      newData.paperWorks = documents?.map(document => {
-        return {
-          mediaType: 5,
-          mediaFormat: 3,
-          url: document,
-        }
-      })
-    } else {
-      newData.paperWorks = []
-    }
+    newData.contracts = contractList.map(contract => {
+      return {
+        mediaType: 4,
+        mediaFormat: 3,
+        url: contract.url,
+      }
+    })
+    newData.paperWorks = documentList.map(document => {
+      return {
+        mediaType: 5,
+        mediaFormat: 3,
+        url: document.url,
+      }
+    })
 
     const res = await updateDetailMerchant(params.id, newData)
     if (res.error) {
@@ -186,6 +204,22 @@ export default function UpdateMerchant(props) {
       setValue('representative', res.represent)
       setValue('website', res.website || '')
       setValue('status', res.status)
+      const defaultContracts = res.contracts.map(item => {
+        const arr = item.url.split('/')
+        return {
+          filename: arr[arr.length - 1],
+          url: item.url,
+        }
+      })
+      const defaultDocuments = res.paperWorks.map(item => {
+        const arr = item.url.split('/')
+        return {
+          filename: arr[arr.length - 1],
+          url: item.url,
+        }
+      })
+      setContractList(defaultContracts)
+      setDocumentList(defaultDocuments)
     }
   }
 
@@ -362,9 +396,56 @@ export default function UpdateMerchant(props) {
               <input
                 type="file"
                 id="upload-contract"
-                multiple
+                onChange={async e => {
+                  if (
+                    document.getElementById('upload-contract').files[0].size >
+                    20000000
+                  ) {
+                    console.log(
+                      document.getElementById('upload-contract').files[0].size,
+                    )
+                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                    return
+                  }
+                  const file = await uploadFile(
+                    document.getElementById('upload-contract').files[0],
+                  )
+
+                  setContractList([file, ...contractList])
+                }}
                 style={{ display: 'none' }}
               />
+              {contractList.map((contractFile, index) => (
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  key={contractFile.filename}
+                >
+                  <p
+                    onClick={() => {
+                      downloadFile(contractFile.url, contractFile.filename)
+                    }}
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#07bc0c',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {contractFile.filename}
+                  </p>
+                  <Icon
+                    color="error"
+                    onClick={() => {
+                      const newArr = cloneDeep(contractList)
+                      newArr.splice(index, 1)
+                      setContractList([...newArr])
+
+                      document.getElementById('upload-contract').value = null
+                    }}
+                  >
+                    delete
+                  </Icon>
+                </div>
+              ))}
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller
@@ -396,8 +477,55 @@ export default function UpdateMerchant(props) {
                 type="file"
                 id="upload-document"
                 multiple
+                onChange={async e => {
+                  if (
+                    document.getElementById('upload-document').files[0].size >
+                    20000000
+                  ) {
+                    console.log(
+                      document.getElementById('upload-document').files[0].size,
+                    )
+                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                    return
+                  }
+                  const file = await uploadFile(
+                    document.getElementById('upload-document').files[0],
+                  )
+
+                  setDocumentList([file, ...documentList])
+                }}
                 style={{ display: 'none' }}
               />
+              {documentList.map((documentFile, index) => (
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  key={documentFile.filename}
+                >
+                  <p
+                    onClick={() => {
+                      downloadFile(documentFile.url, documentFile.filename)
+                    }}
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#07bc0c',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {documentFile.filename}
+                  </p>
+                  <Icon
+                    color="error"
+                    onClick={() => {
+                      const newArr = cloneDeep(documentList)
+                      newArr.splice(index, 1)
+                      setDocumentList([...newArr])
+                      document.getElementById('upload-document').value = null
+                    }}
+                  >
+                    delete
+                  </Icon>
+                </div>
+              ))}
             </Grid>
             <Grid item xs={12} md={12}>
               <Controller

@@ -142,6 +142,19 @@ export default function ListRating() {
     methods.reset({ ...defaultValues, scope: queryParams.scope })
   }, [currentTab])
 
+  useEffect(() => {
+    if (tabRef && tabRef.current != -1) {
+      onResetFilters()
+    }
+    navigate('', {
+      scope: queryParams.scope ?? 'reported',
+    } as any)
+    tabRef.current = currentTab
+    setTabName(navOrdersHistory.items[currentTab].label)
+    setCurrentTab(getCurrentTabIndex(queryParams.scope ?? ''))
+    methods.reset({ ...defaultValues, scope: queryParams.scope })
+  }, [queryParams.scope])
+
   const {
     data,
     isLoading,
@@ -270,7 +283,12 @@ export default function ListRating() {
       setRow(row)
       setOpenDialog(true)
     } else if (cell.id === 'customer') {
-      navigation(`${row.id}/chi-tiet`, {})
+      window.open(
+        `/quan-ly-tai-khoan-khach-hang/${row?.idCustomer}/thong-tin`,
+        '_blank',
+      )
+    } else if (cell.id === 'name') {
+      window.open(`/chi-tiet-dia-danh/${row?.campGroundId}`, '_blank')
     }
   }
   const onSuccess = (data: any, message?: string) => {

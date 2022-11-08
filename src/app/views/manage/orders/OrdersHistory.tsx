@@ -78,7 +78,7 @@ type ISearchFilters = {
   isPending?: 1 | 0
 }
 
-const dateDefault = () => {
+export const dateDefault = () => {
   const endDate = new Date()
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - 7)
@@ -167,10 +167,10 @@ export default function OrdersHistory() {
     {
       search: Yup.string()
         .min(0, 'hashtag must be at least 0 characters')
-        .max(255, 'hashtag must be at almost 255 characters'),
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       searchHandler: Yup.string()
         .min(0, 'hashtag must be at least 0 characters')
-        .max(255, 'hashtag must be at almost 255 characters'),
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       from: Yup.date()
         .when('to', (to, yup) => {
           if (to && to != 'Invalid Date') {

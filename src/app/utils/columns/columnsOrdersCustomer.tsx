@@ -1,6 +1,8 @@
-import { Chip, Tooltip, Typography } from '@mui/material'
+import { Chip, Stack, Tooltip, Typography } from '@mui/material'
+import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn } from 'app/models'
 import { TitleOrders } from 'app/models/order'
+import moment from 'moment'
 import { getOrderStatusSpec } from '../enums/order'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
@@ -75,7 +77,16 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
     label: 'Thời gian đặt',
     minWidth: 170,
     align: 'center',
-    format: (value: string) => ISODateTimeFormatter(value),
+    format: (value: string) => (
+      <Stack>
+        <MuiTypography fontWeight={500}>
+          {moment(value).format('DD/MM/YYYY')}
+        </MuiTypography>
+        <MuiTypography variant="body2" fontSize={'0.75rem'}>
+          {moment(value).format('(HH:mm:ss)')}
+        </MuiTypography>
+      </Stack>
+    ),
   },
   {
     id: 'status',

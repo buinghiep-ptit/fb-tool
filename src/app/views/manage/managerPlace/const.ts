@@ -6,11 +6,11 @@ export const tableModel = {
     },
     {
       name: 'Ảnh',
-      width: 200,
+      width: 150,
     },
     {
       name: 'Tên địa danh',
-      width: 200,
+      width: 150,
     },
     {
       name: 'Số điểm camp',
@@ -18,7 +18,7 @@ export const tableModel = {
     },
     {
       name: 'Sự kiện',
-      width: 200,
+      width: 100,
     },
     {
       name: 'Địa chỉ',

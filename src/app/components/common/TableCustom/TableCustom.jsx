@@ -233,6 +233,14 @@ const TableCustom = ({
                             style={{
                               textDecoration: 'underline',
                               color: '#07bc0c',
+                              wordBreak: 'normal',
+                              // whiteSpace: 'nowrap',
+                              // width: '200px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              webkitLineClamp: '2',
+                              display: '-webkit-box',
+                              webkitBoxOrient: 'vertical',
                             }}
                           >
                             {data[element].link}
@@ -276,7 +284,7 @@ const TableCustom = ({
                             style={{
                               wordBreak: 'normal',
                               // whiteSpace: 'nowrap',
-                              width: '200px',
+                              // width: '200px',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               webkitLineClamp: '2',

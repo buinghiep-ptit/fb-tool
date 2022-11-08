@@ -203,6 +203,18 @@ export default function OrdersHistory() {
     resolver: yupResolver(validationSchema),
   })
 
+  const from = methods.watch('from')
+  const to = methods.watch('to')
+
+  useEffect(() => {
+    if (!from || !to) return
+
+    if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
+      methods.clearErrors('from')
+      methods.clearErrors('to')
+    }
+  }, [from, to])
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
@@ -312,7 +324,7 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      window.open(`/chi-tiet-dia-danh/${row?.campGroundId}`, '_blank')
+      window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
     } else if (cell.id === 'campGroundRepresent') {
       window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
     }

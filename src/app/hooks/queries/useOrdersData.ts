@@ -11,6 +11,7 @@ import {
   orderUsed,
   paymentConfirm,
   reassignOrder,
+  recalculatePrice,
   receiveCancelOrder,
   receiveOrder,
   refundOrder,
@@ -195,6 +196,22 @@ export const useNoteOrder = (onSuccess?: any, onError?: any) => {
   return useMutation(
     (payload: { orderId?: number; note?: string }) =>
       orderNote(payload.orderId ?? 0, { note: payload.note }),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useRecalculatePriceOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId?: number; payload?: any }) =>
+      recalculatePrice(params.orderId ?? 0, params.payload),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])

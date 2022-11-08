@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { IOrderDetail, IService } from 'app/models/order'
 import { messages } from 'app/utils/messages'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -86,6 +87,20 @@ export const useRHFOrder = (order: IOrderDetail) => {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
+
+  useEffect(() => {
+    if (!dateStart || !dateEnd) return
+
+    if (
+      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
+    ) {
+      methods.clearErrors('dateStart')
+      methods.clearErrors('dateEnd')
+    }
+  }, [dateStart, dateEnd])
 
   const { fields, append, remove } = useFieldArray<SchemaType>({
     name: 'services',

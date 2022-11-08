@@ -6,7 +6,10 @@ import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
-import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
+import {
+  useOrderDetailData,
+  useRecalculatePriceOrder,
+} from 'app/hooks/queries/useOrdersData'
 import useAuth from 'app/hooks/useAuth'
 import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
@@ -82,6 +85,10 @@ export default function OrderDetail(props: Props) {
   } = useOrderDetailData(Number(orderId ?? 0))
 
   const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thành công'),
+  )
+
+  const { mutate: recalculate } = useRecalculatePriceOrder(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 

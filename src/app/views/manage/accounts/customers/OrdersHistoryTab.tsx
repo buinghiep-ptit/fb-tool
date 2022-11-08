@@ -256,7 +256,7 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      window.open(`/chi-tiet-dia-danh/${row?.campGroundId}`, '_blank')
+      window.open(`/chi-tiet-diem-cap/${row?.campGroundId}`, '_blank')
     } else if (cell.id === 'campGroundRepresent') {
       window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
     }

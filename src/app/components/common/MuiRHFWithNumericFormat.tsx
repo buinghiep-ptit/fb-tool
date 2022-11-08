@@ -55,7 +55,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
             return (
               !value ||
               (value &&
-                value > MIN_LIMIT &&
+                value >= MIN_LIMIT &&
                 ((!isAllowDot && !value.toString().includes('.')) ||
                   isAllowDot))
             )

@@ -137,10 +137,9 @@ export default function ServiceDetail(props: Props) {
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
-          amount: Yup.string().max(
-            11,
-            'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ',
-          ),
+          amount: Yup.string()
+            .max(11, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
+            .required(messages.MSG1),
         }),
       ),
     ),
@@ -357,7 +356,7 @@ export default function ServiceDetail(props: Props) {
         return 'Thứ 7'
     }
   }
-
+  console.log(methods.formState.errors)
   return (
     <Container>
       <Box className="breadcrumb">

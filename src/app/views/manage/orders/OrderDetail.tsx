@@ -147,30 +147,28 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        {!isExpiredReceiveUser(order.handleExpireTime ?? '') &&
-          isReceiveUser(order, user) &&
-          order.status !== 4 && (
-            <>
-              <MuiButton
-                title="Lưu"
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={editLoading}
-                loading={editLoading}
-                onClick={methods.handleSubmit(onSubmitHandler)}
-                startIcon={<Icon>done</Icon>}
-              />
-              <MuiButton
-                title="Huỷ"
-                variant="contained"
-                color="warning"
-                disabled={editLoading}
-                onClick={() => methods.reset()}
-                startIcon={<Icon>clear</Icon>}
-              />
-            </>
-          )}
+        {isReceiveUser(order, user) && order.status !== 4 && (
+          <>
+            <MuiButton
+              title="Lưu"
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={editLoading}
+              loading={editLoading}
+              onClick={methods.handleSubmit(onSubmitHandler)}
+              startIcon={<Icon>done</Icon>}
+            />
+            <MuiButton
+              title="Huỷ"
+              variant="contained"
+              color="warning"
+              disabled={editLoading}
+              onClick={() => methods.reset()}
+              startIcon={<Icon>clear</Icon>}
+            />
+          </>
+        )}
 
         <MuiButton
           title="Quay lại"
@@ -196,7 +194,15 @@ export default function OrderDetail(props: Props) {
               : getOrderStatusSpec(order?.status ?? 0, 2).title
           }
           size="medium"
-          color={'default'}
+          sx={{
+            color: order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                  .textColor
+              : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
+            bgcolor: order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).bgColor
+              : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
+          }}
         />
       </Stack>
 
@@ -207,19 +213,19 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
-            {order.cancelRequest && (
+            {order.cancelRequest && order.cancelRequest.status !== 2 && (
               <Stack>
-                <CancelOrderInfo order={order} />
+                <CancelOrderInfo
+                  order={order}
+                  isViewer={!isReceiveUser(order, user)}
+                />
               </Stack>
             )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 <CustomerInfo
                   order={order}
-                  isViewer={
-                    isExpiredReceiveUser(order.handleExpireTime ?? '') ||
-                    !isReceiveUser(order, user)
-                  }
+                  isViewer={!isReceiveUser(order, user)}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -231,10 +237,7 @@ export default function OrderDetail(props: Props) {
                 order={order}
                 fields={fields}
                 methods={methods}
-                isViewer={
-                  isExpiredReceiveUser(order.handleExpireTime ?? '') ||
-                  !isReceiveUser(order, user)
-                }
+                isViewer={!isReceiveUser(order, user)}
               />
             </Stack>
             <Stack>

@@ -69,6 +69,23 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     label: 'Chủ camp',
     minWidth: 120,
     align: 'center',
+    link: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
   },
   {
     id: 'amount',
@@ -238,6 +255,23 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     label: 'Chủ camp',
     minWidth: 120,
     align: 'center',
+    link: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
   },
   {
     id: 'amount',
@@ -391,6 +425,23 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     label: 'Chủ camp',
     minWidth: 120,
     align: 'center',
+    link: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
   },
   {
     id: 'amount',

@@ -155,12 +155,12 @@ export default function PaymentConfirm({ title }: Props) {
                   <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
                     <Stack flexDirection={'row'} gap={1.5}>
                       <FormControlLabel
-                        value={1}
+                        value={2}
                         control={<Radio />}
                         label="Đặt cọc"
                       />
                       <FormControlLabel
-                        value={2}
+                        value={1}
                         control={<Radio />}
                         label="Thanh toán toàn bộ"
                       />

@@ -165,17 +165,14 @@ export function OrderServices({
                     />
                     <Stack flexDirection="row" gap={2}>
                       <MuiTypography variant="subtitle2">
-                        Tổng thanh toán:
+                        Đã thanh toán:
                       </MuiTypography>
                       <MuiTypography
                         variant="body2"
                         color={'primary'}
                         fontWeight={500}
                       >
-                        {CurrencyFormatter(
-                          getTotalAmount(services) ?? order?.amount ?? 0,
-                          2,
-                        )}{' '}
+                        {CurrencyFormatter(order?.paymentTrans?.amount ?? 0, 2)}
                         VNĐ
                       </MuiTypography>
                     </Stack>

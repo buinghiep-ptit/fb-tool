@@ -74,22 +74,16 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
               <MuiTypography variant="subtitle2">Địa danh</MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <Stack flexDirection={'row'} gap={1}>
+              <Stack flexDirection={'row'}>
                 {campground.campAreas?.map((camp, index) => (
-                  <Stack key={camp.id} flexDirection={'row'}>
-                    <MuiTypography color="primary" variant="body2">
-                      {camp.name}
-                    </MuiTypography>
+                  <MuiTypography color="primary" variant="body2">
+                    {camp.name}
                     {campground.campAreas &&
-                      campground.campAreas?.length &&
-                      index !== campground.campAreas?.length - 1 && (
-                        <Divider
-                          orientation="vertical"
-                          sx={{ backgroundColor: '#D9D9D9', mx: 1, my: 0.5 }}
-                          flexItem
-                        />
-                      )}
-                  </Stack>
+                    campground.campAreas?.length &&
+                    index !== campground.campAreas?.length - 1
+                      ? ', '
+                      : ''}
+                  </MuiTypography>
                 ))}
               </Stack>
             </Grid>

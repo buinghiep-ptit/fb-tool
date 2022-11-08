@@ -23,9 +23,9 @@ export const useRHFOrder = (order: IOrderDetail) => {
       defaultValues.dateEnd = order.dateEnd
       defaultValues.fullName = order.contact?.fullName
       defaultValues.mobilePhone = order.contact?.mobilePhone
-      defaultValues.email = order.contact?.email
+      defaultValues.email = order.contact?.email ?? ''
       defaultValues.services = order.services
-      defaultValues.note = order.note
+      defaultValues.note = order.note ?? ''
       defaultValues.paymentType = order.paymentType
 
       methods.reset({ ...defaultValues })
@@ -46,14 +46,21 @@ export const useRHFOrder = (order: IOrderDetail) => {
         return regex.test(phone as string)
       }),
     dateStart: Yup.date()
-      .typeError('Sai dịnh dạng.')
+      .when('endDate', (endDate, yup) => {
+        if (endDate && endDate != 'Invalid Date') {
+          const dayAfter = new Date(endDate.getTime())
+          return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+        }
+        return yup
+      })
+      .typeError('Sai định dạng.')
       .nullable()
       .required(messages.MSG1),
     dateEnd: Yup.date()
-      .when('dateStart', (dateStart, yup) => {
-        if (dateStart && dateStart != 'Invalid Date') {
-          const dayAfter = new Date(dateStart.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc >= ngày bắt đầu')
+      .when('startDate', (startDate, yup) => {
+        if (startDate && startDate != 'Invalid Date') {
+          const dayAfter = new Date(startDate.getTime() + 0)
+          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
         }
         return yup
       })

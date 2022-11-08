@@ -346,7 +346,7 @@ export default function CustomerDetail(props: Props) {
                     placeholder="Nhập Email"
                     fullWidth
                     defaultValue=""
-                    disabled={!!customer.data?.email ?? false}
+                    disabled //!!customer.data?.email ?? false
                     clearIcon={false}
                   />
                   <FormInputText

@@ -324,11 +324,11 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      // window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
-      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
+      window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
+      // navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
     } else if (cell.id === 'campGroundRepresent') {
-      // window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
-      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
+      window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
+      // navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
     }
   }
 

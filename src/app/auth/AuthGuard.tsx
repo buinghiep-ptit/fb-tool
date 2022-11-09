@@ -77,8 +77,6 @@ const AuthGuard = ({ children }: Props) => {
     }
   }, [pathname])
 
-  console.log('hasPermission:', hasPermission)
-
   if (!hasPermission && isAuthenticated) {
     return <Navigate replace to="/" />
   }

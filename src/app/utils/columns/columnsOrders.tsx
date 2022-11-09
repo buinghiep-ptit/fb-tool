@@ -90,7 +90,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'amount',
-    label: 'Giá trị đơn (VNĐ)',
+    label: 'Tổng thực tế (VNĐ)',
     minWidth: 120,
     align: 'center',
     format: (value: number) =>
@@ -102,7 +102,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'paymentAmnt',
-    label: 'Giá trị cọc (VNĐ)',
+    label: 'Đã thanh toán (VNĐ)',
     minWidth: 120,
     align: 'center',
     format: (value: number) =>

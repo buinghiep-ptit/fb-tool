@@ -47,7 +47,7 @@ export default function CreateMerchant(props) {
         .required('Vui lòng nhập password')
         .min(8, 'Có ít nhất 8 ký tự')
         .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
-        .max(254, 'Đã đạt số ký tự tối đa'),
+        .max(255, 'Đã đạt số ký tự tối đa'),
       nameMerchant: yup
         .string()
         .required('Vui lòng nhập tên đối tác')

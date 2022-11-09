@@ -453,6 +453,7 @@ export default function FeedDetail(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={OnDeleteFeed}
+        isLoading={deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

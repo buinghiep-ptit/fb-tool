@@ -4,6 +4,7 @@ import * as React from 'react'
 export interface IDiagLogConfirmProps {
   title?: string
   open?: boolean
+  isLoading?: boolean
   setOpen?: (open: boolean) => void
   onSubmit?: () => void
   children?: React.ReactElement
@@ -16,6 +17,7 @@ export function DiagLogConfirm({
   title = '',
   open = false,
   setOpen,
+  isLoading,
   maxWidth = 'sm',
   onSubmit,
   submitText = 'Xác nhận',
@@ -29,7 +31,7 @@ export function DiagLogConfirm({
         open={open}
         maxWidth={maxWidth}
         onCloseModal={() => setOpen && setOpen(false)}
-        isLoading={false}
+        isLoading={isLoading}
         onSubmit={onSubmit}
         submitText={submitText}
         cancelText={cancelText}

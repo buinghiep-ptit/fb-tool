@@ -324,9 +324,11 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
+      // window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
+      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
     } else if (cell.id === 'campGroundRepresent') {
-      window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
+      // window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
+      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
     }
   }
 
@@ -487,6 +489,7 @@ export default function OrdersHistory() {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={approveConfirm}
+        isLoading={approveLoading || cancelLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">Đồng ý tiếp nhận?</MuiTypography>

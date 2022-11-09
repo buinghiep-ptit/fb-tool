@@ -1,4 +1,4 @@
-import { Chip, Typography } from '@mui/material'
+import { Chip, Tooltip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleUsers } from 'app/models/account'
@@ -23,9 +23,21 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     label: 'Email',
     minWidth: 120,
     action: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
     sticky: {
       position: 'sticky',

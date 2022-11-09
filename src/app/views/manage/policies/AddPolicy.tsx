@@ -292,7 +292,6 @@ export default function AddPolicy({ title }: Props) {
               )}
             </Stack>
           </Stack>
-          {createLoading || (updateLoading && <LinearProgress />)}
         </FormProvider>
       </BoxWrapperDialog>
     )

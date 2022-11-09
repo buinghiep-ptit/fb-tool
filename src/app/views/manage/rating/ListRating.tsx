@@ -266,7 +266,7 @@ export default function ListRating() {
 
   const [getContentNote, methodsNote] = useNoteDialogForm('note')
 
-  const { mutate: note, isLoading: dialogLoading } = useToggleRateStatus(() =>
+  const { mutate: note, isLoading: toggleLoading } = useToggleRateStatus(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
 
@@ -275,7 +275,7 @@ export default function ListRating() {
       setDialogData(prev => ({
         ...prev,
         title: row.status === 1 ? 'Chặn' : 'Hợp lệ',
-        message: (dialogLoading?: boolean) => getContentNote(dialogLoading),
+        message: (toggleLoading?: boolean) => getContentNote(toggleLoading),
         type: 'toggle-status',
         submitText: row.status === 1 ? 'Chặn' : 'Hợp lệ',
         cancelText: 'Huỷ',
@@ -454,9 +454,10 @@ export default function ListRating() {
         onSubmit={() => onSubmitDialog(dialogData.type)}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
+        isLoading={toggleLoading}
       >
         <Stack>
-          {dialogData?.message && dialogData?.message(dialogLoading)}
+          {dialogData?.message && dialogData?.message(toggleLoading)}
         </Stack>
       </DiagLogConfirm>
     </Container>

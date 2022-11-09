@@ -7,7 +7,10 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useInitCancelOrder } from 'app/hooks/queries/useOrdersData'
+import {
+  useInitCancelOrder,
+  useReceiveCancelOrder,
+} from 'app/hooks/queries/useOrdersData'
 import { messages } from 'app/utils/messages'
 import React from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -33,7 +36,7 @@ export default function CancelBooking({ title }: Props) {
     toastSuccess({
       message: message ?? '',
     })
-    navigate(-1)
+    // navigate(-1)
   }
 
   const validationSchema = Yup.object().shape({
@@ -51,9 +54,20 @@ export default function CancelBooking({ title }: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const { mutate: cancelInit, isLoading: isLoading } = useInitCancelOrder(() =>
-    onSuccess(null, 'Tạo yêu cầu huỷ thành công'),
+  const { mutate: cancelInit, isLoading: isLoading } = useInitCancelOrder(
+    (data: any) => {
+      console.log('data:', data)
+      if (data) {
+        onSuccess(null, 'Tạo yêu cầu huỷ thành công')
+        navigate(-1)
+        receiveCancel(Number(orderId ?? 0))
+      }
+    },
   )
+  const { mutate: receiveCancel, isLoading: cancelLoading } =
+    useReceiveCancelOrder(() =>
+      onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
+    )
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     cancelInit({
@@ -74,7 +88,7 @@ export default function CancelBooking({ title }: Props) {
       <BoxWrapperDialog>
         <FormProvider {...methods}>
           <Stack my={1.5} gap={2}>
-            <SelectDropDown name="requester" label="Yêu cầu từ *">
+            <SelectDropDown name="requester" label="Yêu cầu từ" required>
               <MenuItem value="1">Người đặt</MenuItem>
               <MenuItem value="2">Campdi</MenuItem>
               <MenuItem value="3">Điểm camp</MenuItem>
@@ -101,7 +115,7 @@ export default function CancelBooking({ title }: Props) {
         title={title}
         open={isModal}
         onCloseModal={handleClose}
-        isLoading={isLoading}
+        isLoading={isLoading || cancelLoading}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Tiếp tục xử lý"
         cancelText="Quay lại"

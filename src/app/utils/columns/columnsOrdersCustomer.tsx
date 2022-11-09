@@ -65,12 +65,15 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'paymentAmnt',
-    label: 'Tổng thanh toán',
-    minWidth: 100,
+    label: 'Đã thanh toán',
+    minWidth: 120,
     align: 'center',
-    format: (value: number) => (
-      <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-    ),
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateCreated',

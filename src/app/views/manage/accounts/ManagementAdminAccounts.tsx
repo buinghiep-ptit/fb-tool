@@ -79,7 +79,8 @@ export default function AdminAccounts(props: Props) {
     })
     setOpenDialog(false)
   }
-  const { mutate: editUser } = useUpdateUserData(onRowUpdateSuccess)
+  const { mutate: editUser, isLoading: updateLoading } =
+    useUpdateUserData(onRowUpdateSuccess)
 
   const changeStatusUser = () => {
     editUser({
@@ -317,6 +318,7 @@ export default function AdminAccounts(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={changeStatusUser}
+        isLoading={updateLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

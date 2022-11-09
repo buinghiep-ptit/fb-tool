@@ -103,8 +103,8 @@ export default function ListPolicy(props: Props) {
     toastSuccess({ message: message ?? '' })
     setOpenDialog(false)
   }
-  const { mutate: deletePolicy } = useDeletePolicy(() =>
-    onRowUpdateSuccess(null, 'Xoá thành công'),
+  const { mutate: deletePolicy, isLoading: deleteLoading } = useDeletePolicy(
+    () => onRowUpdateSuccess(null, 'Xoá thành công'),
   )
 
   const onSubmitDialog = () => {
@@ -323,6 +323,7 @@ export default function ListPolicy(props: Props) {
         onSubmit={onSubmitDialog}
         submitText={'Xoá'}
         cancelText={'Huỷ'}
+        isLoading={deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

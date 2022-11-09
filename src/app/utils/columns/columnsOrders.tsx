@@ -527,36 +527,41 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
 
 export const columnsOrderProcessesDetail: any = [
   { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
-  {
-    id: 'action',
-    label: 'Hành động',
-    minWidth: 120,
-    align: 'center',
-  },
+  // {
+  //   id: 'action',
+  //   label: 'Hành động',
+  //   minWidth: 120,
+  //   align: 'center',
+  // },
   {
     id: 'account',
     label: 'Người xử lý',
     minWidth: 170,
-    align: 'center',
   },
   {
     id: 'status',
     label: 'Trạng thái đơn hàng',
     minWidth: 120,
     align: 'center',
-    status: (value: any) => (
-      <Chip
-        label={getOrderStatusSpec(value, 2).title}
-        size="small"
-        color={'default'}
-      />
-    ),
+    status: (value: any) =>
+      value !== null ? (
+        <Chip
+          label={getOrderStatusSpec(value, 2).title}
+          size="small"
+          sx={{
+            color: getOrderStatusSpec(value, 2).textColor,
+            bgcolor: getOrderStatusSpec(value, 2).bgColor,
+          }}
+        />
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateCreated',
     label: 'Thời gian',
     minWidth: 170,
-    align: 'right',
+    align: 'center',
     format: (value: string) => ISODateTimeFormatter(value),
   },
 ]
@@ -566,29 +571,23 @@ export const columnsLogsOrderDetail: any = [
   {
     id: 'processName',
     label: 'Hành động',
-    minWidth: 120,
-    align: 'center',
+    minWidth: 170,
   },
   {
     id: 'email',
     label: 'Người thực hiện',
     minWidth: 170,
-    align: 'center',
   },
   {
-    id: 'requestStatus',
+    id: 'note',
     label: 'Ghi chú',
     minWidth: 120,
-    align: 'center',
-    status: (value: any) => (
-      <Chip label={value} size="small" color={'default'} />
-    ),
   },
   {
     id: 'actionDate',
     label: 'Thời gian',
     minWidth: 170,
-    align: 'right',
+    align: 'center',
     format: (value: string) => ISODateTimeFormatter(value),
   },
 ]

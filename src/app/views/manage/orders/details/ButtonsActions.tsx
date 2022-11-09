@@ -365,11 +365,9 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={() => onSubmitDialog(dialogData.type)}
+        isLoading={loading}
       >
-        <>
-          {dialogData.message && dialogData.message()}
-          {loading && <LinearProgress sx={{ flex: 1 }} />}
-        </>
+        {dialogData.message && dialogData.message()}
       </DiagLogConfirm>
     </Stack>
   )

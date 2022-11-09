@@ -153,8 +153,6 @@ export default function ChangePassword({ title }: Props) {
             </MuiTypography>
             <FormTextArea name="note" defaultValue={''} placeholder="Ghi chú" />
           </Stack>
-
-          {isLoading && <LinearProgress />}
         </FormProvider>
       </Box>
     )

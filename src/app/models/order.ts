@@ -92,6 +92,7 @@ export interface IService {
   type?: number
   quantity?: number
   amount?: number
+  imgUrl?: string
 }
 
 export interface IOrderProcess {

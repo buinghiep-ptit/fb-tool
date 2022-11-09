@@ -167,7 +167,7 @@ export default function AddAudio({ title }: Props) {
     onSuccess(null, 'Thêm bài hát thành công'),
   )
 
-  const { mutate: update, isLoading: isLoading } = useUpdateAudio(() =>
+  const { mutate: update, isLoading: updateLoading } = useUpdateAudio(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
 
@@ -517,7 +517,7 @@ export default function AddAudio({ title }: Props) {
         title={title}
         open={isModal}
         onCloseModal={handleClose}
-        isLoading={isLoading}
+        isLoading={createLoading || updateLoading}
         maxWidth={'md'}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Lưu"

@@ -448,8 +448,8 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'amount',
-    label: 'Tổng thực tế',
-    minWidth: 120,
+    label: 'Tổng thực tế (VNĐ)',
+    minWidth: 150,
     align: 'center',
     format: (value: number) =>
       value !== null ? (
@@ -460,8 +460,8 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'paymentAmnt',
-    label: 'Đã thanh toán',
-    minWidth: 120,
+    label: 'Đã thanh toán (VNĐ)',
+    minWidth: 150,
     align: 'center',
     format: (value: number) =>
       value ? (

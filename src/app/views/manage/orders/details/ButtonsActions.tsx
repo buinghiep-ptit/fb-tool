@@ -216,7 +216,11 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
             title="Huỷ đơn"
             variant="outlined"
             color="error"
-            onClick={() => onClickButton('AVAILABLE')}
+            onClick={() =>
+              navigate(`huy-don-hang`, {
+                state: { modal: true },
+              })
+            }
             startIcon={<Icon>clear</Icon>}
           />
           <Divider
@@ -273,26 +277,29 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         </>
       )}
 
-      {order?.status && order?.status < 4 && order.cancelRequest?.status !== 2 && (
-        <>
-          <MuiButton
-            title="Chuyển tiếp"
-            variant="outlined"
-            color="warning"
-            onClick={() =>
-              navigate(`chuyen-tiep`, {
-                state: { modal: true },
-              })
-            }
-            startIcon={<Icon>cached</Icon>}
-          />
-          <Divider
-            orientation="vertical"
-            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-            flexItem
-          />
-        </>
-      )}
+      {order?.status &&
+        order?.status < 4 &&
+        order.cancelRequest?.status !== 2 &&
+        order?.status !== -1 && (
+          <>
+            <MuiButton
+              title="Chuyển tiếp"
+              variant="outlined"
+              color="warning"
+              onClick={() =>
+                navigate(`chuyen-tiep`, {
+                  state: { modal: true },
+                })
+              }
+              startIcon={<Icon>cached</Icon>}
+            />
+            <Divider
+              orientation="vertical"
+              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+              flexItem
+            />
+          </>
+        )}
 
       {!order?.cancelRequest && order?.status === 3 && (
         <>

@@ -242,7 +242,8 @@ export function OrderServices({
               </Stack>
               {order?.status !== 0 &&
                 order?.status !== 1 &&
-                order?.status !== 2 && (
+                order?.status !== 2 &&
+                order?.status !== -1 && (
                   <>
                     <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
                       <Stack flexDirection={'row'} gap={1.5}>

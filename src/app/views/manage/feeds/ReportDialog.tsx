@@ -78,7 +78,6 @@ export default function ReportInfringe({ title }: Props) {
             </Box>
           </Stack>
         </FormProvider>
-        {isLoading && <LinearProgress />}
       </Box>
     )
   }

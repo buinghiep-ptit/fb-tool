@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { IOrderDetail, IService } from 'app/models/order'
 import { messages } from 'app/utils/messages'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import * as Yup from 'yup'
@@ -23,9 +24,9 @@ export const useRHFOrder = (order: IOrderDetail) => {
       defaultValues.dateEnd = order.dateEnd
       defaultValues.fullName = order.contact?.fullName
       defaultValues.mobilePhone = order.contact?.mobilePhone
-      defaultValues.email = order.contact?.email
+      defaultValues.email = order.contact?.email ?? ''
       defaultValues.services = order.services
-      defaultValues.note = order.note
+      defaultValues.note = order.note ?? ''
       defaultValues.paymentType = order.paymentType
 
       methods.reset({ ...defaultValues })
@@ -34,48 +35,73 @@ export const useRHFOrder = (order: IOrderDetail) => {
 
   const [defaultValues] = useState<SchemaType>({})
 
-  const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required(messages.MSG1),
-    mobilePhone: Yup.string()
-      .required(messages.MSG1)
-      .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-        const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-        if (!phone) {
-          return true
-        }
-        return regex.test(phone as string)
-      }),
-    dateStart: Yup.date()
-      .typeError('Sai dịnh dạng.')
-      .nullable()
-      .required(messages.MSG1),
-    dateEnd: Yup.date()
-      .when('dateStart', (dateStart, yup) => {
-        if (dateStart && dateStart != 'Invalid Date') {
-          const dayAfter = new Date(dateStart.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc >= ngày bắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable()
-      .required(messages.MSG1),
-    services: Yup.lazy(() =>
-      Yup.array().of(
-        Yup.object().shape({
-          quantity: Yup.string()
-            .required(messages.MSG1)
-            .max(11, 'Tối đa 9 ký tự'),
+  const validationSchema = Yup.object().shape(
+    {
+      fullName: Yup.string().required(messages.MSG1),
+      mobilePhone: Yup.string()
+        .required(messages.MSG1)
+        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
+          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+          if (!phone) {
+            return true
+          }
+          return regex.test(phone as string)
         }),
+      dateStart: Yup.date()
+        .when('dateEnd', (dateEnd, yup) => {
+          if (dateEnd && dateEnd != 'Invalid Date') {
+            const dayAfter = new Date(dateEnd.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      dateEnd: Yup.date()
+        .when('dateStart', (dateStart, yup) => {
+          if (dateStart && dateStart != 'Invalid Date') {
+            const dayAfter = new Date(dateStart.getTime() + 0)
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      services: Yup.lazy(() =>
+        Yup.array().of(
+          Yup.object().shape({
+            quantity: Yup.string()
+              .required(messages.MSG1)
+              .max(11, 'Tối đa 9 ký tự'),
+          }),
+        ),
       ),
-    ),
-  })
+      note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
+    },
+    [['dateStart', 'dateEnd']], // throw error cyclic dependence if have not this params
+  )
 
   const methods = useForm<SchemaType>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
+
+  useEffect(() => {
+    if (!dateStart || !dateEnd) return
+
+    if (
+      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
+    ) {
+      methods.clearErrors('dateStart')
+      methods.clearErrors('dateEnd')
+    }
+  }, [dateStart, dateEnd])
 
   const { fields, append, remove } = useFieldArray<SchemaType>({
     name: 'services',

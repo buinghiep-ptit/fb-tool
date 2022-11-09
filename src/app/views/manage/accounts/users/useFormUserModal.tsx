@@ -67,7 +67,6 @@ const useFormUserModal = (data?: any) => {
             </SelectDropDown>
           </Stack>
         </FormProvider>
-        {isLoading && <LinearProgress />}
       </Box>
     )
   }

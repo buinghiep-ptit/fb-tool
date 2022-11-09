@@ -114,8 +114,10 @@ export default function ManagerEvents(props: Props) {
     toastSuccess({ message: `${dialogData.title ?? ''} thành công` })
     setOpenDialog(false)
   }
-  const { mutate: updateStatus } = useUpdateStatusEvent(onRowUpdateSuccess)
-  const { mutate: deleteEvent } = useDeleteEvent(onRowUpdateSuccess)
+  const { mutate: updateStatus, isLoading: updateLoading } =
+    useUpdateStatusEvent(onRowUpdateSuccess)
+  const { mutate: deleteEvent, isLoading: deleteLoading } =
+    useDeleteEvent(onRowUpdateSuccess)
 
   const onSubmitDialog = () => {
     if (dialogData.type === 'toggle-status') {
@@ -345,6 +347,7 @@ export default function ManagerEvents(props: Props) {
         onSubmit={onSubmitDialog}
         submitText={'Xoá'}
         cancelText={'Huỷ'}
+        isLoading={updateLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

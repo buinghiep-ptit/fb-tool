@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { LinearProgress, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -35,7 +35,6 @@ const useNoteDialogForm = (name = 'note') => {
               />
             </Stack>
           </FormProvider>
-          {isLoading && <LinearProgress />}
         </>
       </BoxWrapperDialog>
     )

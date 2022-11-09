@@ -8,6 +8,7 @@ import {
   Stack,
 } from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import { ICampArea } from 'app/models/camp'
 import { ICampground } from 'app/models/order'
 
 export interface ICampgroundInfoProps {
@@ -56,12 +57,12 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   campground?.merchant?.email
-                    ? campground?.merchant?.email + '-'
+                    ? campground?.merchant?.email + ' - '
                     : ''
                 }`}
                 {`${
                   campground?.merchant?.mobilePhone
-                    ? campground?.merchant?.mobilePhone + '-'
+                    ? campground?.merchant?.mobilePhone + ' - '
                     : ''
                 }`}
                 {campground?.merchant?.fullName}
@@ -74,23 +75,10 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
               <MuiTypography variant="subtitle2">Địa danh</MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <Stack flexDirection={'row'} gap={1}>
-                {campground.campAreas?.map((camp, index) => (
-                  <Stack key={camp.id} flexDirection={'row'}>
-                    <MuiTypography color="primary" variant="body2">
-                      {camp.name}
-                    </MuiTypography>
-                    {campground.campAreas &&
-                      campground.campAreas?.length &&
-                      index !== campground.campAreas?.length - 1 && (
-                        <Divider
-                          orientation="vertical"
-                          sx={{ backgroundColor: '#D9D9D9', mx: 1, my: 0.5 }}
-                          flexItem
-                        />
-                      )}
-                  </Stack>
-                ))}
+              <Stack flexDirection={'row'}>
+                <MuiTypography color="primary" variant="body2">
+                  {concatCampAreasName(campground.campAreas)}
+                </MuiTypography>
               </Stack>
             </Grid>
           </Grid>
@@ -98,4 +86,13 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
       </AccordionDetails>
     </Accordion>
   )
+}
+
+export const concatCampAreasName = (campAreas?: ICampArea[]) => {
+  if (!campAreas || !campAreas.length) return ''
+  let strName = ''
+  campAreas.forEach((area, index) => {
+    strName += area.name + (index === campAreas?.length - 1 ? '' : ', ')
+  })
+  return strName
 }

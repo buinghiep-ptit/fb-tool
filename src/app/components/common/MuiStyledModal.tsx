@@ -1,13 +1,13 @@
 import { ApprovalRounded, CancelOutlined } from '@mui/icons-material'
 import CloseIcon from '@mui/icons-material/Close'
-import { Icon } from '@mui/material'
+import { Icon, LinearProgress } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
-import { Stack } from '@mui/system'
+import { Box, Stack } from '@mui/system'
 import * as React from 'react'
 import { MuiButton } from './MuiButton'
 
@@ -94,6 +94,7 @@ export default function MuiStyledModal({
         {title}
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
+      {isLoading && <LinearProgress />}
       <DialogActions>
         <Stack
           py={2}

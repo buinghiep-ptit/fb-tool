@@ -147,6 +147,7 @@ const JwtLogin = () => {
                       label={'Email'}
                       placeholder="Nhập email"
                       fullWidth
+                      clearIcon={false}
                     />
                   </Stack>
                   <Stack pt={2}>

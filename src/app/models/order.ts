@@ -53,9 +53,23 @@ export interface IOrderDetail {
     handleExpireTime?: string
   }
   transactions?: ITransaction[]
+  paymentTrans?: IPaymentTrans
   campGround?: ICampground
 }
-
+export interface IPaymentTrans {
+  id?: number
+  txnCode?: string
+  paymentTrnsCode?: string
+  paymentMethod?: number
+  paymentDate?: string
+  type?: number
+  accountNumber?: string
+  urlFile?: string
+  amount?: number
+  status?: number
+  dateCreated?: string
+  dateUpdated?: string
+}
 export interface ICustomerOrder {
   id?: number
   userType?: number
@@ -78,6 +92,7 @@ export interface IService {
   type?: number
   quantity?: number
   amount?: number
+  imgUrl?: string
 }
 
 export interface IOrderProcess {

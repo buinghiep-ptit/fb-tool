@@ -436,6 +436,7 @@ export default function ManagerFeed(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={approveConfirm}
+        isLoading={approveLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

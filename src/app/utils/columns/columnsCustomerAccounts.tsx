@@ -1,6 +1,4 @@
-import { EditOutlined } from '@mui/icons-material'
-import { Avatar, Chip, styled, Tooltip, Typography } from '@mui/material'
-import { MuiSwitch } from 'app/components/common/MuiSwitch'
+import { Chip, Tooltip, Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
 import { TitleCustomers } from 'app/models/account'
 import { getColorByCusStatus } from '../common'
@@ -9,11 +7,6 @@ import {
   getLabelByCusStatus,
   LabelFormatter,
 } from '../formatters/labelFormatter'
-
-const StyledAvatar = styled(Avatar)(() => ({
-  height: '32px',
-  width: '32px',
-}))
 
 export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
   {
@@ -50,9 +43,21 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     minWidth: 200,
     align: 'center',
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {
@@ -61,9 +66,21 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     minWidth: 150,
     align: 'center',
     link: (value: any) => (
-      <Typography color={'primary'} sx={{ textDecorationLine: 'underline' }}>
-        {value}
-      </Typography>
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
     ),
   },
   {

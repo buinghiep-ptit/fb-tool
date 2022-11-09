@@ -1,24 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { FormControlLabel, Grid, Radio, Stack } from '@mui/material'
+import {
+  FormControlLabel,
+  FormHelperText,
+  Grid,
+  Icon,
+  IconButton,
+  Radio,
+  Stack,
+  Tooltip,
+} from '@mui/material'
 import { Box } from '@mui/system'
+import { uploadFileAll } from 'app/apis/uploads/upload.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
-import {
-  useNoteOrder,
-  usePaymentConfirmOrder,
-} from 'app/hooks/queries/useOrdersData'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
-import { IMediaOverall } from 'app/models'
-import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import { usePaymentConfirmOrder } from 'app/hooks/queries/useOrdersData'
 import { messages } from 'app/utils/messages'
-import React, { useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
+import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -30,6 +33,7 @@ type Props = {
 type SchemaType = {
   transCode?: string
   files?: any
+  fileUrl?: string
   bankAccount?: string
   paymentType?: 1 | 2
   amount?: number
@@ -40,15 +44,8 @@ export default function PaymentConfirm({ title }: Props) {
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
   const { orderId } = useParams()
-  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
-    [],
-  )
-  const [fileConfigs] = useState({
-    mediaType: EMediaType.POST,
-    mediaFormat: EMediaFormat.OFFICE,
-    accept: '',
-    multiple: true,
-  })
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const dropzoneAudioRef = useRef(null) as any
 
   const onSuccess = (data: any, message?: string) => {
     toastSuccess({
@@ -68,26 +65,7 @@ export default function PaymentConfirm({ title }: Props) {
     amount: Yup.string()
       .max(11, 'Chỉ được nhập tối đa 9 ký tự')
       .required(messages.MSG1),
-    files: Yup.mixed().test(
-      'fileSize',
-      fileConfigs.mediaFormat === EMediaFormat.VIDEO
-        ? 'Dung lượng video tối đa 3 phút'
-        : 'Dung lượng ảnh tối đa 10MB/ảnh',
-      files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-    ),
   })
-
-  const [
-    selectFiles,
-    uploadFiles,
-    removeUploadedFiles,
-    cancelUploading,
-    uploading,
-    progressInfos,
-    message,
-    setInitialFileInfos,
-    fileInfos,
-  ] = useUploadFiles()
 
   const methods = useForm<SchemaType>({
     mode: 'onChange',
@@ -99,15 +77,20 @@ export default function PaymentConfirm({ title }: Props) {
       onSuccess(null, 'Xác nhận thanh toán thành công'),
     )
 
-  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+  const onSubmitHandler: SubmitHandler<SchemaType> = async (
+    values: SchemaType,
+  ) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-    const files = (fileInfos as IMediaOverall[]).filter(
-      (f: IMediaOverall) => f.mediaFormat === fileConfigs.mediaFormat,
-    )
+    let fileResponse
+    try {
+      if (values.files) fileResponse = await uploadFileAll(values.files)
+    } catch (error) {
+      setSelectedFiles([])
+    }
 
     const payload = {
       transCode: values.transCode,
-      fileUrl: files && files.length && files[0].url,
+      fileUrl: fileResponse.url || null,
       bankAccount: values.bankAccount,
       paymentType: Number(values.paymentType ?? 1),
       amount: Number(amount ?? 0),
@@ -119,12 +102,22 @@ export default function PaymentConfirm({ title }: Props) {
     navigate(-1)
   }
 
+  const openDialogFileAudio = () => {
+    if (dropzoneAudioRef.current) {
+      dropzoneAudioRef.current.open()
+    }
+  }
+  const removeAudioSelected = () => {
+    setSelectedFiles([])
+    methods.setValue('files', undefined)
+  }
+
   const getContent = () => {
     return (
       <BoxWrapperDialog>
         <FormProvider {...methods}>
           <Grid container spacing={3}>
-            <Grid item md={7} xs={12}>
+            <Grid item md={12} xs={12}>
               <Stack my={1.5} gap={3}>
                 <MuiTypography variant="subtitle2">
                   Xác nhận khách hàng đã chuyển khoản?
@@ -139,6 +132,135 @@ export default function PaymentConfirm({ title }: Props) {
                   sx={{ flex: 1 }}
                 />
 
+                <Box sx={{ width: '100%' }}>
+                  <Dropzone
+                    ref={dropzoneAudioRef}
+                    onDrop={acceptedFiles => {
+                      if (!acceptedFiles || !acceptedFiles.length) return
+                      setSelectedFiles(acceptedFiles)
+
+                      methods.setValue('files', acceptedFiles[0])
+                      methods.clearErrors('files')
+                    }}
+                    accept={{
+                      'text/*': [
+                        '.xlsx',
+                        '.xls',
+                        '.csv',
+                        '.pdf',
+                        '.pptx',
+                        '.pptm',
+                        '.ppt',
+                        '.docx',
+                      ],
+                      'video/mp4': [],
+                      'video/webm': [],
+                      'video/mov': [],
+                      'audio/mp3': [],
+                      'audio/wav': [],
+                      'audio/ogg': [],
+                      'image/png': ['.png'],
+                      'image/jpeg': ['.jpg', '.jpeg'],
+                    }}
+                    multiple={false}
+                    maxSize={20 * 1024 * 1024}
+                  >
+                    {({
+                      getRootProps,
+                      getInputProps,
+                      isDragAccept,
+                      isDragReject,
+                    }) => {
+                      const style = useMemo(() => {
+                        console.log('isDragAccept:', isDragAccept)
+                        console.log('isDragReject:', isDragReject)
+                      }, [isDragAccept, isDragReject])
+                      return (
+                        <>
+                          <div {...getRootProps({ className: 'dropzone' })}>
+                            <input {...getInputProps()} />
+                            {!selectedFiles.length && ( // is no file
+                              <Stack
+                                flexDirection={'row'}
+                                sx={{
+                                  background: 'rgba(22, 24, 35, 0.03)',
+                                  borderRadius: 1.5,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  cursor: 'pointer',
+                                  border: '2px dashed rgba(22, 24 , 35, 0.2)',
+                                  '&:hover': {
+                                    border: '2px dashed #2F9B42',
+                                  },
+                                }}
+                              >
+                                <IconButton>
+                                  <Icon>upload</Icon>
+                                </IconButton>
+
+                                <Stack alignItems={'center'}>
+                                  <MuiTypography variant="body2">
+                                    Chọn hoặc kéo thả file
+                                  </MuiTypography>
+                                  <MuiTypography
+                                    variant="body2"
+                                    fontSize={'0.75rem'}
+                                  >
+                                    {`(tối đa 20MB)`}
+                                  </MuiTypography>
+                                </Stack>
+                              </Stack>
+                            )}
+                          </div>
+                          {selectedFiles[0]?.name && (
+                            <Stack
+                              flexDirection={'row'}
+                              sx={{
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              <MuiTypography variant="body1">
+                                {selectedFiles[0]?.name}
+                              </MuiTypography>
+
+                              <Stack flexDirection={'row'} gap={1} ml={2}>
+                                <Tooltip arrow title={'Chọn lại'}>
+                                  <IconButton
+                                    sx={{
+                                      bgcolor: '#303030',
+                                      borderRadius: 1,
+                                    }}
+                                    onClick={openDialogFileAudio}
+                                  >
+                                    <Icon sx={{ color: 'white' }}>cached</Icon>
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip arrow title={'Xóa'}>
+                                  <IconButton
+                                    sx={{
+                                      bgcolor: '#303030',
+                                      borderRadius: 1,
+                                    }}
+                                    onClick={removeAudioSelected}
+                                  >
+                                    <Icon sx={{ color: 'white' }}>delete</Icon>
+                                  </IconButton>
+                                </Tooltip>
+                              </Stack>
+                            </Stack>
+                          )}
+                        </>
+                      )
+                    }}
+                  </Dropzone>
+                  {methods.formState.errors.files && (
+                    <FormHelperText error>
+                      {methods.formState.errors.files?.message as string}
+                    </FormHelperText>
+                  )}
+                </Box>
+
                 <FormInputText
                   type="text"
                   label={'STK nhận'}
@@ -152,15 +274,15 @@ export default function PaymentConfirm({ title }: Props) {
                   <MuiTypography variant="subtitle2">
                     Loại thanh toán:
                   </MuiTypography>
-                  <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
+                  <MuiRHFRadioGroup name="paymentType" defaultValue={2}>
                     <Stack flexDirection={'row'} gap={1.5}>
                       <FormControlLabel
-                        value={1}
+                        value={2}
                         control={<Radio />}
                         label="Đặt cọc"
                       />
                       <FormControlLabel
-                        value={2}
+                        value={1}
                         control={<Radio />}
                         label="Thanh toán toàn bộ"
                       />
@@ -175,35 +297,12 @@ export default function PaymentConfirm({ title }: Props) {
                   placeholder="Nhập giá"
                   fullWidth
                   required
+                  iconEnd={
+                    <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                  }
+                  isAllowZeroFirst={false}
                 />
               </Stack>
-            </Grid>
-            <Grid
-              item
-              md={5}
-              xs={12}
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Box sx={{ width: '100%' }}>
-                <UploadPreviewer
-                  name="files"
-                  initialMedias={[]}
-                  fileInfos={fileInfos}
-                  mediasSrcPreviewer={mediasSrcPreviewer}
-                  setMediasSrcPreviewer={setMediasSrcPreviewer}
-                  mediaConfigs={fileConfigs}
-                  selectFiles={selectFiles}
-                  uploadFiles={uploadFiles}
-                  removeUploadedFiles={removeUploadedFiles}
-                  cancelUploading={cancelUploading}
-                  uploading={uploading}
-                  progressInfos={progressInfos}
-                />
-              </Box>
             </Grid>
           </Grid>
         </FormProvider>
@@ -218,7 +317,7 @@ export default function PaymentConfirm({ title }: Props) {
         open={isModal}
         onCloseModal={handleClose}
         isLoading={isLoading}
-        maxWidth="md"
+        maxWidth="sm"
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Xác nhận"
         cancelText="Quay lại"

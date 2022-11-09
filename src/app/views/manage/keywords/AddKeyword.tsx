@@ -76,7 +76,6 @@ export default function AddKeyword({ title }: Props) {
               required
             />
           </Stack>
-          {createLoading && <LinearProgress />}
         </FormProvider>
       </BoxWrapperDialog>
     )

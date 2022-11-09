@@ -136,3 +136,17 @@ export const fetchLogsActionDetail = async ({
   })
   return data
 }
+
+export const recalculatePrice = async (
+  orderId?: number,
+  payload?: {
+    dateStart?: string
+    dateEnd?: string
+  },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/recalculate-price `,
+    payload,
+  )
+  return data
+}

@@ -6,11 +6,17 @@ import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
-import { useOrderDetailData } from 'app/hooks/queries/useOrdersData'
+import {
+  useOrderDetailData,
+  useRecalculatePriceOrder,
+} from 'app/hooks/queries/useOrdersData'
 import useAuth from 'app/hooks/useAuth'
+import useDebounce from 'app/hooks/useDebounce.'
 import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
+import moment from 'moment'
+import { useEffect } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
@@ -52,6 +58,10 @@ export const isExpiredReceiveUser = (expiredTimeISO: string) => {
   return EXP_IN_MS <= NOW_IN_MS
 }
 
+export const isReceiveUser = (order: IOrderDetail, user: any) => {
+  return order.handledBy === (user as any).id
+}
+
 type SchemaType = {
   dateStart?: string
   dateEnd?: string
@@ -77,15 +87,44 @@ export default function OrderDetail(props: Props) {
     error,
   } = useOrderDetailData(Number(orderId ?? 0))
 
+  const [methods, fields] = useRHFOrder(order as IOrderDetail)
+
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
+
+  const debouncedDateStart = useDebounce(dateStart ?? '', 500)
+  const debouncedDateEnd = useDebounce(dateEnd ?? '', 500)
+
+  useEffect(() => {
+    if (!order) return
+    if (
+      !debouncedDateStart ||
+      !debouncedDateEnd ||
+      order.status === -1 ||
+      order.status === 4 ||
+      !isReceiveUser(order, user) ||
+      moment(new Date(debouncedDateStart)).unix() >
+        moment(new Date(debouncedDateEnd)).unix()
+    )
+      return
+
+    recalculate({
+      orderId: Number(orderId ?? 0),
+      payload: {
+        dateStart: new Date(debouncedDateStart).toISOString(),
+        dateEnd: new Date(debouncedDateEnd).toISOString(),
+      },
+    })
+  }, [debouncedDateStart, debouncedDateEnd, order])
+
   const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
+  const { mutate: recalculate } = useRecalculatePriceOrder(() => {})
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
   }
-
-  const [methods, fields] = useRHFOrder(order as IOrderDetail)
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     values = {
@@ -143,7 +182,8 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        {!isExpiredReceiveUser(order.handleExpireTime ?? '') &&
+        {isReceiveUser(order, user) &&
+          order.status !== -1 &&
           order.status !== 4 && (
             <>
               <MuiButton
@@ -191,7 +231,15 @@ export default function OrderDetail(props: Props) {
               : getOrderStatusSpec(order?.status ?? 0, 2).title
           }
           size="medium"
-          color={'default'}
+          sx={{
+            color: order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                  .textColor
+              : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
+            bgcolor: order.cancelRequest
+              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).bgColor
+              : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
+          }}
         />
       </Stack>
 
@@ -202,21 +250,32 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
-            {order.cancelRequest && (
+            {order.cancelRequest && order.cancelRequest.status !== 2 && (
               <Stack>
-                <CancelOrderInfo order={order} />
+                <CancelOrderInfo
+                  order={order}
+                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                />
               </Stack>
             )}
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
-                <CustomerInfo order={order} />
+                <CustomerInfo
+                  order={order}
+                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <CampgroundInfo campground={order.campGround} />
               </Grid>
             </Grid>
             <Stack>
-              <OrderServices order={order} fields={fields} methods={methods} />
+              <OrderServices
+                order={order}
+                fields={fields}
+                methods={methods}
+                isViewer={!isReceiveUser(order, user) || order.status === -1}
+              />
             </Stack>
             <Stack>
               <OrderProcesses rows={order.orderProcess} />

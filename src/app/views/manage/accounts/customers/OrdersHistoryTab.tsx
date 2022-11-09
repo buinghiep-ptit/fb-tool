@@ -14,20 +14,27 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { useOrdersData } from 'app/hooks/queries/useOrdersData'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import {
+  useOrdersData,
+  useReceiveCancelOrder,
+  useReceiveOrder,
+} from 'app/hooks/queries/useOrdersData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IOrderOverall } from 'app/models/order'
 import { columnsOrdersCustomer } from 'app/utils/columns/columnsOrdersCustomer'
 import { getOrderStatusSpec, OrderStatusEnum } from 'app/utils/enums/order'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { messages } from 'app/utils/messages'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
+import { dateDefault } from '../../orders/OrdersHistory'
 
 type ISearchFilters = {
-  search?: string
-  searchHandler?: string
+  searchCamp?: string
   status?: string
   from?: string
   to?: string
@@ -51,18 +58,29 @@ export default function OrdersHistory() {
     queryParams.size ? +queryParams.size : 20,
   )
 
+  const [titleDialog, setTitleDialog] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [receiveType, setReceiveType] = useState(0)
+  const [orderId, setOrderId] = useState(0)
+
   const [defaultValues] = useState<ISearchFilters>({
-    search: queryParams.search ?? '',
-    searchHandler: queryParams.searchHandler ?? '',
+    searchCamp: queryParams.search ?? '',
     status: queryParams.status ?? 'all',
-    from: queryParams.from ?? undefined,
-    to: queryParams.to ?? undefined,
+    from: queryParams.from ?? (dateDefault() as any).startDate?.toISOString(),
+    to: queryParams.to ?? (dateDefault() as any).endDate?.toISOString(),
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(
-    extractMergeFiltersObject(defaultValues, {}),
+    extractMergeFiltersObject(
+      {
+        ...defaultValues,
+        from: defaultValues.from,
+        to: defaultValues.to,
+      },
+      {},
+    ),
   )
   const { customerId } = useParams() ?? 0
 
@@ -77,28 +95,36 @@ export default function OrdersHistory() {
     cusId: customerId,
   })
 
-  const validationSchema = Yup.object().shape({
-    search: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    searchHandler: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    from: Yup.date()
-      //   .min(new Date(), 'Tối thiều là hôm nay')
-      .typeError('Sai dịnh dạng.')
-      .nullable(),
-    to: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 86400000)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable(),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      search: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      from: Yup.date()
+        .when('to', (to, yup) => {
+          if (to && to != 'Invalid Date') {
+            const dayAfter = new Date(to.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      to: Yup.date()
+        .when('from', (from, yup) => {
+          if (from && from != 'Invalid Date') {
+            const dayAfter = new Date(from.getTime())
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+    },
+    [['from', 'to']],
+  )
 
   const methods = useForm<ISearchFilters>({
     defaultValues,
@@ -163,12 +189,12 @@ export default function OrdersHistory() {
   }
 
   const onResetFilters = () => {
+    console.log('aaa')
     methods.reset({
-      searchHandler: '',
       status: 'all',
-      search: '',
-      from: undefined,
-      to: undefined,
+      searchCamp: '',
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
       page: 0,
       size: 20,
     })
@@ -176,19 +202,63 @@ export default function OrdersHistory() {
     setSize(20)
 
     setFilters({
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
       page: 0,
       size: 20,
     })
 
     navigate('', {
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
       page: 0,
       size: 20,
     } as any)
   }
 
+  const onSuccess = (data: any, message?: string) => {
+    toastSuccess({
+      message: message ?? '',
+    })
+    setOpenDialog(false)
+    navigation(`${orderId}`, {})
+  }
+  const { mutate: receive, isLoading: approveLoading } = useReceiveOrder(() =>
+    onSuccess(null, 'Tiếp nhận đơn hàng thành công'),
+  )
+  const { mutate: receiveCancel, isLoading: cancelLoading } =
+    useReceiveCancelOrder(() =>
+      onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
+    )
+
+  const approveConfirm = () => {
+    console.log(receiveType)
+    if (receiveType === 1) {
+      receive(orderId)
+    } else if (receiveType === 2) {
+      receiveCancel(orderId)
+    }
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.action) {
-      navigation(`${row.orderId}`, {})
+    if (cell.id === 'action') {
+      if (row.status === 0 || row.cancelRequestStatus === 0) {
+        setReceiveType(row.cancelRequestStatus === 0 ? 2 : 1)
+        setTitleDialog('Tiếp nhận')
+        setOrderId(row.orderId)
+        setOpenDialog(true)
+      } else {
+        navigation(`/quan-ly-don-hang/tat-ca/${row.orderId}`, {})
+      }
+    } else if (cell.id === 'cusAccount') {
+      window.open(
+        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/lich-su-dat-cho`,
+        '_blank',
+      )
+    } else if (cell.id === 'campGroundName') {
+      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
+    } else if (cell.id === 'campGroundRepresent') {
+      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
     }
   }
 
@@ -221,11 +291,11 @@ export default function OrdersHistory() {
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Số điện thoại, email'}
+                    label={'Điểm camp'}
                     type="text"
-                    name="search"
+                    name="searchCamp"
                     defaultValue=""
-                    placeholder="Nhập số điện thoại, email"
+                    placeholder="Nhập điểm camp"
                     fullWidth
                   />
                 </Grid>
@@ -298,6 +368,16 @@ export default function OrdersHistory() {
           />
         </SimpleCard>
       </Stack>
+      <DiagLogConfirm
+        title={titleDialog}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={approveConfirm}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">Đồng ý tiếp nhận?</MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </React.Fragment>
   )
 }

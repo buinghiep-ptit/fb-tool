@@ -17,9 +17,10 @@ import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 
 export interface ICustomerInfoProps {
   order?: IOrderDetail
+  isViewer?: boolean
 }
 
-export function CustomerInfo({ order }: ICustomerInfoProps) {
+export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -39,12 +40,12 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   order?.customer?.fullName
-                    ? order?.customer?.fullName + '-'
+                    ? order?.customer?.fullName + ' - '
                     : ''
                 }`}
                 {`${
                   order?.customer?.mobilePhone
-                    ? order?.customer?.mobilePhone + '-'
+                    ? order?.customer?.mobilePhone + ' - '
                     : ''
                 }`}
                 {order?.customer?.email}
@@ -63,6 +64,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Stack flexDirection={'row'} gap={1}>
                     <MuiRHFDatePicker
+                      disabled={isViewer}
                       name="dateStart"
                       label="Từ"
                       required={true}
@@ -70,6 +72,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   </Stack>
                   <Stack flexDirection={'row'} gap={1}>
                     <MuiRHFDatePicker
+                      disabled={isViewer}
                       name="dateEnd"
                       label="Đến"
                       required={true}
@@ -106,6 +109,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="fullName"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
                 <FormInputText
                   label={'Số điện thoại'}
@@ -114,6 +118,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="mobilePhone"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
                 <FormInputText
                   label={'Email'}
@@ -121,6 +126,7 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
                   name="email"
                   defaultValue=""
                   fullWidth
+                  disabled={isViewer}
                 />
               </Stack>
             </Grid>
@@ -128,13 +134,16 @@ export function CustomerInfo({ order }: ICustomerInfoProps) {
 
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
-              <MuiTypography variant="subtitle2">Ghi chú</MuiTypography>
+              <MuiTypography variant="subtitle2">
+                Ghi chú của khách hàng
+              </MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
               <FormTextArea
                 name="note"
                 defaultValue={''}
-                placeholder="Ghi chú"
+                placeholder="Nội dung"
+                disabled={isViewer}
               />
             </Grid>
           </Grid>

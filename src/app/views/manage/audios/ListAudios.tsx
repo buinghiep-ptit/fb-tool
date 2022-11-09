@@ -195,7 +195,7 @@ export default function ListAudios(props: Props) {
     setOpenDialog(false)
   }
 
-  const { mutate: changeStatus, isLoading: statusLoading } =
+  const { mutate: changeStatus, isLoading: updateLoading } =
     useChangeStatusAudio(() => onRowUpdateSuccess(null, 'Cập nhật thành công'))
 
   const { mutate: changeIsDefault, isLoading: defaultLoading } =
@@ -203,7 +203,7 @@ export default function ListAudios(props: Props) {
       onRowUpdateSuccess(null, 'Cập nhật thành công'),
     )
 
-  const { mutate: deleteAudio } = useDeleteAudio(() =>
+  const { mutate: deleteAudio, isLoading: deleteLoading } = useDeleteAudio(() =>
     onRowUpdateSuccess(null, 'Xoá nhạc nền thành công'),
   )
 
@@ -400,6 +400,7 @@ export default function ListAudios(props: Props) {
         onSubmit={submitDialog}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
+        isLoading={updateLoading || deleteLoading || defaultLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

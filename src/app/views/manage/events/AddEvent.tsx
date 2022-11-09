@@ -343,7 +343,7 @@ export default function AddEvent(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
-  const { mutate: deleteEvent } = useDeleteEvent(() =>
+  const { mutate: deleteEvent, isLoading: deleteLoading } = useDeleteEvent(() =>
     onRowUpdateSuccess(null, 'Xoá sự kiện thành công'),
   )
 
@@ -605,6 +605,7 @@ export default function AddEvent(props: Props) {
         onSubmit={onDeleteEvent}
         submitText={'Xoá'}
         cancelText={'Huỷ'}
+        isLoading={deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

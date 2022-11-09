@@ -142,6 +142,19 @@ export default function ListRating() {
     methods.reset({ ...defaultValues, scope: queryParams.scope })
   }, [currentTab])
 
+  useEffect(() => {
+    if (tabRef && tabRef.current != -1) {
+      onResetFilters()
+    }
+    navigate('', {
+      scope: queryParams.scope ?? 'reported',
+    } as any)
+    tabRef.current = currentTab
+    setTabName(navOrdersHistory.items[currentTab].label)
+    setCurrentTab(getCurrentTabIndex(queryParams.scope ?? ''))
+    methods.reset({ ...defaultValues, scope: queryParams.scope })
+  }, [queryParams.scope])
+
   const {
     data,
     isLoading,
@@ -253,7 +266,7 @@ export default function ListRating() {
 
   const [getContentNote, methodsNote] = useNoteDialogForm('note')
 
-  const { mutate: note, isLoading: dialogLoading } = useToggleRateStatus(() =>
+  const { mutate: note, isLoading: toggleLoading } = useToggleRateStatus(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
 
@@ -262,7 +275,7 @@ export default function ListRating() {
       setDialogData(prev => ({
         ...prev,
         title: row.status === 1 ? 'Chặn' : 'Hợp lệ',
-        message: (dialogLoading?: boolean) => getContentNote(dialogLoading),
+        message: (toggleLoading?: boolean) => getContentNote(toggleLoading),
         type: 'toggle-status',
         submitText: row.status === 1 ? 'Chặn' : 'Hợp lệ',
         cancelText: 'Huỷ',
@@ -270,7 +283,12 @@ export default function ListRating() {
       setRow(row)
       setOpenDialog(true)
     } else if (cell.id === 'customer') {
-      navigation(`${row.id}/chi-tiet`, {})
+      window.open(
+        `/quan-ly-tai-khoan-khach-hang/${row?.idCustomer}/thong-tin`,
+        '_blank',
+      )
+    } else if (cell.id === 'name') {
+      window.open(`/chi-tiet-dia-danh/${row?.campGroundId}`, '_blank')
     }
   }
   const onSuccess = (data: any, message?: string) => {
@@ -436,9 +454,10 @@ export default function ListRating() {
         onSubmit={() => onSubmitDialog(dialogData.type)}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
+        isLoading={toggleLoading}
       >
         <Stack>
-          {dialogData?.message && dialogData?.message(dialogLoading)}
+          {dialogData?.message && dialogData?.message(toggleLoading)}
         </Stack>
       </DiagLogConfirm>
     </Container>

@@ -109,8 +109,8 @@ export default function ListTrendingKeyword(props: Props) {
   const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
     () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
-  const { mutate: deleteKeyword } = useDeleteKeyword(() =>
-    onRowUpdateSuccess(null, 'Xoá thành công'),
+  const { mutate: deleteKeyword, isLoading: deleteLoading } = useDeleteKeyword(
+    () => onRowUpdateSuccess(null, 'Xoá thành công'),
   )
 
   const onSubmitDialog = () => {
@@ -204,6 +204,8 @@ export default function ListTrendingKeyword(props: Props) {
       title: 'Xoá từ khoá',
       message: 'Bạn có chắc chắn muốn xoá từ khoá',
       type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
     setRow(row)
@@ -364,6 +366,7 @@ export default function ListTrendingKeyword(props: Props) {
         onSubmit={onSubmitDialog}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
+        isLoading={toggleLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">

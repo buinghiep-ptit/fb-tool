@@ -12,9 +12,10 @@ import { IOrderDetail } from 'app/models/order'
 
 export interface ICustomerInfoProps {
   order?: IOrderDetail
+  isViewer?: boolean
 }
 
-export function CancelOrderInfo({ order }: ICustomerInfoProps) {
+export function CancelOrderInfo({ order, isViewer }: ICustomerInfoProps) {
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -36,12 +37,12 @@ export function CancelOrderInfo({ order }: ICustomerInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   order?.cancelRequest?.requester.fullName
-                    ? order?.cancelRequest?.requester.fullName + '-'
+                    ? order?.cancelRequest?.requester.fullName + ' - '
                     : ''
                 }`}
                 {`${
                   order?.cancelRequest?.requester.mobilePhone
-                    ? order?.cancelRequest?.requester.mobilePhone + '-'
+                    ? order?.cancelRequest?.requester.mobilePhone + ' - '
                     : ''
                 }`}
                 {order?.cancelRequest?.requester.email}
@@ -58,6 +59,7 @@ export function CancelOrderInfo({ order }: ICustomerInfoProps) {
                 name="reason"
                 defaultValue={order?.cancelRequest?.reason ?? ''}
                 placeholder="Lý do"
+                disabled={true}
               />
             </Grid>
           </Grid>

@@ -167,7 +167,7 @@ export default function AddAudio({ title }: Props) {
     onSuccess(null, 'Thêm bài hát thành công'),
   )
 
-  const { mutate: update, isLoading: isLoading } = useUpdateAudio(() =>
+  const { mutate: update, isLoading: updateLoading } = useUpdateAudio(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
 
@@ -283,8 +283,13 @@ export default function AddAudio({ title }: Props) {
                     methods.setValue('audioFile', acceptedFiles[0])
                     methods.clearErrors('audioFile')
                   }}
-                  accept={{ 'audio/*': [] }}
+                  accept={{
+                    'audio/ogg': ['.ogg', '.OGG'],
+                    'audio/wav': ['.wav', '.WAV'],
+                    'audio/mp3': ['.mp3', '.MP3'],
+                  }}
                   multiple={false}
+                  maxSize={20 * 1024 * 1024}
                 >
                   {({ getRootProps, getInputProps }) => (
                     <>
@@ -395,14 +400,18 @@ export default function AddAudio({ title }: Props) {
                     <Dropzone
                       ref={dropzoneImgRef}
                       onDrop={acceptedFiles => {
+                        if (!acceptedFiles || !acceptedFiles.length) return
                         setImagePreviewer({
                           url: URL.createObjectURL(acceptedFiles[0]),
                         })
                         methods.setValue('imageFile', acceptedFiles[0])
                       }}
-                      accept={{ 'image/*': [] }}
+                      accept={{
+                        'image/png': ['.png', '.PNG'],
+                        'image/jpeg': ['.jpg', '.jpeg'],
+                      }}
                       multiple={false}
-                      maxSize={1 * 1024 * 1024}
+                      maxSize={10 * 1024 * 1024}
                     >
                       {({ getRootProps, getInputProps }) => (
                         <>
@@ -517,7 +526,7 @@ export default function AddAudio({ title }: Props) {
         title={title}
         open={isModal}
         onCloseModal={handleClose}
-        isLoading={isLoading}
+        isLoading={createLoading || updateLoading}
         maxWidth={'md'}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Lưu"

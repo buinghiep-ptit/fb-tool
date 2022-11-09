@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, MenuItem, Stack, styled } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -30,6 +30,8 @@ import {
 } from 'app/utils/columns/columnsOrders'
 import { getOrderStatusSpec, OrderStatusEnum } from 'app/utils/enums/order'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { messages } from 'app/utils/messages'
+import moment from 'moment'
 import React, { useEffect, useRef, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
@@ -68,12 +70,23 @@ type ISearchFilters = {
   search?: string
   searchHandler?: string
   status?: string
-  from?: string
-  to?: string
+  from?: any
+  to?: any
   page?: number
   size?: number
   sort?: string
   isPending?: 1 | 0
+}
+
+export const dateDefault = () => {
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setDate(startDate.getDate() - 7)
+
+  return {
+    startDate: moment(startDate),
+    endDate: moment(endDate),
+  }
 }
 
 export interface Props {}
@@ -100,13 +113,20 @@ export default function OrdersHistory() {
     search: queryParams.search ?? '',
     searchHandler: queryParams.searchHandler ?? '',
     status: queryParams.status ?? 'all',
-    from: queryParams.from ?? undefined,
-    to: queryParams.to ?? undefined,
+    from: queryParams.from ?? (dateDefault() as any).startDate?.toISOString(),
+    to: queryParams.to ?? (dateDefault() as any).endDate?.toISOString(),
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
   const [filters, setFilters] = useState<ISearchFilters>(
-    extractMergeFiltersObject(defaultValues, {}),
+    extractMergeFiltersObject(
+      {
+        ...defaultValues,
+        from: defaultValues.from,
+        to: defaultValues.to,
+      },
+      {},
+    ),
   )
   const { source, orderId: id } = useParams() ?? 0
 
@@ -143,34 +163,57 @@ export default function OrdersHistory() {
     error,
   }: UseQueryResult<any, Error> = useOrdersData(filters, currentTab)
 
-  const validationSchema = Yup.object().shape({
-    search: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    searchHandler: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
-    from: Yup.date()
-      //   .min(new Date(), 'Tối thiều là hôm nay')
-      .typeError('Sai dịnh dạng.')
-      .nullable(),
-    to: Yup.date()
-      .when('startDate', (startDate, yup) => {
-        if (startDate && startDate != 'Invalid Date') {
-          const dayAfter = new Date(startDate.getTime() + 0)
-          return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-        }
-        return yup
-      })
-      .typeError('Sai định dạng.')
-      .nullable(),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      search: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      searchHandler: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      from: Yup.date()
+        .when('to', (to, yup) => {
+          if (to && to != 'Invalid Date') {
+            const dayAfter = new Date(to.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      to: Yup.date()
+        .when('from', (from, yup) => {
+          if (from && from != 'Invalid Date') {
+            const dayAfter = new Date(from.getTime())
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+    },
+    [['from', 'to']],
+  )
 
   const methods = useForm<ISearchFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const from = methods.watch('from')
+  const to = methods.watch('to')
+
+  useEffect(() => {
+    if (!from || !to) return
+
+    if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
+      methods.clearErrors('from')
+      methods.clearErrors('to')
+    }
+  }, [from, to])
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -235,8 +278,8 @@ export default function OrdersHistory() {
       searchHandler: '',
       status: 'all',
       search: '',
-      from: undefined,
-      to: undefined,
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
       page: 0,
       size: 20,
     })
@@ -244,13 +287,17 @@ export default function OrdersHistory() {
     setPage(0)
     setSize(20)
     setFilters({
-      page,
-      size,
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
+      page: 0,
+      size: 20,
     })
 
     navigate('', {
-      page,
-      size,
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -272,9 +319,16 @@ export default function OrdersHistory() {
         navigation(`${row.orderId}`, {})
       }
     } else if (cell.id === 'cusAccount') {
-      // navigation(`${row.orderId}`, {})
+      window.open(
+        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/lich-su-dat-cho`,
+        '_blank',
+      )
     } else if (cell.id === 'campGroundName') {
-      // navigation(`${row.orderId}`, {})
+      // window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
+      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
+    } else if (cell.id === 'campGroundRepresent') {
+      // window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
+      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
     }
   }
 
@@ -339,11 +393,11 @@ export default function OrdersHistory() {
                 <Grid container spacing={2}>
                   <Grid item sm={4} xs={12}>
                     <FormInputText
-                      label={'Số điện thoại, email'}
+                      label={'Số điện thoại, email người đặt'}
                       type="text"
                       name="search"
                       defaultValue=""
-                      placeholder="Nhập số điện thoại, email"
+                      placeholder="Nhập số điện thoại, email người đặt"
                       fullWidth
                     />
                   </Grid>
@@ -379,7 +433,7 @@ export default function OrdersHistory() {
                         <MuiRHFDatePicker name="to" label="Ngày kết thúc" />
                       </Grid>
                     </LocalizationProvider>
-                    <Grid item sm={4} xs={12} mt={1}>
+                    <Grid item sm={2} xs={12} mt={1}>
                       <MuiButton
                         loading={isFetching}
                         title="Tìm kiếm"
@@ -388,6 +442,16 @@ export default function OrdersHistory() {
                         type="submit"
                         sx={{ width: '100%' }}
                         startIcon={<SearchSharp />}
+                      />
+                    </Grid>
+                    <Grid item sm={2} xs={12} mt={1}>
+                      <MuiButton
+                        title="Làm mới"
+                        variant="outlined"
+                        color="primary"
+                        onClick={onResetFilters}
+                        sx={{ width: '100%' }}
+                        startIcon={<Icon>cached</Icon>}
                       />
                     </Grid>
                   </Grid>
@@ -425,6 +489,7 @@ export default function OrdersHistory() {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={approveConfirm}
+        isLoading={approveLoading || cancelLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">Đồng ý tiếp nhận?</MuiTypography>
@@ -493,6 +558,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
 
     case 2:
       return [
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.RECEIVED).value,
+          title: getOrderStatusSpec(OrderStatusEnum.RECEIVED).title,
+        },
         {
           value: getOrderStatusSpec(OrderStatusEnum.WAIT_HANDLE).value,
           title: getOrderStatusSpec(OrderStatusEnum.WAIT_HANDLE).title,

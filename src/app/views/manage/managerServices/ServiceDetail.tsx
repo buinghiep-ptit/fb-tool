@@ -137,10 +137,9 @@ export default function ServiceDetail(props: Props) {
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
-          amount: Yup.string().max(
-            11,
-            'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ',
-          ),
+          amount: Yup.string()
+            .max(11, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
+            .required(messages.MSG1),
         }),
       ),
     ),
@@ -281,8 +280,13 @@ export default function ServiceDetail(props: Props) {
   )
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
-    useQuery<ICampAreaResponse, Error>(['camp-grounds'], () =>
-      fetchCampGrounds({ size: 200, page: 0 }),
+    useQuery<ICampAreaResponse, Error>(
+      ['camp-grounds'],
+      () => fetchCampGrounds({ size: 200, page: 0 }),
+      {
+        refetchOnWindowFocus: false,
+        staleTime: 15 * 60 * 1000,
+      },
     )
 
   React.useEffect(() => {
@@ -352,7 +356,7 @@ export default function ServiceDetail(props: Props) {
         return 'Thứ 7'
     }
   }
-
+  console.log(methods.formState.errors)
   return (
     <Container>
       <Box className="breadcrumb">
@@ -373,6 +377,7 @@ export default function ServiceDetail(props: Props) {
           color="primary"
           onClick={methods.handleSubmit(onSubmitHandler)}
           startIcon={<Icon>done</Icon>}
+          disabled={createLoading}
         />
 
         <MuiButton

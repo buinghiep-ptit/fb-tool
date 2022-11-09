@@ -1,7 +1,79 @@
-import { Chip, Icon, Tooltip, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Chip, Icon, Tooltip, Typography, TypographyProps } from '@mui/material'
+import { Box, BoxProps } from '@mui/system'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleEvents } from 'app/models'
+import { ReactElement } from 'react'
+
+type Props = {
+  url?: string
+} & BoxProps
+
+export const BoxImage = ({
+  url = '/assets/images/app/image-default.png',
+  ...props
+}: Props) => {
+  return (
+    <Box
+      {...props}
+      sx={{
+        position: 'relative',
+        overflow: 'hidden',
+        aspectRatio: 'auto 16 / 9',
+        borderRadius: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        border: '1px solid #D9D9D9',
+        backgroundColor: '#EEEEEE',
+        p: 0.25,
+        ml: 1,
+      }}
+    >
+      <img
+        src={url}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          borderRadius: 4,
+        }}
+        loading="lazy"
+        alt="bg"
+      />
+    </Box>
+  )
+}
+
+type TextProps = {
+  text?: string
+  underline?: boolean
+  maxLines?: number
+} & TypographyProps
+
+export const TooltipText = ({
+  text = '',
+  underline = false,
+  maxLines = 1,
+  ...props
+}: TextProps) => {
+  return (
+    <Tooltip arrow title={text}>
+      <Typography
+        {...props}
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: maxLines.toString(),
+          WebkitBoxOrient: 'vertical',
+          textDecorationLine: underline ? 'underline' : 'none',
+        }}
+      >
+        {text}
+      </Typography>
+    </Tooltip>
+  )
+}
 
 export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
   {
@@ -22,38 +94,7 @@ export const columnsEvents: readonly TableColumn<TitleEvents>[] = [
     label: 'Ảnh/Video',
     minWidth: 80,
     align: 'center',
-    media: (value: string) => (
-      <Box
-        sx={{
-          position: 'relative',
-          overflow: 'hidden',
-          aspectRatio: 'auto 16 / 9',
-          borderRadius: 1,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          border: '1px solid #D9D9D9',
-          backgroundColor: '#EEEEEE',
-          p: 0.25,
-          ml: 1,
-        }}
-      >
-        <img
-          src={
-            value ??
-            'https://i.pinimg.com/564x/44/15/ba/4415ba5df0f4bfcee5893d6c441577e0.jpg'
-          }
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            borderRadius: 4,
-          }}
-          loading="lazy"
-          alt="bg"
-        />
-      </Box>
-    ),
+    media: (value: string) => <BoxImage url={value} />,
   },
   {
     id: 'name',

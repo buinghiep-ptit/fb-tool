@@ -159,7 +159,6 @@ export default function LockCustomer({ title }: Props) {
             </Box>
           </Stack>
         </FormProvider>
-        {isLoading && <LinearProgress />}
       </Box>
     )
   }

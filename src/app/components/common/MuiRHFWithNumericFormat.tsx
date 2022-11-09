@@ -10,6 +10,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { NumericFormat } from 'react-number-format'
 
 export type Props = {
+  isAllowZeroFirst?: boolean
   iconStart?: React.ReactElement
   iconEnd?: React.ReactElement
   name: string
@@ -21,13 +22,14 @@ export type Props = {
   required?: boolean
 } & TextFieldProps
 
-const MAX_LIMIT = 1000
-const MIN_LIMIT = 0
+// const MAX_LIMIT = 1000
+// const MIN_LIMIT = 0
 
 const MuiRHFNumericFormatInput: FC<Props> = ({
   name,
   label = '',
   isAllowDot = false,
+  isAllowZeroFirst = true,
   defaultValue,
   iconStart,
   iconEnd,
@@ -52,10 +54,11 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
           label={label}
           isAllowed={(values: any) => {
             const { value } = values
+            const MIN_LIMIT = isAllowZeroFirst ? 0 : 1
             return (
               !value ||
               (value &&
-                value > MIN_LIMIT &&
+                value >= MIN_LIMIT &&
                 ((!isAllowDot && !value.toString().includes('.')) ||
                   isAllowDot))
             )

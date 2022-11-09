@@ -137,7 +137,7 @@ export default function ManagerMerchant(props) {
                 fetchListMerchant({
                   search: search,
                   status: statusFilter,
-                  merchantType: merchantType,
+                  merchantType: merchantType == 0 ? '' : merchantType,
                   page: 0,
                   size: 20,
                 })

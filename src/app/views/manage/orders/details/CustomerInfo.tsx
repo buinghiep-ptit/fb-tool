@@ -40,12 +40,12 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   order?.customer?.fullName
-                    ? order?.customer?.fullName + '-'
+                    ? order?.customer?.fullName + ' - '
                     : ''
                 }`}
                 {`${
                   order?.customer?.mobilePhone
-                    ? order?.customer?.mobilePhone + '-'
+                    ? order?.customer?.mobilePhone + ' - '
                     : ''
                 }`}
                 {order?.customer?.email}

@@ -11,9 +11,12 @@ import {
   useRecalculatePriceOrder,
 } from 'app/hooks/queries/useOrdersData'
 import useAuth from 'app/hooks/useAuth'
+import useDebounce from 'app/hooks/useDebounce.'
 import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
+import moment from 'moment'
+import { useEffect } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
@@ -84,19 +87,44 @@ export default function OrderDetail(props: Props) {
     error,
   } = useOrderDetailData(Number(orderId ?? 0))
 
+  const [methods, fields] = useRHFOrder(order as IOrderDetail)
+
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
+
+  const debouncedDateStart = useDebounce(dateStart ?? '', 500)
+  const debouncedDateEnd = useDebounce(dateEnd ?? '', 500)
+
+  useEffect(() => {
+    if (!order) return
+    if (
+      !debouncedDateStart ||
+      !debouncedDateEnd ||
+      order.status === -1 ||
+      order.status === 4 ||
+      !isReceiveUser(order, user) ||
+      moment(new Date(debouncedDateStart)).unix() >
+        moment(new Date(debouncedDateEnd)).unix()
+    )
+      return
+
+    recalculate({
+      orderId: Number(orderId ?? 0),
+      payload: {
+        dateStart: new Date(debouncedDateStart).toISOString(),
+        dateEnd: new Date(debouncedDateEnd).toISOString(),
+      },
+    })
+  }, [debouncedDateStart, debouncedDateEnd, order])
+
   const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
-
-  const { mutate: recalculate } = useRecalculatePriceOrder(() =>
-    onRowUpdateSuccess(null, 'Cập nhật thành công'),
-  )
+  const { mutate: recalculate } = useRecalculatePriceOrder(() => {})
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
   }
-
-  const [methods, fields] = useRHFOrder(order as IOrderDetail)
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     values = {
@@ -154,28 +182,30 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        {isReceiveUser(order, user) && order.status !== 4 && (
-          <>
-            <MuiButton
-              title="Lưu"
-              variant="contained"
-              color="primary"
-              type="submit"
-              disabled={editLoading}
-              loading={editLoading}
-              onClick={methods.handleSubmit(onSubmitHandler)}
-              startIcon={<Icon>done</Icon>}
-            />
-            <MuiButton
-              title="Huỷ"
-              variant="contained"
-              color="warning"
-              disabled={editLoading}
-              onClick={() => methods.reset()}
-              startIcon={<Icon>clear</Icon>}
-            />
-          </>
-        )}
+        {isReceiveUser(order, user) &&
+          order.status !== -1 &&
+          order.status !== 4 && (
+            <>
+              <MuiButton
+                title="Lưu"
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={editLoading}
+                loading={editLoading}
+                onClick={methods.handleSubmit(onSubmitHandler)}
+                startIcon={<Icon>done</Icon>}
+              />
+              <MuiButton
+                title="Huỷ"
+                variant="contained"
+                color="warning"
+                disabled={editLoading}
+                onClick={() => methods.reset()}
+                startIcon={<Icon>clear</Icon>}
+              />
+            </>
+          )}
 
         <MuiButton
           title="Quay lại"
@@ -224,7 +254,7 @@ export default function OrderDetail(props: Props) {
               <Stack>
                 <CancelOrderInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user)}
+                  isViewer={!isReceiveUser(order, user) || order.status === -1}
                 />
               </Stack>
             )}
@@ -232,7 +262,7 @@ export default function OrderDetail(props: Props) {
               <Grid item xs={12} md={6}>
                 <CustomerInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user)}
+                  isViewer={!isReceiveUser(order, user) || order.status === -1}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -244,7 +274,7 @@ export default function OrderDetail(props: Props) {
                 order={order}
                 fields={fields}
                 methods={methods}
-                isViewer={!isReceiveUser(order, user)}
+                isViewer={!isReceiveUser(order, user) || order.status === -1}
               />
             </Stack>
             <Stack>

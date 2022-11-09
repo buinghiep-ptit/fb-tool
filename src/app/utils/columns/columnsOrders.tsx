@@ -6,6 +6,7 @@ import moment from 'moment'
 import { getOrderStatusSpec } from '../enums/order'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import { TooltipText } from './columnsEvents'
 
 export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   {
@@ -537,6 +538,7 @@ export const columnsOrderProcessesDetail: any = [
     id: 'account',
     label: 'Người xử lý',
     minWidth: 170,
+    action: (value: any) => <TooltipText text={value} />,
   },
   {
     id: 'status',

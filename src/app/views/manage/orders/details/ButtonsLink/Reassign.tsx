@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Stack } from '@mui/material'
+import { Chip, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
@@ -26,6 +26,23 @@ export type ReassignSchema = {
   reason?: string
 }
 
+const extractAccounts = (accounts?: IUser[]) => {
+  if (!accounts || !accounts.length) return []
+  const accArr = accounts.filter(acc => acc.role === 1 || acc.role === 2)
+
+  return accArr.map(acc =>
+    Object.assign(acc, {
+      icon: (
+        <Chip
+          label={acc.role === 1 ? 'Admin' : 'CS'}
+          size="small"
+          color={acc.role === 1 ? 'primary' : 'secondary'}
+        />
+      ),
+    }),
+  )
+}
+
 export default function Reassign({ title }: Props) {
   const navigate = useNavigate()
   const location = useLocation() as any
@@ -50,7 +67,7 @@ export default function Reassign({ title }: Props) {
   })
 
   const { data: handlerUsers }: UseQueryResult<IUserResponse, Error> =
-    useUsersData({ page: 0, size: 200, status: 1, role: 2 })
+    useUsersData({ page: 0, size: 500, status: 1 })
 
   const { mutate: reassign, isLoading: isLoading } = useReassignOrder(() =>
     onSuccess(null, 'Chuyển tiếp thành công'),
@@ -77,7 +94,7 @@ export default function Reassign({ title }: Props) {
             <MuiRHFAutoComplete
               name="newHandler"
               label="Chuyển tiếp cho"
-              options={handlerUsers?.content ?? []}
+              options={extractAccounts(handlerUsers?.content) ?? []}
               optionProperty="email"
               getOptionLabel={option => option.email ?? ''}
               defaultValue=""

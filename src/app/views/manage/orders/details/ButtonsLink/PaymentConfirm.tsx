@@ -82,7 +82,11 @@ export default function PaymentConfirm({ title }: Props) {
   ) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
     let fileResponse
-    if (values.files) fileResponse = await uploadFileAll(values.files)
+    try {
+      if (values.files) fileResponse = await uploadFileAll(values.files)
+    } catch (error) {
+      setSelectedFiles([])
+    }
 
     const payload = {
       transCode: values.transCode,

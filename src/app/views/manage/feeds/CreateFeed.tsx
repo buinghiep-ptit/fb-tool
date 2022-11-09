@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
+  Chip,
   Grid,
   Icon,
   LinearProgress,
@@ -83,6 +84,21 @@ const Container = styled('div')<Props>(({ theme }) => ({
     [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
   },
 }))
+
+const extractCamps = (camps?: any[]) => {
+  if (!camps || !camps.length) return []
+  return camps.map(camp =>
+    Object.assign(camp, {
+      icon: (
+        <Chip
+          label={camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+          size="small"
+          color={camp.status === 1 ? 'primary' : 'default'}
+        />
+      ),
+    }),
+  )
+}
 
 export default function CreateFeed(props: Props) {
   const navigate = useNavigate()
@@ -724,8 +740,8 @@ export default function CreateFeed(props: Props) {
                               name="camp"
                               options={
                                 Number(methods.watch('idSrcType')) === 1
-                                  ? campAreas ?? []
-                                  : campGrounds?.content ?? []
+                                  ? extractCamps(campAreas) ?? []
+                                  : extractCamps(campGrounds?.content) ?? []
                               }
                               optionProperty="name"
                               getOptionLabel={option => option.name ?? ''}

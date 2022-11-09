@@ -1,36 +1,14 @@
-import styled from '@emotion/styled'
 import {
   Autocomplete,
+  Chip,
   CircularProgress,
   Paper,
   Stack,
   TextField,
 } from '@mui/material'
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { MuiTypography } from './MuiTypography'
-
-const CssTextField = styled(TextField)({
-  '& .MuiInputBase-root': {
-    paddingTop: '2px',
-    paddingBottom: '4px',
-    paddingLeft: '6px',
-    '&:focused': {
-      caretColor: '#0062cc',
-    },
-  },
-})
-
-export interface Props {
-  name: string
-  label?: string
-  defaultValue?: any
-  options?: any
-  optionProperty: string // keyof options
-  renderInput?: any
-  getOptionLabel?: (option: any) => string
-  required?: boolean
-}
 
 function CustomPaper({ children, ...others }: any) {
   return (
@@ -51,6 +29,17 @@ function CustomPaper({ children, ...others }: any) {
     </Paper>
   )
 }
+export interface Props {
+  name: string
+  label?: string
+  defaultValue?: any
+  options?: any
+  optionProperty: string // keyof options
+  renderInput?: any
+  getOptionLabel?: (option: any) => string
+  rightIcon?: ReactElement
+  required?: boolean
+}
 
 export function MuiRHFAutoComplete({
   name,
@@ -59,6 +48,7 @@ export function MuiRHFAutoComplete({
   options = [],
   optionProperty,
   getOptionLabel,
+  rightIcon,
   required,
 }: Props) {
   const {
@@ -101,7 +91,22 @@ export function MuiRHFAutoComplete({
             }`
             return (
               <li {...props} key={key}>
-                {option[optionProperty]}
+                <Stack
+                  direction={'row'}
+                  gap={1.5}
+                  justifyContent="space-between"
+                  flex={1}
+                >
+                  <MuiTypography>{option[optionProperty]}</MuiTypography>
+                  {
+                    option.icon && option.icon
+                    // <Chip
+                    //   label={option.role === 1 ? 'Admin' : 'CS'}
+                    //   size="small"
+                    //   color={option.role === 1 ? 'primary' : 'default'}
+                    // />
+                  }
+                </Stack>
               </li>
             )
           }}

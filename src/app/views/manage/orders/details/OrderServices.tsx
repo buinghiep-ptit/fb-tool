@@ -131,6 +131,7 @@ export function OrderServices({
                       <Stack>
                         <IconButton
                           disabled={
+                            isViewer ||
                             convertToNumber(
                               methods.watch(`services.${index}.quantity`),
                             ) >= 999999999
@@ -158,6 +159,7 @@ export function OrderServices({
                         </IconButton>
                         <IconButton
                           disabled={
+                            isViewer ||
                             methods.watch(`services.${index}.quantity`) == 1
                           }
                           onClick={() =>

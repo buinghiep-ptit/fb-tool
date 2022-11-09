@@ -59,7 +59,7 @@ export function CancelOrderInfo({ order, isViewer }: ICustomerInfoProps) {
                 name="reason"
                 defaultValue={order?.cancelRequest?.reason ?? ''}
                 placeholder="Lý do"
-                disabled={isViewer}
+                disabled={true}
               />
             </Grid>
           </Grid>

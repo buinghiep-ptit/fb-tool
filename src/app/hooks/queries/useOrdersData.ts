@@ -213,10 +213,10 @@ export const useRecalculatePriceOrder = (onSuccess?: any, onError?: any) => {
     (params: { orderId?: number; payload?: any }) =>
       recalculatePrice(params.orderId ?? 0, params.payload),
     {
-      onSettled: () => {
-        queryClient.invalidateQueries(['order-detail'])
-        queryClient.invalidateQueries(['orders'])
-        queryClient.invalidateQueries(['logs-order'])
+      onSettled: (data: any) => {
+        if (data) {
+          queryClient.invalidateQueries(['order-detail'])
+        }
       },
       onSuccess,
     },

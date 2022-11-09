@@ -1,9 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  ChangeCircleSharp,
-  PersonAddAltSharp,
-  SearchSharp,
-} from '@mui/icons-material'
+import { ChangeCircleSharp } from '@mui/icons-material'
 import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { UseQueryResult } from '@tanstack/react-query'
@@ -21,9 +17,14 @@ import { IUser, IUserResponse } from 'app/models/account'
 import { columnsAdminAccounts } from 'app/utils/columns/columnsAdminAccounts'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { messages } from 'app/utils/messages'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
@@ -50,6 +51,10 @@ export interface Props {}
 export default function AdminAccounts(props: Props) {
   const navigation = useNavigate()
   const navigate = useNavigateParams()
+  const { id } = useParams()
+  const location = useLocation() as any
+  const isModal = location.state?.modal
+
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(
@@ -58,6 +63,7 @@ export default function AdminAccounts(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
+  console.log(id)
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
@@ -88,6 +94,14 @@ export default function AdminAccounts(props: Props) {
       status: row.status * -1,
     })
   }
+
+  useEffect(() => {
+    if (id && !isModal) {
+      navigation(`${id}/chi-tiet`, {
+        state: { modal: true },
+      })
+    }
+  }, [id])
 
   const validationSchema = Yup.object().shape({
     account: Yup.string()

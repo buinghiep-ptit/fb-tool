@@ -3,6 +3,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Chip,
   Divider,
   FormControlLabel,
   FormHelperText,
@@ -20,6 +21,7 @@ import { BoxImage, TooltipText } from 'app/utils/columns/columnsEvents'
 import { getServiceNameByType } from 'app/utils/enums/order'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 import { useEffect } from 'react'
+import { NavLink } from 'react-router-dom'
 
 export interface IOrderServicesProps {
   methods?: any
@@ -65,6 +67,21 @@ export function OrderServices({
     }
   }, [getTotalAmount(services)])
 
+  const getColorServiceType = (type?: number) => {
+    switch (type) {
+      case 1:
+        return 'primary'
+      case 2:
+      case 1:
+        return 'secondary'
+      case 3:
+        return 'default'
+
+      default:
+        return 'default'
+    }
+  }
+
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -77,9 +94,9 @@ export function OrderServices({
       <AccordionDetails>
         <Stack gap={3}>
           {fields.map(
-            ({ serviceId, quantity, name, type, amount, imgUrl }, index) => (
+            ({ idService, quantity, name, type, amount, imgUrl }, index) => (
               <Stack
-                key={index ?? serviceId}
+                key={index ?? idService}
                 direction={{
                   sm: 'column',
                   md: 'row',
@@ -99,23 +116,31 @@ export function OrderServices({
                 >
                   <BoxImage maxWidth={100} url={imgUrl} />
 
-                  <Stack width="100%">
-                    <TooltipText
-                      text={name}
-                      underline={false}
-                      variant="subtitle2"
-                    />
+                  <Stack width="100%" gap={0.5}>
+                    <NavLink
+                      to={`/quan-ly-dich-vu/${idService}/chi-tiet`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <TooltipText
+                        text={name}
+                        underline={true}
+                        color="primary"
+                        variant="subtitle2"
+                      />
+                    </NavLink>
+
                     <Stack direction={'row'} gap={1}>
-                      <MuiTypography variant="body1">
+                      <MuiTypography variant="body2">
                         Loại dịch vụ:
                       </MuiTypography>
-                      <MuiTypography
-                        variant="body2"
-                        color={'primary'}
-                        fontWeight={500}
-                      >
-                        {getServiceNameByType(type ?? 0)}
-                      </MuiTypography>
+
+                      <Chip
+                        label={getServiceNameByType(type ?? 0)}
+                        size="small"
+                        color={getColorServiceType(type)}
+                      />
                     </Stack>
                   </Stack>
                   <Box minWidth={240}>

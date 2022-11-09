@@ -295,7 +295,7 @@ export default function OrdersHistory() {
                     type="text"
                     name="searchCamp"
                     defaultValue=""
-                    placeholder="Nhập điểm camp"
+                    placeholder="Nhập tên điểm camp"
                     fullWidth
                   />
                 </Grid>

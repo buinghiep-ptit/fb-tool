@@ -30,7 +30,7 @@ export const BoxImage = ({
       }}
     >
       <img
-        src={url}
+        src={url ?? '/assets/images/app/image-default.png'}
         style={{
           width: '100%',
           height: '100%',
@@ -57,7 +57,7 @@ export const TooltipText = ({
   ...props
 }: TextProps) => {
   return (
-    <Tooltip arrow title={text}>
+    <Tooltip arrow title={text} followCursor>
       <Typography
         {...props}
         sx={{

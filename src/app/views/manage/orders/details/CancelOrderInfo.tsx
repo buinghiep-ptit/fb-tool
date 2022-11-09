@@ -37,15 +37,19 @@ export function CancelOrderInfo({ order, isViewer }: ICustomerInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   order?.cancelRequest?.requester.fullName
-                    ? order?.cancelRequest?.requester.fullName + ' - '
+                    ? order?.cancelRequest?.requester.fullName
                     : ''
                 }`}
                 {`${
                   order?.cancelRequest?.requester.mobilePhone
-                    ? order?.cancelRequest?.requester.mobilePhone + ' - '
+                    ? ' - ' + order?.cancelRequest?.requester.mobilePhone
                     : ''
                 }`}
-                {order?.cancelRequest?.requester.email}
+                {`${
+                  order?.cancelRequest?.requester.email
+                    ? ' - ' + order?.cancelRequest?.requester.email
+                    : ''
+                }`}
               </MuiTypography>
             </Grid>
           </Grid>

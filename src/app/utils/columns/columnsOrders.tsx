@@ -69,7 +69,6 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     id: 'campGroundRepresent',
     label: 'Chủ camp',
     minWidth: 120,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -170,7 +169,9 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     id: 'handledBy',
     label: 'Người tiếp nhận',
     minWidth: 170,
-    align: 'center',
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={1} />
+    ),
   },
   {
     id: 'action',
@@ -255,7 +256,6 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     id: 'campGroundRepresent',
     label: 'Chủ camp',
     minWidth: 120,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -342,7 +342,9 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     id: 'handledBy',
     label: 'Người tiếp nhận',
     minWidth: 170,
-    align: 'center',
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={1} />
+    ),
   },
   {
     id: 'action',
@@ -427,7 +429,6 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     id: 'campGroundRepresent',
     label: 'Chủ camp',
     minWidth: 120,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -506,7 +507,9 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     id: 'handledBy',
     label: 'Người tiếp nhận',
     minWidth: 170,
-    align: 'center',
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={1} />
+    ),
   },
   {
     id: 'action',

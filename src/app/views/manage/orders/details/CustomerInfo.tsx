@@ -134,13 +134,15 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
 
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
-              <MuiTypography variant="subtitle2">Ghi chú</MuiTypography>
+              <MuiTypography variant="subtitle2">
+                Ghi chú của khách hàng
+              </MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
               <FormTextArea
                 name="note"
                 defaultValue={''}
-                placeholder="Ghi chú"
+                placeholder="Nội dung"
                 disabled={isViewer}
               />
             </Grid>

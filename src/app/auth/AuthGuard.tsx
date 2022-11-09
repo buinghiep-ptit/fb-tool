@@ -13,8 +13,9 @@ export const userHasPermission = (pathname: string, user: any, routes: any) => {
   if (!user || !user.authorities.length) {
     return false
   }
-  const matched = routes.find((r: any) => r.path === pathname)
-
+  const matched = routes.find((r: any) => {
+    return pathname.includes(r.path)
+  })
   const authenticated =
     matched && matched.auth && matched.auth.length
       ? matched.auth.includes(user.authorities[0])
@@ -75,6 +76,8 @@ const AuthGuard = ({ children }: Props) => {
       logout()
     }
   }, [pathname])
+
+  console.log('hasPermission:', hasPermission)
 
   if (!hasPermission && isAuthenticated) {
     return <Navigate replace to="/" />

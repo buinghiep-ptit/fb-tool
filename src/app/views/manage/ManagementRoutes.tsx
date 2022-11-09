@@ -107,10 +107,12 @@ const ManagementRoutes = [
       {
         path: ':id/chi-tiet',
         element: <UserDetail title="Chi tiết tài khoản" />,
+        auth: [ROLES.ADMIN],
       },
       {
         path: 'them-moi',
         element: <CreateUser title="Thêm tài khoản" />,
+        auth: [ROLES.ADMIN],
       },
     ],
     auth: [ROLES.ADMIN],

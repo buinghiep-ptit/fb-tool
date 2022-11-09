@@ -78,6 +78,7 @@ export const useRHFOrder = (order: IOrderDetail) => {
           }),
         ),
       ),
+      note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
     },
     [['dateStart', 'dateEnd']], // throw error cyclic dependence if have not this params
   )

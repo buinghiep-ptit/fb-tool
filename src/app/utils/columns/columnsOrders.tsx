@@ -90,7 +90,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'amount',
-    label: 'Tổng thực tế',
+    label: 'Giá trị đơn (VNĐ)',
     minWidth: 120,
     align: 'center',
     format: (value: number) =>
@@ -102,7 +102,7 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'paymentAmnt',
-    label: 'Đã thanh toán',
+    label: 'Giá trị cọc (VNĐ)',
     minWidth: 120,
     align: 'center',
     format: (value: number) =>
@@ -276,8 +276,8 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'amount',
-    label: 'Tổng thực tế',
-    minWidth: 100,
+    label: 'Tổng thực tế (VNĐ)',
+    minWidth: 150,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -286,18 +286,18 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
         <></>
       ),
   },
-  {
-    id: 'paymentAmnt',
-    label: 'Đã thanh toán',
-    minWidth: 120,
-    align: 'center',
-    format: (value: number) =>
-      value ? (
-        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
-      ) : (
-        <></>
-      ),
-  },
+  // {
+  //   id: 'paymentAmnt',
+  //   label: 'Đã thanh toán',
+  //   minWidth: 120,
+  //   align: 'center',
+  //   format: (value: number) =>
+  //     value ? (
+  //       <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+  //     ) : (
+  //       <></>
+  //     ),
+  // },
   {
     id: 'dateCreated',
     label: 'Thời gian đặt',
@@ -334,7 +334,9 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     id: 'adminNote',
     label: 'Ghi chú',
     minWidth: 170,
-    align: 'center',
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={2} />
+    ),
   },
   {
     id: 'handledBy',
@@ -583,7 +585,10 @@ export const columnsLogsOrderDetail: any = [
   {
     id: 'note',
     label: 'Ghi chú',
-    minWidth: 120,
+    minWidth: 200,
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={2} />
+    ),
   },
   {
     id: 'actionDate',

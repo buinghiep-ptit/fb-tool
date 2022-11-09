@@ -85,21 +85,25 @@ export default function CreatePlace(props) {
             return true
           }
         })
-        .test('fileFormat', 'Định dạng file không hợp lệ', value => {
-          if (value.length > 0) {
-            for (let i = 0; i < value.length; i++) {
-              const arrString = value[i].name.split('.')
-              const type = arrString[arrString.length - 1]
-              const checkList = formatFile.filter(
-                item => item == type.toLowerCase(),
-              )
-              if (checkList.length < 1) {
-                return false
+        .test(
+          'fileFormat',
+          'Định dạng ảnh/video/audio không phù hợp',
+          value => {
+            if (value.length > 0) {
+              for (let i = 0; i < value.length; i++) {
+                const arrString = value[i].name.split('.')
+                const type = arrString[arrString.length - 1]
+                const checkList = formatFile.filter(
+                  item => item == type.toLowerCase(),
+                )
+                if (checkList.length < 1) {
+                  return false
+                }
               }
+              return true
             }
-            return true
-          }
-        }),
+          },
+        ),
     })
     .required()
 

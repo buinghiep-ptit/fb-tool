@@ -43,7 +43,7 @@ export default function ManagerPlace(props) {
   const [provinces, setProvinces] = useState()
   const [provinceId, setProvinceId] = useState(null)
   const navigate = useNavigate()
-
+  const tableRef = React.useRef()
   const fetchListPlace = async param => {
     await getListPlace(param)
       .then(data => {
@@ -75,6 +75,7 @@ export default function ManagerPlace(props) {
   }
 
   const handleSearch = async () => {
+    tableRef.current.handleClickSearch()
     const res = fetchListPlace({
       name: inputNamePlace,
       page: 0,
@@ -211,6 +212,7 @@ export default function ManagerPlace(props) {
           </Grid>
         </Grid>
         <TableCustom
+          ref={tableRef}
           title="Danh sách địa danh Camp"
           dataTable={listPlace || []}
           tableModel={tableModel}

@@ -14,7 +14,7 @@ export interface IActionsHistoryProps {
 
 export function ActionsHistory({ orderId }: IActionsHistoryProps) {
   const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(10)
+  const [size, setSize] = useState<number>(5)
   const [filters, setFilters] = useState({
     orderId,
     page,

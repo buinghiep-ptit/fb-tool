@@ -393,11 +393,11 @@ export default function OrdersHistory() {
                 <Grid container spacing={2}>
                   <Grid item sm={4} xs={12}>
                     <FormInputText
-                      label={'Số điện thoại, email'}
+                      label={'Số điện thoại, email người đặt'}
                       type="text"
                       name="search"
                       defaultValue=""
-                      placeholder="Nhập số điện thoại, email"
+                      placeholder="Nhập số điện thoại, email người đặt"
                       fullWidth
                     />
                   </Grid>

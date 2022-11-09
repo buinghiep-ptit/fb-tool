@@ -34,7 +34,7 @@ import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
 import { dateDefault } from '../../orders/OrdersHistory'
 
 type ISearchFilters = {
-  search?: string
+  searchCamp?: string
   status?: string
   from?: string
   to?: string
@@ -64,7 +64,7 @@ export default function OrdersHistory() {
   const [orderId, setOrderId] = useState(0)
 
   const [defaultValues] = useState<ISearchFilters>({
-    search: queryParams.search ?? '',
+    searchCamp: queryParams.search ?? '',
     status: queryParams.status ?? 'all',
     from: queryParams.from ?? (dateDefault() as any).startDate?.toISOString(),
     to: queryParams.to ?? (dateDefault() as any).endDate?.toISOString(),
@@ -192,7 +192,7 @@ export default function OrdersHistory() {
     console.log('aaa')
     methods.reset({
       status: 'all',
-      search: '',
+      searchCamp: '',
       from: (dateDefault() as any).startDate?.toISOString(),
       to: (dateDefault() as any).endDate.toISOString(),
       page: 0,
@@ -291,11 +291,11 @@ export default function OrdersHistory() {
               <Grid container spacing={2}>
                 <Grid item sm={3} xs={12}>
                   <FormInputText
-                    label={'Số điện thoại, email'}
+                    label={'Điểm camp'}
                     type="text"
-                    name="search"
+                    name="searchCamp"
                     defaultValue=""
-                    placeholder="Nhập số điện thoại, email"
+                    placeholder="Nhập điểm camp"
                     fullWidth
                   />
                 </Grid>

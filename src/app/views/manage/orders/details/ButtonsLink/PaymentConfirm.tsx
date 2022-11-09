@@ -20,7 +20,7 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { usePaymentConfirmOrder } from 'app/hooks/queries/useOrdersData'
 import { messages } from 'app/utils/messages'
-import React, { useRef, useState } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -136,6 +136,7 @@ export default function PaymentConfirm({ title }: Props) {
                   <Dropzone
                     ref={dropzoneAudioRef}
                     onDrop={acceptedFiles => {
+                      if (!acceptedFiles || !acceptedFiles.length) return
                       setSelectedFiles(acceptedFiles)
 
                       methods.setValue('files', acceptedFiles[0])
@@ -152,91 +153,106 @@ export default function PaymentConfirm({ title }: Props) {
                         '.ppt',
                         '.docx',
                       ],
-                      'video/*': [],
+                      'video/mp4': [],
+                      'video/webm': [],
+                      'video/mov': [],
+                      'audio/mp3': [],
+                      'audio/wav': [],
+                      'audio/ogg': [],
                       'image/png': ['.png'],
                       'image/jpeg': ['.jpg', '.jpeg'],
-                      'audio/*': [],
                     }}
                     multiple={false}
                     maxSize={20 * 1024 * 1024}
                   >
-                    {({ getRootProps, getInputProps }) => (
-                      <>
-                        <div {...getRootProps({ className: 'dropzone' })}>
-                          <input {...getInputProps()} />
-                          {!selectedFiles.length && ( // is no file
+                    {({
+                      getRootProps,
+                      getInputProps,
+                      isDragAccept,
+                      isDragReject,
+                    }) => {
+                      const style = useMemo(() => {
+                        console.log('isDragAccept:', isDragAccept)
+                        console.log('isDragReject:', isDragReject)
+                      }, [isDragAccept, isDragReject])
+                      return (
+                        <>
+                          <div {...getRootProps({ className: 'dropzone' })}>
+                            <input {...getInputProps()} />
+                            {!selectedFiles.length && ( // is no file
+                              <Stack
+                                flexDirection={'row'}
+                                sx={{
+                                  background: 'rgba(22, 24, 35, 0.03)',
+                                  borderRadius: 1.5,
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  cursor: 'pointer',
+                                  border: '2px dashed rgba(22, 24 , 35, 0.2)',
+                                  '&:hover': {
+                                    border: '2px dashed #2F9B42',
+                                  },
+                                }}
+                              >
+                                <IconButton>
+                                  <Icon>upload</Icon>
+                                </IconButton>
+
+                                <Stack alignItems={'center'}>
+                                  <MuiTypography variant="body2">
+                                    Chọn hoặc kéo thả file
+                                  </MuiTypography>
+                                  <MuiTypography
+                                    variant="body2"
+                                    fontSize={'0.75rem'}
+                                  >
+                                    {`(tối đa 20MB)`}
+                                  </MuiTypography>
+                                </Stack>
+                              </Stack>
+                            )}
+                          </div>
+                          {selectedFiles[0]?.name && (
                             <Stack
                               flexDirection={'row'}
                               sx={{
-                                background: 'rgba(22, 24, 35, 0.03)',
-                                borderRadius: 1.5,
-                                justifyContent: 'center',
                                 alignItems: 'center',
                                 cursor: 'pointer',
-                                border: '2px dashed rgba(22, 24 , 35, 0.2)',
-                                '&:hover': {
-                                  border: '2px dashed #2F9B42',
-                                },
                               }}
                             >
-                              <IconButton>
-                                <Icon>upload</Icon>
-                              </IconButton>
+                              <MuiTypography variant="body1">
+                                {selectedFiles[0]?.name}
+                              </MuiTypography>
 
-                              <Stack alignItems={'center'}>
-                                <MuiTypography variant="body2">
-                                  Chọn hoặc kéo thả file
-                                </MuiTypography>
-                                <MuiTypography
-                                  variant="body2"
-                                  fontSize={'0.75rem'}
-                                >
-                                  (.pdf / .xlsx hoặc .docx)
-                                </MuiTypography>
+                              <Stack flexDirection={'row'} gap={1} ml={2}>
+                                <Tooltip arrow title={'Chọn lại'}>
+                                  <IconButton
+                                    sx={{
+                                      bgcolor: '#303030',
+                                      borderRadius: 1,
+                                    }}
+                                    onClick={openDialogFileAudio}
+                                  >
+                                    <Icon sx={{ color: 'white' }}>cached</Icon>
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip arrow title={'Xóa'}>
+                                  <IconButton
+                                    sx={{
+                                      bgcolor: '#303030',
+                                      borderRadius: 1,
+                                    }}
+                                    onClick={removeAudioSelected}
+                                  >
+                                    <Icon sx={{ color: 'white' }}>delete</Icon>
+                                  </IconButton>
+                                </Tooltip>
                               </Stack>
                             </Stack>
                           )}
-                        </div>
-                        {selectedFiles[0]?.name && (
-                          <Stack
-                            flexDirection={'row'}
-                            sx={{
-                              alignItems: 'center',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <MuiTypography variant="body1">
-                              {selectedFiles[0]?.name}
-                            </MuiTypography>
-
-                            <Stack flexDirection={'row'} gap={1} ml={2}>
-                              <Tooltip arrow title={'Chọn lại'}>
-                                <IconButton
-                                  sx={{
-                                    bgcolor: '#303030',
-                                    borderRadius: 1,
-                                  }}
-                                  onClick={openDialogFileAudio}
-                                >
-                                  <Icon sx={{ color: 'white' }}>cached</Icon>
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip arrow title={'Xóa'}>
-                                <IconButton
-                                  sx={{
-                                    bgcolor: '#303030',
-                                    borderRadius: 1,
-                                  }}
-                                  onClick={removeAudioSelected}
-                                >
-                                  <Icon sx={{ color: 'white' }}>delete</Icon>
-                                </IconButton>
-                              </Tooltip>
-                            </Stack>
-                          </Stack>
-                        )}
-                      </>
-                    )}
+                        </>
+                      )
+                    }}
                   </Dropzone>
                   {methods.formState.errors.files && (
                     <FormHelperText error>
@@ -281,6 +297,10 @@ export default function PaymentConfirm({ title }: Props) {
                   placeholder="Nhập giá"
                   fullWidth
                   required
+                  iconEnd={
+                    <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                  }
+                  isAllowZeroFirst={false}
                 />
               </Stack>
             </Grid>

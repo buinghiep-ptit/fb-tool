@@ -57,12 +57,12 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
               <MuiTypography color="primary" variant="body2">
                 {`${
                   campground?.merchant?.email
-                    ? campground?.merchant?.email + '-'
+                    ? campground?.merchant?.email + ' - '
                     : ''
                 }`}
                 {`${
                   campground?.merchant?.mobilePhone
-                    ? campground?.merchant?.mobilePhone + '-'
+                    ? campground?.merchant?.mobilePhone + ' - '
                     : ''
                 }`}
                 {campground?.merchant?.fullName}

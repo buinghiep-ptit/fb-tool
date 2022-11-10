@@ -255,6 +255,8 @@ export default function OrdersHistory() {
     setSize(20)
     values = {
       ...values,
+      search: values.search?.trim(),
+      searchHandler: values.searchHandler?.trim(),
       from: (values.from as any)?.toISOString(),
       to: (values.to as any)?.toISOString(),
     }
@@ -541,6 +543,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
         {
           value: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).value,
           title: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).title,
+        },
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).value,
+          title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).title,
         },
         {
           value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 2).value,

@@ -35,7 +35,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }
@@ -95,7 +95,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }
@@ -131,7 +131,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }

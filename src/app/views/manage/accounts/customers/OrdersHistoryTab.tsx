@@ -64,7 +64,7 @@ export default function OrdersHistory() {
   const [orderId, setOrderId] = useState(0)
 
   const [defaultValues] = useState<ISearchFilters>({
-    searchCamp: queryParams.search ?? '',
+    searchCamp: queryParams.searchCamp ?? '',
     status: queryParams.status ?? 'all',
     from: queryParams.from ?? (dateDefault() as any).startDate?.toISOString(),
     to: queryParams.to ?? (dateDefault() as any).endDate?.toISOString(),
@@ -97,7 +97,7 @@ export default function OrdersHistory() {
 
   const validationSchema = Yup.object().shape(
     {
-      search: Yup.string()
+      searchCamp: Yup.string()
         .min(0, 'hashtag must be at least 0 characters')
         .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       from: Yup.date()
@@ -170,6 +170,7 @@ export default function OrdersHistory() {
   ) => {
     values = {
       ...values,
+      searchCamp: values.searchCamp?.trim(),
       from: (values.from as any)?.toISOString(),
       to: (values.to as any)?.toISOString(),
     }

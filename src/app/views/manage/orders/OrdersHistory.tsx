@@ -255,6 +255,8 @@ export default function OrdersHistory() {
     setSize(20)
     values = {
       ...values,
+      search: values.search?.trim(),
+      searchHandler: values.searchHandler?.trim(),
       from: (values.from as any)?.toISOString(),
       to: (values.to as any)?.toISOString(),
     }

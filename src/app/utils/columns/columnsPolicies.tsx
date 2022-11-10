@@ -53,13 +53,13 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     ),
   },
   {
-    id: 'amount',
-    label: 'Giá trị',
+    id: 'scaleAmount',
+    label: '% Giao dịch',
     minWidth: 100,
     align: 'center',
     format: (value: number) =>
       value ? (
-        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+        <Typography color={'primary'}>{value.toFixed(2)}</Typography>
       ) : (
         <></>
       ),

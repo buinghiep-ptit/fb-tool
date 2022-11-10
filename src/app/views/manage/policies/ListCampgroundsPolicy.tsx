@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack } from '@mui/material'
+import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchLinkedCampgrounds } from 'app/apis/policy/policy.service'
 import { SimpleCard } from 'app/components'
@@ -143,48 +144,51 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
   return (
     <Stack gap={3}>
-      <SimpleCard>
-        <form
-          onSubmit={methods.handleSubmit(onSubmitHandler)}
-          noValidate
-          autoComplete="off"
-        >
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
-                <FormInputText
-                  label={'Tên điểm camp'}
-                  type="text"
-                  name="name"
-                  defaultValue=""
-                  placeholder="Nhập tên điểm camp"
-                  fullWidth
-                />
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 9999 }}>
+        {' '}
+        <SimpleCard>
+          <form
+            onSubmit={methods.handleSubmit(onSubmitHandler)}
+            noValidate
+            autoComplete="off"
+          >
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={6} xs={12}>
+                  <FormInputText
+                    label={'Tên điểm camp'}
+                    type="text"
+                    name="name"
+                    defaultValue=""
+                    placeholder="Nhập tên điểm camp"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Làm mới"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<Icon>cached</Icon>}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Làm mới"
-                  variant="outlined"
-                  color="primary"
-                  onClick={onResetFilters}
-                  sx={{ width: '100%' }}
-                  startIcon={<Icon>cached</Icon>}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
-      </SimpleCard>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+      </Box>
 
       <SimpleCard>
         <MuiStyledTable

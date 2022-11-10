@@ -188,6 +188,10 @@ export default function ListPolicy(props: Props) {
       }))
       setOpenDialog(true)
       setRow(row)
+    } else if (cell.id === 'name') {
+      navigation(`${row.id}/chi-tiet`, {
+        state: { modal: true, mode: 'update' },
+      })
     }
   }
 

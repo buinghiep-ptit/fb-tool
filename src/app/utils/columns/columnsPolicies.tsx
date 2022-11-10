@@ -23,21 +23,8 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
     id: 'name',
     label: 'Tên chính sách',
     minWidth: 150,
-    action: (value: any) => (
-      <Tooltip arrow title={value}>
-        <Typography
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: '1',
-            WebkitBoxOrient: 'vertical',
-          }}
-          color={'primary'}
-        >
-          {value}
-        </Typography>
-      </Tooltip>
+    link: (value: any) => (
+      <TooltipText text={value} underline maxLines={1} color="primary" />
     ),
   },
   {

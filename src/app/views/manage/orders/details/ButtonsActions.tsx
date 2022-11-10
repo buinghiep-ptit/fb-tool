@@ -9,7 +9,7 @@ import {
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
 import { IUser, IUserProfile } from 'app/models'
-import { IOrderDetail } from 'app/models/order'
+import { ICustomerOrder, IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { isReceiveUser } from '../OrderDetail'
@@ -17,7 +17,7 @@ import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
-  currentUser?: IUserProfile
+  currentUser?: IUserProfile & ICustomerOrder
 }
 
 export type ReassignSchema = {
@@ -157,7 +157,8 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         {order?.status &&
           order?.status !== -1 &&
           order?.status < 4 &&
-          order.cancelRequest?.status !== 2 && (
+          order.cancelRequest?.status !== 2 &&
+          currentUser?.userType === 1 && (
             <>
               <MuiButton
                 title="Chuyển tiếp"
@@ -280,7 +281,8 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       {order?.status &&
         order?.status < 4 &&
         order.cancelRequest?.status !== 2 &&
-        order?.status !== -1 && (
+        order?.status !== -1 &&
+        currentUser?.userType === 1 && (
           <>
             <MuiButton
               title="Chuyển tiếp"

@@ -130,6 +130,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
                 <FormInputText
                   label={'Số điện thoại'}
@@ -139,6 +140,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
                 <FormInputText
                   label={'Email'}
@@ -147,6 +149,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
               </Stack>
             </Grid>

@@ -115,6 +115,7 @@ export default function AddPolicy({ title }: Props) {
       .required(messages.MSG1),
     minAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
     maxAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
+    note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<SchemaType>({

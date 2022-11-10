@@ -180,10 +180,10 @@ export default function ListPolicy(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'campGroundNames') {
+    if (cell.id === 'amountCampGrounds' && !!row.amountCampGrounds) {
       setDialogData(prev => ({
         ...prev,
-        title: 'Điểm camp sử dụng',
+        title: 'Số điểm camp sử dụng',
         type: 'linked-camps',
       }))
       setOpenDialog(true)

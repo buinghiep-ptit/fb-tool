@@ -221,7 +221,7 @@ export default function OrdersHistory() {
       message: message ?? '',
     })
     setOpenDialog(false)
-    navigation(`${orderId}`, {})
+    navigation(`/quan-ly-don-hang/tat-ca/${orderId}`, {})
   }
   const { mutate: receive, isLoading: approveLoading } = useReceiveOrder(() =>
     onSuccess(null, 'Tiếp nhận đơn hàng thành công'),
@@ -391,6 +391,10 @@ const getDropdownMenuItems = () => {
     {
       value: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).value,
       title: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).title,
+    },
+    {
+      value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).value,
+      title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).title,
     },
     {
       value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 2).value,

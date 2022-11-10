@@ -3,6 +3,7 @@ import { TableColumn } from 'app/models'
 import { TitlePolicies } from 'app/models/policy'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import { TooltipText } from './columnsEvents'
 
 export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
   {
@@ -65,29 +66,24 @@ export const columnsPolicies: readonly TableColumn<TitlePolicies>[] = [
       ),
   },
   {
-    id: 'campGroundNames',
-    label: 'Camps áp dụng',
+    id: 'amountCampGrounds',
+    label: 'Camp áp dụng',
     minWidth: 200,
-    action: (value: number) => (
-      <Typography
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: '2',
-          WebkitBoxOrient: 'vertical',
-          pl: 1,
-          textDecorationLine: 'underline',
-        }}
-        color={'primary'}
-      >
-        {value}
-      </Typography>
-    ),
+    link: (value: number) =>
+      value ? (
+        <TooltipText
+          text={`${value.toString()} điểm camp liên kết`}
+          underline
+          maxLines={1}
+          color="primary"
+        />
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'dateUpdated',
-    label: 'Thời gian',
+    label: 'Thời gian cập nhật',
     minWidth: 170,
     align: 'center',
     format: (value: string) => ISODateTimeFormatter(value),

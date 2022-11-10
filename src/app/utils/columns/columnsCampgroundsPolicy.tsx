@@ -2,6 +2,7 @@ import { Chip, Tooltip, Typography } from '@mui/material'
 import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn } from 'app/models'
 import { TitleCampgrounds } from 'app/models/camp'
+import { TooltipText } from './columnsEvents'
 
 export const columnsCampgroundsPolicy: readonly TableColumn<TitleCampgrounds>[] =
   [
@@ -21,21 +22,8 @@ export const columnsCampgroundsPolicy: readonly TableColumn<TitleCampgrounds>[] 
       id: 'name',
       label: 'Tên địa điểm camping',
       minWidth: 200,
-      action: (value: any) => (
-        <Tooltip placement="bottom-start" arrow title={value}>
-          <Typography
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: '1',
-              WebkitBoxOrient: 'vertical',
-              px: 1,
-            }}
-          >
-            {value}
-          </Typography>
-        </Tooltip>
+      link: (value: string) => (
+        <TooltipText text={value} underline maxLines={1} color="primary" />
       ),
     },
     {

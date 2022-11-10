@@ -49,9 +49,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
   )
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 255 characters'),
+    name: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -117,12 +115,12 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
   }
 
   const onRowDetail = (cell: any, row: any) => {
-    window.open(`/chi-tiet-dia-danh/${row.id}`, '_blank')
+    window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'name') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+      window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
     }
   }
 
@@ -201,9 +199,9 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
           error={isError ? error : null}
           actions={[
             {
-              icon: 'edit',
-              color: 'warning',
-              tooltip: 'Chi tiết',
+              icon: 'double_arrow',
+              color: 'primary',
+              tooltip: 'Xem chi tiết',
               onClick: onRowDetail,
             },
           ]}

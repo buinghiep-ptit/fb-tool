@@ -214,9 +214,9 @@ export const useRecalculatePriceOrder = (onSuccess?: any, onError?: any) => {
       recalculatePrice(params.orderId ?? 0, params.payload),
     {
       onSettled: (data: any) => {
-        if (data) {
-          queryClient.invalidateQueries(['order-detail'])
-        }
+        // if (data) {
+        //   queryClient.invalidateQueries(['order-detail'])
+        // }
       },
       onSuccess,
     },

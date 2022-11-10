@@ -16,7 +16,7 @@ import { IUserProfile } from 'app/models'
 import { IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
 import moment from 'moment'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
@@ -76,7 +76,7 @@ export interface Props {}
 
 export default function OrderDetail(props: Props) {
   const { user } = useAuth()
-
+  const [services, setServices] = useState<IService[]>([])
   const navigate = useNavigate()
   const { source, orderId } = useParams()
   const {
@@ -87,7 +87,7 @@ export default function OrderDetail(props: Props) {
     error,
   } = useOrderDetailData(Number(orderId ?? 0))
 
-  const [methods, fields] = useRHFOrder(order as IOrderDetail)
+  const [methods, fields] = useRHFOrder(order as IOrderDetail, services)
 
   const dateStart = methods.watch('dateStart')
   const dateEnd = methods.watch('dateEnd')
@@ -120,7 +120,20 @@ export default function OrderDetail(props: Props) {
   const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
-  const { mutate: recalculate } = useRecalculatePriceOrder(() => {})
+  const servicesW = methods.watch('services')
+
+  const { mutate: recalculate } = useRecalculatePriceOrder((data: any) => {
+    if (servicesW && servicesW.length) {
+      data.map((item: IService, index: number) =>
+        Object.assign(item, {
+          quantity: servicesW[index]
+            ? servicesW[index].quantity
+            : item.quantity,
+        }),
+      )
+    }
+    setServices(data)
+  })
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })

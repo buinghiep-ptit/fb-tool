@@ -8,7 +8,7 @@ import {
   useReceiveCancelOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
-import { IUser, IUserProfile } from 'app/models'
+import { IProfile, IUser, IUserProfile } from 'app/models'
 import { ICustomerOrder, IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -17,7 +17,7 @@ import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
-  currentUser?: IUserProfile & ICustomerOrder
+  currentUser?: IProfile
 }
 
 export type ReassignSchema = {
@@ -156,13 +156,13 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       <Stack flexDirection={'row'}>
         {order?.status &&
           order?.status !== -1 &&
-          order?.status < 4 &&
+          order?.status < 3 && // ?? 4
           order.cancelRequest?.status !== 2 &&
-          currentUser?.userType === 1 && (
+          currentUser?.authorities?.includes(1) && (
             <>
               <MuiButton
                 title="Chuyển tiếp"
-                variant="outlined"
+                variant="contained"
                 color="primary"
                 onClick={() =>
                   navigate(`chuyen-tiep`, {
@@ -180,7 +180,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           )}
         <MuiButton
           title="Ghi chú"
-          variant="outlined"
+          variant="contained"
           color="warning"
           onClick={() =>
             navigate(`ghi-chu`, {
@@ -199,7 +199,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Xác nhận KH đã thanh toán"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() =>
               navigate(`xac-nhan-thanh-toan`, {
@@ -215,7 +215,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ đơn"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`huy-don-hang`, {
@@ -236,7 +236,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Còn chỗ"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() => onClickButton('AVAILABLE')}
             startIcon={<Icon>how_to_reg</Icon>}
@@ -249,8 +249,9 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Hết chỗ"
-            variant="outlined"
-            sx={{ color: '#AAAAAA' }}
+            variant="contained"
+            color="warning"
+            // sx={{ color: '#AAAAAA' }}
             onClick={() => onClickButton('UN_AVAILABLE')}
             startIcon={<Icon>person_off</Icon>}
           />
@@ -261,7 +262,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`huy-don-hang`, {
@@ -279,14 +280,13 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       )}
 
       {order?.status &&
-        order?.status < 4 &&
+        order?.status < 3 && // ?? 4
         order.cancelRequest?.status !== 2 &&
-        order?.status !== -1 &&
-        currentUser?.userType === 1 && (
+        order?.status !== -1 && (
           <>
             <MuiButton
               title="Chuyển tiếp"
-              variant="outlined"
+              variant="contained"
               color="warning"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
@@ -307,7 +307,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Hoàn tất"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() => onClickButton('ORDER_USED')}
             startIcon={<Icon>how_to_reg</Icon>}
@@ -319,7 +319,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ đặt chỗ"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`yeu-cau-huy-dat-cho`, {
@@ -340,7 +340,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Huỷ chỗ, hoàn tiền"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`hoan-tien`, {
@@ -359,7 +359,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
 
       <MuiButton
         title="Ghi chú"
-        variant="outlined"
+        variant="contained"
         color="warning"
         onClick={() =>
           navigate(`ghi-chu`, {

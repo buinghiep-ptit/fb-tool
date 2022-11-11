@@ -15,9 +15,13 @@ import { NavLink } from 'react-router-dom'
 
 export interface ICampgroundInfoProps {
   campground?: ICampground
+  address?: string
 }
 
-export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
+export function CampgroundInfo({
+  campground = {},
+  address = '',
+}: ICampgroundInfoProps) {
   return (
     <Accordion defaultExpanded={true} sx={{ height: '100%' }}>
       <AccordionSummary
@@ -57,7 +61,7 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
             </Grid>
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
-                {campground.address}
+                {address}
               </MuiTypography>
             </Grid>
           </Grid>
@@ -69,7 +73,9 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
             <Grid item xs={12} md={8}>
               <MuiTypography color="primary" variant="body2">
                 {`${
-                  campground?.merchant?.email ? campground?.merchant?.email : ''
+                  campground?.merchant?.fullName
+                    ? campground?.merchant?.fullName
+                    : ''
                 }`}
                 {`${
                   campground?.merchant?.mobilePhone
@@ -77,8 +83,8 @@ export function CampgroundInfo({ campground = {} }: ICampgroundInfoProps) {
                     : ''
                 }`}
                 {`${
-                  campground?.merchant?.fullName
-                    ? ' - ' + campground?.merchant?.fullName
+                  campground?.merchant?.email
+                    ? ' - ' + campground?.merchant?.email
                     : ''
                 }`}
               </MuiTypography>

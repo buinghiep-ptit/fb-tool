@@ -1,5 +1,11 @@
 import { Chip, Grid, Icon, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
+import { getDetailCampGround } from 'app/apis/campGround/ground.service'
+import {
+  getDistricts,
+  getProvinces,
+  getWards,
+} from 'app/apis/common/common.service'
 import { Breadcrumb } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -13,7 +19,7 @@ import {
 import useAuth from 'app/hooks/useAuth'
 import useDebounce from 'app/hooks/useDebounce.'
 import { IUserProfile } from 'app/models'
-import { IOrderDetail, IService } from 'app/models/order'
+import { ICampground, IOrderDetail, IService } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
@@ -79,13 +85,49 @@ export default function OrderDetail(props: Props) {
   const [services, setServices] = useState<IService[]>([])
   const navigate = useNavigate()
   const { source, orderId } = useParams()
+
+  const [addressCampground, setAddressCampground] = useState('')
+
+  const onSuccess = async (order: IOrderDetail) => {
+    let address = ''
+    try {
+      const campground = (await getDetailCampGround(
+        order.campGround?.id,
+      )) as ICampground
+      const provinces = await getProvinces()
+      if (campground && campground.idProvince) {
+        const province: any = provinces.find(
+          (province: any) => province.id == campground.idProvince,
+        )
+        address += province ? province.name : ''
+        const districts = await getDistricts(campground.idProvince)
+        const district: any = districts.find(
+          (district: any) => district.id == campground.idDistrict,
+        )
+        if (district) {
+          address = district ? district.name + ', ' + address : address
+          const awards = await getWards(district.id)
+          const award: any = awards.find(
+            (award: any) => award.id == campground.idWard,
+          )
+          address = award ? award.name + ', ' + address : address
+          address = campground.address
+            ? campground.address + ', ' + address
+            : address
+        }
+
+        setAddressCampground(address)
+      }
+    } catch (error) {}
+  }
+
   const {
     data: order,
     isLoading,
     isError,
     isFetching,
     error,
-  } = useOrderDetailData(Number(orderId ?? 0))
+  } = useOrderDetailData(Number(orderId ?? 0), onSuccess)
 
   const [methods, fields] = useRHFOrder(order as IOrderDetail, services)
 
@@ -279,7 +321,10 @@ export default function OrderDetail(props: Props) {
                 />
               </Grid>
               <Grid item xs={12} md={6}>
-                <CampgroundInfo campground={order.campGround} />
+                <CampgroundInfo
+                  campground={order.campGround}
+                  address={addressCampground}
+                />
               </Grid>
             </Grid>
             <Stack>

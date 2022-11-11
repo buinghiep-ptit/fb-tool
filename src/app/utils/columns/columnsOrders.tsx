@@ -532,17 +532,12 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
 ]
 
 export const columnsOrderProcessesDetail: any = [
-  { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
-  // {
-  //   id: 'action',
-  //   label: 'Hành động',
-  //   minWidth: 120,
-  //   align: 'center',
-  // },
+  { id: 'order', label: 'STT', minWidth: 50, width: 50, align: 'center' },
   {
     id: 'account',
     label: 'Người xử lý',
-    minWidth: 170,
+    minWidth: 150,
+    width: 200,
     action: (value: any) => <TooltipText text={value} />,
   },
   {
@@ -568,17 +563,18 @@ export const columnsOrderProcessesDetail: any = [
     id: 'dateCreated',
     label: 'Thời gian',
     minWidth: 170,
-    align: 'center',
+    align: 'right',
     format: (value: string) => ISODateTimeFormatter(value),
   },
 ]
 
 export const columnsLogsOrderDetail: any = [
-  { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
+  { id: 'order', label: 'STT', minWidth: 50, width: 50, align: 'center' },
   {
     id: 'processName',
     label: 'Hành động',
-    minWidth: 170,
+    minWidth: 150,
+    width: 200,
   },
   {
     id: 'email',
@@ -597,7 +593,7 @@ export const columnsLogsOrderDetail: any = [
     id: 'actionDate',
     label: 'Thời gian',
     minWidth: 170,
-    align: 'center',
+    align: 'right',
     format: (value: string) => ISODateTimeFormatter(value),
   },
 ]

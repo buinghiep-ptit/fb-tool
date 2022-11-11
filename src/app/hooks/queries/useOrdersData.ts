@@ -47,8 +47,10 @@ export const useLogsActionOrderData = (filters: any) => {
   )
 }
 
-export const useOrderDetailData = (orderId: number) => {
-  return useQuery(['order-detail', orderId], () => orderDetail(orderId))
+export const useOrderDetailData = (orderId: number, onSuccess?: any) => {
+  return useQuery(['order-detail', orderId], () => orderDetail(orderId), {
+    onSuccess,
+  })
 }
 
 export const useReceiveOrder = (onSuccess?: any, onError?: any) => {

@@ -107,6 +107,14 @@ export const getOrderStatusSpec = (
           textColor: '#FB7800',
           bgColor: '#FCF5ED',
         }
+      case OrderStatusEnum.SUCCEEDED:
+        return {
+          key: 3,
+          value: 3,
+          title: 'Đặt thành công',
+          textColor: '#2F9B42',
+          bgColor: '#EDFDEF',
+        }
 
       default:
         return {

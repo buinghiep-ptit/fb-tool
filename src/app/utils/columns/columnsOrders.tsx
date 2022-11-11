@@ -536,8 +536,8 @@ export const columnsOrderProcessesDetail: any = [
   {
     id: 'account',
     label: 'Người xử lý',
-    minWidth: 150,
-    width: 200,
+    minWidth: 200,
+    // width: '50%',
     action: (value: any) => <TooltipText text={value} />,
   },
   {
@@ -574,7 +574,6 @@ export const columnsLogsOrderDetail: any = [
     id: 'processName',
     label: 'Hành động',
     minWidth: 150,
-    width: 200,
   },
   {
     id: 'email',

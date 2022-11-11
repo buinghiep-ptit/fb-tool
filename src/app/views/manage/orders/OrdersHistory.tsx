@@ -532,6 +532,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
           value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 1).value,
           title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 1).title,
         },
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 1).value,
+          title: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 1).title,
+        },
       ]
 
     case 1:

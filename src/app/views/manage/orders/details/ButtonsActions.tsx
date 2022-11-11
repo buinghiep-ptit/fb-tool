@@ -156,7 +156,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       <Stack flexDirection={'row'}>
         {order?.status &&
           order?.status !== -1 &&
-          order?.status < 3 && // ?? 4
+          order?.status < 4 &&
           order.cancelRequest?.status !== 2 &&
           currentUser?.authorities?.includes(1) && (
             <>
@@ -176,19 +176,19 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
                 sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
                 flexItem
               />
+              <MuiButton
+                title="Ghi chú"
+                variant="contained"
+                color="warning"
+                onClick={() =>
+                  navigate(`ghi-chu`, {
+                    state: { modal: true },
+                  })
+                }
+                startIcon={<Icon>event_note</Icon>}
+              />
             </>
           )}
-        <MuiButton
-          title="Ghi chú"
-          variant="contained"
-          color="warning"
-          onClick={() =>
-            navigate(`ghi-chu`, {
-              state: { modal: true },
-            })
-          }
-          startIcon={<Icon>event_note</Icon>}
-        />
       </Stack>
     )
   }
@@ -280,14 +280,14 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       )}
 
       {order?.status &&
-        order?.status < 3 && // ?? 4
+        order?.status < 4 &&
         order.cancelRequest?.status !== 2 &&
         order?.status !== -1 && (
           <>
             <MuiButton
               title="Chuyển tiếp"
               variant="contained"
-              color="warning"
+              color="primary"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
                   state: { modal: true },
@@ -347,13 +347,29 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
                 state: { modal: true, data: order },
               })
             }
-            startIcon={<Icon>cached</Icon>}
+            startIcon={<Icon>clear</Icon>}
           />
           <Divider
             orientation="vertical"
             sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
             flexItem
           />
+          {/* <MuiButton
+            title="Cập nhật đơn hàng"
+            variant="contained"
+            color="primary"
+            onClick={() =>
+              navigate(`hoan-tien`, {
+                state: { modal: true, data: order },
+              })
+            }
+            startIcon={<Icon>saved</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          /> */}
         </>
       )}
 

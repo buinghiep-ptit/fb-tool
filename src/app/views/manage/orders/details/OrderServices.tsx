@@ -273,13 +273,13 @@ export function OrderServices({
                     <MuiRHFRadioGroup name="paymentType" defaultValue={1}>
                       <Stack flexDirection={'row'} gap={1.5}>
                         <FormControlLabel
-                          value={2}
+                          value={1}
                           disabled
                           control={<Radio />}
                           label="Thanh toán toàn bộ"
                         />
                         <FormControlLabel
-                          value={1}
+                          value={2}
                           disabled
                           control={<Radio />}
                           label="Đặt cọc"

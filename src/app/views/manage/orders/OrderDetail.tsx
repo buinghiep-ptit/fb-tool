@@ -287,6 +287,9 @@ export default function OrderDetail(props: Props) {
           }
           size="medium"
           sx={{
+            px: 1,
+            fontSize: '1.125rem',
+            fontWeight: 500,
             color: order.cancelRequest
               ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
                   .textColor

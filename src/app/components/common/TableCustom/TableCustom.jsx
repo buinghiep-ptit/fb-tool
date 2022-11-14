@@ -137,7 +137,7 @@ const TableCustom = forwardRef(
               {dataTable.length === 0 && (
                 <tr>
                   <td
-                    colspan={tableModel.headCell.length}
+                    colSpan={tableModel.headCell.length}
                     style={{ textAlign: 'center', padding: '20px' }}
                   >
                     Không tồn tại bản ghi

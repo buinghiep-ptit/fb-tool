@@ -34,6 +34,7 @@ import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { object } from 'prop-types'
 import { formatFile } from 'app/utils/constant'
+import { checkExistedName } from 'app/apis/audio/audio.service'
 
 export default function InformationCampGround({ action }) {
   const [hashtag, setHashtag] = React.useState([])
@@ -258,6 +259,10 @@ export default function InformationCampGround({ action }) {
   }
 
   const onSubmit = async data => {
+    // const checkNameCamp = await checkExistedName({
+    //   name: data.nameCampground,
+    // })
+    // if (checkNameCamp.exist) return
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -405,7 +410,7 @@ export default function InformationCampGround({ action }) {
               res.find(province => province.id === data.idProvince),
             )
 
-            setValue('policy', data.depositPolicy.id)
+            setValue('policy', data.depositPolicy?.id || null)
             // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
@@ -447,6 +452,7 @@ export default function InformationCampGround({ action }) {
             data.campGroundVehicles.forEach(item => {
               setValue(VEHICLES[item]?.name, true)
             })
+            console.log('xx')
             getDistricts(data.idProvince)
               .then(dataDistrict => {
                 setDistricts(dataDistrict)
@@ -462,7 +468,7 @@ export default function InformationCampGround({ action }) {
                   setWards(dataWard)
                   setValue(
                     'ward',
-                    dataWard.find(ward => ward.id == data.idWard),
+                    dataWard.find(ward => ward?.id == data?.idWard),
                   )
                 })
                 .catch(err => console.log(err))

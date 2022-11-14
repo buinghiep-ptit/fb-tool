@@ -11,14 +11,16 @@ import FormHelperText from '@mui/material/FormHelperText'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
+import DialogCustom from 'app/components/common/DialogCustom'
 import {
   getDetailMerchant,
   updateDetailMerchant,
 } from 'app/apis/merchant/merchant.service'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
-
+import { useState, useRef } from 'react'
 import axios from 'axios'
-
+import { generate } from 'generate-password'
+import ChangePasswordMerchant from './changePasswordMerchant'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -29,9 +31,12 @@ const Container = styled('div')(({ theme }) => ({
 }))
 
 export default function UpdateMerchant(props) {
-  const [statusMerchant, setStatusMerchant] = React.useState()
-  const [contractList, setContractList] = React.useState([])
-  const [documentList, setDocumentList] = React.useState([])
+  const [statusMerchant, setStatusMerchant] = useState()
+  const [contractList, setContractList] = useState([])
+  const [documentList, setDocumentList] = useState([])
+  const [passwordReset, setPasswordReset] = useState()
+  const [noteChangePass, setNoteChangePass] = useState()
+  const dialogConfirm = useRef(null)
   const schema = yup
     .object({
       nameMerchant: yup
@@ -123,7 +128,6 @@ export default function UpdateMerchant(props) {
     const type = arr[arr.length - 1]
     try {
       const token = window.localStorage.getItem('accessToken')
-      const config = { responseType: 'blob' }
       axios({
         method: 'get',
         url,
@@ -133,17 +137,13 @@ export default function UpdateMerchant(props) {
         },
         responseType: 'blob',
       }).then(response => {
-        // create file link in browser's memory
         const href = URL.createObjectURL(response.data)
         console.log(response.data)
-        // create "a" HTML element with href to file & click
         const link = document.createElement('a')
         link.href = href
-        link.setAttribute('download', `${name}.${type}`) //or any other extension
+        link.setAttribute('download', `${name}.${type}`)
         document.body.appendChild(link)
         link.click()
-
-        // clean up "a" element & remove ObjectURL
         document.body.removeChild(link)
         URL.revokeObjectURL(href)
       })
@@ -153,6 +153,7 @@ export default function UpdateMerchant(props) {
   }
 
   const onSubmit = async data => {
+    console.log('xxx')
     const newData = new Object()
     newData.status = parseInt(data.status)
     newData.name = data.nameMerchant
@@ -410,6 +411,12 @@ export default function UpdateMerchant(props) {
                   const file = await uploadFile(
                     document.getElementById('upload-contract').files[0],
                   )
+                  console.log(file)
+                  if (file?.code === '400') {
+                    e.target.value = null
+                    toastError({ message: file?.errorDescription })
+                    return
+                  }
 
                   setContractList([file, ...contractList])
                 }}
@@ -418,7 +425,7 @@ export default function UpdateMerchant(props) {
               {contractList.map((contractFile, index) => (
                 <div
                   style={{ display: 'flex', alignItems: 'center' }}
-                  key={contractFile.filename}
+                  key={contractFile.filename + index}
                 >
                   <p
                     onClick={() => {
@@ -491,7 +498,11 @@ export default function UpdateMerchant(props) {
                   const file = await uploadFile(
                     document.getElementById('upload-document').files[0],
                   )
-
+                  if (file?.code === '400') {
+                    e.target.value = null
+                    toastError({ message: file?.errorDescription })
+                    return
+                  }
                   setDocumentList([file, ...documentList])
                 }}
                 style={{ display: 'none' }}
@@ -499,7 +510,7 @@ export default function UpdateMerchant(props) {
               {documentList.map((documentFile, index) => (
                 <div
                   style={{ display: 'flex', alignItems: 'center' }}
-                  key={documentFile.filename}
+                  key={documentFile.filename + index}
                 >
                   <p
                     onClick={() => {
@@ -586,6 +597,9 @@ export default function UpdateMerchant(props) {
                 color="primary"
                 variant="contained"
                 style={{ marginRight: '15px' }}
+                onClick={() => {
+                  dialogConfirm.current.handleClickOpen()
+                }}
               >
                 Đổi mật khẩu
               </Button>
@@ -602,6 +616,11 @@ export default function UpdateMerchant(props) {
             </Grid>
           </Grid>
         </form>
+        <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="md">
+          <ChangePasswordMerchant
+            handleClose={dialogConfirm?.current?.handleClose}
+          />
+        </DialogCustom>
       </SimpleCard>
     </Container>
   )

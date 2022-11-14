@@ -32,3 +32,11 @@ export const updateMerchantStatus = async (id: any): Promise<any> => {
   const { data } = await http.put<any>(`/api/merchant/${id}/lock/toggle`)
   return data
 }
+
+export const updateMerchantPassword = async (
+  id: any,
+  params: any,
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/merchant/${id}`, params)
+  return data
+}

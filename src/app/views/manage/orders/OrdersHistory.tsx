@@ -128,6 +128,18 @@ export default function OrdersHistory() {
       {},
     ),
   )
+
+  const filtersRef = useRef(
+    extractMergeFiltersObject(
+      {
+        ...defaultValues,
+        from: defaultValues.from,
+        to: defaultValues.to,
+      },
+      {},
+    ),
+  )
+
   const { source, orderId: id } = useParams() ?? 0
 
   const tabRef = useRef<number>(-1)
@@ -161,6 +173,7 @@ export default function OrdersHistory() {
     isFetching,
     isError,
     error,
+    refetch,
   }: UseQueryResult<any, Error> = useOrdersData(filters, currentTab)
 
   const validationSchema = Yup.object().shape(
@@ -267,6 +280,23 @@ export default function OrdersHistory() {
         size: 20,
       }
     })
+
+    if (
+      JSON.stringify(filtersRef.current) ===
+      JSON.stringify({
+        ...extractMergeFiltersObject(filters, values),
+        page: 0,
+        size: 20,
+      })
+    ) {
+      refetch()
+    }
+
+    filtersRef.current = {
+      ...extractMergeFiltersObject(filters, values),
+      page: 0,
+      size: 20,
+    }
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),

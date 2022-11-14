@@ -99,7 +99,7 @@ export function MuiRHFAutoComplete({
                 >
                   <MuiTypography>{option[optionProperty]}</MuiTypography>
                   {
-                    option.icon && option.icon
+                    option.icon && option.icon()
                     // <Chip
                     //   label={option.role === 1 ? 'Admin' : 'CS'}
                     //   size="small"

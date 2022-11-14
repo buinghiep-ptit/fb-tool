@@ -86,10 +86,10 @@ const Container = styled('div')<Props>(({ theme }) => ({
 }))
 
 const extractCamps = (camps?: any[]) => {
-  if (!camps || !camps.length) return []
+  if (!camps || !camps.length) return
   return camps.map(camp =>
     Object.assign(camp, {
-      icon: (
+      icon: () => (
         <Chip
           label={camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
           size="small"
@@ -219,21 +219,21 @@ export default function CreateFeed(props: Props) {
   const { data: audios }: UseQueryResult<ICampAreaResponse, Error> = useQuery<
     ICampAreaResponse,
     Error
-  >(['audios'], () => fetchAudios({ size: 200, page: 0, status: 1 }), {
+  >(['audios'], () => fetchAudios({ size: 500, page: 0, status: 1 }), {
     enabled: true,
   })
 
   const { data: campAreas }: UseQueryResult<ICampArea[], Error> = useQuery<
     ICampArea[],
     Error
-  >(['camp-areas'], () => fetchCampAreas({ size: 200, page: 0 }), {
+  >(['camp-areas'], () => fetchCampAreas({ size: 500, page: 0 }), {
     enabled: Number(methods.watch('idSrcType')) === 1,
   })
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
     useQuery<ICampAreaResponse, Error>(
       ['camp-grounds'],
-      () => fetchCampGrounds({ size: 200, page: 0 }),
+      () => fetchCampGrounds({ size: 500, page: 0 }),
       {
         enabled: Number(methods.watch('idSrcType')) === 2,
       },
@@ -269,6 +269,10 @@ export default function CreateFeed(props: Props) {
   }, [feed])
 
   useEffect(() => {
+    methods.setValue('camp', null)
+  }, [methods.watch('idSrcType')])
+
+  useEffect(() => {
     if (!feed) {
       if (methods.watch('type') == 1) {
         methods.setValue('audio', { name: 'Âm thanh của video' })
@@ -277,6 +281,19 @@ export default function CreateFeed(props: Props) {
       }
       return
     }
+  }, [methods.watch('type')])
+
+  useEffect(() => {
+    if (!feed) {
+      // if (methods.watch('type') == 1) {
+      //   methods.setValue('audio', { name: 'Âm thanh của video' })
+      // } else {
+      //   console.log('vao day')
+      //   methods.setValue('audio', undefined)
+      // }
+      return
+    }
+
     if (feed.customerInfo?.type && feed.customerInfo?.type === 1) {
       methods.setValue('customer', customerCampdi ?? undefined)
     } else {
@@ -410,6 +427,7 @@ export default function CreateFeed(props: Props) {
   ] = useUploadFiles()
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    console.log(values)
     const files = (fileInfos as IMediaOverall[])
       .filter(
         (f: IMediaOverall) =>

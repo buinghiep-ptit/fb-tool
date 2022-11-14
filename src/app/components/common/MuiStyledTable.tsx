@@ -115,7 +115,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     sx={{
                       minWidth: column.minWidth,
                       maxWidth: column.maxWidth ?? null,
-                      width: column.width ?? null,
+                      width: column.width ?? 50,
                       padding: '4px',
                       backgroundColor: 'white',
                       ...column.sticky,

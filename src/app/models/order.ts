@@ -87,7 +87,7 @@ export interface IContact {
 }
 
 export interface IService {
-  serviceId?: number
+  idService?: number
   name?: string
   type?: number
   quantity?: number

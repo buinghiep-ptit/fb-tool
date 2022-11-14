@@ -128,6 +128,18 @@ export default function OrdersHistory() {
       {},
     ),
   )
+
+  const filtersRef = useRef(
+    extractMergeFiltersObject(
+      {
+        ...defaultValues,
+        from: defaultValues.from,
+        to: defaultValues.to,
+      },
+      {},
+    ),
+  )
+
   const { source, orderId: id } = useParams() ?? 0
 
   const tabRef = useRef<number>(-1)
@@ -161,6 +173,7 @@ export default function OrdersHistory() {
     isFetching,
     isError,
     error,
+    refetch,
   }: UseQueryResult<any, Error> = useOrdersData(filters, currentTab)
 
   const validationSchema = Yup.object().shape(
@@ -255,6 +268,8 @@ export default function OrdersHistory() {
     setSize(20)
     values = {
       ...values,
+      search: values.search?.trim(),
+      searchHandler: values.searchHandler?.trim(),
       from: (values.from as any)?.toISOString(),
       to: (values.to as any)?.toISOString(),
     }
@@ -265,6 +280,23 @@ export default function OrdersHistory() {
         size: 20,
       }
     })
+
+    if (
+      JSON.stringify(filtersRef.current) ===
+      JSON.stringify({
+        ...extractMergeFiltersObject(filters, values),
+        page: 0,
+        size: 20,
+      })
+    ) {
+      refetch()
+    }
+
+    filtersRef.current = {
+      ...extractMergeFiltersObject(filters, values),
+      page: 0,
+      size: 20,
+    }
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
@@ -324,11 +356,11 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      // window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
-      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
+      window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
+      // navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
     } else if (cell.id === 'campGroundRepresent') {
-      // window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
-      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
+      window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
+      // navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
     }
   }
 
@@ -530,6 +562,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
           value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 1).value,
           title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 1).title,
         },
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 1).value,
+          title: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 1).title,
+        },
       ]
 
     case 1:
@@ -541,6 +577,10 @@ const getDropdownMenuItems = (tabIndex: number) => {
         {
           value: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).value,
           title: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).title,
+        },
+        {
+          value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).value,
+          title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).title,
         },
         {
           value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 2).value,

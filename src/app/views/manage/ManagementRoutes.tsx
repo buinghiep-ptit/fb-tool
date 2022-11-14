@@ -323,7 +323,7 @@ const ManagementRoutes = [
         element: <AddPolicy title="Thêm mới chính sách riêng" />,
       },
     ],
-    auth: [ROLES.ADMIN, ROLES.CS],
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     path: '/quan-ly-tu-khoa-yeu-thich',

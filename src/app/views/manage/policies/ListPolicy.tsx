@@ -180,14 +180,18 @@ export default function ListPolicy(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'campGroundNames') {
+    if (cell.id === 'amountCampGrounds' && !!row.amountCampGrounds) {
       setDialogData(prev => ({
         ...prev,
-        title: 'Điểm camp sử dụng',
+        title: 'Số điểm camp sử dụng',
         type: 'linked-camps',
       }))
       setOpenDialog(true)
       setRow(row)
+    } else if (cell.id === 'name') {
+      navigation(`${row.id}/chi-tiet`, {
+        state: { modal: true, mode: 'update' },
+      })
     }
   }
 

@@ -32,7 +32,7 @@ const extractAccounts = (accounts?: IUser[]) => {
 
   return accArr.map(acc =>
     Object.assign(acc, {
-      icon: (
+      icon: () => (
         <Chip
           label={acc.role === 1 ? 'Admin' : 'CS'}
           size="small"

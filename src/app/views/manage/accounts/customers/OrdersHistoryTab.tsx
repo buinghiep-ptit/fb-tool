@@ -64,7 +64,7 @@ export default function OrdersHistory() {
   const [orderId, setOrderId] = useState(0)
 
   const [defaultValues] = useState<ISearchFilters>({
-    searchCamp: queryParams.search ?? '',
+    searchCamp: queryParams.searchCamp ?? '',
     status: queryParams.status ?? 'all',
     from: queryParams.from ?? (dateDefault() as any).startDate?.toISOString(),
     to: queryParams.to ?? (dateDefault() as any).endDate?.toISOString(),
@@ -97,7 +97,7 @@ export default function OrdersHistory() {
 
   const validationSchema = Yup.object().shape(
     {
-      search: Yup.string()
+      searchCamp: Yup.string()
         .min(0, 'hashtag must be at least 0 characters')
         .max(255, 'Nội dung không được vượt quá 255 ký tự'),
       from: Yup.date()
@@ -170,6 +170,7 @@ export default function OrdersHistory() {
   ) => {
     values = {
       ...values,
+      searchCamp: values.searchCamp?.trim(),
       from: (values.from as any)?.toISOString(),
       to: (values.to as any)?.toISOString(),
     }
@@ -221,7 +222,7 @@ export default function OrdersHistory() {
       message: message ?? '',
     })
     setOpenDialog(false)
-    navigation(`${orderId}`, {})
+    navigation(`/quan-ly-don-hang/tat-ca/${orderId}`, {})
   }
   const { mutate: receive, isLoading: approveLoading } = useReceiveOrder(() =>
     onSuccess(null, 'Tiếp nhận đơn hàng thành công'),
@@ -256,9 +257,9 @@ export default function OrdersHistory() {
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
-      navigation(`/chi-tiet-diem-camp/${row?.campGroundId}`, {})
+      window.open(`/chi-tiet-diem-camp/${row?.campGroundId}`, '_blank')
     } else if (cell.id === 'campGroundRepresent') {
-      navigation(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, {})
+      window.open(`/cap-nhat-thong-tin-doi-tac/${row?.merchantId}`, '_blank')
     }
   }
 
@@ -295,7 +296,7 @@ export default function OrdersHistory() {
                     type="text"
                     name="searchCamp"
                     defaultValue=""
-                    placeholder="Nhập điểm camp"
+                    placeholder="Nhập tên điểm camp"
                     fullWidth
                   />
                 </Grid>
@@ -391,6 +392,10 @@ const getDropdownMenuItems = () => {
     {
       value: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).value,
       title: getOrderStatusSpec(OrderStatusEnum.RECEIVED, 2).title,
+    },
+    {
+      value: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).value,
+      title: getOrderStatusSpec(OrderStatusEnum.WAIT_PAY, 2).title,
     },
     {
       value: getOrderStatusSpec(OrderStatusEnum.SUCCEEDED, 2).value,

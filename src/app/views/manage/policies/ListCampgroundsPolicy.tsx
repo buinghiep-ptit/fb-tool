@@ -1,6 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, Stack } from '@mui/material'
+import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchLinkedCampgrounds } from 'app/apis/policy/policy.service'
 import { SimpleCard } from 'app/components'
@@ -48,9 +49,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
   )
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 255 characters'),
+    name: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -116,12 +115,12 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
   }
 
   const onRowDetail = (cell: any, row: any) => {
-    window.open(`/chi-tiet-dia-danh/${row.id}`, '_blank')
+    window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
   }
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'name') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+      window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
     }
   }
 
@@ -143,48 +142,51 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
   return (
     <Stack gap={3}>
-      <SimpleCard>
-        <form
-          onSubmit={methods.handleSubmit(onSubmitHandler)}
-          noValidate
-          autoComplete="off"
-        >
-          <FormProvider {...methods}>
-            <Grid container spacing={2}>
-              <Grid item sm={6} xs={12}>
-                <FormInputText
-                  label={'Tên điểm camp'}
-                  type="text"
-                  name="name"
-                  defaultValue=""
-                  placeholder="Nhập tên điểm camp"
-                  fullWidth
-                />
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 9999 }}>
+        {' '}
+        <SimpleCard>
+          <form
+            onSubmit={methods.handleSubmit(onSubmitHandler)}
+            noValidate
+            autoComplete="off"
+          >
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item sm={6} xs={12}>
+                  <FormInputText
+                    label={'Tên điểm camp'}
+                    type="text"
+                    name="name"
+                    defaultValue=""
+                    placeholder="Nhập tên điểm camp"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Tìm kiếm"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
+                <Grid item sm={3} xs={12}>
+                  <MuiButton
+                    title="Làm mới"
+                    variant="outlined"
+                    color="primary"
+                    onClick={onResetFilters}
+                    sx={{ width: '100%' }}
+                    startIcon={<Icon>cached</Icon>}
+                  />
+                </Grid>
               </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Tìm kiếm"
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  sx={{ width: '100%' }}
-                  startIcon={<SearchSharp />}
-                />
-              </Grid>
-              <Grid item sm={3} xs={12}>
-                <MuiButton
-                  title="Làm mới"
-                  variant="outlined"
-                  color="primary"
-                  onClick={onResetFilters}
-                  sx={{ width: '100%' }}
-                  startIcon={<Icon>cached</Icon>}
-                />
-              </Grid>
-            </Grid>
-          </FormProvider>
-        </form>
-      </SimpleCard>
+            </FormProvider>
+          </form>
+        </SimpleCard>
+      </Box>
 
       <SimpleCard>
         <MuiStyledTable
@@ -197,9 +199,9 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
           error={isError ? error : null}
           actions={[
             {
-              icon: 'edit',
-              color: 'warning',
-              tooltip: 'Chi tiết',
+              icon: 'double_arrow',
+              color: 'primary',
+              tooltip: 'Xem chi tiết',
               onClick: onRowDetail,
             },
           ]}

@@ -14,6 +14,7 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { IOrderDetail } from 'app/models/order'
 import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
+import { NavLink } from 'react-router-dom'
 
 export interface ICustomerInfoProps {
   order?: IOrderDetail
@@ -37,19 +38,38 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
               <MuiTypography variant="subtitle2">Người đặt</MuiTypography>
             </Grid>
             <Grid item xs={12} md={8}>
-              <MuiTypography color="primary" variant="body2">
-                {`${
-                  order?.customer?.fullName
-                    ? order?.customer?.fullName + ' - '
-                    : ''
-                }`}
-                {`${
-                  order?.customer?.mobilePhone
-                    ? order?.customer?.mobilePhone + ' - '
-                    : ''
-                }`}
-                {order?.customer?.email}
-              </MuiTypography>
+              <NavLink
+                to={
+                  // order?.customer?.userType === 1
+                  //   ? `/quan-ly-tai-khoan-admin/${order?.customer?.id}/chi-tiet`
+                  //   : `/quan-ly-tai-khoan-khach-hang/${order?.customer?.id}/thong-tin`
+
+                  `/quan-ly-tai-khoan-khach-hang/${order?.customer?.id}/thong-tin`
+                }
+                // state={{
+                //   modal: order?.customer?.userType === 1 ? true : false,
+                // }}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <MuiTypography
+                  color="primary"
+                  variant="body2"
+                  sx={{ textDecorationLine: 'underline' }}
+                >
+                  {`${
+                    order?.customer?.fullName ? order?.customer?.fullName : ''
+                  }`}
+                  {`${
+                    order?.customer?.mobilePhone
+                      ? ' - ' + order?.customer?.mobilePhone
+                      : ''
+                  }`}
+                  {`${
+                    order?.customer?.email ? ' - ' + order?.customer?.email : ''
+                  }`}
+                </MuiTypography>
+              </NavLink>
             </Grid>
           </Grid>
 
@@ -110,6 +130,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
                 <FormInputText
                   label={'Số điện thoại'}
@@ -119,6 +140,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
                 <FormInputText
                   label={'Email'}
@@ -127,6 +149,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   defaultValue=""
                   fullWidth
                   disabled={isViewer}
+                  clearIcon={!isViewer}
                 />
               </Stack>
             </Grid>

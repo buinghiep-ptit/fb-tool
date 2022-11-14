@@ -45,10 +45,10 @@ export const navigations = [
     auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
-    name: 'Quản lý chính sách',
+    name: 'Quản lý chính sách đặt cọc',
     path: '/quan-ly-chinh-sach',
     icon: 'security',
-    auth: [ROLES.ADMIN, ROLES.CS],
+    auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
     name: 'Quản lý địa danh',

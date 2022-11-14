@@ -17,7 +17,7 @@ type SchemaType = {
   paymentType?: 1 | 2
 }
 
-export const useRHFOrder = (order: IOrderDetail) => {
+export const useRHFOrder = (order: IOrderDetail, services?: IService[]) => {
   useEffect(() => {
     if (order) {
       defaultValues.dateStart = order.dateStart
@@ -32,6 +32,12 @@ export const useRHFOrder = (order: IOrderDetail) => {
       methods.reset({ ...defaultValues })
     }
   }, [order])
+
+  useEffect(() => {
+    if (services && !!services.length) {
+      methods.setValue('services', services)
+    }
+  }, [services])
 
   const [defaultValues] = useState<SchemaType>({})
 
@@ -109,7 +115,8 @@ export const useRHFOrder = (order: IOrderDetail) => {
   })
 
   useEffect(() => {
-    const currentProp = order?.services?.length || 0
+    const currentProp =
+      (services && services.length) || order?.services?.length || 0
     const previousProp = fields.length
     if (currentProp > previousProp) {
       for (let i = previousProp; i < currentProp; i++) {
@@ -120,7 +127,7 @@ export const useRHFOrder = (order: IOrderDetail) => {
         remove(i - 1)
       }
     }
-  }, [order?.services, fields])
+  }, [order?.services, services, fields])
 
   return [methods as any, fields as any] as const
 }

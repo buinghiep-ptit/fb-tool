@@ -8,8 +8,8 @@ import {
   useReceiveCancelOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
-import { IUser, IUserProfile } from 'app/models'
-import { IOrderDetail } from 'app/models/order'
+import { IProfile, IUser, IUserProfile } from 'app/models'
+import { ICustomerOrder, IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { isReceiveUser } from '../OrderDetail'
@@ -17,7 +17,7 @@ import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
   order?: IOrderDetail
-  currentUser?: IUserProfile
+  currentUser?: IProfile
 }
 
 export type ReassignSchema = {
@@ -157,11 +157,12 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         {order?.status &&
           order?.status !== -1 &&
           order?.status < 4 &&
-          order.cancelRequest?.status !== 2 && (
+          order.cancelRequest?.status !== 2 &&
+          currentUser?.authorities?.includes(1) && (
             <>
               <MuiButton
                 title="Chuyển tiếp"
-                variant="outlined"
+                variant="contained"
                 color="primary"
                 onClick={() =>
                   navigate(`chuyen-tiep`, {
@@ -175,19 +176,19 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
                 sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
                 flexItem
               />
+              <MuiButton
+                title="Ghi chú"
+                variant="contained"
+                color="warning"
+                onClick={() =>
+                  navigate(`ghi-chu`, {
+                    state: { modal: true },
+                  })
+                }
+                startIcon={<Icon>event_note</Icon>}
+              />
             </>
           )}
-        <MuiButton
-          title="Ghi chú"
-          variant="outlined"
-          color="warning"
-          onClick={() =>
-            navigate(`ghi-chu`, {
-              state: { modal: true },
-            })
-          }
-          startIcon={<Icon>event_note</Icon>}
-        />
       </Stack>
     )
   }
@@ -198,7 +199,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Xác nhận KH đã thanh toán"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() =>
               navigate(`xac-nhan-thanh-toan`, {
@@ -214,7 +215,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ đơn"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`huy-don-hang`, {
@@ -235,7 +236,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Còn chỗ"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() => onClickButton('AVAILABLE')}
             startIcon={<Icon>how_to_reg</Icon>}
@@ -248,8 +249,9 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Hết chỗ"
-            variant="outlined"
-            sx={{ color: '#AAAAAA' }}
+            variant="contained"
+            color="warning"
+            // sx={{ color: '#AAAAAA' }}
             onClick={() => onClickButton('UN_AVAILABLE')}
             startIcon={<Icon>person_off</Icon>}
           />
@@ -260,7 +262,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`huy-don-hang`, {
@@ -284,8 +286,8 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           <>
             <MuiButton
               title="Chuyển tiếp"
-              variant="outlined"
-              color="warning"
+              variant="contained"
+              color="primary"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
                   state: { modal: true },
@@ -305,7 +307,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Hoàn tất"
-            variant="outlined"
+            variant="contained"
             color="primary"
             onClick={() => onClickButton('ORDER_USED')}
             startIcon={<Icon>how_to_reg</Icon>}
@@ -317,7 +319,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           />
           <MuiButton
             title="Huỷ đặt chỗ"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`yeu-cau-huy-dat-cho`, {
@@ -338,26 +340,42 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         <>
           <MuiButton
             title="Huỷ chỗ, hoàn tiền"
-            variant="outlined"
+            variant="contained"
             color="error"
             onClick={() =>
               navigate(`hoan-tien`, {
                 state: { modal: true, data: order },
               })
             }
-            startIcon={<Icon>cached</Icon>}
+            startIcon={<Icon>clear</Icon>}
           />
           <Divider
             orientation="vertical"
             sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
             flexItem
           />
+          {/* <MuiButton
+            title="Cập nhật đơn hàng"
+            variant="contained"
+            color="primary"
+            onClick={() =>
+              navigate(`hoan-tien`, {
+                state: { modal: true, data: order },
+              })
+            }
+            startIcon={<Icon>saved</Icon>}
+          />
+          <Divider
+            orientation="vertical"
+            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+            flexItem
+          /> */}
         </>
       )}
 
       <MuiButton
         title="Ghi chú"
-        variant="outlined"
+        variant="contained"
         color="warning"
         onClick={() =>
           navigate(`ghi-chu`, {

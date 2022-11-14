@@ -17,7 +17,8 @@ export default function CreateUser({ title }: Props) {
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Thêm mới tài khoản thành công' })
-    navigate(-1)
+    navigate('/quan-ly-tai-khoan-admin', {})
+    // navigate(-1)
   }
   const { mutate: createUser, isLoading } = useCreateUserData(onSuccess)
 
@@ -28,7 +29,8 @@ export default function CreateUser({ title }: Props) {
   }
 
   const handleClose = () => {
-    navigate(-1)
+    navigate('/quan-ly-tai-khoan-admin', {})
+    // navigate(-1)
   }
 
   return (

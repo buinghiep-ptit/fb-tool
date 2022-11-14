@@ -36,7 +36,7 @@ export default function UserDetail({ title }: Props) {
 
   const onSuccess = async (u: any) => {
     toastSuccess({ message: 'Cập nhật tài khoản thành công' })
-    navigate(-1)
+    navigate('/quan-ly-tai-khoan-admin', {})
     if (user && user.id && u && u.id && user.id === u.id) {
       await updateUser()
     }
@@ -51,7 +51,8 @@ export default function UserDetail({ title }: Props) {
   }
 
   const handleClose = () => {
-    navigate(-1)
+    // navigate(-1)
+    navigate('/quan-ly-tai-khoan-admin', {})
   }
 
   return (

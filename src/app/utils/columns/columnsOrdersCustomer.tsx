@@ -6,6 +6,7 @@ import moment from 'moment'
 import { getOrderStatusSpec } from '../enums/order'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import { TooltipText } from './columnsEvents'
 
 export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
@@ -35,7 +36,6 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
     id: 'campGroundRepresent',
     label: 'Chủ camp',
     minWidth: 120,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -56,8 +56,8 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'amount',
-    label: 'Tổng thực tế',
-    minWidth: 170,
+    label: 'Tổng thực tế (VNĐ)',
+    minWidth: 150,
     align: 'center',
     format: (value: number) => (
       <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
@@ -65,8 +65,8 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
   },
   {
     id: 'paymentAmnt',
-    label: 'Đã thanh toán',
-    minWidth: 120,
+    label: 'Đã thanh toán (VNĐ)',
+    minWidth: 150,
     align: 'center',
     format: (value: number) =>
       value ? (
@@ -114,7 +114,9 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
     id: 'handledBy',
     label: 'Người tiếp nhận',
     minWidth: 170,
-    align: 'center',
+    format: (value: any) => (
+      <TooltipText text={value} underline={false} maxLines={1} />
+    ),
   },
   {
     id: 'action',

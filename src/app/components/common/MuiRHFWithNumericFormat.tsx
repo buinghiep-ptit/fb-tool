@@ -65,6 +65,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
           }}
           disabled={disabled}
           onChange={onChange}
+          // onValueChange={({ floatValue }) => onChange(floatValue)}
           InputLabelProps={{ shrink: true }}
           required={required}
           InputProps={{

@@ -47,8 +47,10 @@ export const useLogsActionOrderData = (filters: any) => {
   )
 }
 
-export const useOrderDetailData = (orderId: number) => {
-  return useQuery(['order-detail', orderId], () => orderDetail(orderId))
+export const useOrderDetailData = (orderId: number, onSuccess?: any) => {
+  return useQuery(['order-detail', orderId], () => orderDetail(orderId), {
+    onSuccess,
+  })
 }
 
 export const useReceiveOrder = (onSuccess?: any, onError?: any) => {
@@ -214,9 +216,9 @@ export const useRecalculatePriceOrder = (onSuccess?: any, onError?: any) => {
       recalculatePrice(params.orderId ?? 0, params.payload),
     {
       onSettled: (data: any) => {
-        if (data) {
-          queryClient.invalidateQueries(['order-detail'])
-        }
+        // if (data) {
+        //   queryClient.invalidateQueries(['order-detail'])
+        // }
       },
       onSuccess,
     },

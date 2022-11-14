@@ -35,7 +35,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }
@@ -95,7 +95,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }
@@ -106,6 +106,14 @@ export const getOrderStatusSpec = (
           title: 'Chờ thanh toán',
           textColor: '#FB7800',
           bgColor: '#FCF5ED',
+        }
+      case OrderStatusEnum.SUCCEEDED:
+        return {
+          key: 3,
+          value: 3,
+          title: 'Đặt thành công',
+          textColor: '#2F9B42',
+          bgColor: '#EDFDEF',
         }
 
       default:
@@ -131,7 +139,7 @@ export const getOrderStatusSpec = (
         return {
           key: 1,
           value: 1,
-          title: 'Tiếp nhận',
+          title: 'Đã tiếp nhận',
           textColor: '#475985',
           bgColor: '#EFF4FB',
         }

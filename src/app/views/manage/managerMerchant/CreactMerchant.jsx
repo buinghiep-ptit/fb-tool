@@ -397,6 +397,7 @@ export default function CreateMerchant(props) {
                 type="file"
                 id="upload-contract"
                 onChange={async e => {
+                  console.log('xx')
                   if (
                     document.getElementById('upload-contract').files[0].size >
                     20000000
@@ -410,7 +411,11 @@ export default function CreateMerchant(props) {
                   const file = await uploadFile(
                     document.getElementById('upload-contract').files[0],
                   )
-
+                  if (file?.code === '400') {
+                    e.target.value = null
+                    toastError({ message: file?.errorDescription })
+                    return
+                  }
                   setContractList([...contractList, file])
                 }}
                 style={{ display: 'none' }}
@@ -490,8 +495,13 @@ export default function CreateMerchant(props) {
                   const file = await uploadFile(
                     document.getElementById('upload-document').files[0],
                   )
-
+                  if (file?.code === '400') {
+                    e.target.value = null
+                    toastError({ message: file?.errorDescription })
+                    return
+                  }
                   setDocumentList([...documentList, file])
+                  e.target.value = null
                 }}
                 style={{ display: 'none' }}
               />

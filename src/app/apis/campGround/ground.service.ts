@@ -142,3 +142,13 @@ export const getListPolicy = async (params: any): Promise<any> => {
   })
   return data
 }
+
+export const checkNameCampExist = async (params: any): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-grounds/validate-camp-ground-name`,
+    {
+      params,
+    },
+  )
+  return data
+}

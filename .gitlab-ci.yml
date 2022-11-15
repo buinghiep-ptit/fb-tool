@@ -21,3 +21,25 @@ dev-deploy:
   only:
     - dev
   when: on_success
+
+# PROD ENV
+prod-build:
+  tags:
+    - trigger-prod
+  stage: build
+  script:
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 1 -b main -i 103 -e STAGE=build -e DOCKER_TAG=${CI_COMMIT_TAG}
+  only:
+    refs:
+      - tags
+
+prod-deploy:
+  tags:
+    - trigger-prod
+  stage: deploy
+  script:
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 0 -b main -i 103 -e STAGE=deploy -e DOCKER_TAG=${CI_COMMIT_TAG}
+  only:
+    refs:
+      - tags
+  when: on_success

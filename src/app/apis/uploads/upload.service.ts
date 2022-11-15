@@ -19,7 +19,7 @@ export const uploadFile = async (
   formData.append('file', file)
 
   const { data }: any = await http.post(path, formData, {
-    baseURL: 'https://dev09-api.campdi.vn/upload',
+    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -34,7 +34,7 @@ export const uploadImage = async (file?: any): Promise<any> => {
   formData.append('file', file)
 
   const { data }: any = await http.post('/api/image/upload', formData, {
-    baseURL: 'https://dev09-api.campdi.vn/upload',
+    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -47,7 +47,7 @@ export const uploadAudio = async (file?: any): Promise<any> => {
   formData.append('file', file)
 
   const { data }: any = await http.post('/api/audio/upload', formData, {
-    baseURL: 'https://dev09-api.campdi.vn/upload',
+    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -60,7 +60,7 @@ export const uploadFileAll = async (file?: any): Promise<any> => {
   formData.append('file', file)
 
   const { data }: any = await http.post('/api/file/upload', formData, {
-    baseURL: 'https://dev09-api.campdi.vn/upload',
+    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
     headers: {
       'Content-Type': 'multipart/form-data',
     },

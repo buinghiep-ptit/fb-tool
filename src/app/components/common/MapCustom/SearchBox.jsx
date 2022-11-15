@@ -61,7 +61,6 @@ class SearchBox extends Component {
       marker.setMap(null)
     })
     markers = []
-    console.log(this.props.mapsapi)
     const bounds = new this.props.mapsapi.LatLngBounds()
 
     places.forEach(place => {

@@ -110,7 +110,7 @@ const MapCustom = React.forwardRef(({ center }, ref) => {
               )
             }}
           >
-            <AnyReactComponent lat={latMarker} lng={lngMarker} />
+            <AnyReactComponent />
             {apiReady && <SearchBox map={mapInstance} mapsapi={mapsapi} />}
           </GoogleMapReact>
           <Typography variant="subtitle2" gutterBottom mt={2}>

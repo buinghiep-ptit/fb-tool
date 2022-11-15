@@ -10,13 +10,11 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 export default function InformationBooking({
   control,
-  errors,
+  setExpand,
   listContact,
   setListContact,
   listMerchant,
-  setValue,
   defaultCheck,
-  getValues,
 }) {
   const [isBooking, setIsBooking] = React.useState()
 
@@ -32,6 +30,7 @@ export default function InformationBooking({
             component="fieldset"
             onChange={event => {
               setIsBooking(event.target.value)
+              setExpand(event.target.value === '1')
             }}
           >
             <FormLabel component="legend">Hỗ trợ đặt chỗ*</FormLabel>

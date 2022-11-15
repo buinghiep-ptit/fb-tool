@@ -22,17 +22,16 @@ import {
   createCampGround,
   getListMerchant,
   deleteCampGround,
-  updateCampGroundStatus,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
 import Feature from './feature'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { object } from 'prop-types'
+
 import { formatFile } from 'app/utils/constant'
 import { checkExistedName } from 'app/apis/audio/audio.service'
 
@@ -45,7 +44,7 @@ export default function InformationCampGround({ action }) {
   const [campAreas, setCampAreas] = React.useState([])
   const [medias, setMedias] = React.useState([])
   const [description, setDescription] = React.useState('')
-  // const [statusCamp, setStatusCamp] = React.useState(null)
+  const [expandPolicy, setExpandPolicy] = React.useState(true)
   const [listMerchant, setListMerchant] = React.useState([])
   const [disabledInternet, setDisabledInternet] = React.useState({
     viettel: true,
@@ -259,10 +258,11 @@ export default function InformationCampGround({ action }) {
   }
 
   const onSubmit = async data => {
-    // const checkNameCamp = await checkExistedName({
-    //   name: data.nameCampground,
-    // })
-    // if (checkNameCamp.exist) return
+    const checkNameCamp = await checkExistedName({
+      name: data.nameCampground,
+      idCampGround: params.id,
+    })
+    if (checkNameCamp.exist) return
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -312,7 +312,12 @@ export default function InformationCampGround({ action }) {
     dataUpdate.id = params.id
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
-    dataUpdate.idDepositPolicy = data.policy
+    if (parseInt(data.isSupportBooking) === 1) {
+      dataUpdate.idDepositPolicy = data.policy
+    } else {
+      dataUpdate.idDepositPolicy = null
+    }
+
     dataUpdate.idMerchant = data.idMerchant?.id || null
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
@@ -411,6 +416,9 @@ export default function InformationCampGround({ action }) {
             )
 
             setValue('policy', data.depositPolicy?.id || null)
+            if (data.depositPolicy === null) {
+              setExpandPolicy(false)
+            }
             // setValue('contact', data.contact)
             setValue('openTime', data.openTime)
             setValue('closeTime', data.closeTime)
@@ -529,7 +537,7 @@ export default function InformationCampGround({ action }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
@@ -557,7 +565,7 @@ export default function InformationCampGround({ action }) {
           />
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel2a-content"
@@ -567,6 +575,7 @@ export default function InformationCampGround({ action }) {
         </AccordionSummary>
         <AccordionDetails>
           <InformationBooking
+            setExpand={setExpandPolicy}
             control={control}
             listContact={listContact}
             setListContact={setListContact}
@@ -578,7 +587,7 @@ export default function InformationCampGround({ action }) {
           />
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel3a-content"
@@ -601,7 +610,7 @@ export default function InformationCampGround({ action }) {
           )}
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion defaultExpanded={true}>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel4a-content"
@@ -623,23 +632,25 @@ export default function InformationCampGround({ action }) {
           />
         </AccordionDetails>
       </Accordion>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel5a-content"
-          id="panel5a-header"
-        >
-          <Typography>5. Chính sách</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Policy
-            setValue={setValue}
-            action={action}
-            detailPolicy={detailPolicy}
-            setDetailPolicy={setDetailPolicy}
-          />
-        </AccordionDetails>
-      </Accordion>
+      {expandPolicy && (
+        <Accordion defaultExpanded={true}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel5a-content"
+            id="panel5a-header"
+          >
+            <Typography>5. Chính sách</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Policy
+              setValue={setValue}
+              action={action}
+              detailPolicy={detailPolicy}
+              setDetailPolicy={setDetailPolicy}
+            />
+          </AccordionDetails>
+        </Accordion>
+      )}
       <div style={{ marginTop: '50px' }}>
         {action === 'create' ? (
           <>

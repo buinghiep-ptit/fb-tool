@@ -68,6 +68,7 @@ export default function GeneralInformation({
             render={({ field }) => (
               <TextField
                 {...field}
+                fullWidth
                 label="Tên điểm camp*"
                 variant="outlined"
                 error={!!errors.nameCampground}

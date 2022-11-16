@@ -192,7 +192,8 @@ export default function AddAudio({ title }: Props) {
   }
 
   useEffect(() => {
-    if (!debouncedSearchQuery) return
+    if (!debouncedSearchQuery || (audio && audio.name == methods.watch('name')))
+      return
     checkName(debouncedSearchQuery.trim())
   }, [debouncedSearchQuery])
 

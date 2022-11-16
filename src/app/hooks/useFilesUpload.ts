@@ -24,6 +24,10 @@ export const useUploadFiles = () => {
     val: FileInfoProgress[]
   }>({ val: [] })
   const [message, setMessage] = useState<string[]>([])
+  const [rejected, setRejected] = useState<
+    { index?: number; filename?: string }[]
+  >([])
+
   const [fileInfos, setFileInfos] = useState<
     FileInfoResult[] | IMediaOverall[]
   >([])
@@ -75,14 +79,18 @@ export const useUploadFiles = () => {
           mediaType: thumbnail ? 2 : 3,
         }
       })
-      .catch(() => {
+      .catch(e => {
+        console.log('Could not upload the file:', e)
         _progressInfos[idx].percentage = 0
         setProgressInfos({ val: _progressInfos as any })
-
-        setMessage(prevMessage => [
+        setRejected(prevMessage => [
           ...prevMessage,
-          'Could not upload the file: ' + file.name,
+          { index: idx, filename: file.name },
         ])
+        // setMessage(prevMessage => [
+        //   ...prevMessage,
+        //   'Could not upload the file: ' + file.name,
+        // ])
       })
   }
 
@@ -91,6 +99,7 @@ export const useUploadFiles = () => {
     mediaFormat?: number,
     thumbnail?: { type: 'video' | 'image' },
   ) => {
+    setMessage([])
     // remove progress when is thumbnail
     setUploading(true)
     const selectedFilesToArr = Array.from(files ?? [])
@@ -111,7 +120,7 @@ export const useUploadFiles = () => {
     )
 
     const filesResult = await Promise.all(uploadPromises)
-    setFileInfos(prev => [...prev, ...filesResult])
+    setFileInfos(prev => [...prev, ...filesResult.filter(file => file && file)])
     setUploading(false)
     setMessage([])
   }
@@ -151,7 +160,7 @@ export const useUploadFiles = () => {
     cancelUploading,
     uploading,
     progressInfos,
-    message,
+    rejected,
     (files: FileInfoResult[] | IMediaOverall[]) => setInitialFileInfos(files),
     fileInfos,
   ] as const

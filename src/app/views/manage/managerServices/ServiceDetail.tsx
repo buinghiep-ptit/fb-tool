@@ -115,7 +115,9 @@ export default function ServiceDetail(props: Props) {
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
         const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-          media => media.mediaFormat === fileConfigs.mediaFormat,
+          media =>
+            media.mediaFormat === fileConfigs.mediaFormat &&
+            media.mediaType === 3,
         )
 
         if (files && files.length) {
@@ -492,6 +494,7 @@ export default function ServiceDetail(props: Props) {
                         cancelUploading={cancelUploading}
                         uploading={uploading}
                         progressInfos={progressInfos}
+                        message={message}
                       />
                     </Box>
                   </Stack>

@@ -116,7 +116,8 @@ export const columnsBase: readonly TableColumn<TitleRating>[] = [
   {
     id: 'imgUrl',
     label: 'Ảnh',
-    minWidth: 80,
+    minWidth: 100,
+    width: 120,
     align: 'center',
     media: (value: string) => (
       <Box

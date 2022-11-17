@@ -160,8 +160,6 @@ export function UploadPreviewer({
     })
   }, [message])
 
-  console.log('fileInfos:', fileInfos)
-
   useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
     if (durationVideo && mediaFormat === EMediaFormat.VIDEO && fileVideo) {

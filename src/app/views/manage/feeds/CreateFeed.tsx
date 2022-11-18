@@ -831,6 +831,7 @@ export default function CreateFeed(props: Props) {
                       cancelUploading={cancelUploading}
                       uploading={uploading}
                       progressInfos={progressInfos}
+                      message={message}
                     />
                   </Box>
                 </Stack>

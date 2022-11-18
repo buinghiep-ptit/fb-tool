@@ -246,7 +246,8 @@ export default function AddPolicy({ title }: Props) {
 
             <MuiRHFNumericFormatInput
               type="text"
-              isAllowDot
+              isAllowDot={false}
+              isAllowZeroFirst={false}
               name="scaleAmount"
               label="% giao dịch"
               placeholder="Nhập % giao dich"

@@ -92,11 +92,11 @@ export const navigations = [
     path: '/quan-ly-danh-gia',
     icon: 'stars',
   },
-  {
-    name: 'Quản lý từ cấm',
-    path: '/quan-ly-tu-cam',
-    icon: 'comments_disabled',
-  },
+  // {
+  //   name: 'Quản lý từ cấm',
+  //   path: '/quan-ly-tu-cam',
+  //   icon: 'comments_disabled',
+  // },
   // { label: 'PAGES', type: 'label' },
   // {
   //   name: 'Session/Auth',

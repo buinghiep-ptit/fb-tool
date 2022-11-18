@@ -23,7 +23,8 @@ export const columnsAudios: readonly TableColumn<TitleAudios>[] = [
   {
     id: 'urlImage',
     label: 'Hình',
-    minWidth: 80,
+    minWidth: 100,
+    width: 120,
     align: 'center',
     media: (value: string) => (
       <Box

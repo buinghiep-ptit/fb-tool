@@ -76,6 +76,7 @@ interface Props {
   mediasSrcPreviewer: IMediaOverall[]
   fileInfos?: IMediaOverall[]
   setMediasSrcPreviewer: (files: any) => void
+  message?: { index?: number; filename?: string }[]
 }
 
 export function UploadPreviewer({
@@ -98,6 +99,8 @@ export function UploadPreviewer({
   mediasSrcPreviewer,
   fileInfos,
   setMediasSrcPreviewer,
+  message,
+  initialMedias,
 }: Props) {
   const { mediaFormat, mediaType, multiple, accept, isLimitFiles } =
     mediaConfigs
@@ -137,6 +140,27 @@ export function UploadPreviewer({
   }, [mediaFormat])
 
   useEffect(() => {
+    if (!message || !message?.length) return
+    message.forEach(m => {
+      setMediasSrcPreviewer([
+        ...(mediasSrcPreviewer.filter(
+          (media, index) =>
+            index !== (m?.index ?? 0) + mediasSrcPreviewer.length - 1,
+        ) ?? []),
+      ])
+      setValue(
+        name,
+        getValues(name) && getValues(name).length
+          ? getValues(name).filter(
+              (item: any, index: number) =>
+                index !== (m?.index ?? 0) + getValues(name).length - 1,
+            )
+          : null,
+      )
+    })
+  }, [message])
+
+  useEffect(() => {
     const fileVideo = getValues(name) && getValues(name)[0]
     if (durationVideo && mediaFormat === EMediaFormat.VIDEO && fileVideo) {
       const newFiles = Object.assign(fileVideo, {
@@ -162,7 +186,7 @@ export function UploadPreviewer({
     }
     if (files) {
       if (mediaIndex !== -1) {
-        files.splice(mediaIndex ?? 0, 1)
+        files.splice((mediaIndex ?? 0) - (initialMedias ?? [])?.length, 1)
         setValue(name, [...files])
       }
     } else setValue(name, null)

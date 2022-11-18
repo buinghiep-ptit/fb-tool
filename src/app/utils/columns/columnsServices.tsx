@@ -21,7 +21,8 @@ export const columnsServices: readonly TableColumn<TitleServices>[] = [
   {
     id: 'image',
     label: 'Hình ảnh',
-    minWidth: 80,
+    minWidth: 100,
+    width: 120,
     media: (value: string) => (
       <Box
         sx={{

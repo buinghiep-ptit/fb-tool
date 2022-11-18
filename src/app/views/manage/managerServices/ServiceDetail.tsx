@@ -130,7 +130,9 @@ export default function ServiceDetail({
       .test('empty', messages.MSG1, files => {
         // if (!!Number(eventId ?? 0)) {
         const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-          media => media.mediaFormat === fileConfigs.mediaFormat,
+          media =>
+            media.mediaFormat === fileConfigs.mediaFormat &&
+            media.mediaType === 3,
         )
 
         if (files && files.length) {
@@ -546,6 +548,7 @@ export default function ServiceDetail({
                         cancelUploading={cancelUploading}
                         uploading={uploading}
                         progressInfos={progressInfos}
+                        message={message}
                       />
                     </Box>
                   </Stack>

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import { Box, Button, Grid, Icon, styled, TextField, Fab } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import InputLabel from '@mui/material/InputLabel'
@@ -172,19 +172,20 @@ export default function ManagerLocation(props) {
               display: 'flex',
               alignItems: 'center',
               margin: '20px 0',
-              cursor: 'pointer',
             }}
           >
-            <Icon
-              fontSize="large"
+            <Fab
               color="primary"
-              sx={{ marginRight: '5px' }}
+              aria-label="Add"
+              className="button"
+              sx={{ marginRight: '15px', cursor: 'pointer' }}
+              size="small"
               onClick={() => {
                 navigate('/them-diem-camp')
               }}
             >
-              add_circle
-            </Icon>
+              <Icon>add</Icon>
+            </Fab>
             <Paragraph
               variant="h1"
               component="h2"

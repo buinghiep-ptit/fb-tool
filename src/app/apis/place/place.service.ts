@@ -6,6 +6,14 @@ export const getListPlace = async (params: any): Promise<PlaceCamp> => {
   return data
 }
 
+export const getListPlaceProvince = async (params: any): Promise<PlaceCamp> => {
+  const { data } = await http.get<PlaceCamp>(
+    '/api/camp-areas/default-camp-areas',
+    { params },
+  )
+  return data
+}
+
 export const updatePlace = async (id: any, place: any): Promise<any> => {
   const { data } = await http.put<any>(`/api/camp-areas/${id}`, place)
   return data

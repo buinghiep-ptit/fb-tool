@@ -68,6 +68,7 @@ type Props = {
   children?: React.ReactElement
   onSubmit?: any
   isLoading?: boolean
+  hideFooter?: boolean
 }
 
 export default function MuiStyledModal({
@@ -80,6 +81,7 @@ export default function MuiStyledModal({
   onSubmit,
   children,
   isLoading,
+  hideFooter = false,
 }: Props) {
   //   const [open, setOpen] = React.useState(false)
   return (
@@ -95,51 +97,53 @@ export default function MuiStyledModal({
       </BootstrapDialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       {isLoading && <LinearProgress />}
-      <DialogActions>
-        <Stack
-          py={2}
-          sx={{
-            paddingLeft: {
-              xs: '6.66%',
-              sm: '13.33%',
-            },
-            paddingRight: {
-              xs: '6.66%',
-              sm: '13.33%',
-            },
-          }}
-          direction={'row'}
-          justifyContent="center"
-          width={'100%'}
-          gap={2}
-        >
-          {onSubmit && (
-            <MuiButton
-              disabled={isLoading}
-              title={submitText}
-              variant="contained"
-              color="primary"
-              type="submit"
-              sx={{ flex: !!onCloseModal ? 1 : null, minWidth: 200 }}
-              startIcon={<Icon>save</Icon>}
-              onClick={() => onSubmit()}
-              loading={isLoading}
-            />
-          )}
+      {!hideFooter && (
+        <DialogActions>
+          <Stack
+            py={2}
+            sx={{
+              paddingLeft: {
+                xs: '6.66%',
+                sm: '13.33%',
+              },
+              paddingRight: {
+                xs: '6.66%',
+                sm: '13.33%',
+              },
+            }}
+            direction={'row'}
+            justifyContent="center"
+            width={'100%'}
+            gap={2}
+          >
+            {onSubmit && (
+              <MuiButton
+                disabled={isLoading}
+                title={submitText}
+                variant="contained"
+                color="primary"
+                type="submit"
+                sx={{ flex: !!onCloseModal ? 1 : null, minWidth: 200 }}
+                startIcon={<Icon>save</Icon>}
+                onClick={() => onSubmit()}
+                loading={isLoading}
+              />
+            )}
 
-          {onCloseModal && (
-            <MuiButton
-              title={cancelText}
-              variant="outlined"
-              color="secondary"
-              type="submit"
-              sx={{ flex: onSubmit ? 1 : null, minWidth: 200 }}
-              startIcon={<Icon>cancel</Icon>}
-              onClick={onCloseModal}
-            />
-          )}
-        </Stack>
-      </DialogActions>
+            {onCloseModal && !hideFooter && (
+              <MuiButton
+                title={cancelText}
+                variant="outlined"
+                color="secondary"
+                type="submit"
+                sx={{ flex: onSubmit ? 1 : null, minWidth: 200 }}
+                startIcon={<Icon>cancel</Icon>}
+                onClick={onCloseModal}
+              />
+            )}
+          </Stack>
+        </DialogActions>
+      )}
     </BootstrapDialog>
   )
 }

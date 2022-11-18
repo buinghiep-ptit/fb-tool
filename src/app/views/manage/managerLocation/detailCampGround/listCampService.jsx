@@ -1,14 +1,15 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
-import { Breadcrumb, SimpleCard } from 'app/components'
+import { Button, Grid, Icon, Fab, TextField } from '@mui/material'
+import { SimpleCard } from 'app/components'
 import * as React from 'react'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-import { tableModelSevrvice } from '../const'
+import { tableModelService, typeService } from '../const'
 import { Paragraph } from 'app/components/Typography'
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
+import DialogCustom from 'app/components/common/DialogCustom'
 import {
   deleteCampGroundService,
   getListCampGroundService,
@@ -16,6 +17,7 @@ import {
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
 import { useNavigate, useParams } from 'react-router-dom'
+import ServiceDetail from '../../managerServices/ServiceDetail'
 
 export default function ListCampService(props) {
   const [inputFilter, setInputFilter] = useState('')
@@ -25,6 +27,7 @@ export default function ListCampService(props) {
   const [totalListCampGroundService, setTotalListCampgroundService] = useState()
   const navigate = useNavigate()
   const params = useParams()
+  const dialogCustomRef = React.useRef()
 
   const fetchListCampGroundService = async param => {
     await getListCampGroundService(params.id, param)
@@ -32,19 +35,19 @@ export default function ListCampService(props) {
         const newList = cloneDeep(data.content).map(campGroundService => {
           const convertCampGroundService = {}
           convertCampGroundService.id = campGroundService.id
-          convertCampGroundService.image = campGroundService.imgUrl
+          convertCampGroundService.image = campGroundService.imageUrl
           convertCampGroundService.linkDetail = {
             link: campGroundService.name,
-            path: '/chi-tiet-diem-camp/',
+            path: `/chi-tiet-diem-camp/${params.id}/sua-dich-vu/`,
           }
-          convertCampGroundService.type = campGroundService.type
+          convertCampGroundService.type = typeService[campGroundService.type]
 
           convertCampGroundService.quantity = campGroundService.capacity
 
           convertCampGroundService.status =
             campGroundService.status === 1 ? true : false
 
-          convertCampGroundService.action = ['edit', 'delete']
+          convertCampGroundService.action = ['editModal', 'delete']
           return convertCampGroundService
         })
 
@@ -96,9 +99,10 @@ export default function ListCampService(props) {
                   setTypeFilter(e.target.value)
                 }}
               >
-                <MenuItem value={0}>Nghỉ</MenuItem>
-                <MenuItem value={1}>Thuê</MenuItem>
-                <MenuItem value={2}>Khác</MenuItem>
+                <MenuItem value={0}>Tất cả</MenuItem>
+                <MenuItem value={1}>Gói dịch vụ</MenuItem>
+                <MenuItem value={2}>Lưu trú</MenuItem>
+                <MenuItem value={3}>Khác</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -111,9 +115,9 @@ export default function ListCampService(props) {
                   setStatusFilter(e.target.value)
                 }}
               >
+                <MenuItem value={0}>Tất cả</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
                 <MenuItem value={-1}>Không hoạt dộng</MenuItem>
-                <MenuItem value={0}>Lưu nháp</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -124,8 +128,9 @@ export default function ListCampService(props) {
             type="submit"
             onClick={() => {
               fetchListCampGroundService({
-                name: inputFilter,
-                status: statusFilter,
+                name: inputFilter || null,
+                status: statusFilter === 0 ? null : statusFilter,
+                type: typeFilter === 0 ? null : typeFilter,
                 page: 0,
                 size: 20,
               })
@@ -144,21 +149,26 @@ export default function ListCampService(props) {
             display: 'flex',
             alignItems: 'center',
             margin: '20px 0',
-            cursor: 'pointer',
           }}
         >
-          <Icon fontSize="large" color="primary" sx={{ marginRight: '5px' }}>
-            add_circle
-          </Icon>
+          <Fab
+            color="primary"
+            aria-label="Add"
+            className="button"
+            sx={{ marginRight: '15px', cursor: 'pointer' }}
+            size="small"
+            onClick={() => {
+              dialogCustomRef.current.handleClickOpen()
+            }}
+          >
+            <Icon>add</Icon>
+          </Fab>
           <Paragraph
             variant="h1"
             component="h2"
             children={undefined}
             className={undefined}
             ellipsis={undefined}
-            onClick={() => {
-              navigate('/quan-ly-dich-vu/chi-tiet-dich-vu')
-            }}
           >
             Thêm dịch vụ
           </Paragraph>
@@ -167,7 +177,7 @@ export default function ListCampService(props) {
       <TableCustom
         title="Danh sách dịch vụ"
         dataTable={listCampGroundService || []}
-        tableModel={tableModelSevrvice}
+        tableModel={tableModelService}
         pagination={true}
         onDeleteData={deleteCampGroundService}
         updateStatus={updateCampGroundServiceStatus}
@@ -175,6 +185,15 @@ export default function ListCampService(props) {
         fetchDataTable={fetchListCampGroundService}
         filter={{ name: inputFilter, status: statusFilter, type: typeFilter }}
       />
+      <DialogCustom ref={dialogCustomRef} title="Tạo dịch vụ" maxWidth="xl">
+        <ServiceDetail
+          isModal={false}
+          idCampGround={params.id}
+          handleCloseModal={() => dialogCustomRef.current.handleClose()}
+          extendFunction={() => fetchListCampGroundService()}
+          idService={'84'}
+        />
+      </DialogCustom>
     </SimpleCard>
   )
 }

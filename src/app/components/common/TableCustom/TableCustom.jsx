@@ -19,6 +19,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { cloneDeep, isNaN } from 'lodash'
 import DialogCustom from '../DialogCustom'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import ServiceDetail from 'app/views/manage/managerServices/ServiceDetail'
 
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: 'pre',
@@ -64,6 +65,8 @@ const TableCustom = forwardRef(
     }))
 
     const dialogConfirm = React.useRef()
+    const dialogCustomRef = React.useRef()
+    const [selectedId, setSelectedId] = React.useState()
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(20)
     const [filterTable, setFilterTable] = useState({
@@ -125,7 +128,11 @@ const TableCustom = forwardRef(
                     )
                   }
                   return (
-                    <TableCell align="center" key={cell.name}>
+                    <TableCell
+                      align="center"
+                      key={cell.name}
+                      style={{ minWidth: 100 }}
+                    >
                       {cell.name}
                     </TableCell>
                   )
@@ -225,11 +232,30 @@ const TableCustom = forwardRef(
                                     onClick={() => {
                                       navigate(
                                         `${data.linkDetail.path}${data.id}`,
+                                        {
+                                          state: { modal: true },
+                                        },
                                       )
                                     }}
                                   >
                                     <Icon color="error">{type}</Icon>
                                   </IconButton>
+                                )
+                              }
+
+                              if (type === 'editModal') {
+                                return (
+                                  <>
+                                    <IconButton
+                                      key={indexType}
+                                      onClick={() => {
+                                        setSelectedId(data.id)
+                                        dialogCustomRef.current.handleClickOpen()
+                                      }}
+                                    >
+                                      <Icon color="error">edit</Icon>
+                                    </IconButton>
+                                  </>
                                 )
                               }
 
@@ -370,6 +396,18 @@ const TableCustom = forwardRef(
               Hủy
             </Button>
           </div>
+        </DialogCustom>
+        <DialogCustom
+          ref={dialogCustomRef}
+          title="Cập nhật dịch vụ"
+          maxWidth="xl"
+        >
+          <ServiceDetail
+            isModal={false}
+            handleCloseModal={() => dialogCustomRef.current.handleClose()}
+            extendFunction={() => fetchDataTable(filterTable)}
+            idService={selectedId}
+          />
         </DialogCustom>
       </SimpleCard>
     )

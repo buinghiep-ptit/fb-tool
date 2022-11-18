@@ -55,7 +55,7 @@ export const tableModel = {
   ],
 }
 
-export const tableModelSevrvice = {
+export const tableModelService = {
   headCell: [
     {
       name: 'STT',
@@ -67,23 +67,23 @@ export const tableModelSevrvice = {
     },
     {
       name: 'Tên dịch vụ',
-      width: null,
+      width: 120,
     },
     {
       name: 'Loại dịch vụ',
-      width: null,
+      width: 80,
     },
     {
       name: 'Số lượng',
-      width: null,
+      width: 80,
     },
     {
       name: 'Trạng thái',
-      width: null,
+      width: 100,
     },
     {
       name: '',
-      width: null,
+      width: 150,
     },
   ],
   bodyCell: [
@@ -167,4 +167,10 @@ export const VEHICLES = {
   2: { name: 'car' },
   3: { name: 'motobike' },
   4: { name: 'boat' },
+}
+
+export const typeService = {
+  1: 'Gói dịch vụ',
+  2: 'Lưu trú',
+  3: 'Khác',
 }

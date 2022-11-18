@@ -38,6 +38,9 @@ const FeedDetail = Loadable(lazy(() => import('./feeds/FeedDetail')))
 const PostsCheck = Loadable(lazy(() => import('./feeds/PostsCheck')))
 const ReportDialog = Loadable(lazy(() => import('./feeds/ReportDialog')))
 const ManagerPlace = Loadable(lazy(() => import('./managerPlace/ManagerPlace')))
+const ManagerPlaceProvince = Loadable(
+  lazy(() => import('./managerPlaceProvince/ManagerPlaceProvince')),
+)
 const ManagerMerchant = Loadable(lazy(() => import('./managerMerchant')))
 const CreateFeed = Loadable(lazy(() => import('./feeds/CreateFeed')))
 const ListAudios = Loadable(lazy(() => import('./audios/ListAudios')))
@@ -58,6 +61,7 @@ const RateDetail = Loadable(lazy(() => import('./rating/RateDetail')))
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
 )
+
 const ManagerForbiddenWord = Loadable(
   lazy(() => import('./ManagerForbiddenWord')),
 )
@@ -66,6 +70,12 @@ const ManagerServiceDetail = Loadable(
 )
 const DetailPlace = Loadable(
   lazy(() => import('./managerPlace/detailPlace/detailPlace')),
+)
+const DetailPlaceProvince = Loadable(
+  lazy(
+    () =>
+      import('./managerPlaceProvince/detailPlaceProvince/detailPlaceProvince'),
+  ),
 )
 const DetailCampGround = Loadable(
   lazy(() => import('./managerLocation/detailCampGround/detailCampground')),
@@ -390,6 +400,10 @@ const ManagementRoutes = [
     element: <ManagerPlace />,
   },
   {
+    path: '/quan-ly-thong-tin-dia-danh-tinh-thanh',
+    element: <ManagerPlaceProvince />,
+  },
+  {
     path: '/quan-ly-thong-tin-doi-tac',
     element: <ManagerMerchant />,
     auth: [ROLES.ADMIN, ROLES.SALE],
@@ -411,6 +425,10 @@ const ManagementRoutes = [
   {
     path: '/chi-tiet-dia-danh/:id',
     element: <DetailPlace />,
+  },
+  {
+    path: '/chi-tiet-dia-danh-tinh-thanh/:id',
+    element: <DetailPlaceProvince />,
   },
   {
     path: '/chi-tiet-diem-camp/:id',

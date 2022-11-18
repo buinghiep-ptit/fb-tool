@@ -86,6 +86,10 @@ class SearchBox extends Component {
           position: place.geometry.location,
         }),
       )
+      console.log(place)
+      this.props.setLatMarker(place.geometry.location.lat())
+      this.props.setLngMarker(place.geometry.location.lng())
+      this.props.setAddress(place.formatted_address)
       if (place.geometry.viewport) {
         // Only geocodes have viewport.
         bounds.union(place.geometry.viewport)

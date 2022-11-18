@@ -20,7 +20,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
 import {
   deletePlace,
-  getListPlace,
+  getListPlaceProvince,
   updatePlaceStatus,
 } from 'app/apis/place/place.service'
 import { tableModel, typeAreas } from './const'
@@ -36,7 +36,7 @@ const Container = styled('div')(({ theme }) => ({
   },
 }))
 
-export default function ManagerPlace(props) {
+export default function ManagerPlaceProvince(props) {
   const [listPlace, setListPlace] = useState()
   const [totalPlace, setTotalPlace] = useState()
   const [inputNamePlace, setInputNamePlace] = useState('')
@@ -46,7 +46,7 @@ export default function ManagerPlace(props) {
   const navigate = useNavigate()
   const tableRef = React.useRef()
   const fetchListPlace = async param => {
-    await getListPlace(param)
+    await getListPlaceProvince(param)
       .then(data => {
         const newList = cloneDeep(data.content).map(place => {
           const convertPlace = {}
@@ -54,7 +54,7 @@ export default function ManagerPlace(props) {
           convertPlace.image = place.imgUrl
           convertPlace.linkDetail = {
             link: place.name,
-            path: '/chi-tiet-dia-danh/',
+            path: '/chi-tiet-dia-danh-tinh-thanh/',
           }
           convertPlace.quantity = place.campGroundAmount
           convertPlace.eventPlace = {
@@ -64,7 +64,7 @@ export default function ManagerPlace(props) {
           convertPlace.address = place.address
           convertPlace.type = place.campType
           convertPlace.status = place.status === 1 ? true : false
-          convertPlace.action = ['edit', 'delete']
+          convertPlace.action = ['edit']
           return convertPlace
         })
 
@@ -110,7 +110,7 @@ export default function ManagerPlace(props) {
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý địa danh' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý địa danh tỉnh thành' }]} />
       </Box>
       <SimpleCard>
         <Grid container>
@@ -170,52 +170,20 @@ export default function ManagerPlace(props) {
               color="primary"
               variant="contained"
               type="button"
+              style={{ marginBottom: '15px' }}
               onClick={() => {
                 handleSearch()
               }}
             >
-              <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}
+              <Icon style={{ fontSize: '20px' }}>search</Icon>
               <span>Tìm kiếm</span>
             </Button>
           </Grid>
         </Grid>
-        <Grid container>
-          <Grid
-            item
-            sm={6}
-            xs={6}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              margin: '20px 0',
-            }}
-          >
-            <Fab
-              color="primary"
-              aria-label="Add"
-              className="button"
-              sx={{ marginRight: '15px', cursor: 'pointer' }}
-              size="small"
-              onClick={() => {
-                navigate('/them-dia-danh')
-              }}
-            >
-              <Icon>add</Icon>
-            </Fab>
-            <Paragraph
-              variant="h1"
-              component="h2"
-              children={undefined}
-              className={undefined}
-              ellipsis={undefined}
-            >
-              Thêm địa danh
-            </Paragraph>
-          </Grid>
-        </Grid>
+
         <TableCustom
           ref={tableRef}
-          title="Danh sách địa danh Camp"
+          title="Danh sách địa danh tỉnh thành"
           dataTable={listPlace || []}
           tableModel={tableModel}
           totalData={parseInt(totalPlace, 0)}

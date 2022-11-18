@@ -56,6 +56,11 @@ export const navigations = [
     icon: 'edit_location_alt',
   },
   {
+    name: 'Quản lý địa danh tỉnh thành',
+    path: '/quan-ly-thong-tin-dia-danh-tinh-thanh',
+    icon: 'edit_location_alt',
+  },
+  {
     name: 'Quản lý điểm camp',
     path: '/quan-ly-thong-tin-diem-camp',
     icon: 'edit_location',

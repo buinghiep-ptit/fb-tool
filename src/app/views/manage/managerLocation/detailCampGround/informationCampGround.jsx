@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { Button, FormHelperText } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
+import DialogCustom from 'app/components/common/DialogCustom'
 import axios from 'axios'
 import {
   getDistricts,
@@ -22,6 +23,7 @@ import {
   createCampGround,
   getListMerchant,
   deleteCampGround,
+  checkNameCampExist,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -31,10 +33,7 @@ import { INTERNET, seasonsById, VEHICLES } from '../const'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import Policy from './policy'
 import { yupResolver } from '@hookform/resolvers/yup'
-
 import { formatFile } from 'app/utils/constant'
-import { checkExistedName } from 'app/apis/audio/audio.service'
-
 export default function InformationCampGround({ action }) {
   const [hashtag, setHashtag] = React.useState([])
   const [provinces, setProvinces] = React.useState([])
@@ -46,6 +45,8 @@ export default function InformationCampGround({ action }) {
   const [description, setDescription] = React.useState('')
   const [expandPolicy, setExpandPolicy] = React.useState(true)
   const [listMerchant, setListMerchant] = React.useState([])
+  const [dataSubmit, setDataSubmit] = React.useState([])
+  const dialogCustomRef = React.useRef()
   const [disabledInternet, setDisabledInternet] = React.useState({
     viettel: true,
     mobiphone: true,
@@ -257,12 +258,7 @@ export default function InformationCampGround({ action }) {
     return listUrl
   }
 
-  const onSubmit = async data => {
-    const checkNameCamp = await checkExistedName({
-      name: data.nameCampground,
-      idCampGround: params.id,
-    })
-    if (checkNameCamp.exist) return
+  const submitRequest = async data => {
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -376,6 +372,21 @@ export default function InformationCampGround({ action }) {
         navigate('/quan-ly-thong-tin-diem-camp')
       }
     }
+  }
+
+  const onSubmit = async data => {
+    setDataSubmit(data)
+    const param = {
+      name: data.nameCampground,
+      idCampGround: params.id,
+    }
+    const checkNameCamp = await checkNameCampExist(param)
+    if (checkNameCamp.exist) {
+      dialogCustomRef.current.handleClickOpen()
+      return
+    }
+
+    submitRequest(data)
   }
 
   const fetchListCampArea = async () => {
@@ -728,6 +739,32 @@ export default function InformationCampGround({ action }) {
             >
               Quay lại
             </Button>
+            <DialogCustom ref={dialogCustomRef} title="Xác nhận" maxWidth="sm">
+              <div style={{ textAlign: 'center' }}>
+                Tên điểm camp đã tồn tại bạn có muốn tiếp tục
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ marginRight: '10px' }}
+                  onClick={() => {
+                    submitRequest(dataSubmit)
+                    dialogCustomRef.current.handleClose()
+                  }}
+                >
+                  Có
+                </Button>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ marginRight: '10px' }}
+                  onClick={() => dialogCustomRef.current.handleClose()}
+                >
+                  Không
+                </Button>
+              </div>
+            </DialogCustom>
           </>
         )}
       </div>

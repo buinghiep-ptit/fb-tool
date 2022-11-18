@@ -58,7 +58,7 @@ export const updateCampGroundServiceStatus = async (id: any): Promise<any> => {
 }
 
 export const deleteCampGroundService = async (id: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/camp-service/${id}/delete`)
+  const { data } = await http.delete<any>(`/api/camp-service/${id}/delete`)
   return data
 }
 
@@ -146,9 +146,7 @@ export const getListPolicy = async (params: any): Promise<any> => {
 export const checkNameCampExist = async (params: any): Promise<any> => {
   const { data } = await http.get<any>(
     `/api/camp-grounds/validate-camp-ground-name`,
-    {
-      params,
-    },
+    { params },
   )
   return data
 }

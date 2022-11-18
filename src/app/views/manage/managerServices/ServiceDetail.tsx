@@ -57,7 +57,13 @@ const Container = styled('div')(({ theme }) => ({
     [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
   },
 }))
-export interface Props {}
+export interface Props {
+  isModal?: boolean
+  idCampGround?: any
+  handleCloseModal?: any
+  extendFunction?: any
+  idService?: any
+}
 type TypeElement = {
   camp?: ICampGround
   files?: any
@@ -68,10 +74,19 @@ type TypeElement = {
   status?: number | string
   weekdayPrices?: WeekdayPrices[]
 }
-export default function ServiceDetail(props: Props) {
+export default function ServiceDetail({
+  isModal = true,
+  idCampGround = null,
+  handleCloseModal,
+  extendFunction,
+  idService,
+}: Props) {
+  const params = useParams()
   const navigate = useNavigate()
-  const { serviceId } = useParams()
+  const [serviceId, setServiceId] = useState<any>()
+  // const { serviceId } = useParams()
   const [loading, setLoading] = useState(false)
+  const [campGroundDefault, setCampGroundDefault] = useState<any>('')
   const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
     [],
   )
@@ -167,6 +182,7 @@ export default function ServiceDetail(props: Props) {
     setInitialFileInfos,
     fileInfos,
   ] = useUploadFiles()
+
   const {
     data: campService,
     isLoading,
@@ -175,7 +191,10 @@ export default function ServiceDetail(props: Props) {
     error,
   }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
     ['campService', serviceId],
-    () => getServiceDetail(Number(serviceId ?? 0)),
+    () => {
+      console.log(serviceId)
+      return getServiceDetail(Number(serviceId ?? 0))
+    },
     {
       enabled: !!serviceId,
       staleTime: 5 * 60 * 1000, // 5min
@@ -268,16 +287,22 @@ export default function ServiceDetail(props: Props) {
   const onRowUpdateSuccess = (data: any, message?: string) => {
     toastSuccess({ message: message ?? '' })
     // setMediasSrcPreviewer([])
-    navigate(-1)
+    if (!isModal) {
+      handleCloseModal()
+      extendFunction()
+    } else {
+      navigate(-1)
+    }
+
     methods.reset()
   }
-  const { mutate: add, isLoading: createLoading } = useCreateService(() =>
-    onRowUpdateSuccess(null, 'Thêm mới thành công'),
-  )
+  const { mutate: add, isLoading: createLoading } = useCreateService(() => {
+    onRowUpdateSuccess(null, 'Thêm mới thành công')
+  })
 
-  const { mutate: edit, isLoading: editLoading } = useUpdateService(() =>
-    onRowUpdateSuccess(null, 'Cập nhật thành công'),
-  )
+  const { mutate: edit, isLoading: editLoading } = useUpdateService(() => {
+    onRowUpdateSuccess(null, 'Cập nhật thành công')
+  })
 
   const { data: campGrounds }: UseQueryResult<ICampGroundResponse, Error> =
     useQuery<ICampAreaResponse, Error>(
@@ -288,6 +313,26 @@ export default function ServiceDetail(props: Props) {
         staleTime: 15 * 60 * 1000,
       },
     )
+
+  React.useEffect(() => {
+    if (idCampGround) {
+      console.log(campGrounds)
+      const camp = (campGrounds?.content || []).find(
+        (item: any) => idCampGround === item.id,
+      )
+      console.log(camp)
+      setCampGroundDefault(camp)
+    }
+  }, [campGrounds])
+
+  React.useEffect(() => {
+    console.log(params.serviceId, idService)
+    if (idService) {
+      setServiceId(idService)
+    } else {
+      setServiceId(params.serviceId)
+    }
+  }, [idService, params.serviceId])
 
   React.useEffect(() => {
     if (campService) {
@@ -359,13 +404,15 @@ export default function ServiceDetail(props: Props) {
   console.log(methods.formState.errors)
   return (
     <Container>
-      <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: serviceId ? 'Chi tiết dịch vụ' : 'Thêm mới dịch vụ' },
-          ]}
-        />
-      </Box>
+      {isModal && (
+        <Box className="breadcrumb">
+          <Breadcrumb
+            routeSegments={[
+              { name: serviceId ? 'Chi tiết dịch vụ' : 'Thêm mới dịch vụ' },
+            ]}
+          />
+        </Box>
+      )}
       <Stack
         flexDirection={'row'}
         gap={2}
@@ -392,7 +439,13 @@ export default function ServiceDetail(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (!isModal) {
+              handleCloseModal()
+            } else {
+              navigate(-1)
+            }
+          }}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
@@ -409,8 +462,9 @@ export default function ServiceDetail(props: Props) {
                     options={campGrounds?.content ?? []}
                     optionProperty="name"
                     getOptionLabel={option => option.name ?? ''}
-                    defaultValue=""
+                    defaultValue={campGroundDefault}
                     required
+                    key={campGroundDefault}
                   />
 
                   <SelectDropDown

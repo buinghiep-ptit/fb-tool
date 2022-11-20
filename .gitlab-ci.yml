@@ -8,7 +8,7 @@ dev-build:
     - trigger-dev
   stage: build
   script:
-    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 1 -b dev -i 103 -e STAGE=build -e DOCKER_TAG=${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 1 -b dev -i 147 -e STAGE=build -e DOCKER_TAG=${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
   only:
     - dev
 
@@ -17,7 +17,29 @@ dev-deploy:
     - trigger-dev
   stage: deploy
   script:
-    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 0 -b dev -i 103 -e STAGE=deploy -e DOCKER_TAG=${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 0 -b dev -i 147 -e STAGE=deploy -e DOCKER_TAG=${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
   only:
     - dev
+  when: on_success
+
+# PROD ENV
+prod-build:
+  tags:
+    - trigger-prod
+  stage: build
+  script:
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 1 -b main -i 147 -e STAGE=build -e DOCKER_TAG=${CI_COMMIT_TAG}
+  only:
+    refs:
+      - tags
+
+prod-deploy:
+  tags:
+    - trigger-prod
+  stage: deploy
+  script:
+    - trigger -h "http://gitlab.dsc.com" -a "${CI_BOT_ACCESS_TOKEN}" -u "/api/v4/projects" -p "${TRIGGER_TOKEN}" -o 0 -b main -i 147 -e STAGE=deploy -e DOCKER_TAG=${CI_COMMIT_TAG}
+  only:
+    refs:
+      - tags
   when: on_success

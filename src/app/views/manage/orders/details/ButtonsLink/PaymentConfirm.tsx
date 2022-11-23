@@ -99,7 +99,7 @@ export default function PaymentConfirm({ title }: Props) {
 
     const payload = {
       transCode: values.transCode,
-      fileUrl: fileResponse.url || null,
+      fileUrl: (fileResponse && fileResponse.url) || null,
       bankAccount: values.bankAccount,
       paymentType: Number(values.paymentType ?? 1),
       note: values.note,

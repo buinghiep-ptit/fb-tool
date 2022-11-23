@@ -100,7 +100,7 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
                   >
                     <BoxImage maxWidth={100} url={imgUrl} />
 
-                    <Stack width="100%" gap={0.5}>
+                    <Stack width="100%" gap={1}>
                       <NavLink
                         to={`/quan-ly-dich-vu/${idService}/chi-tiet`}
                         target="_blank"
@@ -142,7 +142,8 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
                           color={'primary'}
                           fontWeight={500}
                         >
-                          {CurrencyFormatter(quantity ?? 0, 2)}
+                          {CurrencyFormatter(quantity ?? 0, 2)}{' '}
+                          {type === 3 ? 'sản phẩm' : 'người'}
                         </MuiTypography>
                       </Stack>
                     </Box>

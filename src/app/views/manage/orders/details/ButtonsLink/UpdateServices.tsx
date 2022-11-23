@@ -49,6 +49,8 @@ export default function UpdateServices({ title }: Props) {
   const { orderId } = useParams()
   const { data: order } = useOrderDetailData(Number(orderId ?? 0))
 
+  console.log(location.state)
+
   const [services, setServices] = useState<IService[]>([])
   const [lengthServices, setLengthServices] = useState<number[]>([])
 

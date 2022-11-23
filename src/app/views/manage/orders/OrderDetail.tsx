@@ -61,11 +61,24 @@ export const isExpiredReceiveUser = (expiredTimeISO: string) => {
   return EXP_IN_MS <= NOW_IN_MS
 }
 
-export const isReceiveUser = (order: IOrderDetail, user: any) => {
-  if (order.cancelRequest) {
-    return order.cancelRequest.handledBy === (user as any).id
-  }
+export const isReceiveOrder = (order?: IOrderDetail, user?: any) => {
+  if (!order || !user) return false
   return order.handledBy === (user as any).id
+}
+
+export const isReceiveCancelOrder = (order?: IOrderDetail, user?: any) => {
+  if (!order || !user || !order.cancelRequest) return false
+  return order.cancelRequest.handledBy === (user as any).id
+}
+export const isInprogressOrder = (order?: IOrderDetail) => {
+  if (!order) return false
+
+  return (
+    order?.status &&
+    order?.status < 4 &&
+    order.cancelRequest?.status !== 2 &&
+    order?.status !== -1
+  )
 }
 
 type SchemaType = {
@@ -137,9 +150,9 @@ export default function OrderDetail(props: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const payload: any = {
-      note: values.note,
+      note: values.note || null,
       fullName: values.fullName,
-      email: values.email,
+      email: values.email || null,
       mobilePhone: values.mobilePhone,
     }
     edit({ payload: payload, orderId: Number(orderId ?? 0) })
@@ -170,7 +183,7 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        {isReceiveUser(order, user) &&
+        {isReceiveOrder(order, user) &&
           order.status !== -1 &&
           order.status !== 4 && (
             <>
@@ -241,11 +254,13 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
-            {order.cancelRequest && order.cancelRequest.status !== 2 && (
+            {order.cancelRequest && isInprogressOrder(order) && (
               <Stack>
                 <CancelOrderInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                  isViewer={
+                    !isReceiveOrder(order, user) || !isInprogressOrder(order)
+                  }
                 />
               </Stack>
             )}
@@ -253,7 +268,9 @@ export default function OrderDetail(props: Props) {
               <Grid item xs={12} md={6}>
                 <CustomerInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                  isViewer={
+                    !isReceiveOrder(order, user) || !isInprogressOrder(order)
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -267,9 +284,7 @@ export default function OrderDetail(props: Props) {
               <OrderServices
                 order={order}
                 isViewer={
-                  !isReceiveUser(order, user) ||
-                  order.status === -1 ||
-                  order.status === 4
+                  !isReceiveOrder(order, user) || !isInprogressOrder(order)
                 }
               />
             </Stack>

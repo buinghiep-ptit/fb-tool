@@ -284,7 +284,9 @@ export default function OrderDetail(props: Props) {
               <OrderServices
                 order={order}
                 isViewer={
-                  !isReceiveOrder(order, user) || !isInprogressOrder(order)
+                  !isReceiveOrder(order, user) ||
+                  !isInprogressOrder(order) ||
+                  order.status === 3
                 }
               />
             </Stack>

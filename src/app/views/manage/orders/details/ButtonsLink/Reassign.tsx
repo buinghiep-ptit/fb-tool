@@ -51,6 +51,7 @@ export default function Reassign({ title }: Props) {
   const navigate = useNavigate()
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
+  const receiveType = location.state?.receiveType ?? 1
   const { orderId } = useParams()
 
   const { data: order } = useOrderDetailData(Number(orderId ?? 0))
@@ -89,14 +90,14 @@ export default function Reassign({ title }: Props) {
   const onSubmitHandler: SubmitHandler<ReassignSchema> = (
     values: ReassignSchema,
   ) => {
-    if (order?.cancelRequest) {
-      reassignCancel({
+    if (receiveType == 1) {
+      reassign({
         orderId: Number(orderId ?? 0),
         userId: values.newHandler?.userId,
         note: values.note,
       })
     } else
-      reassign({
+      reassignCancel({
         orderId: Number(orderId ?? 0),
         userId: values.newHandler?.userId,
         note: values.note,

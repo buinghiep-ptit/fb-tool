@@ -284,7 +284,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
               color="primary"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
-                  state: { modal: true },
+                  state: { modal: true, receiveType: 1 },
                 })
               }
               startIcon={<Icon>cached</Icon>}
@@ -308,7 +308,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
               color="primary"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
-                  state: { modal: true },
+                  state: { modal: true, receiveType: 2 },
                 })
               }
               startIcon={<Icon>cached</Icon>}

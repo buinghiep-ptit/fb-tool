@@ -21,7 +21,6 @@ export const columnsTrendingKeywords: readonly TableColumn<TitleKeywords>[] = [
     id: 'word',
     label: 'Từ khoá',
     minWidth: 150,
-    align: 'center',
     action: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -49,7 +48,7 @@ export const columnsTrendingKeywords: readonly TableColumn<TitleKeywords>[] = [
   {
     id: 'createdBy',
     label: 'Người đăng',
-    minWidth: 200,
+    minWidth: 300,
     align: 'center',
     format: (value: number) => (
       <Typography

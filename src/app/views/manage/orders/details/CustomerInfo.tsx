@@ -6,9 +6,6 @@ import {
   Grid,
   Stack,
 } from '@mui/material'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
@@ -73,7 +70,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
             </Grid>
           </Grid>
 
-          <Grid container spacing={1}>
+          {/* <Grid container spacing={1}>
             <Grid item xs={12} md={4}>
               <MuiTypography variant="subtitle2">
                 Thời gian sử dụng
@@ -101,7 +98,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                 </LocalizationProvider>
               </Stack>
             </Grid>
-          </Grid>
+          </Grid> */}
 
           <Grid container spacing={1}>
             <Grid item xs={12} md={4}>

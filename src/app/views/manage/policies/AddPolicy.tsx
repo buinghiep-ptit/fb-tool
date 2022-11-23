@@ -106,17 +106,37 @@ export default function AddPolicy({ title }: Props) {
     navigate(-1)
   }
 
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .max(255, 'Nội dung không được vượt quá 255 ký tự')
-      .required(messages.MSG1),
-    scaleAmount: Yup.string()
-      .max(11, 'Chỉ được nhập tối đa 9 ký tự')
-      .required(messages.MSG1),
-    minAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
-    maxAmount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
-    note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      name: Yup.string()
+        .max(255, 'Nội dung không được vượt quá 255 ký tự')
+        .required(messages.MSG1),
+      scaleAmount: Yup.number().max(100, 'Tối đa 100%').required(messages.MSG1),
+      maxAmount: Yup.number()
+        .when(['minAmount'], {
+          is: (minAmount: any) => Boolean(minAmount),
+          otherwise: Yup.number().positive().nullable(),
+          then: Yup.number()
+            .positive()
+            .min(Yup.ref('minAmount'), 'Không được thấp hơn giá trị tối thiểu')
+            .nullable(),
+        })
+        .max(999999999, 'Chỉ được nhập tối đa 9 chữ số'),
+      minAmount: Yup.number()
+        .when(['maxAmount'], {
+          is: (maxAmount: any) => Boolean(maxAmount),
+          otherwise: Yup.number().positive().nullable(),
+          then: Yup.number()
+            .positive()
+            .max(Yup.ref('maxAmount'), 'Không được lớn hơn giá trị tối đa')
+            .nullable(),
+        })
+        .max(999999999, 'Chỉ được nhập tối đa 9 chữ số'),
+
+      note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
+    },
+    [['minAmount', 'maxAmount']],
+  )
 
   const methods = useForm<SchemaType>({
     defaultValues,

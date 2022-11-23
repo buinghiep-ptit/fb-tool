@@ -51,6 +51,7 @@ export interface IOrderDetail {
     status?: number
     idOrder?: number
     handleExpireTime?: string
+    handledBy?: number
   }
   transactions?: ITransaction[]
   paymentTrans?: IPaymentTrans
@@ -93,6 +94,7 @@ export interface IService {
   quantity?: number
   amount?: number
   imgUrl?: string
+  capacity?: number
 }
 
 export interface IOrderProcess {

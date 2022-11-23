@@ -573,12 +573,12 @@ export const columnsLogsOrderDetail: any = [
   {
     id: 'processName',
     label: 'Hành động',
-    minWidth: 150,
+    minWidth: 200,
   },
   {
     id: 'email',
     label: 'Người thực hiện',
-    minWidth: 170,
+    minWidth: 200,
   },
   {
     id: 'note',

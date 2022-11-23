@@ -123,7 +123,9 @@ export default function AddEvent(props: Props) {
         .typeError('Sai định dạng.')
         .nullable()
         .required(messages.MSG1),
-      amount: Yup.string().max(11, 'Chỉ được nhập tối đa 9 ký tự').nullable(),
+      amount: Yup.number()
+        .max(999999999, 'Chỉ được nhập tối đa 9 chữ số')
+        .nullable(),
       files: Yup.mixed()
         .test('empty', messages.MSG1, files => {
           // if (!!Number(eventId ?? 0)) {

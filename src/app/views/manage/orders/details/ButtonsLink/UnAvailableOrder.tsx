@@ -30,7 +30,7 @@ export default function UnAvailableOrder({ title }: Props) {
     isFetching,
     error,
   } = useOrderDetailData(Number(orderId ?? 0))
-  const [methods, fields] = useRHFOrder(order as IOrderDetail)
+  const [methods] = useRHFOrder(order as IOrderDetail)
 
   const onSubmitHandler: SubmitErrorHandler<any> = (values: any) => {
     console.log(values)

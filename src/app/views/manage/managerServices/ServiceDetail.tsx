@@ -116,8 +116,8 @@ export default function ServiceDetail({
   const validationSchema = Yup.object().shape({
     camp: Yup.object().nullable().required(messages.MSG1),
     rentalType: Yup.string().required(messages.MSG1),
-    capacity: Yup.string()
-      .max(5, 'Chỉ được nhập tối đa 4 chữ số')
+    capacity: Yup.number()
+      .max(9999, 'Chỉ được nhập tối đa 4 chữ số')
       .required(messages.MSG1),
     name: Yup.string()
       .max(255, 'Chỉ được nhập tối đa 255 ký tự')
@@ -154,8 +154,8 @@ export default function ServiceDetail({
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
-          amount: Yup.string()
-            .max(11, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
+          amount: Yup.number()
+            .max(999999999, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
             .required(messages.MSG1),
         }),
       ),
@@ -481,6 +481,7 @@ export default function ServiceDetail({
                   {methods.watch('rentalType') &&
                   Number(methods.watch('rentalType') ?? 0) !== 3 ? (
                     <MuiRHFNumericFormatInput
+                      isAllowZeroFirst={false}
                       type="text"
                       name="capacity"
                       label="Áp dụng"
@@ -493,6 +494,7 @@ export default function ServiceDetail({
                     />
                   ) : (
                     <MuiRHFNumericFormatInput
+                      isAllowZeroFirst={false}
                       type="text"
                       name="capacity"
                       label="Áp dụng"

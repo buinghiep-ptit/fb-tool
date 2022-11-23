@@ -8,7 +8,11 @@ import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useReassignOrder } from 'app/hooks/queries/useOrdersData'
+import {
+  useOrderDetailData,
+  useReassignOrder,
+  useReassignOrderCancelRequest,
+} from 'app/hooks/queries/useOrdersData'
 import { useUsersData } from 'app/hooks/queries/useUsersData'
 import { IUser, IUserResponse } from 'app/models/account'
 import { messages } from 'app/utils/messages'
@@ -23,7 +27,7 @@ type Props = {
 
 export type ReassignSchema = {
   newHandler?: IUser
-  reason?: string
+  note?: string
 }
 
 const extractAccounts = (accounts?: IUser[]) => {
@@ -49,6 +53,8 @@ export default function Reassign({ title }: Props) {
   const isModal = location.state?.modal ?? false
   const { orderId } = useParams()
 
+  const { data: order } = useOrderDetailData(Number(orderId ?? 0))
+
   const onSuccess = (data: any, message?: string) => {
     toastSuccess({
       message: message ?? '',
@@ -58,7 +64,9 @@ export default function Reassign({ title }: Props) {
 
   const validationSchema = Yup.object().shape({
     newHandler: Yup.object().required(messages.MSG1).nullable(),
-    reason: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
+    note: Yup.string()
+      .max(255, 'Nội dung không được vượt quá 255 ký tự')
+      .required(messages.MSG1),
   })
 
   const methods = useForm<ReassignSchema>({
@@ -70,16 +78,29 @@ export default function Reassign({ title }: Props) {
     useUsersData({ page: 0, size: 500, status: 1 })
 
   const { mutate: reassign, isLoading: isLoading } = useReassignOrder(() =>
-    onSuccess(null, 'Chuyển tiếp thành công'),
+    onSuccess(null, 'Chuyển tiếp đơn hàng thành công'),
   )
+
+  const { mutate: reassignCancel, isLoading: isLoadingCancel } =
+    useReassignOrderCancelRequest(() =>
+      onSuccess(null, 'Chuyển tiếp yêu cầu huỷ thành công'),
+    )
 
   const onSubmitHandler: SubmitHandler<ReassignSchema> = (
     values: ReassignSchema,
   ) => {
-    reassign({
-      orderId: Number(orderId ?? 0),
-      userId: values.newHandler?.userId,
-    })
+    if (order?.cancelRequest) {
+      reassignCancel({
+        orderId: Number(orderId ?? 0),
+        userId: values.newHandler?.userId,
+        note: values.note,
+      })
+    } else
+      reassign({
+        orderId: Number(orderId ?? 0),
+        userId: values.newHandler?.userId,
+        note: values.note,
+      })
   }
 
   const handleClose = () => {
@@ -105,7 +126,7 @@ export default function Reassign({ title }: Props) {
                 Lý do:
               </MuiTypography>
               <FormTextArea
-                name="reason"
+                name="note"
                 defaultValue={''}
                 placeholder="Nhập lý do"
               />
@@ -122,7 +143,7 @@ export default function Reassign({ title }: Props) {
         title={title}
         open={isModal}
         onCloseModal={handleClose}
-        isLoading={isLoading}
+        isLoading={isLoading || isLoadingCancel}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Chuyển tiếp"
         cancelText="Huỷ"

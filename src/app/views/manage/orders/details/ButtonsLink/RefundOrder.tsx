@@ -81,7 +81,7 @@ export default function RefundOrder({ title }: Props) {
         refundType: Number(values.refundType),
         transCode: values.refundType !== 3 ? values.transCode : null,
         amount: values.refundType !== 3 ? Number(amount) : null,
-        reason: values.note,
+        note: values.note,
       },
     })
   }

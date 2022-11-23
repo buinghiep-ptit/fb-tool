@@ -50,13 +50,41 @@ export const updateOrder = async (
   return data
 }
 
+export const updateContactOrder = async (
+  orderId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.put<any>(
+    `/api/order/${orderId}/update/contact`,
+    payload,
+  )
+  return data
+}
+
+export const updateServicesOrder = async (
+  orderId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.put<any>(
+    `/api/order/${orderId}/update/services`,
+    payload,
+  )
+  return data
+}
+
 export const availableOrder = async (orderId: number): Promise<any> => {
   const { data } = await http.post<any>(`/api/order/${orderId}/available`)
   return data
 }
 
-export const unavailableOrder = async (orderId: number): Promise<any> => {
-  const { data } = await http.post<any>(`/api/order/${orderId}/unavailable`)
+export const unavailableOrder = async (
+  orderId: number,
+  payload: { note?: string },
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/unavailable`,
+    payload,
+  )
   return data
 }
 
@@ -71,10 +99,25 @@ export const cancelOrder = async (
 export const reassignOrder = async (
   orderId: number,
   userId: number,
+  note?: string,
 ): Promise<any> => {
   const { data } = await http.post<any>(
     `/api/order/${orderId}/reassign/${userId}`,
+    { note },
   )
+  return data
+}
+
+export const reassignOrderCancelRequest = async (
+  orderId: number,
+  userId: number,
+  note?: string,
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/request-cancel/reassign/${userId}`,
+    { note },
+  )
+
   return data
 }
 
@@ -109,6 +152,13 @@ export const initCancelOrder = async (
   const { data } = await http.post<any>(
     `/api/order/${orderId}/init-request-cancel`,
     payload,
+  )
+  return data
+}
+
+export const ignoreCancelOrder = async (orderId: number): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/order/${orderId}/ignore-request-cancel`,
   )
   return data
 }

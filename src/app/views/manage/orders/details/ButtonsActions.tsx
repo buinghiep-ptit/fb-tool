@@ -1,16 +1,19 @@
-import { Divider, Icon, LinearProgress, Stack } from '@mui/material'
+import { Divider, Icon, Stack } from '@mui/material'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import useNoteDialogForm from 'app/hooks/components/useNoteDialogForm'
 import {
   useAvailableOrder,
+  useIgnoreCancelOrder,
   useOrderUsed,
   useReceiveCancelOrder,
   useUnAvailableOrder,
 } from 'app/hooks/queries/useOrdersData'
-import { IProfile, IUser, IUserProfile } from 'app/models'
-import { ICustomerOrder, IOrderDetail } from 'app/models/order'
+import { IProfile, IUser } from 'app/models'
+import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
+import { SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { isReceiveUser } from '../OrderDetail'
 import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
@@ -30,7 +33,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const { orderId } = useParams()
   const [dialogData, setDialogData] = useState<{
     title?: string
-    message?: () => ReactElement
+    message?: string | ReactElement | any
     type?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
@@ -54,12 +57,21 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
       onSuccess(null, 'Tiếp nhận yêu cầu huỷ thành công'),
     )
 
+  const { mutate: ignoreCancel, isLoading: ignoreCancelLoading } =
+    useIgnoreCancelOrder(() => onSuccess(null, 'Bỏ yêu cầu huỷ thành công'))
+
   const { mutate: orderUsed, isLoading: usedOrderLoading } = useOrderUsed(() =>
     onSuccess(null, 'Hoàn tất đơn hàng thành công'),
   )
 
+  const [getContentNote, methodsNote] = useNoteDialogForm('note')
+
   const loading =
-    availableLoading || unavailableLoading || cancelLoading || usedOrderLoading
+    availableLoading ||
+    unavailableLoading ||
+    cancelLoading ||
+    usedOrderLoading ||
+    ignoreCancelLoading
 
   const onClickButton = (type?: string) => {
     setOpenDialog(true)
@@ -68,7 +80,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Còn chỗ',
-          message: () => (
+          message: (loading?: boolean) => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
                 Xác nhận còn chỗ?
@@ -82,13 +94,8 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Hết chỗ',
-          message: () => (
-            <Stack py={5} justifyContent={'center'} alignItems="center">
-              <MuiTypography variant="subtitle1">
-                Xác nhận hết chỗ?
-              </MuiTypography>
-            </Stack>
-          ),
+          message: (unAvailableLoading?: boolean) =>
+            getContentNote(unAvailableLoading),
           type: 'UN_AVAILABLE',
         }))
         break
@@ -97,7 +104,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Tiếp nhận',
-          message: () => (
+          message: (loading?: boolean) => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
                 Tiếp nhận yêu cầu huỷ?
@@ -108,11 +115,26 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         }))
         break
 
+      case 'IGNORE_CANCEL':
+        setDialogData(prev => ({
+          ...prev,
+          title: 'Bỏ yêu cầu',
+          message: (loading?: boolean) => (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                Bạn có chắc chắn muốn bỏ yêu cầu?
+              </MuiTypography>
+            </Stack>
+          ),
+          type: 'IGNORE_CANCEL',
+        }))
+        break
+
       case 'ORDER_USED':
         setDialogData(prev => ({
           ...prev,
           title: 'Hoàn tất',
-          message: () => (
+          message: (loading?: boolean) => (
             <Stack py={5} justifyContent={'center'} alignItems="center">
               <MuiTypography variant="subtitle1">
                 Xác nhận hoàn tất đơn hàng?
@@ -128,6 +150,15 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
     }
   }
 
+  const onSubmitDialogHandler: SubmitHandler<{
+    note?: string
+  }> = (values: { note?: string }) => {
+    unavailable({
+      orderId: Number(orderId ?? 0),
+      note: values.note ?? '',
+    })
+  }
+
   const onSubmitDialog = (type?: string) => {
     switch (type) {
       case 'AVAILABLE':
@@ -135,11 +166,14 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         break
 
       case 'UN_AVAILABLE':
-        unavailable(Number(orderId ?? 0))
+        methodsNote.handleSubmit(onSubmitDialogHandler)()
         break
 
       case 'RECEIVE_REQUEST_CANCEL':
         receiveCancel(Number(orderId ?? 0))
+        break
+      case 'IGNORE_CANCEL':
+        ignoreCancel(Number(orderId ?? 0))
         break
 
       case 'ORDER_USED':
@@ -354,22 +388,18 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
             sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
             flexItem
           />
-          {/* <MuiButton
-            title="Cập nhật đơn hàng"
+          <MuiButton
+            title="Bỏ yêu cầu"
             variant="contained"
-            color="primary"
-            onClick={() =>
-              navigate(`hoan-tien`, {
-                state: { modal: true, data: order },
-              })
-            }
-            startIcon={<Icon>saved</Icon>}
+            color="warning"
+            onClick={() => onClickButton('IGNORE_CANCEL')}
+            startIcon={<Icon>clear</Icon>}
           />
           <Divider
             orientation="vertical"
             sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
             flexItem
-          /> */}
+          />
         </>
       )}
 
@@ -392,7 +422,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         onSubmit={() => onSubmitDialog(dialogData.type)}
         isLoading={loading}
       >
-        {dialogData.message && dialogData.message()}
+        {dialogData.message && dialogData.message(unavailableLoading)}
       </DiagLogConfirm>
     </Stack>
   )

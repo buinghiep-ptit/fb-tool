@@ -382,7 +382,7 @@ export default function InformationCampGround({ action }) {
     }
     const checkNameCamp = await checkNameCampExist(param)
     if (checkNameCamp.exist) {
-      dialogCustomRef.current.handleClickOpen()
+      dialogCustomRef?.current.handleClickOpen()
       return
     }
 
@@ -739,34 +739,34 @@ export default function InformationCampGround({ action }) {
             >
               Quay lại
             </Button>
-            <DialogCustom ref={dialogCustomRef} title="Xác nhận" maxWidth="sm">
-              <div style={{ textAlign: 'center' }}>
-                Tên điểm camp đã tồn tại bạn có muốn tiếp tục
-              </div>
-              <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  style={{ marginRight: '10px' }}
-                  onClick={() => {
-                    submitRequest(dataSubmit)
-                    dialogCustomRef.current.handleClose()
-                  }}
-                >
-                  Có
-                </Button>
-                <Button
-                  color="primary"
-                  variant="contained"
-                  style={{ marginRight: '10px' }}
-                  onClick={() => dialogCustomRef.current.handleClose()}
-                >
-                  Không
-                </Button>
-              </div>
-            </DialogCustom>
           </>
         )}
+        <DialogCustom ref={dialogCustomRef} title="Xác nhận" maxWidth="sm">
+          <div style={{ textAlign: 'center' }}>
+            Tên điểm camp đã tồn tại bạn có muốn tiếp tục
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                submitRequest(dataSubmit)
+                dialogCustomRef?.current.handleClose()
+              }}
+            >
+              Có
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              style={{ marginRight: '10px' }}
+              onClick={() => dialogCustomRef?.current.handleClose()}
+            >
+              Không
+            </Button>
+          </div>
+        </DialogCustom>
       </div>
     </form>
   )

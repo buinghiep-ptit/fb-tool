@@ -56,8 +56,7 @@ export default function CreatePlace(props) {
     { label: 'Chạy bộ', id: 2 },
     { label: 'Teambuiding', id: 3 },
     { label: 'Lưu trú', id: 4 },
-    { label: 'Trekking', id: 5 },
-    { label: 'Leo núi', id: 6 },
+    { label: 'Leo núi', id: 5 },
   ]
 
   const uploadImageRef = React.useRef()

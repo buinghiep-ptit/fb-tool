@@ -471,7 +471,7 @@ export default function InformationCampGround({ action }) {
             data.campGroundVehicles.forEach(item => {
               setValue(VEHICLES[item]?.name, true)
             })
-            console.log('xx')
+
             getDistricts(data.idProvince)
               .then(dataDistrict => {
                 setDistricts(dataDistrict)
@@ -501,7 +501,7 @@ export default function InformationCampGround({ action }) {
         }
         for (const property in INTERNET) {
           setValue(INTERNET[property].name, true)
-          setValue(INTERNET[property].speed, 1)
+          setValue(INTERNET[property].speed, 3)
         }
         setDisabledInternet({
           viettel: false,

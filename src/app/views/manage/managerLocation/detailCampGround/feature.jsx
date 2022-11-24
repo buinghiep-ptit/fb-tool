@@ -191,9 +191,7 @@ export default function Feature({
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                     >
-                      <MenuItem value={0}>Không có sóng</MenuItem>
                       <MenuItem value={1}>Sóng yếu </MenuItem>
-                      <MenuItem value={2}>Sóng trung bình</MenuItem>
                       <MenuItem value={3}>Sóng mạnh</MenuItem>
                     </Select>
                   </FormControl>
@@ -240,7 +238,7 @@ export default function Feature({
                       id="demo-simple-select"
                     >
                       <MenuItem value={1}>Sóng yếu </MenuItem>
-                      <MenuItem value={3}>Sóng khỏe</MenuItem>
+                      <MenuItem value={3}>Sóng mạnh</MenuItem>
                     </Select>
                   </FormControl>
                 )}
@@ -289,9 +287,7 @@ export default function Feature({
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                     >
-                      <MenuItem value={0}>Không có sóng</MenuItem>
                       <MenuItem value={1}>Sóng yếu </MenuItem>
-                      <MenuItem value={2}>Sóng trung bình</MenuItem>
                       <MenuItem value={3}>Sóng mạnh</MenuItem>
                     </Select>
                   </FormControl>
@@ -337,9 +333,7 @@ export default function Feature({
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                     >
-                      <MenuItem value={0}>Không có sóng</MenuItem>
                       <MenuItem value={1}>Sóng yếu </MenuItem>
-                      <MenuItem value={2}>Sóng trung bình</MenuItem>
                       <MenuItem value={3}>Sóng mạnh</MenuItem>
                     </Select>
                   </FormControl>

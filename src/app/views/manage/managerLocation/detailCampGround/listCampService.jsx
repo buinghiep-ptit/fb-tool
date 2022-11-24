@@ -191,7 +191,6 @@ export default function ListCampService(props) {
           idCampGround={params.id}
           handleCloseModal={() => dialogCustomRef.current.handleClose()}
           extendFunction={() => fetchListCampGroundService()}
-          idService={'84'}
         />
       </DialogCustom>
     </SimpleCard>

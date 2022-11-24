@@ -93,6 +93,10 @@ const TableCustom = forwardRef(
       fetchDataTable(filter)
     }
 
+    const isNumeric = value => {
+      return /^-?\d+$/.test(value)
+    }
+
     const handleDeleteAction = async id => {
       const res = await onDeleteData(id)
       if (res) {
@@ -324,7 +328,7 @@ const TableCustom = forwardRef(
                           </TableCell>
                         )
                       default:
-                        const alight = isNaN(parseInt(data[element]))
+                        const alight = !isNumeric(data[element])
                           ? 'left'
                           : 'center'
                         console.log(parseInt(data[element]))

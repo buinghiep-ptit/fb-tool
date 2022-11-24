@@ -86,7 +86,7 @@ export default function CreatePlace(props) {
         })
         .test(
           'fileFormat',
-          'Định dạng ảnh/video/audio không phù hợp',
+          'Định dạng ảnh/video/audio không phù hợp. Định dạng cho phép: Hình ảnh: “.png”, “.jpeg”, “.jpg”, Video: “.mp4”, “.webm',
           value => {
             if (value.length > 0) {
               for (let i = 0; i < value.length; i++) {

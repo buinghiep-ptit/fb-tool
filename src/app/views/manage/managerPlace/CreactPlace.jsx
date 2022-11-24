@@ -56,8 +56,7 @@ export default function CreatePlace(props) {
     { label: 'Chạy bộ', id: 2 },
     { label: 'Teambuiding', id: 3 },
     { label: 'Lưu trú', id: 4 },
-    { label: 'Trekking', id: 5 },
-    { label: 'Leo núi', id: 6 },
+    { label: 'Leo núi', id: 5 },
   ]
 
   const uploadImageRef = React.useRef()
@@ -87,7 +86,7 @@ export default function CreatePlace(props) {
         })
         .test(
           'fileFormat',
-          'Định dạng ảnh/video/audio không phù hợp',
+          'Định dạng ảnh/video/audio không phù hợp. Định dạng cho phép: Hình ảnh: “.png”, “.jpeg”, “.jpg”, Video: “.mp4”, “.webm',
           value => {
             if (value.length > 0) {
               for (let i = 0; i < value.length; i++) {

@@ -368,7 +368,7 @@ export default function ServiceDetail({
     const previousProp = fields.length
     if (currentProp > previousProp) {
       for (let i = previousProp; i < currentProp; i++) {
-        append({ day: calendar[i].day, amount: '' })
+        append({ day: calendar[i].day, amount: undefined })
       }
     } else {
       for (let i = previousProp; i > currentProp; i--) {

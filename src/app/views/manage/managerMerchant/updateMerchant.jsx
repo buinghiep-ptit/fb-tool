@@ -107,7 +107,7 @@ export default function UpdateMerchant(props) {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({
         method: 'post',
-        url: 'https://dev09-api.campdi.vn/upload/api/file/upload',
+        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/file/upload`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',

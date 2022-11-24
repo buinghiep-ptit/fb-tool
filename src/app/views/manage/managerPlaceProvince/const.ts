@@ -21,18 +21,9 @@ export const tableModel = {
       width: 100,
     },
     {
-      name: 'Địa chỉ',
-      width: 200,
-    },
-    {
       name: 'Loại hình',
       width: 100,
     },
-    {
-      name: 'Trạng thái',
-      width: 150,
-    },
-
     {
       name: '',
       width: 100,
@@ -44,9 +35,7 @@ export const tableModel = {
     'linkDetail',
     'quantity',
     'eventPlace',
-    'address',
     'type',
-    'status',
     'action',
   ],
 }

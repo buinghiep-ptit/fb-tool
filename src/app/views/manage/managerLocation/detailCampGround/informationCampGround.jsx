@@ -24,6 +24,7 @@ import {
   getListMerchant,
   deleteCampGround,
   checkNameCampExist,
+  getListCampArea,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -81,8 +82,7 @@ export default function InformationCampGround({ action }) {
     { label: 'Chạy bộ', id: 2 },
     { label: 'Teambuiding', id: 3 },
     { label: 'Lưu trú', id: 4 },
-    { label: 'Trekking', id: 5 },
-    { label: 'Leo núi', id: 6 },
+    { label: 'Leo núi', id: 5 },
   ]
 
   const arrInternet = [
@@ -210,7 +210,7 @@ export default function InformationCampGround({ action }) {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
             method: 'post',
-            url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+            url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/image/upload`,
             data: formData,
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -232,7 +232,7 @@ export default function InformationCampGround({ action }) {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
             method: 'post',
-            url: 'https://dev09-api.campdi.vn/upload/api/video/upload',
+            url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/video/upload`,
             data: formData,
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -390,7 +390,7 @@ export default function InformationCampGround({ action }) {
   }
 
   const fetchListCampArea = async () => {
-    const res = await getListCampAreaWithoutProvince()
+    const res = await getListCampArea()
     setCampAreas(res)
   }
 

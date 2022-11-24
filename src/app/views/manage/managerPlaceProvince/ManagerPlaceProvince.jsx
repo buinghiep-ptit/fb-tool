@@ -63,7 +63,6 @@ export default function ManagerPlaceProvince(props) {
           }
           convertPlace.address = place.address
           convertPlace.type = place.campType
-          convertPlace.status = place.status === 1 ? true : false
           convertPlace.action = ['edit']
           return convertPlace
         })
@@ -133,24 +132,6 @@ export default function ManagerPlaceProvince(props) {
                   }
                 }}
               />
-              <FormControl sx={{ minWidth: 200, ml: 10 }}>
-                <InputLabel id="demo-simple-select-label">
-                  Trạng thái
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Trạng thái"
-                  defaultValue={0}
-                  onChange={e => {
-                    setStatusFilter(e.target.value)
-                  }}
-                >
-                  <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
-                  <MenuItem value={0}>Tất cả</MenuItem>
-                </Select>
-              </FormControl>
               <Autocomplete
                 disablePortal
                 sx={{ minWidth: 200, ml: 10 }}

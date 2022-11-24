@@ -51,6 +51,6 @@ export const DateTimeFullConverter = (unixTimestamp: number) => {
 }
 
 export const GtmToYYYYMMDD = (gtmTime: string) => {
-  const formattedStr = moment(new Date(gtmTime)).format('YYYY-MM-DD')
+  const formattedStr = moment(new Date(gtmTime)).format('YYYY/MM/DD')
   return formattedStr
 }

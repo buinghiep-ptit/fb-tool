@@ -156,9 +156,13 @@ export const initCancelOrder = async (
   return data
 }
 
-export const ignoreCancelOrder = async (orderId: number): Promise<any> => {
+export const ignoreCancelOrder = async (
+  orderId: number,
+  payload: { note?: string },
+): Promise<any> => {
   const { data } = await http.post<any>(
     `/api/order/${orderId}/ignore-request-cancel`,
+    payload,
   )
   return data
 }

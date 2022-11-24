@@ -230,14 +230,18 @@ export const useInitCancelOrder = (onSuccess?: any, onError?: any) => {
 
 export const useIgnoreCancelOrder = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
-  return useMutation((orderId: number) => ignoreCancelOrder(orderId), {
-    onSettled: () => {
-      queryClient.invalidateQueries(['order-detail'])
-      queryClient.invalidateQueries(['orders'])
-      queryClient.invalidateQueries(['logs-order'])
+  return useMutation(
+    (payload: { orderId?: number; note?: string }) =>
+      ignoreCancelOrder(payload.orderId ?? 0, { note: payload.note }),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
     },
-    onSuccess,
-  })
+  )
 }
 
 export const useReceiveCancelOrder = (onSuccess?: any, onError?: any) => {

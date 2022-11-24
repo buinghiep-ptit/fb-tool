@@ -119,13 +119,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         setDialogData(prev => ({
           ...prev,
           title: 'Bỏ yêu cầu',
-          message: (loading?: boolean) => (
-            <Stack py={5} justifyContent={'center'} alignItems="center">
-              <MuiTypography variant="subtitle1">
-                Bạn có chắc chắn muốn bỏ yêu cầu?
-              </MuiTypography>
-            </Stack>
-          ),
+          message: (ignoreCancel?: boolean) => getContentNote(ignoreCancel),
           type: 'IGNORE_CANCEL',
         }))
         break
@@ -153,10 +147,17 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const onSubmitDialogHandler: SubmitHandler<{
     note?: string
   }> = (values: { note?: string }) => {
-    unavailable({
-      orderId: Number(orderId ?? 0),
-      note: values.note ?? '',
-    })
+    if (dialogData.type === '') {
+      unavailable({
+        orderId: Number(orderId ?? 0),
+        note: values.note ?? '',
+      })
+    } else if (dialogData.type === 'IGNORE_CANCEL') {
+      ignoreCancel({
+        orderId: Number(orderId ?? 0),
+        note: values.note ?? '',
+      })
+    }
   }
 
   const onSubmitDialog = (type?: string) => {
@@ -173,7 +174,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
         receiveCancel(Number(orderId ?? 0))
         break
       case 'IGNORE_CANCEL':
-        ignoreCancel(Number(orderId ?? 0))
+        methodsNote.handleSubmit(onSubmitDialogHandler)()
         break
 
       case 'ORDER_USED':
@@ -252,7 +253,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
             flexItem
           />
           <MuiButton
-            title="Huỷ"
+            title="Huỷ đơn"
             variant="contained"
             color="error"
             onClick={() =>
@@ -260,7 +261,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
                 state: { modal: true },
               })
             }
-            startIcon={<Icon>person_remove</Icon>}
+            startIcon={<Icon>clear</Icon>}
           />
           <Divider
             orientation="vertical"

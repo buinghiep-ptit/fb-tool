@@ -76,24 +76,23 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
     label: 'Số lượng điểm camp',
     minWidth: 200,
     align: 'left',
-    action: (value: number) =>
-      value ? (
-        <Typography
-          sx={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: '1',
-            WebkitBoxOrient: 'vertical',
-            textDecorationLine: 'underline',
-          }}
-          color={'primary'}
-        >
-          {CurrencyFormatter(value, 2)} điểm camp đã liên kết
-        </Typography>
-      ) : (
-        <></>
-      ),
+    link: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          textDecorationLine: 'underline',
+        }}
+        color={'primary'}
+      >
+        {value
+          ? CurrencyFormatter(value, 2) + ' điểm camp đã liên kết'
+          : 'Chưa liên kết'}
+      </Typography>
+    ),
   },
   {
     id: 'actions',

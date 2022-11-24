@@ -1,11 +1,14 @@
 import { FilterNone } from '@mui/icons-material'
 import {
+  Checkbox,
   Icon,
   IconButton,
   Skeleton,
   Stack,
   styled,
+  Toolbar,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -18,6 +21,7 @@ import { TableColumn } from 'app/models'
 import { messages } from 'app/utils/messages'
 import * as React from 'react'
 import { MuiTypography } from './MuiTypography'
+import { alpha } from '@mui/material/styles'
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
@@ -43,6 +47,7 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
   page?: number
   actionKeys?: string[]
   actions?: {
+    type?: 0 | 1 // 0: default with icon, 1: selection
     icon?: string
     tooltip?: string
     color?:
@@ -101,8 +106,38 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     return cell.format ? cell.format(value) : value
   }
 
+  const [selected, setSelected] = React.useState<readonly string[]>([])
+
+  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
+    console.log(name)
+    const selectedIndex = selected.indexOf(name)
+    let newSelected: readonly string[] = []
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name)
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1))
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1))
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      )
+    }
+
+    setSelected(newSelected)
+  }
+
+  const isSelected = (name: string) => selected.indexOf(name) !== -1
+
+  console.log(selected)
+
   return (
     <>
+      {selected.length ? (
+        <EnhancedTableToolbar numSelected={selected.length} />
+      ) : null}
       <TableContainer sx={{ maxHeight: maxHeight ?? null }}>
         <Table stickyHeader aria-label="sticky table">
           {!isFetching && (
@@ -131,12 +166,18 @@ export default function MuiPagingTable<T extends Record<string, any>>({
           <TableBody>
             {!isFetching ? (
               memoizedData.map((row, index) => {
+                const isItemSelected = isSelected(
+                  row.id ? row.id.toString() : '',
+                )
+                const labelId = `enhanced-table-checkbox-${index}`
+
                 return (
                   <StyledTableRow
                     hover
                     role="checkbox"
                     tabIndex={-1}
                     key={index} //row.userId ?? row.customerId ?? row.id ??
+                    selected={isItemSelected}
                     sx={{
                       '&.MuiTableRow-hover': {
                         '&:hover': {
@@ -174,6 +215,38 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                               gap={0.5}
                             >
                               {actions.map((action, index) => {
+                                if (action.type) {
+                                  return (
+                                    <Tooltip
+                                      key={index}
+                                      arrow
+                                      title={
+                                        isItemSelected ? 'Bỏ thêm' : 'Thêm'
+                                      }
+                                    >
+                                      <IconButton
+                                        size="small"
+                                        onClick={event =>
+                                          handleClick(event, row.id.toString())
+                                        }
+                                      >
+                                        <Icon
+                                          color={
+                                            isItemSelected ? 'error' : 'primary'
+                                          }
+                                        >
+                                          {row.isLinked
+                                            ? !isItemSelected
+                                              ? 'remove_circle_outlined'
+                                              : 'add_circle_outlined'
+                                            : !isItemSelected
+                                            ? 'add_circle_outlined'
+                                            : 'remove_circle_outlined'}
+                                        </Icon>
+                                      </IconButton>
+                                    </Tooltip>
+                                  )
+                                }
                                 if (
                                   action.disableActions &&
                                   action.disableActions(
@@ -269,5 +342,38 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         )}
       </TableContainer>
     </>
+  )
+}
+interface EnhancedTableToolbarProps {
+  numSelected: number
+}
+
+function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
+  const { numSelected } = props
+
+  return (
+    <Toolbar
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
+          bgcolor: theme =>
+            alpha(
+              theme.palette.primary.main,
+              theme.palette.action.activatedOpacity,
+            ),
+        }),
+      }}
+    >
+      {numSelected > 0 && (
+        <MuiTypography
+          sx={{ flex: '1 1 100%' }}
+          color="primary"
+          variant="subtitle2"
+        >
+          {numSelected} điểm camp đã được chọn
+        </MuiTypography>
+      )}
+    </Toolbar>
   )
 }

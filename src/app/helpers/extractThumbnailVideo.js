@@ -146,7 +146,7 @@ const blobToFile = (theBlob, fileName) => {
 export const compressImageFile = async (
   imageFile,
   maxWidth = 400,
-  maxHeight = 350,
+  maxHeight = 812,
 ) => {
   return new Promise(resolve => {
     convertBase64(imageFile).then(imageAsBase64 => {

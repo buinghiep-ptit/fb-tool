@@ -287,28 +287,31 @@ export default function AddEvent(props: Props) {
                 </SelectDropDown>
               </Grid>
             </Grid>
-            <Stack
-              direction={'row'}
-              my={1.5}
-              gap={1.5}
-              justifyContent="space-between"
-            >
-              <MuiButton
-                title="Xem điểm camping đã liên kết"
-                variant="text"
-                color="primary"
-                onClick={() => openLinkedCampgrounds()}
-                endIcon={<Icon>double_arrow</Icon>}
-              />
-              <MuiButton
-                title="Thêm điểm camping"
-                variant="text"
-                color="primary"
-                onClick={() => openUnlinkedCampgrounds()}
-                startIcon={<Icon>add</Icon>}
-              />
-            </Stack>
-            <Stack>
+            {handbookId && (
+              <Stack
+                direction={'row'}
+                mt={1.5}
+                gap={1.5}
+                justifyContent="space-between"
+              >
+                <MuiButton
+                  title="Xem điểm camping đã liên kết"
+                  variant="text"
+                  color="primary"
+                  onClick={() => openLinkedCampgrounds()}
+                  endIcon={<Icon>double_arrow</Icon>}
+                />
+                <MuiButton
+                  title="Thêm điểm camping"
+                  variant="text"
+                  color="primary"
+                  onClick={() => openUnlinkedCampgrounds()}
+                  startIcon={<Icon>add</Icon>}
+                />
+              </Stack>
+            )}
+
+            <Stack my={1.5}>
               <MuiTypography variant="subtitle2" pb={1}>
                 Nội dung*
               </MuiTypography>

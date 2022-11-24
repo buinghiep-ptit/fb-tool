@@ -6,7 +6,7 @@ export const uploadFile = async files => {
       const token = window.localStorage.getItem('accessToken')
       const res = axios({
         method: 'post',
-        url: 'https://dev09-api.campdi.vn/upload/api/image/upload',
+        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/image/upload`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',

@@ -15,11 +15,7 @@ import { IOrderDetail } from 'app/models/order'
 import { ReactElement, useState } from 'react'
 import { SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  isInprogressOrder,
-  isReceiveCancelOrder,
-  isReceiveOrder,
-} from '../OrderDetail'
+import { isInprogressOrder, isReceiveOrder } from '../OrderDetail'
 import { DiagLogConfirm } from './ButtonsLink/DialogConfirm'
 
 export interface IButtonsActionProps {
@@ -279,36 +275,12 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           currentUser?.authorities?.includes(1)) && (
           <>
             <MuiButton
-              title="Chuyển tiếp đơn"
+              title="Chuyển tiếp"
               variant="contained"
               color="primary"
               onClick={() =>
                 navigate(`chuyen-tiep`, {
                   state: { modal: true, receiveType: 1 },
-                })
-              }
-              startIcon={<Icon>cached</Icon>}
-            />
-            <Divider
-              orientation="vertical"
-              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-              flexItem
-            />
-          </>
-        )}
-
-      {isInprogressOrder(order) &&
-        order &&
-        order.cancelRequest &&
-        isReceiveCancelOrder(order, currentUser) && (
-          <>
-            <MuiButton
-              title="Chuyển tiếp y/c huỷ"
-              variant="contained"
-              color="primary"
-              onClick={() =>
-                navigate(`chuyen-tiep`, {
-                  state: { modal: true, receiveType: 2 },
                 })
               }
               startIcon={<Icon>cached</Icon>}
@@ -356,38 +328,40 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           </>
         )}
 
-      {isInprogressOrder(order) && isReceiveCancelOrder(order, currentUser) && (
-        <>
-          <MuiButton
-            title="Huỷ chỗ, hoàn tiền"
-            variant="contained"
-            color="error"
-            onClick={() =>
-              navigate(`hoan-tien`, {
-                state: { modal: true, data: order },
-              })
-            }
-            startIcon={<Icon>clear</Icon>}
-          />
-          <Divider
-            orientation="vertical"
-            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-            flexItem
-          />
-          <MuiButton
-            title="Bỏ yêu cầu"
-            variant="contained"
-            color="warning"
-            onClick={() => onClickButton('IGNORE_CANCEL')}
-            startIcon={<Icon>clear</Icon>}
-          />
-          <Divider
-            orientation="vertical"
-            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-            flexItem
-          />
-        </>
-      )}
+      {isInprogressOrder(order) &&
+        isReceiveOrder(order, currentUser) &&
+        order?.cancelRequest && (
+          <>
+            <MuiButton
+              title="Huỷ chỗ, hoàn tiền"
+              variant="contained"
+              color="error"
+              onClick={() =>
+                navigate(`hoan-tien`, {
+                  state: { modal: true, data: order },
+                })
+              }
+              startIcon={<Icon>clear</Icon>}
+            />
+            <Divider
+              orientation="vertical"
+              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+              flexItem
+            />
+            <MuiButton
+              title="Bỏ yêu cầu"
+              variant="contained"
+              color="warning"
+              onClick={() => onClickButton('IGNORE_CANCEL')}
+              startIcon={<Icon>clear</Icon>}
+            />
+            <Divider
+              orientation="vertical"
+              sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
+              flexItem
+            />
+          </>
+        )}
 
       {(isReceiveOrder(order, currentUser) ||
         currentUser?.authorities?.includes(1)) && (

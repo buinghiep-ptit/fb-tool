@@ -66,10 +66,6 @@ export const isReceiveOrder = (order?: IOrderDetail, user?: any) => {
   return order.handledBy === (user as any).id
 }
 
-export const isReceiveCancelOrder = (order?: IOrderDetail, user?: any) => {
-  if (!order || !user || !order.cancelRequest) return false
-  return order.cancelRequest.handledBy === (user as any).id
-}
 export const isInprogressOrder = (order?: IOrderDetail) => {
   if (!order) return false
 

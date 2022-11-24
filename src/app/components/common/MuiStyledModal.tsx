@@ -69,6 +69,7 @@ type Props = {
   onSubmit?: any
   isLoading?: boolean
   hideFooter?: boolean
+  disabled?: boolean
 }
 
 export default function MuiStyledModal({
@@ -82,6 +83,7 @@ export default function MuiStyledModal({
   children,
   isLoading,
   hideFooter = false,
+  disabled = false,
 }: Props) {
   //   const [open, setOpen] = React.useState(false)
   return (
@@ -118,7 +120,7 @@ export default function MuiStyledModal({
           >
             {onSubmit && (
               <MuiButton
-                disabled={isLoading}
+                disabled={isLoading || disabled}
                 title={submitText}
                 variant="contained"
                 color="primary"
@@ -132,6 +134,7 @@ export default function MuiStyledModal({
 
             {onCloseModal && !hideFooter && (
               <MuiButton
+                disabled={isLoading}
                 title={cancelText}
                 variant="outlined"
                 color="secondary"

@@ -47,8 +47,6 @@ export default function UpdateServices({ title }: Props) {
   const { orderId } = useParams()
   const { data: order } = useOrderDetailData(Number(orderId ?? 0))
 
-  console.log(location.state)
-
   const [services, setServices] = useState<IService[]>([])
   const [lengthServices, setLengthServices] = useState<number[]>([])
 
@@ -204,6 +202,20 @@ export default function UpdateServices({ title }: Props) {
     const total = services?.reduce(
       (acc, service) =>
         acc + Number(service?.quantity ?? 0) * Number(service?.amount ?? 0),
+      0,
+    )
+
+    return total
+  }
+
+  const getTotalQuantity = (
+    services?: {
+      quantity?: number
+      amount?: number
+    }[],
+  ) => {
+    const total = services?.reduce(
+      (acc, service) => acc + Number(service?.quantity ?? 0),
       0,
     )
 
@@ -459,6 +471,7 @@ export default function UpdateServices({ title }: Props) {
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         submitText="Lưu"
         cancelText="Quay lại"
+        disabled={getTotalQuantity(servicesW) == 0}
       >
         {getContent()}
       </MuiStyledModal>

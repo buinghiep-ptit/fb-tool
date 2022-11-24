@@ -90,18 +90,18 @@ export default function Reassign({ title }: Props) {
   const onSubmitHandler: SubmitHandler<ReassignSchema> = (
     values: ReassignSchema,
   ) => {
-    if (receiveType == 1) {
-      reassign({
-        orderId: Number(orderId ?? 0),
-        userId: values.newHandler?.userId,
-        note: values.note,
-      })
-    } else
-      reassignCancel({
-        orderId: Number(orderId ?? 0),
-        userId: values.newHandler?.userId,
-        note: values.note,
-      })
+    // if (receiveType == 1) {
+    reassign({
+      orderId: Number(orderId ?? 0),
+      userId: values.newHandler?.userId,
+      note: values.note,
+    })
+    // } else
+    //   reassignCancel({
+    //     orderId: Number(orderId ?? 0),
+    //     userId: values.newHandler?.userId,
+    //     note: values.note,
+    //   })
   }
 
   const handleClose = () => {

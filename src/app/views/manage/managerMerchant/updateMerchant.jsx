@@ -21,6 +21,7 @@ import { useState, useRef } from 'react'
 import axios from 'axios'
 import { generate } from 'generate-password'
 import ChangePasswordMerchant from './changePasswordMerchant'
+import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -102,7 +103,8 @@ export default function UpdateMerchant(props) {
 
   const uploadFile = async file => {
     const formData = new FormData()
-    formData.append('file', file)
+    const newFile = await compressImageFile(file)
+    formData.append('file', newFile)
     try {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({

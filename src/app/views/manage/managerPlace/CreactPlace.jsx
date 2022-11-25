@@ -30,6 +30,7 @@ import DialogCustom from 'app/components/common/DialogCustom'
 import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
 import { messages } from 'app/utils/messages'
 import { formatFile } from 'app/utils/constant'
+import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -155,10 +156,11 @@ export default function CreatePlace(props) {
   const handleDataImageUpload = async () => {
     const introData = uploadImageRef.current.getFiles()
 
-    const fileUploadImage = [...introData].map(file => {
+    const fileUploadImage = [...introData].map(async file => {
       if (file.type.startsWith('image/')) {
         const formData = new FormData()
-        formData.append('file', file)
+        const newFile = await compressImageFile(file)
+        formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -170,17 +172,18 @@ export default function CreatePlace(props) {
               Authorization: `Bearer ${token}`,
             },
           })
-          return res
+          return await res
         } catch (e) {
           console.log(e)
         }
       }
     })
 
-    const fileUploadVideo = [...introData].map(file => {
+    const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        formData.append('file', file)
+        const newFile = await compressImageFile(file)
+        formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -192,7 +195,7 @@ export default function CreatePlace(props) {
               Authorization: `Bearer ${token}`,
             },
           })
-          return res
+          return await res
         } catch (e) {
           console.log(e)
         }

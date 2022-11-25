@@ -46,6 +46,5 @@ export const typeAreas = [
   'Chạy bộ',
   'Teambuiding',
   'Lưu trú',
-  'Trekking',
   'Leo núi',
 ]

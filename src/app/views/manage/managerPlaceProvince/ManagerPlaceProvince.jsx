@@ -1,31 +1,17 @@
-import {
-  Box,
-  Button,
-  Grid,
-  Icon,
-  styled,
-  TextField,
-  Autocomplete,
-  Fab,
-} from '@mui/material'
+import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { cloneDeep } from 'lodash'
-import { Paragraph } from 'app/components/Typography'
+
 import { useState } from 'react'
 import TableCustom from 'app/components/common/TableCustom/TableCustom'
-import FormControl from '@mui/material/FormControl'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
+
 import {
   deletePlace,
   getListPlaceProvince,
   updatePlaceStatus,
 } from 'app/apis/place/place.service'
 import { tableModel, typeAreas } from './const'
-import { useNavigate } from 'react-router-dom'
-import { getProvinces } from 'app/apis/common/common.service'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -40,10 +26,7 @@ export default function ManagerPlaceProvince(props) {
   const [listPlace, setListPlace] = useState()
   const [totalPlace, setTotalPlace] = useState()
   const [inputNamePlace, setInputNamePlace] = useState('')
-  const [statusFilter, setStatusFilter] = useState(0)
-  const [provinces, setProvinces] = useState()
-  const [provinceId, setProvinceId] = useState(null)
-  const navigate = useNavigate()
+
   const tableRef = React.useRef()
   const fetchListPlace = async param => {
     await getListPlaceProvince(param)
@@ -80,8 +63,6 @@ export default function ManagerPlaceProvince(props) {
       name: inputNamePlace,
       page: 0,
       size: 20,
-      status: statusFilter === 0 ? null : statusFilter,
-      idProvince: provinceId,
     })
     if (res.length === 0) {
       toastWarning({
@@ -90,20 +71,13 @@ export default function ManagerPlaceProvince(props) {
     }
   }
 
-  const fetchProvinces = async () => {
-    const res = await getProvinces()
-    setProvinces(res)
-  }
-
   React.useEffect(() => {
     const param = {
       name: inputNamePlace,
       page: 0,
       size: 20,
-      idProvince: provinceId,
     }
     fetchListPlace(param)
-    fetchProvinces()
   }, [])
 
   return (
@@ -131,19 +105,6 @@ export default function ManagerPlaceProvince(props) {
                     handleSearch()
                   }
                 }}
-              />
-              <Autocomplete
-                disablePortal
-                sx={{ minWidth: 200, ml: 10 }}
-                options={provinces}
-                getOptionLabel={option => option.name}
-                onChange={(_, data) => {
-                  console.log(data)
-                  setProvinceId(data.id)
-                }}
-                renderInput={params => (
-                  <TextField {...params} fullWidth label="Tỉnh/thành phố" />
-                )}
               />
             </div>
 
@@ -174,8 +135,6 @@ export default function ManagerPlaceProvince(props) {
           updateStatus={updatePlaceStatus}
           filter={{
             name: inputNamePlace,
-            status: statusFilter === 0 ? null : statusFilter,
-            idProvince: provinceId,
             page: 0,
             size: 20,
           }}

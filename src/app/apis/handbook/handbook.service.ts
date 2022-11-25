@@ -49,3 +49,11 @@ export const deleteHandbook = async (handbookId?: number): Promise<any> => {
   const { data } = await http.delete<any>(`/api/handbooks/${handbookId}/delete`)
   return data
 }
+
+export const toggleLinkCamps = async (payload: any): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/handbooks/toggle-handbook`,
+    payload,
+  )
+  return data
+}

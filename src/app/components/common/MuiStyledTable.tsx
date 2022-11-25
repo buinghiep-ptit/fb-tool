@@ -1,6 +1,5 @@
 import { FilterNone } from '@mui/icons-material'
 import {
-  Checkbox,
   Icon,
   IconButton,
   Skeleton,
@@ -8,8 +7,8 @@ import {
   styled,
   Toolbar,
   Tooltip,
-  Typography,
 } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -21,7 +20,6 @@ import { TableColumn } from 'app/models'
 import { messages } from 'app/utils/messages'
 import * as React from 'react'
 import { MuiTypography } from './MuiTypography'
-import { alpha } from '@mui/material/styles'
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
@@ -68,6 +66,7 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
     disableKey?: string
     disableActions?: (key?: number) => boolean
   }[]
+  setSelectedItems?: (items: readonly number[]) => void
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -81,6 +80,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   page = 0,
   actionKeys = ['status'],
   actions = [],
+  setSelectedItems,
 }: MuiPagingTableProps<T>) {
   const memoizedData = React.useMemo(() => rows, [rows])
   const memoizedColumns = React.useMemo(() => columns, [columns])
@@ -106,12 +106,11 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     return cell.format ? cell.format(value) : value
   }
 
-  const [selected, setSelected] = React.useState<readonly string[]>([])
+  const [selected, setSelected] = React.useState<readonly number[]>([])
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    console.log(name)
+  const handleClick = (event: React.MouseEvent<unknown>, name: number) => {
     const selectedIndex = selected.indexOf(name)
-    let newSelected: readonly string[] = []
+    let newSelected: readonly number[] = []
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, name)
@@ -125,13 +124,11 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         selected.slice(selectedIndex + 1),
       )
     }
-
+    setSelectedItems && setSelectedItems(newSelected)
     setSelected(newSelected)
   }
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1
-
-  console.log(selected)
+  const isSelected = (name: number) => selected.indexOf(name) !== -1
 
   return (
     <>
@@ -166,9 +163,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
           <TableBody>
             {!isFetching ? (
               memoizedData.map((row, index) => {
-                const isItemSelected = isSelected(
-                  row.id ? row.id.toString() : '',
-                )
+                const isItemSelected = isSelected(row.id ? row.id : 0)
                 const labelId = `enhanced-table-checkbox-${index}`
 
                 return (
@@ -221,18 +216,30 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                                       key={index}
                                       arrow
                                       title={
-                                        isItemSelected ? 'Bỏ thêm' : 'Thêm'
+                                        row.isLinked
+                                          ? !isItemSelected
+                                            ? 'Bỏ thêm'
+                                            : 'Thêm'
+                                          : !isItemSelected
+                                          ? 'Thêm'
+                                          : 'Bỏ thêm'
                                       }
                                     >
                                       <IconButton
                                         size="small"
                                         onClick={event =>
-                                          handleClick(event, row.id.toString())
+                                          handleClick(event, row.id)
                                         }
                                       >
                                         <Icon
                                           color={
-                                            isItemSelected ? 'error' : 'primary'
+                                            row.isLinked
+                                              ? !isItemSelected
+                                                ? 'error'
+                                                : 'primary'
+                                              : !isItemSelected
+                                              ? 'primary'
+                                              : 'error'
                                           }
                                         >
                                           {row.isLinked

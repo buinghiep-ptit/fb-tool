@@ -25,6 +25,7 @@ import * as Yup from 'yup'
 export interface Props {
   handbook?: IHandbookOverall
   isLinked?: number
+  setSelectedCamps?: (items: readonly number[]) => void
 }
 
 type ISearchFilters = {
@@ -37,8 +38,8 @@ type ISearchFilters = {
 export default function UnlinkedCampgrounds({
   handbook,
   isLinked = -1,
+  setSelectedCamps,
 }: Props) {
-  console.log(isLinked, handbook)
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -229,6 +230,7 @@ export default function UnlinkedCampgrounds({
               onClick: onRowDetail,
             },
           ]}
+          setSelectedItems={setSelectedCamps}
         />
         <MuiStyledPagination
           component="div"

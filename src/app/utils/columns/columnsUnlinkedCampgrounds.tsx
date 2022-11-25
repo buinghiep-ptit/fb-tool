@@ -22,7 +22,6 @@ export const columnsUnlinkedCampgrounds: readonly TableColumn<TitleCampgrounds>[
       id: 'campAreaName',
       label: 'Tên địa điểm camping',
       minWidth: 200,
-      align: 'center',
       format: (value: number) => (
         <Typography
           sx={{
@@ -42,7 +41,6 @@ export const columnsUnlinkedCampgrounds: readonly TableColumn<TitleCampgrounds>[
       id: 'campGroundName',
       label: 'Địa danh',
       minWidth: 200,
-      align: 'center',
       format: (value: number) => (
         <Typography
           sx={{

@@ -31,6 +31,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import DialogCustom from 'app/components/common/DialogCustom'
 import { formatFile } from 'app/utils/constant'
+import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
 export default function InformationPlace(props) {
   const [hashtag, setHashtag] = React.useState([])
   const [provinceId, setProvinceId] = React.useState(null)
@@ -78,7 +79,7 @@ export default function InformationPlace(props) {
         })
         .test(
           'fileFormat',
-          'Định dạng ảnh/video/audio không phù hợp',
+          'Định dạng ảnh/video/audio không phù hợp. Định dạng cho phép: Hình ảnh: “.png”, “.jpeg”, “.jpg”, Video: “.mp4”, “.webm',
           value => {
             if (medias.length > 0 && value.length === 0) return true
 
@@ -199,10 +200,12 @@ export default function InformationPlace(props) {
   const handleDataImageUpload = async () => {
     const introData = uploadImageRef.current.getFiles()
 
-    const fileUploadImage = [...introData].map(file => {
+    const fileUploadImage = [...introData].map(async file => {
       if (file.type.startsWith('image/')) {
         const formData = new FormData()
-        formData.append('file', file)
+        console.log(file)
+        const newFile = await compressImageFile(file)
+        formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -214,17 +217,18 @@ export default function InformationPlace(props) {
               Authorization: `Bearer ${token}`,
             },
           })
-          return res
+          return await res
         } catch (e) {
           console.log(e)
         }
       }
     })
 
-    const fileUploadVideo = [...introData].map(file => {
+    const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        formData.append('file', file)
+        const newFile = await compressImageFile(file)
+        formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -236,7 +240,7 @@ export default function InformationPlace(props) {
               Authorization: `Bearer ${token}`,
             },
           })
-          return res
+          return await res
         } catch (e) {
           console.log(e)
         }

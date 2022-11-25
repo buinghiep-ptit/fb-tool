@@ -1,7 +1,10 @@
+import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
+
 export const uploadFile = async files => {
-  const fileUpload = [...files].map(file => {
+  const fileUpload = [...files].map(async file => {
     const formData = new FormData()
-    formData.append('file', file)
+    const newFile = await compressImageFile(file)
+    formData.append('file', newFile)
     try {
       const token = window.localStorage.getItem('accessToken')
       const res = axios({

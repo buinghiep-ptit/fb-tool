@@ -25,6 +25,7 @@ import { generate } from 'generate-password'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { cloneDeep, set } from 'lodash'
+import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
 
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -105,7 +106,8 @@ export default function CreateMerchant(props) {
 
   const uploadFile = async file => {
     const formData = new FormData()
-    formData.append('file', file)
+    const newFile = await compressImageFile(file)
+    formData.append('file', newFile)
     try {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({

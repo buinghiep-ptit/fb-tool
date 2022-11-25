@@ -205,6 +205,18 @@ export default function AddEvent(props: Props) {
     },
   )
 
+  const formatDateToISO = (date?: string, isEveryYear?: 0 | 1) => {
+    if (!date) return ''
+    const darr = date.split('/') // ["25", "09", "2019"]
+    const ISOFormat = new Date(
+      isEveryYear === 1 ? new Date().getFullYear() : parseInt(darr[2]),
+      parseInt(darr[1]) - 1,
+      parseInt(darr[0]),
+    )
+
+    return ISOFormat.toISOString()
+  }
+
   useEffect(() => {
     initDefaultValues(event)
   }, [event])
@@ -217,8 +229,11 @@ export default function AddEvent(props: Props) {
       defaultValues.amount = event.amount
       defaultValues.status = event.status
       defaultValues.editor_content = event.content
-      defaultValues.startDate = event.startDate
-      defaultValues.endDate = event.endDate
+      defaultValues.startDate = formatDateToISO(
+        event.startDate,
+        event.isEveryYear,
+      )
+      defaultValues.endDate = formatDateToISO(event.endDate, event.isEveryYear)
       defaultValues.editor_content = event.content
       defaultValues.type =
         event.medias && event.medias.length && event.medias[0].mediaFormat

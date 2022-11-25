@@ -147,15 +147,15 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
   const onSubmitDialogHandler: SubmitHandler<{
     note?: string
   }> = (values: { note?: string }) => {
-    if (dialogData.type === '') {
+    if (dialogData.type === 'UN_AVAILABLE') {
       unavailable({
         orderId: Number(orderId ?? 0),
-        note: values.note ?? '',
+        note: values.note || undefined,
       })
     } else if (dialogData.type === 'IGNORE_CANCEL') {
       ignoreCancel({
         orderId: Number(orderId ?? 0),
-        note: values.note ?? '',
+        note: values.note || undefined,
       })
     }
   }

@@ -47,9 +47,7 @@ type ISearchFilters = {
 const newEvents = (events: IEventOverall[]) => {
   return events.map(event => ({
     ...event,
-    dateActive: `${DDMMYYYYFormatter(
-      event.startDate ?? '',
-    )} - ${DDMMYYYYFormatter(event.endDate ?? '')}`,
+    dateActive: `${event.startDate ?? ''} - ${event.endDate ?? ''}`,
   }))
 }
 

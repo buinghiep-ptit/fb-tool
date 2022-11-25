@@ -117,7 +117,9 @@ export const useUnAvailableOrder = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
     (payload: { orderId?: number; note?: string }) =>
-      unavailableOrder(payload.orderId ?? 0, { note: payload.note }),
+      unavailableOrder(payload.orderId ?? 0, {
+        note: payload.note || undefined,
+      }),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])
@@ -232,7 +234,9 @@ export const useIgnoreCancelOrder = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
     (payload: { orderId?: number; note?: string }) =>
-      ignoreCancelOrder(payload.orderId ?? 0, { note: payload.note }),
+      ignoreCancelOrder(payload.orderId ?? 0, {
+        note: payload.note || undefined,
+      }),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])

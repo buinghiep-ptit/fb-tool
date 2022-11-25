@@ -145,7 +145,7 @@ const blobToFile = (theBlob, fileName) => {
 
 export const compressImageFile = async (
   imageFile,
-  maxWidth = 400,
+  maxWidth = 812,
   maxHeight = 812,
 ) => {
   return new Promise(resolve => {
@@ -177,7 +177,10 @@ export const compressImageFile = async (
 
         const blob = await fetch(canvas.toDataURL()).then(res => res.blob())
 
+        const image = canvas.toDataURL()
+
         const fileCompressed = blobToFile(blob, 'thumbnail.jpeg')
+        console.log(fileCompressed, image.length)
 
         resolve(fileCompressed)
       }

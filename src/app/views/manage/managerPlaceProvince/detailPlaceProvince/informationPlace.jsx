@@ -46,6 +46,7 @@ export default function InformationPlace(props) {
   const uploadImageRef = React.useRef()
   const [createDegrees, setCreateDegrees] = React.useState()
   const dialogCustomRef = React.useRef(null)
+
   const navigate = useNavigate()
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
@@ -59,7 +60,7 @@ export default function InformationPlace(props) {
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
       province: yup.object().required(),
-      description: yup.string().required(messages.MSG1),
+      description: yup.string().required(messages.MSG1).trim(),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       file: yup
         .mixed()
@@ -256,14 +257,6 @@ export default function InformationPlace(props) {
         listUrl.video = responseVideo.map(item => item?.data.url)
     }
     return listUrl
-  }
-
-  const handleDeletePlace = async () => {
-    const res = await deletePlace(params.id)
-    if (res) {
-      toastSuccess({ message: 'Xóa điểm dia danh thành công' })
-      navigate('/quan-ly-thong-tin-dia-danh')
-    }
   }
 
   const onSubmit = async data => {
@@ -581,14 +574,6 @@ export default function InformationPlace(props) {
         )}
         <Button color="primary" type="submit" variant="contained">
           Lưu
-        </Button>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => handleDeletePlace()}
-          style={{ marginLeft: '10px' }}
-        >
-          Xóa
         </Button>
         <Button
           color="primary"

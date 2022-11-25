@@ -229,7 +229,7 @@ export default function InformationCampGround({ action }) {
     const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        const newFile = await compressImageFile()
+        const newFile = await compressImageFile(file)
         formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')

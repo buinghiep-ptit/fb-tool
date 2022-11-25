@@ -25,6 +25,7 @@ import * as Yup from 'yup'
 export interface Props {
   handbook?: IHandbookOverall
   isLinked?: number
+  setSelectedCamps?: (items: readonly number[]) => void
 }
 
 type ISearchFilters = {
@@ -37,8 +38,8 @@ type ISearchFilters = {
 export default function UnlinkedCampgrounds({
   handbook,
   isLinked = -1,
+  setSelectedCamps,
 }: Props) {
-  console.log(isLinked, handbook)
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -133,7 +134,7 @@ export default function UnlinkedCampgrounds({
   }
 
   const onRowDetail = (cell: any, row: any) => {
-    window.open(`/chi-tiet-dia-danh/${row.id}`, '_blank')
+    window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
   }
 
   const onClickRow = (cell: any, row: any) => {
@@ -220,12 +221,16 @@ export default function UnlinkedCampgrounds({
           error={isError ? error : null}
           actions={[
             {
-              icon: 'data_saver_on',
+              type: 1,
+            },
+            {
+              icon: 'double_arrow',
               color: 'primary',
-              tooltip: 'Thêm',
+              tooltip: 'Xem điểm chi tiết điểm camp',
               onClick: onRowDetail,
             },
           ]}
+          setSelectedItems={setSelectedCamps}
         />
         <MuiStyledPagination
           component="div"

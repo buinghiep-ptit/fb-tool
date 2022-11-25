@@ -159,7 +159,7 @@ export default function CreatePlace(props) {
     const fileUploadImage = [...introData].map(async file => {
       if (file.type.startsWith('image/')) {
         const formData = new FormData()
-        const newFile = await compressImageFile()
+        const newFile = await compressImageFile(file)
         formData.append('file', newFile)
         try {
           const token = window.localStorage.getItem('accessToken')

@@ -29,6 +29,25 @@ export const uploadFile = async (
   return data
 }
 
+export const uploadApi = async (
+  file?: any,
+  onUploadProgress?: any,
+  cancelToken?: any,
+): Promise<any> => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const { data }: any = await http.post('/api/image/upload', formData, {
+    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    onUploadProgress,
+    cancelToken: cancelToken,
+  })
+  return data
+}
+
 export const uploadImage = async (file?: any): Promise<any> => {
   const formData = new FormData()
   formData.append('file', file)

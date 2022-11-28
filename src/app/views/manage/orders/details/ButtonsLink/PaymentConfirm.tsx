@@ -330,7 +330,7 @@ export default function PaymentConfirm({ title }: Props) {
 
                 <Box>
                   <MuiTypography variant="subtitle2" pb={1}>
-                    Ghi chú:
+                    Ghi chú*:
                   </MuiTypography>
                   <FormTextArea
                     name="note"

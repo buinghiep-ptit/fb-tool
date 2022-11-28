@@ -114,8 +114,11 @@ export default function UpdateServices({ title }: Props) {
         Yup.array().of(
           Yup.object().shape({
             quantity: Yup.number()
-              .required(messages.MSG1)
+              .typeError('Giá trị phải là một chữ số')
+              // .positive() // Sso nguyen duong
               .max(999999999, 'Tối đa 9 chữ số'),
+            // .nullable(), // neu k can nhap so 0
+            // .required(messages.MSG1),
           }),
         ),
       ),

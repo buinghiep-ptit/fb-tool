@@ -6,6 +6,7 @@ import {
   Stack,
   Icon,
   FormHelperText,
+  Box,
 } from '@mui/material'
 import UploadImage from 'app/components/common/uploadImage'
 import * as React from 'react'
@@ -32,6 +33,7 @@ import * as yup from 'yup'
 import DialogCustom from 'app/components/common/DialogCustom'
 import { formatFile } from 'app/utils/constant'
 import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
+import LinearProgress from '@mui/material/LinearProgress'
 export default function InformationPlace(props) {
   const [hashtag, setHashtag] = React.useState([])
   const [provinceId, setProvinceId] = React.useState(null)
@@ -40,6 +42,7 @@ export default function InformationPlace(props) {
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(false)
 
   const params = useParams()
   const mapRef = React.useRef()
@@ -55,6 +58,14 @@ export default function InformationPlace(props) {
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
+
+  const hashtagTypeCamp = {
+    1: '#camtrai',
+    2: '#chaybo',
+    3: '#teambuilding',
+    4: '#luutru',
+    5: '#leonui',
+  }
 
   const schema = yup
     .object({
@@ -73,7 +84,11 @@ export default function InformationPlace(props) {
           if (medias.length > 0 && value.length === 0) return true
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].size > 10000000) return false
+              if (
+                value[i].size > 10000000 &&
+                !value[i].type.startsWith('video')
+              )
+                return false
             }
             return true
           }
@@ -228,9 +243,9 @@ export default function InformationPlace(props) {
     const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        const newFile = await compressImageFile(file)
-        formData.append('file', newFile)
+        formData.append('file', file)
         try {
+          setIsLoading(true)
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
             method: 'post',
@@ -243,6 +258,7 @@ export default function InformationPlace(props) {
           })
           return await res
         } catch (e) {
+          setIsLoading(false)
           console.log(e)
         }
       }
@@ -250,6 +266,7 @@ export default function InformationPlace(props) {
 
     const responseImage = await Promise.all(fileUploadImage)
     const responseVideo = await Promise.all(fileUploadVideo)
+    setIsLoading(false)
     const listUrl = new Object()
     if (responseImage && responseVideo) {
       if (responseImage.length > 0)
@@ -315,8 +332,9 @@ export default function InformationPlace(props) {
       status: 1,
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
-
+    setIsLoading(true)
     const res = await updateDetailPlace(params.id, paramDetail)
+    setIsLoading(false)
     if (res) {
       toastSuccess({ message: 'Lưu thành công' })
       fetchInforPlace()
@@ -330,6 +348,19 @@ export default function InformationPlace(props) {
 
   return (
     <>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container>
           <Grid item xs={12} md={12}>
@@ -496,7 +527,33 @@ export default function InformationPlace(props) {
                   options={[...typeCamp]}
                   getOptionLabel={option => option.label}
                   filterSelectedOptions
-                  onChange={(_, data) => field.onChange(data)}
+                  onChange={(_, data) => {
+                    field.onChange(data)
+                    const hashtags = data.map(item => {
+                      return { value: hashtagTypeCamp[item.id] }
+                    })
+                    const currentHashtags = getValues('hashtag').filter(
+                      item => {
+                        if (
+                          item.value === '#camtrai' ||
+                          item.value === '#chaybo' ||
+                          item.value === '#teambuilding' ||
+                          item.value === '#luutru' ||
+                          item.value === '#leonui'
+                        ) {
+                          return false
+                        }
+                        return true
+                      },
+                    )
+                    const newHashtag = [...currentHashtags, ...hashtags]
+                    const unique = [
+                      ...new Map(
+                        newHashtag.map(item => [item.value, item]),
+                      ).values(),
+                    ]
+                    setValue('hashtag', unique)
+                  }}
                   sx={{ width: 400, marginRight: 5 }}
                   renderInput={params => (
                     <TextField

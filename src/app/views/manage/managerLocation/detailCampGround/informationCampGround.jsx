@@ -393,7 +393,8 @@ export default function InformationCampGround({ action }) {
   }
 
   const fetchListCampArea = async () => {
-    const res = await getListCampArea()
+    const res = await getListCampAreaWithoutProvince()
+    console.log(res)
     setCampAreas(res)
   }
 

@@ -312,7 +312,7 @@ export default function InformationCampGround({ action }) {
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
     if (parseInt(data.isSupportBooking) === 1) {
-      dataUpdate.idDepositPolicy = data.policy
+      dataUpdate.idDepositPolicy = data.policy || 1
     } else {
       dataUpdate.idDepositPolicy = null
     }

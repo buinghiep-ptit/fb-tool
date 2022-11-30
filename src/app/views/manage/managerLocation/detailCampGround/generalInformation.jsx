@@ -54,6 +54,14 @@ export default function GeneralInformation({
     { label: 'Leo núi', id: 5 },
   ]
 
+  const hashtagTypeCamp = {
+    1: '#camtrai',
+    2: '#chaybo',
+    3: '#teambuilding',
+    4: '#luutru',
+    5: '#leonui',
+  }
+
   const dialogCustomRef = React.useRef(null)
   const mapRef = React.useRef()
 
@@ -127,7 +135,7 @@ export default function GeneralInformation({
                       errors.province ? 'Vui lòng chọn tỉnh/thành' : ''
                     }
                     {...params}
-                    label="Tỉnh/thành phố"
+                    label="Tỉnh/thành phố*"
                     margin="normal"
                   />
                 )}
@@ -152,7 +160,7 @@ export default function GeneralInformation({
                 renderInput={params => (
                   <TextField
                     {...params}
-                    label="Quận huyện"
+                    label="Quận huyện*"
                     margin="normal"
                     error={!!errors.district}
                     helperText={
@@ -252,13 +260,38 @@ export default function GeneralInformation({
                 options={[...typeCamp]}
                 getOptionLabel={option => option?.label || ''}
                 filterSelectedOptions
-                onChange={(_, data) => field.onChange(data)}
+                onChange={(_, data) => {
+                  field.onChange(data)
+
+                  const hashtags = data.map(item => {
+                    return { value: hashtagTypeCamp[item.id] }
+                  })
+                  const currentHashtags = getValues('hashtag').filter(item => {
+                    if (
+                      item.value === '#camtrai' ||
+                      item.value === '#chaybo' ||
+                      item.value === '#teambuilding' ||
+                      item.value === '#luutru' ||
+                      item.value === '#leonui'
+                    ) {
+                      return false
+                    }
+                    return true
+                  })
+                  const newHashtag = [...currentHashtags, ...hashtags]
+                  const unique = [
+                    ...new Map(
+                      newHashtag.map(item => [item.value, item]),
+                    ).values(),
+                  ]
+                  setValue('hashtag', unique)
+                }}
                 sx={{ width: 400, marginRight: 5 }}
                 renderInput={params => (
                   <TextField
                     {...params}
                     variant="outlined"
-                    label="Loại hình"
+                    label="Loại hình*"
                     placeholder="Loại hình"
                     fullWidth
                     margin="normal"

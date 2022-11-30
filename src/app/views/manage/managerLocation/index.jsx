@@ -205,7 +205,12 @@ export default function ManagerLocation(props) {
           updateStatus={updateCampGroundStatus}
           totalData={parseInt(totalListCampGround, 0)}
           fetchDataTable={fetchListCampGround}
-          filter={{ name: inputFilter, status: statusFilter }}
+          filter={{
+            name: inputFilter,
+            status: statusFilter,
+            page: 0,
+            size: 20,
+          }}
           onDeleteData={deleteCampGround}
         />
       </SimpleCard>

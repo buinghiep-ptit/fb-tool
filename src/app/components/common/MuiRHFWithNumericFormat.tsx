@@ -64,8 +64,10 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
             )
           }}
           disabled={disabled}
-          onChange={onChange}
-          // onValueChange={({ floatValue }) => onChange(floatValue)}
+          // onChange={onChange}
+          onValueChange={({ floatValue }) =>
+            onChange(isNaN(floatValue as any) ? null : floatValue)
+          }
           InputLabelProps={{ shrink: true }}
           required={required}
           InputProps={{

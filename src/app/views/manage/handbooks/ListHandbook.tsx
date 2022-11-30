@@ -11,7 +11,10 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useDeleteHandbook } from 'app/hooks/queries/useHandbooksData'
+import {
+  useDeleteHandbook,
+  useToggleLinkCampsHandbook,
+} from 'app/hooks/queries/useHandbooksData'
 import { useTogglePinKeyword } from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IHandbookOverall, IHandbookResponse } from 'app/models/handbook'
@@ -67,11 +70,15 @@ export default function ListHandbook(props: Props) {
     title?: string
     message?: string
     type?: string
+    isLinked?: number
     submitText?: string
     cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
+  const [selectedCamps, setSelectedCamps] = useState<readonly number[]>([])
+
+  console.log(selectedCamps)
 
   const validationSchema = Yup.object().shape({
     title: Yup.string()
@@ -105,26 +112,50 @@ export default function ListHandbook(props: Props) {
     setOpenDialog(false)
   }
 
-  const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
-    () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
-  )
-  const { mutate: deleteHandbook } = useDeleteHandbook(() =>
-    onRowUpdateSuccess(null, 'Xoá thành công'),
-  )
+  const { mutate: toggleLinkCamps, isLoading: toggleLoading } =
+    useToggleLinkCampsHandbook(() =>
+      onRowUpdateSuccess(
+        null,
+        dialogData.type === 'linked'
+          ? 'Xoá liên kết thành công'
+          : 'Thêm liên kết thành công',
+      ),
+    )
+  const { mutate: deleteHandbook, isLoading: deleteLoading } =
+    useDeleteHandbook(() => onRowUpdateSuccess(null, 'Xoá thành công'))
+
+  const handbooksToLink = (selectedCamps: readonly number[]) => {
+    const selectedCampsExtra = selectedCamps.map(camp =>
+      Object.assign(
+        {},
+        {
+          idCampGround: camp,
+          idHandBook: row.id,
+        },
+      ),
+    )
+
+    return selectedCampsExtra
+  }
 
   const onSubmitDialog = () => {
     switch (dialogData.type) {
-      case 'camps':
-        deleteHandbook(row.id)
+      case 'linked':
+        toggleLinkCamps({
+          isAdd: 0,
+          handbooksToLink: handbooksToLink(selectedCamps),
+        })
+
         break
-        break
-      case 'toggle-pin':
-        togglePin(row.id)
+      case 'unlinked':
+        toggleLinkCamps({
+          isAdd: 1,
+          handbooksToLink: handbooksToLink(selectedCamps),
+        })
         break
 
       case 'delete':
         deleteHandbook(row.id)
-        break
         break
 
       default:
@@ -189,12 +220,13 @@ export default function ListHandbook(props: Props) {
     setDialogData(prev => ({
       ...prev,
       title: 'Thêm điểm camping',
-      type: 'camps',
-      submitText: 'Lưu',
+      type: 'unlinked',
+      isLinked: 0,
+      submitText: 'Thêm',
       cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
-    // setRow(row)
+    setRow(row)
   }
 
   const onRowDelete = (cell: any, row: any) => {
@@ -221,8 +253,9 @@ export default function ListHandbook(props: Props) {
       setDialogData(prev => ({
         ...prev,
         title: 'Điểm camping đã liên kết',
-        type: 'camps',
-        submitText: 'Lưu',
+        type: 'linked',
+        isLinked: 1,
+        submitText: 'Xoá',
         cancelText: 'Huỷ',
       }))
       setOpenDialog(true)
@@ -359,15 +392,18 @@ export default function ListHandbook(props: Props) {
         title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={dialogData.type === 'camps' ? undefined : onSubmitDialog}
-        maxWidth={dialogData.type === 'camps' ? 'md' : 'sm'}
-        submitText={
-          dialogData.type === 'camps' ? undefined : dialogData.submitText
-        }
+        onSubmit={onSubmitDialog}
+        maxWidth={dialogData.type === 'delete' ? 'sm' : 'md'}
+        submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
+        isLoading={toggleLoading || deleteLoading}
       >
-        {dialogData.type === 'camps' ? (
-          <UnlinkedCampgrounds handbook={row} isLinked={1} />
+        {dialogData.type !== 'delete' ? (
+          <UnlinkedCampgrounds
+            handbook={row}
+            isLinked={dialogData.isLinked}
+            setSelectedCamps={setSelectedCamps}
+          />
         ) : (
           <Stack py={5} justifyContent={'center'} alignItems="center">
             <MuiTypography variant="subtitle1">

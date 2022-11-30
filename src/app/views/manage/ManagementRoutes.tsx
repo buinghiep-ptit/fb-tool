@@ -87,6 +87,9 @@ const UpdateMerchant = Loadable(
 )
 const OrdersHistory = Loadable(lazy(() => import('./orders/OrdersHistory')))
 const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
+const UpdateServices = Loadable(
+  lazy(() => import('./orders/details/ButtonsLink/UpdateServices')),
+)
 const PaymentConfirm = Loadable(
   lazy(() => import('./orders/details/ButtonsLink/PaymentConfirm')),
 )
@@ -241,7 +244,7 @@ const ManagementRoutes = [
         element: <AddAudio title="Thêm bài hát" />,
       },
     ],
-    auth: [ROLES.ADMIN, ROLES.CS, ROLES.MKT],
+    auth: [ROLES.ADMIN],
   },
   {
     path: '/quan-ly-su-kien',
@@ -309,6 +312,10 @@ const ManagementRoutes = [
               <AvailablePayment title="Chi tiết đơn hàng (Còn chỗ, chờ thanh toán)" />
             ),
           },
+          {
+            path: 'update-service',
+            element: <UpdateServices title="Cập nhật đơn hàng" />,
+          },
         ],
       },
     ],
@@ -349,7 +356,7 @@ const ManagementRoutes = [
         element: <AddKeyword title="Thêm từ khoá" />,
       },
     ],
-    auth: [ROLES.ADMIN, ROLES.CS],
+    auth: [ROLES.ADMIN, ROLES.MKT],
   },
   {
     path: '/quan-ly-cam-nang',
@@ -365,7 +372,6 @@ const ManagementRoutes = [
       //   element: <AddHandbook title="Thêm cẩm nang" />,
       // },
     ],
-    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     path: '/quan-ly-cam-nang/them-moi',
@@ -390,10 +396,12 @@ const ManagementRoutes = [
   {
     path: '/quan-ly-danh-gia',
     element: <ListRating />,
+    auth: [ROLES.ADMIN, ROLES.MKT],
   },
   {
     path: '/quan-ly-danh-gia/:rateId/chi-tiet',
     element: <RateDetail />,
+    auth: [ROLES.ADMIN, ROLES.MKT],
   },
   {
     path: '/quan-ly-thong-tin-dia-danh',

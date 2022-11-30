@@ -11,18 +11,15 @@ import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useUpdateOrder } from 'app/hooks/queries/useOrderData'
 import {
   useOrderDetailData,
-  useRecalculatePriceOrder,
+  useUpdateContactOrder,
 } from 'app/hooks/queries/useOrdersData'
 import useAuth from 'app/hooks/useAuth'
-import useDebounce from 'app/hooks/useDebounce.'
 import { IUserProfile } from 'app/models'
-import { ICampground, IOrderDetail, IService } from 'app/models/order'
+import { ICampground, IOrderDetail } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
-import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
@@ -64,25 +61,33 @@ export const isExpiredReceiveUser = (expiredTimeISO: string) => {
   return EXP_IN_MS <= NOW_IN_MS
 }
 
-export const isReceiveUser = (order: IOrderDetail, user: any) => {
+export const isReceiveOrder = (order?: IOrderDetail, user?: any) => {
+  if (!order || !user) return false
   return order.handledBy === (user as any).id
 }
 
+export const isInprogressOrder = (order?: IOrderDetail) => {
+  if (!order) return false
+
+  return (
+    order?.status &&
+    order?.status < 4 &&
+    order.cancelRequest?.status !== 2 &&
+    order?.status !== -1
+  )
+}
+
 type SchemaType = {
-  dateStart?: string
-  dateEnd?: string
   fullName?: string
   mobilePhone?: string
   email?: string
   note?: string
-  services?: IService[]
 }
 
 export interface Props {}
 
 export default function OrderDetail(props: Props) {
   const { user } = useAuth()
-  const [services, setServices] = useState<IService[]>([])
   const navigate = useNavigate()
   const { source, orderId } = useParams()
 
@@ -129,87 +134,24 @@ export default function OrderDetail(props: Props) {
     error,
   } = useOrderDetailData(Number(orderId ?? 0), onSuccess)
 
-  const [methods, fields] = useRHFOrder(order as IOrderDetail, services)
+  const [methods] = useRHFOrder(order as IOrderDetail)
 
-  const dateStart = methods.watch('dateStart')
-  const dateEnd = methods.watch('dateEnd')
-
-  const debouncedDateStart = useDebounce(dateStart ?? '', 500)
-  const debouncedDateEnd = useDebounce(dateEnd ?? '', 500)
-
-  useEffect(() => {
-    if (!order) return
-    if (
-      !debouncedDateStart ||
-      !debouncedDateEnd ||
-      order.status === -1 ||
-      order.status === 4 ||
-      !isReceiveUser(order, user) ||
-      moment(new Date(debouncedDateStart)).unix() >
-        moment(new Date(debouncedDateEnd)).unix()
-    )
-      return
-
-    recalculate({
-      orderId: Number(orderId ?? 0),
-      payload: {
-        dateStart: new Date(debouncedDateStart).toISOString(),
-        dateEnd: new Date(debouncedDateEnd).toISOString(),
-      },
-    })
-  }, [debouncedDateStart, debouncedDateEnd, order])
-
-  const { mutate: edit, isLoading: editLoading } = useUpdateOrder(() =>
+  const { mutate: edit, isLoading: editLoading } = useUpdateContactOrder(() =>
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
-  const servicesW = methods.watch('services')
-
-  const { mutate: recalculate } = useRecalculatePriceOrder((data: any) => {
-    if (servicesW && servicesW.length) {
-      data.map((item: IService, index: number) =>
-        Object.assign(item, {
-          quantity: servicesW[index]
-            ? servicesW[index].quantity
-            : item.quantity,
-        }),
-      )
-    }
-    setServices(data)
-  })
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    values = {
-      ...values,
-      dateStart: (values.dateStart as any)?.toISOString(),
-      dateEnd: (values.dateEnd as any)?.toISOString(),
+    const payload: any = {
+      note: values.note || null,
+      fullName: values.fullName,
+      email: values.email || null,
+      mobilePhone: values.mobilePhone,
     }
-    if (values.services && values.services.length) {
-      values.services = values.services.map(item => ({
-        ...item,
-        quantity: Number(
-          item.quantity?.toString().replace(/,(?=\d{3})/g, '') ?? 0,
-        ),
-      })) as IService[]
-    }
-
-    const payload: IOrderDetail = {
-      ...order,
-      dateStart: values.dateStart,
-      dateEnd: values.dateEnd,
-      note: values.note,
-      contact: {
-        ...order?.contact,
-        fullName: values.fullName,
-        email: values.email,
-        mobilePhone: values.mobilePhone,
-      },
-      services: [...(values?.services ?? [])],
-    }
-    edit({ ...payload, id: Number(orderId ?? 0) })
+    edit({ payload: payload, orderId: Number(orderId ?? 0) })
   }
 
   if (isLoading) return <MuiLoading />
@@ -237,7 +179,7 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        {isReceiveUser(order, user) &&
+        {isReceiveOrder(order, user) &&
           order.status !== -1 &&
           order.status !== 4 && (
             <>
@@ -308,11 +250,13 @@ export default function OrderDetail(props: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={3} mt={3}>
-            {order.cancelRequest && order.cancelRequest.status !== 2 && (
+            {order.cancelRequest && isInprogressOrder(order) && (
               <Stack>
                 <CancelOrderInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                  isViewer={
+                    !isReceiveOrder(order, user) || !isInprogressOrder(order)
+                  }
                 />
               </Stack>
             )}
@@ -320,7 +264,9 @@ export default function OrderDetail(props: Props) {
               <Grid item xs={12} md={6}>
                 <CustomerInfo
                   order={order}
-                  isViewer={!isReceiveUser(order, user) || order.status === -1}
+                  isViewer={
+                    !isReceiveOrder(order, user) || !isInprogressOrder(order)
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -333,9 +279,11 @@ export default function OrderDetail(props: Props) {
             <Stack>
               <OrderServices
                 order={order}
-                fields={fields}
-                methods={methods}
-                isViewer={!isReceiveUser(order, user) || order.status === -1}
+                isViewer={
+                  !isReceiveOrder(order, user) ||
+                  !isInprogressOrder(order) ||
+                  order.status === 3
+                }
               />
             </Stack>
             <Stack>

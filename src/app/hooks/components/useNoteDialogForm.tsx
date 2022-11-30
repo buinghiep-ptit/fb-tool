@@ -11,9 +11,13 @@ type SchemaType = {
   note?: string
 }
 
-const useNoteDialogForm = (name = 'note') => {
+const useNoteDialogForm = (name = 'note', required = false) => {
   const validationSchema = Yup.object().shape({
-    note: Yup.string().required(messages.MSG1),
+    note: required
+      ? Yup.string()
+          .required(messages.MSG1)
+          .max(255, 'Nội dung không được vượt quá 255 ký tự')
+      : Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<SchemaType>({
@@ -27,7 +31,9 @@ const useNoteDialogForm = (name = 'note') => {
         <>
           <FormProvider {...methods}>
             <Stack gap={1.5}>
-              <MuiTypography variant="subtitle2">Ghi chú*:</MuiTypography>
+              <MuiTypography variant="subtitle2">
+                Ghi chú{required ? '*' : ''}:
+              </MuiTypography>
               <FormTextArea
                 name={name}
                 defaultValue={''}

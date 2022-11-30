@@ -1,31 +1,24 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { IOrderDetail, IService } from 'app/models/order'
+import { IOrderDetail } from 'app/models/order'
 import { messages } from 'app/utils/messages'
-import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import * as Yup from 'yup'
 
 type SchemaType = {
-  dateStart?: string
-  dateEnd?: string
   fullName?: string
   mobilePhone?: string
   email?: string
   note?: string
-  services?: IService[]
   paymentType?: 1 | 2
 }
 
-export const useRHFOrder = (order: IOrderDetail, services?: IService[]) => {
+export const useRHFOrder = (order: IOrderDetail) => {
   useEffect(() => {
     if (order) {
-      defaultValues.dateStart = order.dateStart
-      defaultValues.dateEnd = order.dateEnd
       defaultValues.fullName = order.contact?.fullName
       defaultValues.mobilePhone = order.contact?.mobilePhone
       defaultValues.email = order.contact?.email ?? ''
-      defaultValues.services = order.services
       defaultValues.note = order.note ?? ''
       defaultValues.paymentType = order.paymentType
 
@@ -33,61 +26,21 @@ export const useRHFOrder = (order: IOrderDetail, services?: IService[]) => {
     }
   }, [order])
 
-  useEffect(() => {
-    if (services && !!services.length) {
-      methods.setValue('services', services)
-    }
-  }, [services])
-
   const [defaultValues] = useState<SchemaType>({})
 
-  const validationSchema = Yup.object().shape(
-    {
-      fullName: Yup.string().required(messages.MSG1),
-      mobilePhone: Yup.string()
-        .required(messages.MSG1)
-        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-          if (!phone) {
-            return true
-          }
-          return regex.test(phone as string)
-        }),
-      dateStart: Yup.date()
-        .when('dateEnd', (dateEnd, yup) => {
-          if (dateEnd && dateEnd != 'Invalid Date') {
-            const dayAfter = new Date(dateEnd.getTime())
-            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
-          }
-          return yup
-        })
-        .typeError('Sai định dạng.')
-        .nullable()
-        .required(messages.MSG1),
-      dateEnd: Yup.date()
-        .when('dateStart', (dateStart, yup) => {
-          if (dateStart && dateStart != 'Invalid Date') {
-            const dayAfter = new Date(dateStart.getTime() + 0)
-            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
-          }
-          return yup
-        })
-        .typeError('Sai định dạng.')
-        .nullable()
-        .required(messages.MSG1),
-      services: Yup.lazy(() =>
-        Yup.array().of(
-          Yup.object().shape({
-            quantity: Yup.string()
-              .required(messages.MSG1)
-              .max(11, 'Tối đa 9 ký tự'),
-          }),
-        ),
-      ),
-      note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
-    },
-    [['dateStart', 'dateEnd']], // throw error cyclic dependence if have not this params
-  )
+  const validationSchema = Yup.object().shape({
+    fullName: Yup.string().required(messages.MSG1),
+    mobilePhone: Yup.string()
+      .required(messages.MSG1)
+      .test('check valid', 'Số điện thoại không hợp lệ', phone => {
+        const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+        if (!phone) {
+          return true
+        }
+        return regex.test(phone as string)
+      }),
+    note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
+  })
 
   const methods = useForm<SchemaType>({
     defaultValues,
@@ -95,39 +48,5 @@ export const useRHFOrder = (order: IOrderDetail, services?: IService[]) => {
     resolver: yupResolver(validationSchema),
   })
 
-  const dateStart = methods.watch('dateStart')
-  const dateEnd = methods.watch('dateEnd')
-
-  useEffect(() => {
-    if (!dateStart || !dateEnd) return
-
-    if (
-      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
-    ) {
-      methods.clearErrors('dateStart')
-      methods.clearErrors('dateEnd')
-    }
-  }, [dateStart, dateEnd])
-
-  const { fields, append, remove } = useFieldArray<SchemaType>({
-    name: 'services',
-    control: methods.control,
-  })
-
-  useEffect(() => {
-    const currentProp =
-      (services && services.length) || order?.services?.length || 0
-    const previousProp = fields.length
-    if (currentProp > previousProp) {
-      for (let i = previousProp; i < currentProp; i++) {
-        append({ quantity: 0 })
-      }
-    } else {
-      for (let i = previousProp; i > currentProp; i--) {
-        remove(i - 1)
-      }
-    }
-  }, [order?.services, services, fields])
-
-  return [methods as any, fields as any] as const
+  return [methods as any] as const
 }

@@ -11,6 +11,7 @@ export interface IDiagLogConfirmProps {
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false | string
   submitText?: string
   cancelText?: string
+  disabled?: boolean
 }
 
 export function DiagLogConfirm({
@@ -23,6 +24,7 @@ export function DiagLogConfirm({
   submitText = 'Xác nhận',
   cancelText = 'Quay lại',
   children,
+  disabled = false,
 }: IDiagLogConfirmProps) {
   return (
     <React.Fragment>
@@ -35,6 +37,7 @@ export function DiagLogConfirm({
         onSubmit={onSubmit}
         submitText={submitText}
         cancelText={cancelText}
+        disabled={disabled}
       >
         {children}
       </MuiStyledModal>

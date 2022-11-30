@@ -116,8 +116,8 @@ export default function ServiceDetail({
   const validationSchema = Yup.object().shape({
     camp: Yup.object().nullable().required(messages.MSG1),
     rentalType: Yup.string().required(messages.MSG1),
-    capacity: Yup.string()
-      .max(5, 'Chỉ được nhập tối đa 4 chữ số')
+    capacity: Yup.number()
+      .max(9999, 'Chỉ được nhập tối đa 4 chữ số')
       .required(messages.MSG1),
     name: Yup.string()
       .max(255, 'Chỉ được nhập tối đa 255 ký tự')
@@ -154,8 +154,9 @@ export default function ServiceDetail({
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
-          amount: Yup.string()
-            .max(11, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
+          amount: Yup.number()
+            .typeError('Giá trị phải là một chữ số')
+            .max(999999999, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
             .required(messages.MSG1),
         }),
       ),
@@ -194,7 +195,6 @@ export default function ServiceDetail({
   }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
     ['campService', serviceId],
     () => {
-      console.log(serviceId)
       return getServiceDetail(Number(serviceId ?? 0))
     },
     {
@@ -318,17 +318,14 @@ export default function ServiceDetail({
 
   React.useEffect(() => {
     if (idCampGround) {
-      console.log(campGrounds)
       const camp = (campGrounds?.content || []).find(
         (item: any) => idCampGround === item.id,
       )
-      console.log(camp)
       setCampGroundDefault(camp)
     }
   }, [campGrounds])
 
   React.useEffect(() => {
-    console.log(params.serviceId, idService)
     if (idService) {
       setServiceId(idService)
     } else {
@@ -368,7 +365,7 @@ export default function ServiceDetail({
     const previousProp = fields.length
     if (currentProp > previousProp) {
       for (let i = previousProp; i < currentProp; i++) {
-        append({ day: calendar[i].day, amount: '' })
+        append({ day: calendar[i].day, amount: undefined })
       }
     } else {
       for (let i = previousProp; i > currentProp; i--) {
@@ -403,7 +400,6 @@ export default function ServiceDetail({
         return 'Thứ 7'
     }
   }
-  console.log(methods.formState.errors)
   return (
     <Container>
       {isModal && (
@@ -481,6 +477,7 @@ export default function ServiceDetail({
                   {methods.watch('rentalType') &&
                   Number(methods.watch('rentalType') ?? 0) !== 3 ? (
                     <MuiRHFNumericFormatInput
+                      isAllowZeroFirst={false}
                       type="text"
                       name="capacity"
                       label="Áp dụng"
@@ -493,6 +490,7 @@ export default function ServiceDetail({
                     />
                   ) : (
                     <MuiRHFNumericFormatInput
+                      isAllowZeroFirst={false}
                       type="text"
                       name="capacity"
                       label="Áp dụng"

@@ -167,7 +167,7 @@ export const getOrderStatusSpec = (
 export const getServiceNameByType = (type?: number) => {
   switch (type) {
     case 1:
-      return 'Gói dịch vụ'
+      return 'Gói trải nghiệm'
     case 2:
       return 'Lưu trú'
     case 3:

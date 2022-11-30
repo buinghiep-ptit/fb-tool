@@ -5,17 +5,21 @@ import {
   fetchLogsActionDetail,
   fetchOrdersCancelRequests,
   fetchOrdersOverall,
+  ignoreCancelOrder,
   initCancelOrder,
   orderDetail,
   orderNote,
   orderUsed,
   paymentConfirm,
   reassignOrder,
+  reassignOrderCancelRequest,
   recalculatePrice,
   receiveCancelOrder,
   receiveOrder,
   refundOrder,
   unavailableOrder,
+  updateContactOrder,
+  updateServicesOrder,
 } from 'app/apis/order/order.service'
 import { IOrderResponse } from 'app/models/order'
 
@@ -31,6 +35,38 @@ export const useOrdersData = (filters: any, type?: number) => {
       refetchOnWindowFocus: false,
       keepPreviousData: true,
       enabled: !!filters,
+    },
+  )
+}
+
+export const useUpdateContactOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId: number; payload: any }) =>
+      updateContactOrder(params.orderId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useUpdateServicesOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { orderId: number; payload: any }) =>
+      updateServicesOrder(params.orderId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
     },
   )
 }
@@ -79,14 +115,20 @@ export const useAvailableOrder = (onSuccess?: any, onError?: any) => {
 
 export const useUnAvailableOrder = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
-  return useMutation((orderId: number) => unavailableOrder(orderId), {
-    onSettled: () => {
-      queryClient.invalidateQueries(['order-detail'])
-      queryClient.invalidateQueries(['orders'])
-      queryClient.invalidateQueries(['logs-order'])
+  return useMutation(
+    (payload: { orderId?: number; note?: string }) =>
+      unavailableOrder(payload.orderId ?? 0, {
+        note: payload.note || undefined,
+      }),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
     },
-    onSuccess,
-  })
+  )
 }
 
 export const useCancelOrder = (onSuccess?: any, onError?: any) => {
@@ -108,8 +150,31 @@ export const useCancelOrder = (onSuccess?: any, onError?: any) => {
 export const useReassignOrder = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
-    (payload: { orderId?: number; userId?: number }) =>
-      reassignOrder(payload.orderId ?? 0, payload.userId ?? 0),
+    (payload: { orderId?: number; userId?: number; note?: string }) =>
+      reassignOrder(payload.orderId ?? 0, payload.userId ?? 0, payload.note),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useReassignOrderCancelRequest = (
+  onSuccess?: any,
+  onError?: any,
+) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (payload: { orderId?: number; userId?: number; note?: string }) =>
+      reassignOrderCancelRequest(
+        payload.orderId ?? 0,
+        payload.userId ?? 0,
+        payload.note,
+      ),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])
@@ -154,6 +219,24 @@ export const useInitCancelOrder = (onSuccess?: any, onError?: any) => {
   return useMutation(
     (params: { orderId?: number; payload?: any }) =>
       initCancelOrder(params.orderId ?? 0, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['order-detail'])
+        queryClient.invalidateQueries(['orders'])
+        queryClient.invalidateQueries(['logs-order'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useIgnoreCancelOrder = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (payload: { orderId?: number; note?: string }) =>
+      ignoreCancelOrder(payload.orderId ?? 0, {
+        note: payload.note || undefined,
+      }),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['order-detail'])

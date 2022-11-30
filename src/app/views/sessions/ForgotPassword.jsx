@@ -24,11 +24,11 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
-import { toastError } from 'app/helpers/toastNofication'
 import { messages } from 'app/utils/messages'
-import { useState } from 'react'
+import _ from 'lodash'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const FlexBox = styled(Box)(() => ({
@@ -78,6 +78,9 @@ const defaultValues = {
 
 const ForgotPassword = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const queryParams = Object.fromEntries([...searchParams])
+
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [snackBar, setSnackBar] = useState({
@@ -110,23 +113,32 @@ const ForgotPassword = () => {
     resolver: yupResolver(step === 1 ? validationSchema1 : validationSchema2),
   })
 
+  useEffect(() => {
+    ;(async () => {
+      if (_.isEmpty(queryParams)) return
+      try {
+        const response = await resetPasswordCheck({
+          key: queryParams.key ?? '',
+        })
+        if (response.isValid) setStep(2)
+        else navigate('/session/signin')
+      } catch (error) {}
+    })()
+  }, [])
+
   const onSubmitHandler = async values => {
-    const postfixKey = values.email.split('@')[0]
     if (step === 3) {
       navigate(-1)
       return
     }
     setLoading(true)
     try {
-      let response = null
       if (step === 1) {
-        response = await resetPasswordInit(values)
-        response = await resetPasswordCheck({ key: postfixKey })
-        if (response.isValid) setStep(step + 1)
+        await resetPasswordInit(values)
         setLoading(false)
       } else if (step === 2) {
-        response = await resetPasswordFinish({
-          key: postfixKey,
+        await resetPasswordFinish({
+          key: queryParams.key ?? '',
           newPassword: values.password,
         })
         setStep(step + 1)

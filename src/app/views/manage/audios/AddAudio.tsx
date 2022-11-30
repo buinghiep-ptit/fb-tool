@@ -288,6 +288,8 @@ export default function AddAudio({ title }: Props) {
                     'audio/ogg': ['.ogg', '.OGG'],
                     'audio/wav': ['.wav', '.WAV'],
                     'audio/mp3': ['.mp3', '.MP3'],
+                    'audio/mp4': ['.mp4', '.MP4'],
+                    'audio/aac': ['.aac', '.AAC'],
                   }}
                   multiple={false}
                   maxSize={20 * 1024 * 1024}

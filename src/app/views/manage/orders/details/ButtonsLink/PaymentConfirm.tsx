@@ -14,13 +14,17 @@ import { uploadFileAll } from 'app/apis/uploads/upload.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
-import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
+import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { usePaymentConfirmOrder } from 'app/hooks/queries/useOrdersData'
+import {
+  useOrderDetailData,
+  usePaymentConfirmOrder,
+} from 'app/hooks/queries/useOrdersData'
+import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 import { messages } from 'app/utils/messages'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useMemo, useRef } from 'react'
 import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -36,7 +40,8 @@ type SchemaType = {
   fileUrl?: string
   bankAccount?: string
   paymentType?: 1 | 2
-  amount?: number
+  // amount?: number
+  note?: string
 }
 
 export default function PaymentConfirm({ title }: Props) {
@@ -44,8 +49,9 @@ export default function PaymentConfirm({ title }: Props) {
   const location = useLocation() as any
   const isModal = location.state?.modal ?? false
   const { orderId } = useParams()
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const dropzoneAudioRef = useRef(null) as any
+
+  const { data: order } = useOrderDetailData(Number(orderId ?? 0))
 
   const onSuccess = (data: any, message?: string) => {
     toastSuccess({
@@ -62,8 +68,11 @@ export default function PaymentConfirm({ title }: Props) {
       .max(255, 'Nội dung không được vượt quá 255 ký tự')
       .required(messages.MSG1),
     paymentType: Yup.string().required(messages.MSG1),
-    amount: Yup.string()
-      .max(11, 'Chỉ được nhập tối đa 9 ký tự')
+    // amount: Yup.string()
+    //   .max(11, 'Chỉ được nhập tối đa 9 ký tự')
+    //   .required(messages.MSG1),
+    note: Yup.string()
+      .max(255, 'Nội dung không được vượt quá 255 ký tự')
       .required(messages.MSG1),
   })
 
@@ -80,20 +89,21 @@ export default function PaymentConfirm({ title }: Props) {
   const onSubmitHandler: SubmitHandler<SchemaType> = async (
     values: SchemaType,
   ) => {
-    const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
+    // const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
     let fileResponse
     try {
       if (values.files) fileResponse = await uploadFileAll(values.files)
     } catch (error) {
-      setSelectedFiles([])
+      methods.setValue('files', undefined)
     }
 
     const payload = {
       transCode: values.transCode,
-      fileUrl: fileResponse.url || null,
+      fileUrl: (fileResponse && fileResponse.url) || null,
       bankAccount: values.bankAccount,
       paymentType: Number(values.paymentType ?? 1),
-      amount: Number(amount ?? 0),
+      note: values.note,
+      // amount: Number(amount ?? 0),
     }
     paymentConfirm({ orderId: Number(orderId ?? 0), payload: payload })
   }
@@ -108,7 +118,6 @@ export default function PaymentConfirm({ title }: Props) {
     }
   }
   const removeAudioSelected = () => {
-    setSelectedFiles([])
     methods.setValue('files', undefined)
   }
 
@@ -137,7 +146,6 @@ export default function PaymentConfirm({ title }: Props) {
                     ref={dropzoneAudioRef}
                     onDrop={acceptedFiles => {
                       if (!acceptedFiles || !acceptedFiles.length) return
-                      setSelectedFiles(acceptedFiles)
 
                       methods.setValue('files', acceptedFiles[0])
                       methods.clearErrors('files')
@@ -153,33 +161,41 @@ export default function PaymentConfirm({ title }: Props) {
                         '.ppt',
                         '.docx',
                       ],
-                      'video/mp4': [],
-                      'video/webm': [],
-                      'video/mov': [],
-                      'audio/mp3': [],
-                      'audio/wav': [],
-                      'audio/ogg': [],
+                      'video/mp4': ['.mp4'],
+                      'video/webm': ['.webm'],
+                      'video/mov': ['.mov'],
+                      'video/3gp': ['.3gp'],
+                      'audio/ogg': ['.ogg', '.OGG'],
+                      'audio/wav': ['.wav', '.WAV'],
+                      'audio/mp3': ['.mp3', '.MP3'],
+                      'audio/mp4': ['.mp4', '.MP4'],
+                      'audio/aac': ['.aac', '.AAC'],
                       'image/png': ['.png'],
                       'image/jpeg': ['.jpg', '.jpeg'],
                     }}
                     multiple={false}
                     maxSize={20 * 1024 * 1024}
+                    // validator: nameLengthValidator
                   >
                     {({
                       getRootProps,
                       getInputProps,
                       isDragAccept,
                       isDragReject,
+                      fileRejections,
                     }) => {
                       const style = useMemo(() => {
-                        console.log('isDragAccept:', isDragAccept)
-                        console.log('isDragReject:', isDragReject)
-                      }, [isDragAccept, isDragReject])
+                        if (fileRejections && fileRejections.length)
+                          methods.setError('files', {
+                            message: fileRejections[0]?.errors[0]?.message,
+                          })
+                        else methods.clearErrors('files')
+                      }, [isDragAccept, isDragReject, fileRejections])
                       return (
                         <>
                           <div {...getRootProps({ className: 'dropzone' })}>
                             <input {...getInputProps()} />
-                            {!selectedFiles.length && ( // is no file
+                            {!methods.getValues('files') && ( // is no file
                               <Stack
                                 flexDirection={'row'}
                                 sx={{
@@ -212,7 +228,7 @@ export default function PaymentConfirm({ title }: Props) {
                               </Stack>
                             )}
                           </div>
-                          {selectedFiles[0]?.name && (
+                          {methods.getValues('files') && (
                             <Stack
                               flexDirection={'row'}
                               sx={{
@@ -221,7 +237,7 @@ export default function PaymentConfirm({ title }: Props) {
                               }}
                             >
                               <MuiTypography variant="body1">
-                                {selectedFiles[0]?.name}
+                                {methods.getValues('files')?.name}
                               </MuiTypography>
 
                               <Stack flexDirection={'row'} gap={1} ml={2}>
@@ -270,11 +286,11 @@ export default function PaymentConfirm({ title }: Props) {
                   required
                 />
 
-                <Stack>
-                  <MuiTypography variant="subtitle2">
-                    Loại thanh toán:
-                  </MuiTypography>
+                <Stack gap={1}>
                   <MuiRHFRadioGroup name="paymentType" defaultValue={2}>
+                    <MuiTypography variant="subtitle2">
+                      Loại thanh toán:
+                    </MuiTypography>
                     <Stack flexDirection={'row'} gap={1.5}>
                       <FormControlLabel
                         value={2}
@@ -288,12 +304,21 @@ export default function PaymentConfirm({ title }: Props) {
                       />
                     </Stack>
                   </MuiRHFRadioGroup>
+                  <MuiTypography variant="subtitle2">
+                    Giá trị:{' '}
+                    <span style={{ color: '#2F9B42' }}>
+                      {methods.watch('paymentType') == 1
+                        ? CurrencyFormatter(order?.amount ?? 0, 2)
+                        : CurrencyFormatter(order?.deposit ?? 0, 2)}
+                    </span>{' '}
+                    VNĐ
+                  </MuiTypography>
                 </Stack>
 
-                <MuiRHFNumericFormatInput
+                {/* <MuiRHFNumericFormatInput
                   type="text"
                   name="amount"
-                  label="Giá"
+                  label="Giá trị"
                   placeholder="Nhập giá"
                   fullWidth
                   required
@@ -301,7 +326,18 @@ export default function PaymentConfirm({ title }: Props) {
                     <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
                   }
                   isAllowZeroFirst={false}
-                />
+                /> */}
+
+                <Box>
+                  <MuiTypography variant="subtitle2" pb={1}>
+                    Ghi chú*:
+                  </MuiTypography>
+                  <FormTextArea
+                    name="note"
+                    defaultValue={''}
+                    placeholder="Nhập nội dung"
+                  />
+                </Box>
               </Stack>
             </Grid>
           </Grid>

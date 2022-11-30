@@ -618,7 +618,10 @@ const getFilesType = (formatType?: number) => {
   switch (formatType) {
     case EMediaFormat.VIDEO:
       return {
-        'video/*': ['.mp4', '.webm', '.ogg'],
+        'video/mp4': ['.mp4'],
+        'video/webm': ['.webm'],
+        'video/mov': ['.mov'],
+        'video/3gp': ['.3gp'],
       }
     case EMediaFormat.AUDIO:
       return {
@@ -626,7 +629,7 @@ const getFilesType = (formatType?: number) => {
       }
     case EMediaFormat.IMAGE:
       return {
-        'image/png': ['.png'],
+        'image/png': ['.png', '.PNG'],
         'image/jpeg': ['.jpg', '.jpeg'],
       }
     case EMediaFormat.OFFICE:

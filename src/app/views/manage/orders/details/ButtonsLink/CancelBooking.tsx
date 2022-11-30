@@ -56,11 +56,10 @@ export default function CancelBooking({ title }: Props) {
 
   const { mutate: cancelInit, isLoading: isLoading } = useInitCancelOrder(
     (data: any) => {
-      console.log('data:', data)
       if (data) {
         onSuccess(null, 'Tạo yêu cầu huỷ thành công')
         navigate(-1)
-        receiveCancel(Number(orderId ?? 0))
+        // receiveCancel(Number(orderId ?? 0))
       }
     },
   )
@@ -95,7 +94,7 @@ export default function CancelBooking({ title }: Props) {
             </SelectDropDown>
             <Box>
               <MuiTypography variant="subtitle2" pb={1}>
-                Lý do:
+                Lý do*:
               </MuiTypography>
               <FormTextArea
                 name="reason"

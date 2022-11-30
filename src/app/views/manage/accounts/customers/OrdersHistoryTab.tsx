@@ -190,7 +190,6 @@ export default function OrdersHistory() {
   }
 
   const onResetFilters = () => {
-    console.log('aaa')
     methods.reset({
       status: 'all',
       searchCamp: '',
@@ -233,7 +232,6 @@ export default function OrdersHistory() {
     )
 
   const approveConfirm = () => {
-    console.log(receiveType)
     if (receiveType === 1) {
       receive(orderId)
     } else if (receiveType === 2) {

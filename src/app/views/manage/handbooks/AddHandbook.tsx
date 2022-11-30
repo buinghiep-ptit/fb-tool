@@ -2,7 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Grid,
   Icon,
-  IconButton,
   LinearProgress,
   MenuItem,
   Stack,
@@ -22,6 +21,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useCreateHandbook,
   useDeleteHandbook,
+  useToggleLinkCampsHandbook,
   useUpdateHandbook,
 } from 'app/hooks/queries/useHandbooksData'
 import { IHandbookDetail } from 'app/models/handbook'
@@ -63,7 +63,7 @@ export default function AddEvent(props: Props) {
     cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
-
+  const [selectedCamps, setSelectedCamps] = useState<readonly number[]>([])
   const [defaultValues] = useState<SchemaType>({
     status: 1,
   })
@@ -134,9 +134,18 @@ export default function AddEvent(props: Props) {
     onRowUpdateSuccess(null, 'Cập nhật thành công'),
   )
 
-  const { mutate: deleteHandbook } = useDeleteHandbook(() =>
-    onRowUpdateSuccess(null, 'Xoá thành công'),
-  )
+  const { mutate: deleteHandbook, isLoading: deleteLoading } =
+    useDeleteHandbook(() => onRowUpdateSuccess(null, 'Xoá thành công'))
+
+  const { mutate: toggleLinkCamps, isLoading: toggleLoading } =
+    useToggleLinkCampsHandbook(() =>
+      onRowUpdateSuccess(
+        null,
+        dialogData.type === 'linked'
+          ? 'Xoá liên kết thành công'
+          : 'Thêm liên kết thành công',
+      ),
+    )
 
   const openDeleteDialog = () => {
     setDialogData(prev => ({
@@ -172,19 +181,38 @@ export default function AddEvent(props: Props) {
     setOpenDialog(true)
   }
 
+  const handbooksToLink = (selectedCamps: readonly number[]) => {
+    const selectedCampsExtra = selectedCamps.map(camp =>
+      Object.assign(
+        {},
+        {
+          idCampGround: camp,
+          idHandBook: Number(handbookId ?? 0),
+        },
+      ),
+    )
+
+    return selectedCampsExtra
+  }
+
   const onSubmitDialog = () => {
     switch (dialogData.type) {
       case 'linked':
-        // deleteHandbook(row.id)
+        toggleLinkCamps({
+          isAdd: 0,
+          handbooksToLink: handbooksToLink(selectedCamps),
+        })
+
         break
-        break
-      case 'toggle-pin':
-        // togglePin(row.id)
+      case 'unlinked':
+        toggleLinkCamps({
+          isAdd: 1,
+          handbooksToLink: handbooksToLink(selectedCamps),
+        })
         break
 
       case 'delete':
         deleteHandbook(Number(handbookId))
-        break
         break
 
       default:
@@ -287,28 +315,31 @@ export default function AddEvent(props: Props) {
                 </SelectDropDown>
               </Grid>
             </Grid>
-            <Stack
-              direction={'row'}
-              my={1.5}
-              gap={1.5}
-              justifyContent="space-between"
-            >
-              <MuiButton
-                title="Xem điểm camping đã liên kết"
-                variant="text"
-                color="primary"
-                onClick={() => openLinkedCampgrounds()}
-                endIcon={<Icon>double_arrow</Icon>}
-              />
-              <MuiButton
-                title="Thêm điểm camping"
-                variant="text"
-                color="primary"
-                onClick={() => openUnlinkedCampgrounds()}
-                startIcon={<Icon>add</Icon>}
-              />
-            </Stack>
-            <Stack>
+            {handbookId && (
+              <Stack
+                direction={'row'}
+                mt={1.5}
+                gap={1.5}
+                justifyContent="space-between"
+              >
+                <MuiButton
+                  title="Xem điểm camping đã liên kết"
+                  variant="text"
+                  color="primary"
+                  onClick={() => openLinkedCampgrounds()}
+                  endIcon={<Icon>double_arrow</Icon>}
+                />
+                <MuiButton
+                  title="Thêm điểm camping"
+                  variant="text"
+                  color="primary"
+                  onClick={() => openUnlinkedCampgrounds()}
+                  startIcon={<Icon>add</Icon>}
+                />
+              </Stack>
+            )}
+
+            <Stack my={1.5}>
               <MuiTypography variant="subtitle2" pb={1}>
                 Nội dung*
               </MuiTypography>
@@ -322,15 +353,20 @@ export default function AddEvent(props: Props) {
         title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={dialogData.type !== 'delete' ? undefined : onSubmitDialog}
+        onSubmit={onSubmitDialog}
         maxWidth={dialogData.type !== 'delete' ? 'md' : 'sm'}
-        submitText={dialogData.type !== 'delete' ? undefined : 'Xoá'}
+        submitText={dialogData.type === 'unlinked' ? 'Lưu' : 'Xoá'}
         cancelText={'Huỷ'}
+        disabled={!selectedCamps.length}
+        isLoading={
+          toggleLoading || editLoading || deleteLoading || createLoading
+        }
       >
         {dialogData.type !== 'delete' ? (
           <UnlinkedCampgrounds
             handbook={handbook}
             isLinked={dialogData.isLinked}
+            setSelectedCamps={setSelectedCamps}
           />
         ) : (
           <Stack py={5} justifyContent={'center'} alignItems="center">

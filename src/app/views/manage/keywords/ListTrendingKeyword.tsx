@@ -213,7 +213,7 @@ export default function ListTrendingKeyword(props: Props) {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'word') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+      // navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     }
   }
 

@@ -12,7 +12,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import { useRefundOrder } from 'app/hooks/queries/useOrdersData'
 import { IOrderDetail } from 'app/models/order'
 import { messages } from 'app/utils/messages'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -73,6 +73,8 @@ export default function RefundOrder({ title }: Props) {
     resolver: yupResolver(validationSchema),
   })
 
+  const refundType = methods.watch('refundType')
+
   const { mutate: refund, isLoading: isLoading } = useRefundOrder(() =>
     onSuccess(null, 'Hoàn tiền thành công'),
   )
@@ -86,12 +88,14 @@ export default function RefundOrder({ title }: Props) {
         refundType: Number(values.refundType),
         transCode: values.refundType !== 3 ? values.transCode : null,
         amount: values.refundType !== 3 ? Number(amount) : null,
-        note: values.note,
+        note: values.note || null,
       },
     })
   }
 
-  console.log(methods.getValues('amount'))
+  useEffect(() => {
+    if (refundType == 1) methods.setValue('amount', order.paymentTrans?.amount)
+  }, [refundType])
 
   const handleClose = () => {
     navigate(-1)

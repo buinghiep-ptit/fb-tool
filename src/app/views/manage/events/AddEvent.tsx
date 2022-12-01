@@ -205,16 +205,33 @@ export default function AddEvent(props: Props) {
     },
   )
 
-  const formatDateToISO = (date?: string, isEveryYear?: 0 | 1) => {
+  const formatDateToISO = (
+    date?: string,
+    isEveryYear?: 0 | 1,
+    check?: boolean,
+  ) => {
     if (!date) return ''
     const darr = date.split('/') // ["25", "09", "2019"]
     const ISOFormat = new Date(
-      isEveryYear === 1 ? new Date().getFullYear() : parseInt(darr[2]),
+      isEveryYear === 1
+        ? check
+          ? new Date().getFullYear() + 1
+          : new Date().getFullYear()
+        : parseInt(darr[2]),
       parseInt(darr[1]) - 1,
       parseInt(darr[0]),
     )
 
     return ISOFormat.toISOString()
+  }
+
+  const compareDate = (start?: string, end?: string) => {
+    if (!start || !end) return false
+    const darrStart = start.split('/')
+    const darrEnd = end.split('/')
+
+    if (parseInt(darrEnd[1]) < parseInt(darrStart[1])) return true
+    return false
   }
 
   useEffect(() => {
@@ -229,11 +246,18 @@ export default function AddEvent(props: Props) {
       defaultValues.amount = event.amount
       defaultValues.status = event.status
       defaultValues.editor_content = event.content
+      const check =
+        event.isEveryYear === 1 && compareDate(event.startDate, event.endDate)
+
       defaultValues.startDate = formatDateToISO(
         event.startDate,
         event.isEveryYear,
       )
-      defaultValues.endDate = formatDateToISO(event.endDate, event.isEveryYear)
+      defaultValues.endDate = formatDateToISO(
+        event.endDate,
+        event.isEveryYear,
+        check,
+      )
       defaultValues.editor_content = event.content
       defaultValues.type =
         event.medias && event.medias.length && event.medias[0].mediaFormat
@@ -503,20 +527,42 @@ export default function AddEvent(props: Props) {
 
                     <Stack flexDirection={'row'} gap={3}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Stack flexDirection={'row'} gap={1}>
-                          <MuiRHFDatePicker
-                            name="startDate"
-                            label="Ngày bắt đầu"
-                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
-                          />
-                        </Stack>
-                        <Stack flexDirection={'row'} gap={1}>
-                          <MuiRHFDatePicker
-                            name="endDate"
-                            label="Ngày kết thúc"
-                            inputFormat={isEveryYear ? 'DD/MM' : 'DD/MM/YYYY'}
-                          />
-                        </Stack>
+                        {isEveryYear && (
+                          <>
+                            <Stack flexDirection={'row'} gap={1}>
+                              <MuiRHFDatePicker
+                                name="startDate"
+                                label="Ngày bắt đầu"
+                                inputFormat={'DD/MM'}
+                              />
+                            </Stack>
+                            <Stack flexDirection={'row'} gap={1}>
+                              <MuiRHFDatePicker
+                                name="endDate"
+                                label="Ngày kết thúc"
+                                inputFormat={'DD/MM'}
+                              />
+                            </Stack>
+                          </>
+                        )}
+                        {!isEveryYear && (
+                          <>
+                            <Stack flexDirection={'row'} gap={1}>
+                              <MuiRHFDatePicker
+                                name="startDate"
+                                label="Ngày bắt đầu"
+                                inputFormat={'DD/MM/YYYY'}
+                              />
+                            </Stack>
+                            <Stack flexDirection={'row'} gap={1}>
+                              <MuiRHFDatePicker
+                                name="endDate"
+                                label="Ngày kết thúc"
+                                inputFormat={'DD/MM/YYYY'}
+                              />
+                            </Stack>
+                          </>
+                        )}
                       </LocalizationProvider>
                       {/* <CalPicker
                         label="Select date and time"

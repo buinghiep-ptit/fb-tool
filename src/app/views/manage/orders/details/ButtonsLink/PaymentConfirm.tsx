@@ -298,6 +298,7 @@ export default function PaymentConfirm({ title }: Props) {
                     </MuiTypography>
                     <Stack flexDirection={'row'} gap={1.5}>
                       <FormControlLabel
+                        disabled={(order?.amount ?? 0) < (order?.deposit ?? 0)}
                         value={2}
                         control={<Radio />}
                         label="Đặt cọc"

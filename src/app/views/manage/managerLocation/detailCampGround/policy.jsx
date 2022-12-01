@@ -75,7 +75,9 @@ const Policy = ({ setValue, detailPolicy, setDetailPolicy }) => {
             }`}
           </div>
           <div>{`- Tên chính sách: ${detailPolicy?.name}`}</div>
-          <div>{`- ${detailPolicy?.scaleAmount}% giá trị giao dịch, Tối đa: ${detailPolicy?.maxAmount}, Tối thiểu ${detailPolicy.minAmount}`}</div>
+          <div>{`- ${detailPolicy?.scaleAmount}% giá trị giao dịch, Tối đa: ${
+            detailPolicy?.maxAmount || ''
+          }, Tối thiểu: ${detailPolicy.minAmount || ''}`}</div>
         </div>
       )}
       <Button

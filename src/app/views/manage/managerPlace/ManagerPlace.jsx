@@ -215,6 +215,7 @@ export default function ManagerPlace(props) {
         </Grid>
         <TableCustom
           ref={tableRef}
+          msgDelete="Sau khi xóa, toàn bộ thông tin về địa danh sẽ được loại bỏ khỏi hệ thống. Bạn có chắc muốn xóa địa danh?"
           title="Danh sách địa danh Camp"
           dataTable={listPlace || []}
           tableModel={tableModel}

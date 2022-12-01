@@ -55,6 +55,7 @@ const TableCustom = forwardRef(
       onAddData,
       filter,
       updateStatus,
+      msgDelete,
     },
     ref,
   ) => {
@@ -100,7 +101,7 @@ const TableCustom = forwardRef(
     const handleDeleteAction = async id => {
       const res = await onDeleteData(id)
       if (res) {
-        toastSuccess({ message: 'Đã được xóa' })
+        toastSuccess({ message: 'Xóa thành công' })
         fetchDataTable(filter)
       }
     }
@@ -216,6 +217,24 @@ const TableCustom = forwardRef(
                                 )
                               }
 
+                              if (type === 'unlinked') {
+                                return (
+                                  <p
+                                    style={{
+                                      textDecoration: 'underline',
+                                      color: '#07bc0c',
+                                      cursor: 'pointer',
+                                    }}
+                                    onClick={() => {
+                                      dialogConfirm.current.handleClickOpen()
+                                      idDelete.current = data.id
+                                    }}
+                                  >
+                                    Hủy liên kết
+                                  </p>
+                                )
+                              }
+
                               if (type === 'add') {
                                 return (
                                   <IconButton
@@ -284,8 +303,6 @@ const TableCustom = forwardRef(
                                 textDecoration: 'underline',
                                 color: '#07bc0c',
                                 wordBreak: 'normal',
-                                // whiteSpace: 'nowrap',
-                                // width: '200px',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 webkitLineClamp: '2',
@@ -304,16 +321,16 @@ const TableCustom = forwardRef(
                             key={`${element}${id}`}
                             style={{ wordBreak: 'normal', color: '#07bc0c' }}
                           >
-                            <Link
-                              style={{ textDecoration: 'underline' }}
-                              to={
-                                data.idMerchant
-                                  ? `/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`
-                                  : '#'
-                              }
-                            >
-                              {data[element]}
-                            </Link>
+                            {data.idMerchant ? (
+                              <Link
+                                style={{ textDecoration: 'underline' }}
+                                to={`/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`}
+                              >
+                                {data[element]}
+                              </Link>
+                            ) : (
+                              data[element]
+                            )}
                           </TableCell>
                         )
                       case 'eventPlace':
@@ -378,7 +395,7 @@ const TableCustom = forwardRef(
         </Box>
         <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="sm">
           <Typography variant="h5" component="h6" align="center" mt={5} mb={5}>
-            Bạn chắc chắn muốn xóa?
+            {msgDelete || ' Bạn chắc chắn muốn xóa?'}
           </Typography>
           <div style={{ textAlign: 'center' }}>
             <Button

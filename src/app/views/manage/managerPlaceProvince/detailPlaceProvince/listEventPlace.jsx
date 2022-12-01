@@ -93,7 +93,7 @@ export default function ListEventPlace(props) {
           convertEvent.time = `${event.startDate} - ${event.endDate}`
           convertEvent['des-status'] =
             event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
-          convertEvent.action = ['delete']
+          convertEvent.action = ['unlinked']
           return convertEvent
         })
 

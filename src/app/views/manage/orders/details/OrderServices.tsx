@@ -212,12 +212,19 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
             </Box>
           )}
           <Stack alignItems={'flex-end'} gap={1}>
-            {/* <Stack flexDirection="row" gap={2}>
-              <MuiTypography variant="subtitle2">Cọc:</MuiTypography>
-              <MuiTypography variant="body2" color={'primary'} fontWeight={500}>
-                {CurrencyFormatter(order?.deposit ?? 0, 2)} VNĐ
-              </MuiTypography>
-            </Stack> */}
+            {(order?.amount ?? 0) >= (order?.deposit ?? 0) && (
+              <Stack flexDirection="row" gap={2}>
+                <MuiTypography variant="subtitle2">Cọc:</MuiTypography>
+                <MuiTypography
+                  variant="body2"
+                  color={'primary'}
+                  fontWeight={500}
+                >
+                  {CurrencyFormatter(order?.deposit ?? 0, 2)} VNĐ
+                </MuiTypography>
+              </Stack>
+            )}
+
             <Box>
               <Stack flexDirection="row" gap={2}>
                 <MuiTypography variant="subtitle2">Tổng thực tế:</MuiTypography>

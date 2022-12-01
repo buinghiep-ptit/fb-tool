@@ -570,7 +570,12 @@ export default function CreatePlace(props) {
               {errors.file?.message || 'acb'}
             </FormHelperText>
           )}
-          <Button color="primary" type="submit" variant="contained">
+          <Button
+            color="primary"
+            type="submit"
+            variant="contained"
+            disabled={isLoading}
+          >
             Lưu
           </Button>
           <Button

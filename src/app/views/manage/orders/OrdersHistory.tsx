@@ -348,7 +348,7 @@ export default function OrdersHistory() {
         setOrderId(row.orderId)
         setOpenDialog(true)
       } else {
-        navigation(`${row.orderId}`, {})
+        navigation(`${row.orderId}`, { state: { from: 'order-list' } })
       }
     } else if (cell.id === 'cusAccount') {
       window.open(

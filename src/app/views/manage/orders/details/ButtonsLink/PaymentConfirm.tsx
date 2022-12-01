@@ -287,7 +287,12 @@ export default function PaymentConfirm({ title }: Props) {
                 />
 
                 <Stack gap={1}>
-                  <MuiRHFRadioGroup name="paymentType" defaultValue={2}>
+                  <MuiRHFRadioGroup
+                    name="paymentType"
+                    defaultValue={
+                      (order?.amount ?? 0) < (order?.deposit ?? 0) ? 1 : 2
+                    }
+                  >
                     <MuiTypography variant="subtitle2">
                       Loại thanh toán:
                     </MuiTypography>
@@ -298,6 +303,7 @@ export default function PaymentConfirm({ title }: Props) {
                         label="Đặt cọc"
                       />
                       <FormControlLabel
+                        disabled={(order?.amount ?? 0) < (order?.deposit ?? 0)}
                         value={1}
                         control={<Radio />}
                         label="Thanh toán toàn bộ"

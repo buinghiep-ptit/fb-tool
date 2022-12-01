@@ -21,7 +21,7 @@ import { ICampground, IOrderDetail } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
 import { CampgroundInfo } from './details/CampgroundInfo'
@@ -91,6 +91,10 @@ export default function OrderDetail(props: Props) {
   const navigate = useNavigate()
   const { source, orderId } = useParams()
 
+  const prevRoute = useLocation()
+
+  console.log(prevRoute)
+
   const [addressCampground, setAddressCampground] = useState('')
 
   const onSuccess = async (order: IOrderDetail) => {
@@ -142,6 +146,11 @@ export default function OrderDetail(props: Props) {
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
+  }
+
+  const goBack = () => {
+    if (prevRoute && prevRoute?.state?.from) navigate(-1)
+    else navigate('/quan-ly-don-hang', {})
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
@@ -208,7 +217,7 @@ export default function OrderDetail(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigate(-1)}
+          onClick={() => goBack()}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>

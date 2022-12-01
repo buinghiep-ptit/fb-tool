@@ -16,6 +16,7 @@ import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { IOrderDetail } from 'app/models/order'
 import { BoxImage, TooltipText } from 'app/utils/columns/columnsEvents'
+import { getDifferenceInDays } from 'app/utils/common'
 import { getServiceNameByType } from 'app/utils/enums/order'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 import moment from 'moment'
@@ -58,6 +59,13 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
     }
   }
 
+  console.log(
+    getDifferenceInDays(
+      moment(order?.dateStart).format('MM/DD/YYYY'),
+      moment(order?.dateEnd).format('MM/DD/YYYY'),
+    ),
+  )
+
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -69,11 +77,32 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
       </AccordionSummary>
 
       <AccordionDetails>
-        <MuiTypography variant="subtitle2" px={1} mb={1.5}>
-          {moment(order?.dateStart).format('DD/MM/YYYY')}
-          {' - '}
-          {moment(order?.dateEnd).format('DD/MM/YYYY')}
-        </MuiTypography>
+        <Stack direction={'row'} mb={1.5}>
+          <MuiTypography variant="subtitle2" px={1}>
+            Thời gian sử dụng:
+          </MuiTypography>
+
+          <Box>
+            <MuiTypography variant="subtitle2" px={1}>
+              {moment(order?.dateStart).format('DD/MM/YYYY')}
+              {' - '}
+              {moment(order?.dateEnd).format('DD/MM/YYYY')}
+            </MuiTypography>
+          </Box>
+          <MuiTypography
+            variant="subtitle2"
+            color={'primary'}
+            px={1}
+            fontWeight={500}
+          >
+            (
+            {getDifferenceInDays(
+              moment(order?.dateStart).format('MM/DD/YYYY'),
+              moment(order?.dateEnd).format('MM/DD/YYYY'),
+            )}{' '}
+            đêm)
+          </MuiTypography>
+        </Stack>
 
         <Stack gap={3}>
           {order?.services &&

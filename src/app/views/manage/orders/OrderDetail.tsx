@@ -233,7 +233,7 @@ export default function OrderDetail(props: Props) {
         />
         {order.cancelRequest?.status == 2 && order.status === 3 ? (
           <Chip
-            label="Đã thanh toán"
+            label="Đặt thành công"
             size="medium"
             sx={{
               px: 1,

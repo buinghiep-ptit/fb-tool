@@ -4,9 +4,6 @@ import uploadFileTypes from './uploadFile.types'
 
 export const clearUploadingFile = fileInitial => ({
   type: uploadFileTypes.CLEAR_UPLOADING_FILE,
-  //   payload: {
-  //     fileInitial,
-  //   },
 })
 
 export const setInitialFile = fileInitial => ({
@@ -55,7 +52,12 @@ export const uploadFile = files => dispatch => {
           },
           file.cancelSource.token,
         )
-        dispatch(successUploadFile(file.id, fileResult))
+        dispatch(
+          successUploadFile(file.id, {
+            ...fileResult,
+            mediaFormat: file.file.type.includes('video') ? 1 : 2,
+          }),
+        )
       } catch (error) {
         if (axios.isCancel(error)) {
           // Do something when user cancel upload

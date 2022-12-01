@@ -1,20 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
 import { size, toArray } from 'lodash'
+import { useEffect } from 'react'
+import { connect } from 'react-redux'
 
-import Styles from './UploadProgress.module.css'
+import { Icon, IconButton, Stack } from '@mui/material'
 import {
   clearUploadingFile,
   retryUpload,
+  setInitialFile,
   uploadFile,
 } from 'app/redux/reducers/upload/uploadFile.actions'
-import UploadItem from '../UploadFile/UploadItem'
-import { Icon, IconButton, Stack } from '@mui/material'
 import { MuiTypography } from '../MuiTypography'
+import UploadItem from '../UploadFile/UploadItem'
+import Styles from './UploadProgress.module.css'
 
 const UploadProgress = props => {
   const { fileProgress, uploadFile, retryUpload } = props
   const uploadedFileAmount = size(fileProgress)
+
+  useEffect(() => {
+    return () => {
+      props.clearUploadingFile()
+      props.setInitialFile([])
+    }
+  }, [])
 
   useEffect(() => {
     const fileToUpload = toArray(fileProgress).filter(
@@ -57,6 +65,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
+  setInitialFile: files => dispatch(setInitialFile(files)),
   clearUploadingFile: files => dispatch(clearUploadingFile(files)),
   uploadFile: files => dispatch(uploadFile(files)),
   retryUpload: id => dispatch(retryUpload(id)),

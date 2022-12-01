@@ -1,4 +1,12 @@
-import { Grid, Icon, IconButton, Stack, styled, Tooltip } from '@mui/material'
+import {
+  FormHelperText,
+  Grid,
+  Icon,
+  IconButton,
+  Stack,
+  styled,
+  Tooltip,
+} from '@mui/material'
 import { Box } from '@mui/system'
 import { IMediaOverall } from 'app/models'
 import React, { Fragment, useCallback, useState } from 'react'
@@ -7,6 +15,8 @@ import { useDropzone } from 'react-dropzone'
 import { ImageListView } from './ImageListCustomize'
 import { MuiTypography } from './MuiTypography'
 import { MuiButton } from './MuiButton'
+import { useFormContext } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 
 export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
   ({ aspectRatio }) => ({
@@ -31,27 +41,42 @@ const PreviewerViewport = styled(Box)(() => ({
 }))
 
 export interface Props {
+  name: string
   images: IMediaOverall[]
   setUploadFile: (files: File[]) => void
   setInitialFile: (files: IMediaOverall[]) => void
 }
 
 export function ImageUploadPreviewer({
+  name,
   images = [],
   setUploadFile,
   setInitialFile,
 }: Props) {
   const [openDialog, setOpenDialog] = useState(false)
+  const fileInfos = useSelector((state: any) => state.UploadFile.fileInfos)
 
-  const onDrop = useCallback((droppedFiles: File[]) => {
-    console.log(droppedFiles)
+  const {
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext()
+  const files: File[] = watch(name)
 
-    setUploadFile(droppedFiles)
-  }, [])
+  const onDrop = useCallback(
+    (droppedFiles: File[]) => {
+      setValue(name, droppedFiles, { shouldValidate: true })
+      setUploadFile(droppedFiles)
+    },
+    [setValue, name, files],
+  )
 
   const { getRootProps, getInputProps, open } = useDropzone({
     multiple: true,
-    accept: { 'image/*': ['.jpg', '.jpeg', '.png'] },
+    accept: {
+      'image/png': ['.png', '.PNG'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+    },
     onDrop,
     maxFiles: 15,
     maxSize: 10 * 1024 * 1024,
@@ -59,11 +84,20 @@ export function ImageUploadPreviewer({
 
   const handleRemoveMedia = (imgIdx?: number) => {
     images.splice(imgIdx ?? 0, 1)
-    setInitialFile([...images])
-
+    setInitialFile([
+      ...(fileInfos.filter((f: IMediaOverall) => f.mediaFormat !== 2) ?? []),
+      ...(images ?? []),
+    ])
     if (!images.length) {
+      setValue(name, null)
       setOpenDialog(false)
     }
+  }
+
+  const handleRemoveAllMedias = () => {
+    const newFiles = fileInfos.filter((f: IMediaOverall) => f.mediaFormat !== 2)
+    setValue(name, null)
+    setInitialFile(newFiles)
   }
 
   const thumbs = images.map((media, index) => (
@@ -137,7 +171,7 @@ export function ImageUploadPreviewer({
 
           <DropWrapper
             sx={{
-              aspectRatio: 'auto 1 / 1',
+              aspectRatio: 'auto 16 / 9',
               borderRadius: 1.5,
               display: 'flex',
             }}
@@ -157,7 +191,7 @@ export function ImageUploadPreviewer({
               </MuiTypography>
 
               <MuiButton
-                title="Chọn tập tin"
+                title="Chọn ảnh"
                 variant="contained"
                 color="primary"
                 sx={{ mt: 2 }}
@@ -165,6 +199,10 @@ export function ImageUploadPreviewer({
             </Stack>
           </DropWrapper>
         </div>
+      )}
+
+      {errors[name] && (
+        <FormHelperText error>{errors[name]?.message as string}</FormHelperText>
       )}
 
       {!!images.length && (
@@ -196,7 +234,7 @@ export function ImageUploadPreviewer({
             />
 
             <CustomIconButton
-              handleClick={() => {}}
+              handleClick={handleRemoveAllMedias}
               iconName={'delete'}
               title={'Xoá tất cả'}
             />
@@ -204,7 +242,7 @@ export function ImageUploadPreviewer({
         </PreviewerViewport>
       )}
       <MuiStyledDialogEditor
-        title={'Chỉnh sửa ảnh/video'}
+        title={'Chỉnh sửa ảnh'}
         open={openDialog}
         maxWidth={images.length <= 2 ? 'sm' : images.length <= 4 ? 'md' : 'lg'}
         onCloseModal={() => setOpenDialog(false)}

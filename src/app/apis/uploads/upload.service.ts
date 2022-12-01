@@ -37,7 +37,16 @@ export const uploadApi = async (
   const formData = new FormData()
   formData.append('file', file)
 
-  const { data }: any = await http.post('/api/image/upload', formData, {
+  let path = ''
+  if (file.type.includes('video')) {
+    path = '/api/video/upload'
+  } else if (file.type.includes('image')) {
+    path = '/api/image/upload'
+  } else {
+    path = '/api/file/upload'
+  }
+
+  const { data }: any = await http.post(path, formData, {
     baseURL: process.env.REACT_APP_API_UPLOAD_URL,
     headers: {
       'Content-Type': 'multipart/form-data',

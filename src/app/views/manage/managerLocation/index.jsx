@@ -50,9 +50,11 @@ export default function ManagerLocation(props) {
           convertCampGround.type = campGround.campTypes
           convertCampGround.service = campGround.campRentalAmount
           convertCampGround.place = campGround.campAreaName
-          convertCampGround.contact = `${campGround.merchantEmail || ''}  ${
-            campGround.merchantMobilePhone || ''
-          }`
+          convertCampGround.contact = `${campGround.merchantEmail || ''}${
+            campGround.merchantEmail && campGround.merchantMobilePhone
+              ? ' - '
+              : ''
+          }${campGround.merchantMobilePhone || ''}`
 
           convertCampGround.address = campGround.address
           if (convertCampGround.status !== 0) {

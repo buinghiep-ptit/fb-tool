@@ -106,8 +106,7 @@ export default function CreateMerchant(props) {
 
   const uploadFile = async file => {
     const formData = new FormData()
-    const newFile = await compressImageFile(file)
-    formData.append('file', newFile)
+    formData.append('file', file)
     try {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({
@@ -128,7 +127,7 @@ export default function CreateMerchant(props) {
     }
   }
 
-  const downloadFile = url => {
+  const downloadFile = (url, name) => {
     const arr = url.split('.')
     const type = arr[arr.length - 1]
     try {
@@ -149,7 +148,7 @@ export default function CreateMerchant(props) {
         // create "a" HTML element with href to file & click
         const link = document.createElement('a')
         link.href = href
-        link.setAttribute('download', `file.${type}`) //or any other extension
+        link.setAttribute('download', `${name}`) //or any other extension
         document.body.appendChild(link)
         link.click()
 

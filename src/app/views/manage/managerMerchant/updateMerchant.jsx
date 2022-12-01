@@ -103,8 +103,7 @@ export default function UpdateMerchant(props) {
 
   const uploadFile = async file => {
     const formData = new FormData()
-    const newFile = await compressImageFile(file)
-    formData.append('file', newFile)
+    formData.append('file', file)
     try {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({
@@ -143,7 +142,7 @@ export default function UpdateMerchant(props) {
         console.log(response.data)
         const link = document.createElement('a')
         link.href = href
-        link.setAttribute('download', `${name}.${type}`)
+        link.setAttribute('download', name)
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)

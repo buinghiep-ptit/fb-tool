@@ -707,6 +707,7 @@ export default function InformationCampGround({ action }) {
                 type="submit"
                 variant="contained"
                 style={{ marginRight: '10px' }}
+                disabled={isLoading}
               >
                 Lưu
               </Button>
@@ -744,6 +745,7 @@ export default function InformationCampGround({ action }) {
                 type="submit"
                 variant="contained"
                 style={{ marginRight: '10px' }}
+                disabled={isLoading}
               >
                 Lưu
               </Button>

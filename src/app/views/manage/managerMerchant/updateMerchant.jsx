@@ -1,4 +1,12 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import {
+  Box,
+  Button,
+  Grid,
+  Icon,
+  styled,
+  TextField,
+  LinearProgress,
+} from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import { cloneDeep } from 'lodash'
@@ -19,9 +27,9 @@ import {
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import { useState, useRef } from 'react'
 import axios from 'axios'
-import { generate } from 'generate-password'
+
 import ChangePasswordMerchant from './changePasswordMerchant'
-import { compressImageFile } from 'app/helpers/extractThumbnailVideo'
+
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -35,8 +43,7 @@ export default function UpdateMerchant(props) {
   const [statusMerchant, setStatusMerchant] = useState()
   const [contractList, setContractList] = useState([])
   const [documentList, setDocumentList] = useState([])
-  const [passwordReset, setPasswordReset] = useState()
-  const [noteChangePass, setNoteChangePass] = useState()
+  const [isLoading, setIsLoading] = React.useState(false)
   const dialogConfirm = useRef(null)
   const schema = yup
     .object({
@@ -154,7 +161,7 @@ export default function UpdateMerchant(props) {
   }
 
   const onSubmit = async data => {
-    console.log('xxx')
+    setIsLoading(true)
     const newData = new Object()
     newData.status = parseInt(data.status)
     newData.name = data.nameMerchant
@@ -184,6 +191,7 @@ export default function UpdateMerchant(props) {
     })
 
     const res = await updateDetailMerchant(params.id, newData)
+    setIsLoading(false)
     if (res.error) {
       toastError({ message: res.errorDescription })
       return
@@ -230,399 +238,419 @@ export default function UpdateMerchant(props) {
   }, [])
 
   return (
-    <Container>
-      <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Quản lý đối tác', path: '/quan-ly-thong-tin-doi-tac' },
-            { name: 'Thông tin đối tác' },
-          ]}
-        />
-      </Box>
-      <SimpleCard title="Thông tin đối tác">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
-            <Grid item xs={10} md={10}>
-              <Controller
-                name="nameMerchant"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '50%' }}
-                    error={errors.nameMerchant}
-                    helperText={errors.nameMerchant?.message}
-                    {...field}
-                    label="Tên đối tác*"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={2} md={2} style={{ textAlign: 'right' }}>
-              {statusMerchant === 1 ? (
-                <Button variant="contained">Hoạt động</Button>
-              ) : (
-                <Button variant="contained" disabled>
-                  Không hoạt động
-                </Button>
-              )}
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="merchantType"
-                control={control}
-                render={({ field }) => (
-                  <FormControl
-                    style={{ width: '150px' }}
-                    margin="normal"
-                    error={errors.merchantType}
-                  >
-                    <InputLabel id="demo-simple-select-label">
-                      Loại đối tác*
-                    </InputLabel>
-                    <Select
-                      style={{ width: '200px' }}
-                      {...field}
-                      label="Loại đối tác*"
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                    >
-                      <MenuItem value={1}>Điểm camp</MenuItem>
-                      <MenuItem value={2}>Nhà cung cấp</MenuItem>
-                    </Select>
-                    {errors.merchantType && (
-                      <FormHelperText>
-                        Vui lòng nhập loại đối tác
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '30%' }}
-                    error={errors.email}
-                    helperText={errors.email?.message}
-                    {...field}
-                    label="Email*"
-                    margin="normal"
-                    variant="outlined"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="mobilePhone"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '30%' }}
-                    error={errors.mobilePhone}
-                    helperText={errors.mobilePhone?.message}
-                    {...field}
-                    label="Số điện thoại*"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="website"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '30%' }}
-                    error={errors.website}
-                    helperText={errors.website?.message}
-                    {...field}
-                    label="Website"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="taxCode"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '30%' }}
-                    error={errors.taxCode}
-                    helperText={errors.taxCode?.message}
-                    {...field}
-                    label="Mã số thuế"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                control={control}
-                name="businessModel"
-                render={({ field }) => (
-                  <TextField
-                    fullWidth
-                    error={!!errors.businessModel}
-                    helperText={errors?.businessModel?.message}
-                    {...field}
-                    label="Mô hình kinh doanh"
-                    margin="normal"
-                    multiline
-                    rows={10}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  document.getElementById('upload-contract').click()
-                }}
-              >
-                Upload hợp đồng
-              </Button>
-              <input
-                type="file"
-                id="upload-contract"
-                onChange={async e => {
-                  if (
-                    document.getElementById('upload-contract').files[0].size >
-                    20000000
-                  ) {
-                    console.log(
-                      document.getElementById('upload-contract').files[0].size,
-                    )
-                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
-                    return
-                  }
-                  const file = await uploadFile(
-                    document.getElementById('upload-contract').files[0],
-                  )
-                  console.log(file)
-                  if (file?.code === '400') {
-                    e.target.value = null
-                    toastError({ message: file?.errorDescription })
-                    return
-                  }
-
-                  setContractList([file, ...contractList])
-                }}
-                style={{ display: 'none' }}
-              />
-              {contractList.map((contractFile, index) => (
-                <div
-                  style={{ display: 'flex', alignItems: 'center' }}
-                  key={contractFile.filename + index}
-                >
-                  <p
-                    onClick={() => {
-                      downloadFile(contractFile.url, contractFile.filename)
-                    }}
-                    style={{
-                      textDecoration: 'underline',
-                      color: '#07bc0c',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {contractFile.filename}
-                  </p>
-                  <Icon
-                    color="error"
-                    onClick={() => {
-                      const newArr = cloneDeep(contractList)
-                      newArr.splice(index, 1)
-                      setContractList([...newArr])
-
-                      document.getElementById('upload-contract').value = null
-                    }}
-                  >
-                    delete
-                  </Icon>
-                </div>
-              ))}
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                name="representative"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    style={{ width: '30%' }}
-                    error={errors.representative}
-                    helperText={errors.representative?.message}
-                    {...field}
-                    label="Người đại diện*"
-                    variant="outlined"
-                    margin="normal"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  document.getElementById('upload-document').click()
-                }}
-              >
-                Upload giấy tờ
-              </Button>
-              <input
-                type="file"
-                id="upload-document"
-                multiple
-                onChange={async e => {
-                  if (
-                    document.getElementById('upload-document').files[0].size >
-                    20000000
-                  ) {
-                    console.log(
-                      document.getElementById('upload-document').files[0].size,
-                    )
-                    toastError({ message: 'Dung lượng file vượt quá 20mb' })
-                    return
-                  }
-                  const file = await uploadFile(
-                    document.getElementById('upload-document').files[0],
-                  )
-                  if (file?.code === '400') {
-                    e.target.value = null
-                    toastError({ message: file?.errorDescription })
-                    return
-                  }
-                  setDocumentList([file, ...documentList])
-                }}
-                style={{ display: 'none' }}
-              />
-              {documentList.map((documentFile, index) => (
-                <div
-                  style={{ display: 'flex', alignItems: 'center' }}
-                  key={documentFile.filename + index}
-                >
-                  <p
-                    onClick={() => {
-                      downloadFile(documentFile.url, documentFile.filename)
-                    }}
-                    style={{
-                      textDecoration: 'underline',
-                      color: '#07bc0c',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {documentFile.filename}
-                  </p>
-                  <Icon
-                    color="error"
-                    onClick={() => {
-                      const newArr = cloneDeep(documentList)
-                      newArr.splice(index, 1)
-                      setDocumentList([...newArr])
-                      document.getElementById('upload-document').value = null
-                    }}
-                  >
-                    delete
-                  </Icon>
-                </div>
-              ))}
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                control={control}
-                name="address"
-                render={({ field }) => (
-                  <TextField
-                    error={errors.address}
-                    helperText={errors.address?.message}
-                    {...field}
-                    label="Địa chỉ"
-                    margin="normal"
-                    multiline
-                    rows={10}
-                    fullWidth
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <Controller
-                control={control}
-                name="status"
-                render={({ field }) => (
-                  <FormControl
-                    sx={{ minWidth: 200, mb: 5, mt: 1 }}
-                    error={!!errors?.status}
-                  >
-                    <InputLabel id="demo-simple-select-label">
-                      Trạng thái*
-                    </InputLabel>
-                    <Select
-                      {...field}
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Trạng thái"
-                    >
-                      <MenuItem value={1}>Hoạt động</MenuItem>
-                      <MenuItem value={-2}>Không hoạt động</MenuItem>
-                    </Select>
-                    {!!errors?.status?.message && (
-                      <FormHelperText>{errors?.status.message}</FormHelperText>
-                    )}
-                  </FormControl>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} md={12} style={{ marginTop: '50px' }}>
-              <Button
-                color="primary"
-                type="submit"
-                variant="contained"
-                style={{ marginRight: '15px' }}
-              >
-                Lưu
-              </Button>
-              <Button
-                color="primary"
-                variant="contained"
-                style={{ marginRight: '15px' }}
-                onClick={() => {
-                  dialogConfirm.current.handleClickOpen()
-                }}
-              >
-                Đổi mật khẩu
-              </Button>
-              <Button
-                color="primary"
-                variant="contained"
-                style={{ marginRight: '15px' }}
-                onClick={() => {
-                  navigate('/quan-ly-thong-tin-doi-tac')
-                }}
-              >
-                Quay lại
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-        <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="md">
-          <ChangePasswordMerchant
-            handleClose={dialogConfirm?.current?.handleClose}
+    <>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
+      <Container>
+        <Box className="breadcrumb">
+          <Breadcrumb
+            routeSegments={[
+              { name: 'Quản lý đối tác', path: '/quan-ly-thong-tin-doi-tac' },
+              { name: 'Thông tin đối tác' },
+            ]}
           />
-        </DialogCustom>
-      </SimpleCard>
-    </Container>
+        </Box>
+        <SimpleCard title="Thông tin đối tác">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container>
+              <Grid item xs={10} md={10}>
+                <Controller
+                  name="nameMerchant"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '50%' }}
+                      error={errors.nameMerchant}
+                      helperText={errors.nameMerchant?.message}
+                      {...field}
+                      label="Tên đối tác*"
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={2} md={2} style={{ textAlign: 'right' }}>
+                {statusMerchant === 1 ? (
+                  <Button variant="contained">Hoạt động</Button>
+                ) : (
+                  <Button variant="contained" disabled>
+                    Không hoạt động
+                  </Button>
+                )}
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="merchantType"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl
+                      style={{ width: '150px' }}
+                      margin="normal"
+                      error={errors.merchantType}
+                    >
+                      <InputLabel id="demo-simple-select-label">
+                        Loại đối tác*
+                      </InputLabel>
+                      <Select
+                        style={{ width: '200px' }}
+                        {...field}
+                        label="Loại đối tác*"
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                      >
+                        <MenuItem value={1}>Điểm camp</MenuItem>
+                        <MenuItem value={2}>Nhà cung cấp</MenuItem>
+                      </Select>
+                      {errors.merchantType && (
+                        <FormHelperText>
+                          Vui lòng nhập loại đối tác
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '30%' }}
+                      error={errors.email}
+                      helperText={errors.email?.message}
+                      {...field}
+                      label="Email*"
+                      margin="normal"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="mobilePhone"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '30%' }}
+                      error={errors.mobilePhone}
+                      helperText={errors.mobilePhone?.message}
+                      {...field}
+                      label="Số điện thoại*"
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="website"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '30%' }}
+                      error={errors.website}
+                      helperText={errors.website?.message}
+                      {...field}
+                      label="Website"
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="taxCode"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '30%' }}
+                      error={errors.taxCode}
+                      helperText={errors.taxCode?.message}
+                      {...field}
+                      label="Mã số thuế"
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  control={control}
+                  name="businessModel"
+                  render={({ field }) => (
+                    <TextField
+                      fullWidth
+                      error={!!errors.businessModel}
+                      helperText={errors?.businessModel?.message}
+                      {...field}
+                      label="Mô hình kinh doanh"
+                      margin="normal"
+                      multiline
+                      rows={10}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    document.getElementById('upload-contract').click()
+                  }}
+                >
+                  Upload hợp đồng
+                </Button>
+                <input
+                  type="file"
+                  id="upload-contract"
+                  onChange={async e => {
+                    if (
+                      document.getElementById('upload-contract').files[0].size >
+                      20000000
+                    ) {
+                      console.log(
+                        document.getElementById('upload-contract').files[0]
+                          .size,
+                      )
+                      toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                      return
+                    }
+                    const file = await uploadFile(
+                      document.getElementById('upload-contract').files[0],
+                    )
+                    console.log(file)
+                    if (file?.code === '400') {
+                      e.target.value = null
+                      toastError({ message: file?.errorDescription })
+                      return
+                    }
+
+                    setContractList([file, ...contractList])
+                  }}
+                  style={{ display: 'none' }}
+                />
+                {contractList.map((contractFile, index) => (
+                  <div
+                    style={{ display: 'flex', alignItems: 'center' }}
+                    key={contractFile.filename + index}
+                  >
+                    <p
+                      onClick={() => {
+                        downloadFile(contractFile.url, contractFile.filename)
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#07bc0c',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {contractFile.filename}
+                    </p>
+                    <Icon
+                      color="error"
+                      onClick={() => {
+                        const newArr = cloneDeep(contractList)
+                        newArr.splice(index, 1)
+                        setContractList([...newArr])
+
+                        document.getElementById('upload-contract').value = null
+                      }}
+                    >
+                      delete
+                    </Icon>
+                  </div>
+                ))}
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  name="representative"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      style={{ width: '30%' }}
+                      error={errors.representative}
+                      helperText={errors.representative?.message}
+                      {...field}
+                      label="Người đại diện*"
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    document.getElementById('upload-document').click()
+                  }}
+                >
+                  Upload giấy tờ
+                </Button>
+                <input
+                  type="file"
+                  id="upload-document"
+                  multiple
+                  onChange={async e => {
+                    if (
+                      document.getElementById('upload-document').files[0].size >
+                      20000000
+                    ) {
+                      console.log(
+                        document.getElementById('upload-document').files[0]
+                          .size,
+                      )
+                      toastError({ message: 'Dung lượng file vượt quá 20mb' })
+                      return
+                    }
+                    const file = await uploadFile(
+                      document.getElementById('upload-document').files[0],
+                    )
+                    if (file?.code === '400') {
+                      e.target.value = null
+                      toastError({ message: file?.errorDescription })
+                      return
+                    }
+                    setDocumentList([file, ...documentList])
+                  }}
+                  style={{ display: 'none' }}
+                />
+                {documentList.map((documentFile, index) => (
+                  <div
+                    style={{ display: 'flex', alignItems: 'center' }}
+                    key={documentFile.filename + index}
+                  >
+                    <p
+                      onClick={() => {
+                        downloadFile(documentFile.url, documentFile.filename)
+                      }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#07bc0c',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {documentFile.filename}
+                    </p>
+                    <Icon
+                      color="error"
+                      onClick={() => {
+                        const newArr = cloneDeep(documentList)
+                        newArr.splice(index, 1)
+                        setDocumentList([...newArr])
+                        document.getElementById('upload-document').value = null
+                      }}
+                    >
+                      delete
+                    </Icon>
+                  </div>
+                ))}
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  control={control}
+                  name="address"
+                  render={({ field }) => (
+                    <TextField
+                      error={errors.address}
+                      helperText={errors.address?.message}
+                      {...field}
+                      label="Địa chỉ"
+                      margin="normal"
+                      multiline
+                      rows={10}
+                      fullWidth
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Controller
+                  control={control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormControl
+                      sx={{ minWidth: 200, mb: 5, mt: 1 }}
+                      error={!!errors?.status}
+                    >
+                      <InputLabel id="demo-simple-select-label">
+                        Trạng thái*
+                      </InputLabel>
+                      <Select
+                        {...field}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Trạng thái"
+                      >
+                        <MenuItem value={1}>Hoạt động</MenuItem>
+                        <MenuItem value={-2}>Không hoạt động</MenuItem>
+                      </Select>
+                      {!!errors?.status?.message && (
+                        <FormHelperText>
+                          {errors?.status.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} md={12} style={{ marginTop: '50px' }}>
+                <Button
+                  color="primary"
+                  type="submit"
+                  variant="contained"
+                  style={{ marginRight: '15px' }}
+                  disabled={isLoading}
+                >
+                  Lưu
+                </Button>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ marginRight: '15px' }}
+                  onClick={() => {
+                    dialogConfirm.current.handleClickOpen()
+                  }}
+                >
+                  Đổi mật khẩu
+                </Button>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  style={{ marginRight: '15px' }}
+                  onClick={() => {
+                    navigate('/quan-ly-thong-tin-doi-tac')
+                  }}
+                >
+                  Quay lại
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+          <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="md">
+            <ChangePasswordMerchant
+              handleClose={dialogConfirm?.current?.handleClose}
+            />
+          </DialogCustom>
+        </SimpleCard>
+      </Container>
+    </>
   )
 }

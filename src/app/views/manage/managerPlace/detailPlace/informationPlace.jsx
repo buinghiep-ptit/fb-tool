@@ -278,6 +278,7 @@ export default function InformationPlace(props) {
   }
 
   const onSubmit = async data => {
+    setIsLoading(true)
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -518,7 +519,7 @@ export default function InformationPlace(props) {
                   {...field}
                   options={[...typeCamp]}
                   getOptionLabel={option => option.label}
-                  filterSelectedOptions
+                  filterSelectedOptions={true}
                   onChange={(_, data) => {
                     field.onChange(data)
                   }}
@@ -601,7 +602,12 @@ export default function InformationPlace(props) {
         {errors?.file && (
           <FormHelperText error={true}>{errors.file?.message}</FormHelperText>
         )}
-        <Button color="primary" type="submit" variant="contained">
+        <Button
+          color="primary"
+          type="submit"
+          variant="contained"
+          disabled={isLoading}
+        >
           Lưu
         </Button>
         <Button

@@ -490,31 +490,6 @@ export default function CreatePlace(props) {
                     filterSelectedOptions
                     onChange={(_, data) => {
                       field.onChange(data)
-
-                      const hashtags = data.map(item => {
-                        return { value: hashtagTypeCamp[item.id] }
-                      })
-                      const currentHashtags = getValues('hashtag').filter(
-                        item => {
-                          if (
-                            item.value === '#camtrai' ||
-                            item.value === '#chaybo' ||
-                            item.value === '#teambuilding' ||
-                            item.value === '#luutru' ||
-                            item.value === '#leonui'
-                          ) {
-                            return false
-                          }
-                          return true
-                        },
-                      )
-                      const newHashtag = [...currentHashtags, ...hashtags]
-                      const unique = [
-                        ...new Map(
-                          newHashtag.map(item => [item.value, item]),
-                        ).values(),
-                      ]
-                      setValue('hashtag', unique)
                     }}
                     sx={{ width: 400, marginRight: 5 }}
                     renderInput={params => (

@@ -72,7 +72,8 @@ export const isInprogressOrder = (order?: IOrderDetail) => {
   return (
     order?.status &&
     order?.status < 4 &&
-    order.cancelRequest?.status !== 2 &&
+    (order.cancelRequest?.status !== 2 ||
+      (order.cancelRequest?.status === 2 && order?.status === 3)) &&
     order?.status !== -1
   )
 }
@@ -230,26 +231,41 @@ export default function OrderDetail(props: Props) {
           order={order}
           currentUser={user as unknown as IUserProfile}
         />
-        <Chip
-          label={
-            order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
-              : getOrderStatusSpec(order?.status ?? 0, 2).title
-          }
-          size="medium"
-          sx={{
-            px: 1,
-            fontSize: '1.125rem',
-            fontWeight: 500,
-            color: order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
-                  .textColor
-              : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
-            bgcolor: order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).bgColor
-              : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
-          }}
-        />
+        {order.cancelRequest?.status == 2 && order.status === 3 ? (
+          <Chip
+            label="Đã thanh toán"
+            size="medium"
+            sx={{
+              px: 1,
+              fontSize: '1.125rem',
+              fontWeight: 500,
+              color: '#2F9B42',
+              bgColor: '#EDFDEF',
+            }}
+          />
+        ) : (
+          <Chip
+            label={
+              order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
+                : getOrderStatusSpec(order?.status ?? 0, 2).title
+            }
+            size="medium"
+            sx={{
+              px: 1,
+              fontSize: '1.125rem',
+              fontWeight: 500,
+              color: order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                    .textColor
+                : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
+              bgcolor: order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                    .bgColor
+                : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
+            }}
+          />
+        )}
       </Stack>
 
       <form

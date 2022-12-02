@@ -102,7 +102,7 @@ export default function UpdateServices({ title }: Props) {
       dateEnd: Yup.date()
         .when('dateStart', (dateStart, yup) => {
           if (dateStart && dateStart != 'Invalid Date') {
-            const dayAfter = new Date(dateStart.getTime() + 0)
+            const dayAfter = new Date(dateStart.getTime() + 86400000)
             return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
           }
           return yup
@@ -114,8 +114,11 @@ export default function UpdateServices({ title }: Props) {
         Yup.array().of(
           Yup.object().shape({
             quantity: Yup.number()
-              .required(messages.MSG1)
+              .typeError('Giá trị phải là một chữ số')
+              // .positive() // Sso nguyen duong
               .max(999999999, 'Tối đa 9 chữ số'),
+            // .nullable(), // neu k can nhap so 0
+            // .required(messages.MSG1),
           }),
         ),
       ),
@@ -139,9 +142,7 @@ export default function UpdateServices({ title }: Props) {
   useEffect(() => {
     if (!dateStart || !dateEnd) return
 
-    if (
-      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
-    ) {
+    if (moment(new Date(dateStart)).unix() < moment(new Date(dateEnd)).unix()) {
       methods.clearErrors('dateStart')
       methods.clearErrors('dateEnd')
     }
@@ -153,13 +154,18 @@ export default function UpdateServices({ title }: Props) {
   useEffect(() => {
     if (!order || !debouncedDateStart || !debouncedDateEnd) return
 
-    recalculate({
-      orderId: Number(orderId ?? 0),
-      payload: {
-        dateStart: new Date(debouncedDateStart).toISOString(),
-        dateEnd: new Date(debouncedDateEnd).toISOString(),
-      },
-    })
+    if (
+      moment(new Date(debouncedDateStart)).unix() <
+      moment(new Date(debouncedDateEnd)).unix()
+    ) {
+      recalculate({
+        orderId: Number(orderId ?? 0),
+        payload: {
+          dateStart: new Date(debouncedDateStart).toISOString(),
+          dateEnd: new Date(debouncedDateEnd).toISOString(),
+        },
+      })
+    }
   }, [debouncedDateStart, debouncedDateEnd, order])
 
   useEffect(() => {

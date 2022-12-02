@@ -12,7 +12,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import { useRefundOrder } from 'app/hooks/queries/useOrdersData'
 import { IOrderDetail } from 'app/models/order'
 import { messages } from 'app/utils/messages'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -24,7 +24,7 @@ type Props = {
 export type SchemaType = {
   refundType?: number
   transCode?: string
-  amount?: number
+  amount?: number | string
   note?: string
 }
 
@@ -50,10 +50,15 @@ export default function RefundOrder({ title }: Props) {
         .max(255, 'Nội dung không được vượt quá 255 ký tự')
         .required(messages.MSG1),
     }),
-    amount: Yup.string().when('refundType', {
+    amount: Yup.number().when('refundType', {
       is: (refundType: string) => Number(refundType) !== 3,
-      then: Yup.string()
-        .max(11, 'Chỉ được nhập tối đa 9 ký tự')
+      then: Yup.number()
+        .typeError('Giá trị phải là một chữ số')
+        .positive('Giá trị phải là số nguyên dương')
+        .max(
+          order.paymentTrans?.amount ?? 0,
+          'Giá trị không được lớn hơn số tiền đã thanh toán',
+        )
         .required(messages.MSG1),
     }),
     note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
@@ -62,11 +67,13 @@ export default function RefundOrder({ title }: Props) {
   const methods = useForm<SchemaType>({
     defaultValues: {
       refundType: 1,
-      amount: order.amount,
+      amount: order.paymentTrans?.amount ?? '',
     },
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const refundType = methods.watch('refundType')
 
   const { mutate: refund, isLoading: isLoading } = useRefundOrder(() =>
     onSuccess(null, 'Hoàn tiền thành công'),
@@ -81,10 +88,14 @@ export default function RefundOrder({ title }: Props) {
         refundType: Number(values.refundType),
         transCode: values.refundType !== 3 ? values.transCode : null,
         amount: values.refundType !== 3 ? Number(amount) : null,
-        note: values.note,
+        note: values.note || null,
       },
     })
   }
+
+  useEffect(() => {
+    if (refundType == 1) methods.setValue('amount', order.paymentTrans?.amount)
+  }, [refundType])
 
   const handleClose = () => {
     navigate(-1)

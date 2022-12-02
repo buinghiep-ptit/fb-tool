@@ -136,8 +136,8 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                   name="mobilePhone"
                   defaultValue=""
                   fullWidth
-                  disabled={isViewer}
-                  clearIcon={!isViewer}
+                  disabled
+                  clearIcon={false}
                 />
                 <FormInputText
                   label={'Email'}

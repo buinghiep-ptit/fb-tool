@@ -72,7 +72,7 @@ export default function CancelOrder({ title }: Props) {
             </MuiTypography>
             <Box>
               <MuiTypography variant="subtitle2" pb={1}>
-                Lý do:
+                Lý do*:
               </MuiTypography>
               <FormTextArea
                 name="note"

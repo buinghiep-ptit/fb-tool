@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import GeneralInformation from './generalInformation'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
-import { Button, FormHelperText } from '@mui/material'
+import { Button, FormHelperText, Box, LinearProgress } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import axios from 'axios'
@@ -55,6 +55,7 @@ export default function InformationCampGround({ action }) {
     vinaphone: true,
     vietnamMobile: true,
   })
+  const [isLoading, setIsLoading] = React.useState(false)
 
   const [detailPolicy, setDetailPolicy] = React.useState({
     id: 1,
@@ -117,7 +118,11 @@ export default function InformationCampGround({ action }) {
           if (!value?.length) return true
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].size > 10000000) return false
+              if (
+                value[i].size > 10000000 &&
+                !value[i].type.startsWith('video')
+              )
+                return false
             }
             return true
           }
@@ -229,8 +234,7 @@ export default function InformationCampGround({ action }) {
     const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        const newFile = await compressImageFile(file)
-        formData.append('file', newFile)
+        formData.append('file', file)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -262,6 +266,7 @@ export default function InformationCampGround({ action }) {
   }
 
   const submitRequest = async data => {
+    setIsLoading(true)
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -312,7 +317,7 @@ export default function InformationCampGround({ action }) {
     dataUpdate.name = data.nameCampground
     dataUpdate.campTypes = data.campTypes.map(type => type.id)
     if (parseInt(data.isSupportBooking) === 1) {
-      dataUpdate.idDepositPolicy = data.policy
+      dataUpdate.idDepositPolicy = data.policy || 1
     } else {
       dataUpdate.idDepositPolicy = null
     }
@@ -375,6 +380,7 @@ export default function InformationCampGround({ action }) {
         navigate('/quan-ly-thong-tin-diem-camp')
       }
     }
+    setIsLoading(false)
   }
 
   const onSubmit = async data => {
@@ -393,7 +399,8 @@ export default function InformationCampGround({ action }) {
   }
 
   const fetchListCampArea = async () => {
-    const res = await getListCampArea()
+    const res = await getListCampAreaWithoutProvince()
+    console.log(res)
     setCampAreas(res)
   }
 
@@ -550,125 +557,141 @@ export default function InformationCampGround({ action }) {
   }, [])
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Accordion defaultExpanded={true}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+    <>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
         >
-          <Typography>1. Thông tin chung</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <GeneralInformation
-            fetchDistricts={fetchDistricts}
-            control={control}
-            errors={errors}
-            setError={setError}
-            clearErrors={clearErrors}
-            provinces={provinces}
-            districts={districts}
-            wards={wards}
-            fetchWards={fetchWards}
-            getValues={getValues}
-            setValue={setValue}
-            hashtag={hashtag}
-            campAreas={campAreas}
-            createDegrees={createDegrees}
-            setCreateDegrees={setCreateDegrees}
-          />
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded={true}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography>2. Thông tin booking</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <InformationBooking
-            setExpand={setExpandPolicy}
-            control={control}
-            listContact={listContact}
-            setListContact={setListContact}
-            errors={errors}
-            getValues={getValues}
-            setValue={setValue}
-            listMerchant={listMerchant}
-            defaultCheck={getValues('isSupportBooking')}
-          />
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded={true}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3a-content"
-          id="panel3a-header"
-        >
-          <Typography>3. Giới thiệu</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Introduction
-            setDescription={setDescription}
-            ref={introductionRef}
-            medias={medias}
-            action={action}
-            description={description}
-            setMedias={setMedias}
-            setValue={setValue}
-          />
-          {errors?.file && (
-            <FormHelperText error={true}>{errors.file?.message}</FormHelperText>
-          )}
-        </AccordionDetails>
-      </Accordion>
-      <Accordion defaultExpanded={true}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel4a-content"
-          id="panel4a-header"
-        >
-          <Typography>4. Đặc điểm</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Feature
-            action={action}
-            control={control}
-            errors={errors}
-            getValues={getValues}
-            setValue={setValue}
-            feature={feature}
-            updateFeature={updateFeature}
-            disabledInternet={disabledInternet}
-            setDisabledInternet={setDisabledInternet}
-          />
-        </AccordionDetails>
-      </Accordion>
-      {expandPolicy && (
+          <LinearProgress />
+        </Box>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Accordion defaultExpanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel5a-content"
-            id="panel5a-header"
+            aria-controls="panel1a-content"
+            id="panel1a-header"
           >
-            <Typography>5. Chính sách</Typography>
+            <Typography>1. Thông tin chung</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Policy
+            <GeneralInformation
+              fetchDistricts={fetchDistricts}
+              control={control}
+              errors={errors}
+              setError={setError}
+              clearErrors={clearErrors}
+              provinces={provinces}
+              districts={districts}
+              wards={wards}
+              fetchWards={fetchWards}
+              getValues={getValues}
               setValue={setValue}
-              action={action}
-              detailPolicy={detailPolicy}
-              setDetailPolicy={setDetailPolicy}
+              hashtag={hashtag}
+              campAreas={campAreas}
+              createDegrees={createDegrees}
+              setCreateDegrees={setCreateDegrees}
             />
           </AccordionDetails>
         </Accordion>
-      )}
-      <div style={{ marginTop: '50px' }}>
-        {action === 'create' ? (
-          <>
-            {/* <Button
+        <Accordion defaultExpanded={true}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+          >
+            <Typography>2. Thông tin booking</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <InformationBooking
+              setExpand={setExpandPolicy}
+              control={control}
+              listContact={listContact}
+              setListContact={setListContact}
+              errors={errors}
+              getValues={getValues}
+              setValue={setValue}
+              listMerchant={listMerchant}
+              defaultCheck={getValues('isSupportBooking')}
+            />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion defaultExpanded={true}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel3a-content"
+            id="panel3a-header"
+          >
+            <Typography>3. Giới thiệu</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Introduction
+              setDescription={setDescription}
+              ref={introductionRef}
+              medias={medias}
+              action={action}
+              description={description}
+              setMedias={setMedias}
+              setValue={setValue}
+            />
+            {errors?.file && (
+              <FormHelperText error={true}>
+                {errors.file?.message}
+              </FormHelperText>
+            )}
+          </AccordionDetails>
+        </Accordion>
+        <Accordion defaultExpanded={true}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel4a-content"
+            id="panel4a-header"
+          >
+            <Typography>4. Đặc điểm</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Feature
+              action={action}
+              control={control}
+              errors={errors}
+              getValues={getValues}
+              setValue={setValue}
+              feature={feature}
+              updateFeature={updateFeature}
+              disabledInternet={disabledInternet}
+              setDisabledInternet={setDisabledInternet}
+            />
+          </AccordionDetails>
+        </Accordion>
+        {expandPolicy && (
+          <Accordion defaultExpanded={true}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel5a-content"
+              id="panel5a-header"
+            >
+              <Typography>5. Chính sách</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Policy
+                setValue={setValue}
+                action={action}
+                detailPolicy={detailPolicy}
+                setDetailPolicy={setDetailPolicy}
+              />
+            </AccordionDetails>
+          </Accordion>
+        )}
+        <div style={{ marginTop: '50px' }}>
+          {action === 'create' ? (
+            <>
+              {/* <Button
               color="primary"
               variant="contained"
               type="submit"
@@ -679,28 +702,29 @@ export default function InformationCampGround({ action }) {
             >
               Lưu Nháp
             </Button> */}
-            <Button
-              color="primary"
-              type="submit"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-            >
-              Lưu
-            </Button>
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-              onClick={() => {
-                navigate('/quan-ly-thong-tin-diem-camp')
-              }}
-            >
-              Quay lại
-            </Button>
-          </>
-        ) : (
-          <>
-            {/* {statusCamp === 0 && (
+              <Button
+                color="primary"
+                type="submit"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                disabled={isLoading}
+              >
+                Lưu
+              </Button>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => {
+                  navigate('/quan-ly-thong-tin-diem-camp')
+                }}
+              >
+                Quay lại
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* {statusCamp === 0 && (
               <Button
                 color="primary"
                 variant="contained"
@@ -716,15 +740,16 @@ export default function InformationCampGround({ action }) {
                 Lưu Nháp
               </Button>
             )} */}
-            <Button
-              color="primary"
-              type="submit"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-            >
-              Lưu
-            </Button>
-            {/* <Button
+              <Button
+                color="primary"
+                type="submit"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                disabled={isLoading}
+              >
+                Lưu
+              </Button>
+              {/* <Button
               color="primary"
               variant="contained"
               onClick={() => handleDeleteCampGround()}
@@ -732,45 +757,46 @@ export default function InformationCampGround({ action }) {
             >
               Xóa
             </Button> */}
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-              onClick={() => {
-                navigate('/quan-ly-thong-tin-diem-camp')
-              }}
-            >
-              Quay lại
-            </Button>
-          </>
-        )}
-        <DialogCustom ref={dialogCustomRef} title="Xác nhận" maxWidth="sm">
-          <div style={{ textAlign: 'center' }}>
-            Tên điểm camp đã tồn tại bạn có muốn tiếp tục
-          </div>
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-              onClick={() => {
-                submitRequest(dataSubmit)
-                dialogCustomRef?.current.handleClose()
-              }}
-            >
-              Có
-            </Button>
-            <Button
-              color="primary"
-              variant="contained"
-              style={{ marginRight: '10px' }}
-              onClick={() => dialogCustomRef?.current.handleClose()}
-            >
-              Không
-            </Button>
-          </div>
-        </DialogCustom>
-      </div>
-    </form>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => {
+                  navigate('/quan-ly-thong-tin-diem-camp')
+                }}
+              >
+                Quay lại
+              </Button>
+            </>
+          )}
+          <DialogCustom ref={dialogCustomRef} title="Xác nhận" maxWidth="sm">
+            <div style={{ textAlign: 'center' }}>
+              Tên điểm camp đã tồn tại bạn có muốn tiếp tục
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => {
+                  submitRequest(dataSubmit)
+                  dialogCustomRef?.current.handleClose()
+                }}
+              >
+                Có
+              </Button>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => dialogCustomRef?.current.handleClose()}
+              >
+                Không
+              </Button>
+            </div>
+          </DialogCustom>
+        </div>
+      </form>
+    </>
   )
 }

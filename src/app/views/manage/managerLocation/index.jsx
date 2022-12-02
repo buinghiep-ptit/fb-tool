@@ -50,9 +50,12 @@ export default function ManagerLocation(props) {
           convertCampGround.type = campGround.campTypes
           convertCampGround.service = campGround.campRentalAmount
           convertCampGround.place = campGround.campAreaName
-          convertCampGround.contact = `${
-            (campGround.merchantEmail && campGround.merchantEmail + ' -') || ''
-          } ${campGround.merchantMobilePhone || ''}`
+          convertCampGround.contact = `${campGround.merchantEmail || ''}${
+            campGround.merchantEmail && campGround.merchantMobilePhone
+              ? ' - '
+              : ''
+          }${campGround.merchantMobilePhone || ''}`
+
           convertCampGround.address = campGround.address
           if (convertCampGround.status !== 0) {
             convertCampGround.status = campGround.status === 1 ? true : false
@@ -205,7 +208,12 @@ export default function ManagerLocation(props) {
           updateStatus={updateCampGroundStatus}
           totalData={parseInt(totalListCampGround, 0)}
           fetchDataTable={fetchListCampGround}
-          filter={{ name: inputFilter, status: statusFilter }}
+          filter={{
+            name: inputFilter,
+            status: statusFilter,
+            page: 0,
+            size: 20,
+          }}
           onDeleteData={deleteCampGround}
         />
       </SimpleCard>

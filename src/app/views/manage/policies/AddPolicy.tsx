@@ -111,7 +111,11 @@ export default function AddPolicy({ title }: Props) {
       name: Yup.string()
         .max(255, 'Nội dung không được vượt quá 255 ký tự')
         .required(messages.MSG1),
-      scaleAmount: Yup.number().max(100, 'Tối đa 100%').required(messages.MSG1),
+      scaleAmount: Yup.number()
+        .typeError('Giá trị phải là một chữ số')
+        .positive()
+        .max(100, 'Tối đa 100%')
+        .required(messages.MSG1),
       maxAmount: Yup.number()
         .when(['minAmount'], {
           is: (minAmount: any) => Boolean(minAmount),

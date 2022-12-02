@@ -306,7 +306,11 @@ const TableCustom = forwardRef(
                           >
                             <Link
                               style={{ textDecoration: 'underline' }}
-                              to={`/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`}
+                              to={
+                                data.idMerchant
+                                  ? `/cap-nhat-thong-tin-doi-tac/${data.idMerchant}`
+                                  : '#'
+                              }
                             >
                               {data[element]}
                             </Link>

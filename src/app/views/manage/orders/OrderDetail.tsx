@@ -94,8 +94,6 @@ export default function OrderDetail(props: Props) {
 
   const prevRoute = useLocation()
 
-  console.log(prevRoute)
-
   const [addressCampground, setAddressCampground] = useState('')
 
   const onSuccess = async (order: IOrderDetail) => {

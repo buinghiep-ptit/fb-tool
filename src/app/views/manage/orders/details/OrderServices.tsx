@@ -59,13 +59,6 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
     }
   }
 
-  console.log(
-    getDifferenceInDays(
-      moment(order?.dateStart).format('MM/DD/YYYY'),
-      moment(order?.dateEnd).format('MM/DD/YYYY'),
-    ),
-  )
-
   return (
     <Accordion defaultExpanded={true}>
       <AccordionSummary
@@ -196,7 +189,10 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
                 </Stack>
               ),
             )}
-          {!isViewer && (
+          {(!isViewer ||
+            (order?.status === 3 &&
+              order.cancelRequest &&
+              order.cancelRequest.status !== 2)) && (
             <Box p={1}>
               <MuiButton
                 title="Cập nhật dịch vụ"

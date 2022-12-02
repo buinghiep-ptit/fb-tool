@@ -16,8 +16,11 @@ import {
 import useDebounce from 'app/hooks/useDebounce.'
 import { IService } from 'app/models/order'
 import { BoxImage, TooltipText } from 'app/utils/columns/columnsEvents'
+import { convertDateToUTC, getDifferenceInDays } from 'app/utils/common'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 import { messages } from 'app/utils/messages'
+import dayjs from 'dayjs'
+import _ from 'lodash'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import {
@@ -29,6 +32,7 @@ import {
 import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { convertToNumber } from '../OrderServices'
+import { DiagLogConfirm } from './DialogConfirm'
 
 type Props = {
   title: string
@@ -50,34 +54,9 @@ export default function UpdateServices({ title }: Props) {
   const [services, setServices] = useState<IService[]>([])
   const [lengthServices, setLengthServices] = useState<number[]>([])
 
+  const [openDialog, setOpenDialog] = useState(false)
+
   const [defaultValues] = useState<SchemaType>({})
-
-  const { mutate: recalculate, isLoading: recalculateLoading } =
-    useRecalculatePriceOrder((data: any) => {
-      // if (servicesW && servicesW.length) {
-      //   data.map((item: IService, index: number) =>
-      //     Object.assign(item, {
-      //       quantity: servicesW[index]
-      //         ? servicesW[index].quantity
-      //         : item.quantity,
-      //     }),
-      //   )
-      // }
-      const lengthList: number[] = []
-      let serviceList: IService[] = []
-      Object.keys(data).forEach(function (item) {
-        serviceList = serviceList.concat(data[item])
-        lengthList.push(data[item].length)
-      })
-
-      let sum = 0
-      const array: number[] = lengthList
-        .map(elem => (sum = sum + elem))
-        .map((elem, index) => elem - lengthList[index])
-
-      setLengthServices(array)
-      setServices(serviceList)
-    })
 
   const onSuccess = (data: any, message?: string) => {
     toastSuccess({
@@ -91,7 +70,9 @@ export default function UpdateServices({ title }: Props) {
       dateStart: Yup.date()
         .when('dateEnd', (dateEnd, yup) => {
           if (dateEnd && dateEnd != 'Invalid Date') {
-            const dayAfter = new Date(dateEnd.getTime())
+            const dayAfter = new Date(dateEnd.getTime() - 86400000)
+            console.log(dayAfter)
+
             return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
           }
           return yup
@@ -136,8 +117,37 @@ export default function UpdateServices({ title }: Props) {
     control: methods.control,
   })
 
+  const { mutate: recalculate, isLoading: recalculateLoading } =
+    useRecalculatePriceOrder((data: any) => {
+      const lengthList: number[] = []
+      let serviceList: IService[] = []
+      Object.keys(data).forEach(function (item) {
+        serviceList = serviceList.concat(data[item])
+        lengthList.push(data[item].length)
+      })
+
+      if (servicesW && servicesW.length) {
+        serviceList.map((item: IService, index: number) =>
+          Object.assign(item, {
+            quantity: servicesW[index]
+              ? servicesW[index].quantity
+              : item.quantity,
+          }),
+        )
+      }
+
+      let sum = 0
+      const array: number[] = lengthList
+        .map(elem => (sum = sum + elem))
+        .map((elem, index) => elem - lengthList[index])
+
+      setLengthServices(array)
+      setServices(serviceList)
+    })
+
   const dateStart = methods.watch('dateStart')
   const dateEnd = methods.watch('dateEnd')
+  const servicesW = methods.watch('services')
 
   useEffect(() => {
     if (!dateStart || !dateEnd) return
@@ -197,8 +207,6 @@ export default function UpdateServices({ title }: Props) {
     }
   }, [services, fields])
 
-  const servicesW = methods.watch('services')
-
   const getTotalAmount = (
     services?: {
       quantity?: number
@@ -228,6 +236,8 @@ export default function UpdateServices({ title }: Props) {
     return total
   }
 
+  // console.log('date:', dayjs(dateStart ?? new Date()).toISOString(), dateStart)
+
   const { mutate: updateServices, isLoading: isLoading } =
     useUpdateServicesOrder(() => onSuccess(null, 'Cập nhật  thành công'))
 
@@ -245,10 +255,13 @@ export default function UpdateServices({ title }: Props) {
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    const d2 = dayjs(new Date(values.dateEnd ?? '')).format('DD/MM/YYYY')
+    const d1 = dayjs(new Date(values.dateStart ?? '')).format('DD/MM/YYYY')
+
     values = {
       ...values,
-      dateStart: (values.dateStart as any)?.toISOString(),
-      dateEnd: (values.dateEnd as any)?.toISOString(),
+      dateStart: convertDateToUTC(d1),
+      dateEnd: convertDateToUTC(d2),
     }
 
     const payload: any = {
@@ -286,6 +299,24 @@ export default function UpdateServices({ title }: Props) {
               <Stack flexDirection={'row'} gap={2}>
                 <MuiRHFDatePicker name="dateStart" label="Từ" required={true} />
                 <MuiRHFDatePicker name="dateEnd" label="Đến" required={true} />
+                <MuiTypography
+                  variant="subtitle2"
+                  color={'primary'}
+                  fontWeight={500}
+                  minWidth={80}
+                  mt={2.5}
+                >
+                  (
+                  {getDifferenceInDays(
+                    moment(new Date(debouncedDateStart ?? new Date())).format(
+                      'MM/DD/YYYY',
+                    ),
+                    moment(new Date(debouncedDateEnd ?? new Date())).format(
+                      'MM/DD/YYYY',
+                    ),
+                  )}{' '}
+                  đêm)
+                </MuiTypography>
               </Stack>
             </LocalizationProvider>
 
@@ -474,13 +505,32 @@ export default function UpdateServices({ title }: Props) {
         onCloseModal={handleClose}
         isLoading={recalculateLoading || isLoading}
         maxWidth="md"
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
+        // onSubmit={methods.handleSubmit(onSubmitHandler)}
+        onSubmit={() => setOpenDialog(true)}
         submitText="Lưu"
         cancelText="Quay lại"
-        disabled={getTotalQuantity(servicesW) == 0}
+        disabled={
+          getTotalQuantity(servicesW) == 0 ||
+          !_.isEmpty(methods.formState.errors)
+        }
       >
         {getContent()}
       </MuiStyledModal>
+
+      <DiagLogConfirm
+        title={'Xác nhận'}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={methods.handleSubmit(onSubmitHandler)}
+        isLoading={isLoading}
+        cancelText="Hủy"
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            Bạn có chắc muốn cập nhật thay đổi?
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </React.Fragment>
   )
 }

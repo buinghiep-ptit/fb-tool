@@ -24,6 +24,7 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import { messages } from 'app/utils/messages'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
@@ -135,6 +136,10 @@ const ForgotPassword = () => {
     try {
       if (step === 1) {
         await resetPasswordInit(values)
+        toastSuccess({
+          message:
+            'Gửi yêu cầu thành công. Vui lòng kiểm tra email để tiếp tục!',
+        })
         setLoading(false)
       } else if (step === 2) {
         await resetPasswordFinish({

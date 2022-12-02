@@ -29,7 +29,9 @@ export const useRHFOrder = (order: IOrderDetail) => {
   const [defaultValues] = useState<SchemaType>({})
 
   const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required(messages.MSG1),
+    fullName: Yup.string()
+      .required(messages.MSG1)
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     mobilePhone: Yup.string()
       .required(messages.MSG1)
       .test('check valid', 'Số điện thoại không hợp lệ', phone => {
@@ -39,6 +41,7 @@ export const useRHFOrder = (order: IOrderDetail) => {
         }
         return regex.test(phone as string)
       }),
+    email: Yup.string().email(messages.MSG12),
     note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

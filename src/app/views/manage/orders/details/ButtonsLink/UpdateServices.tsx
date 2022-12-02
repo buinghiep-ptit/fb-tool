@@ -102,7 +102,7 @@ export default function UpdateServices({ title }: Props) {
       dateEnd: Yup.date()
         .when('dateStart', (dateStart, yup) => {
           if (dateStart && dateStart != 'Invalid Date') {
-            const dayAfter = new Date(dateStart.getTime() + 0)
+            const dayAfter = new Date(dateStart.getTime() + 86400000)
             return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
           }
           return yup
@@ -142,9 +142,7 @@ export default function UpdateServices({ title }: Props) {
   useEffect(() => {
     if (!dateStart || !dateEnd) return
 
-    if (
-      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
-    ) {
+    if (moment(new Date(dateStart)).unix() < moment(new Date(dateEnd)).unix()) {
       methods.clearErrors('dateStart')
       methods.clearErrors('dateEnd')
     }
@@ -156,13 +154,18 @@ export default function UpdateServices({ title }: Props) {
   useEffect(() => {
     if (!order || !debouncedDateStart || !debouncedDateEnd) return
 
-    recalculate({
-      orderId: Number(orderId ?? 0),
-      payload: {
-        dateStart: new Date(debouncedDateStart).toISOString(),
-        dateEnd: new Date(debouncedDateEnd).toISOString(),
-      },
-    })
+    if (
+      moment(new Date(debouncedDateStart)).unix() <
+      moment(new Date(debouncedDateEnd)).unix()
+    ) {
+      recalculate({
+        orderId: Number(orderId ?? 0),
+        payload: {
+          dateStart: new Date(debouncedDateStart).toISOString(),
+          dateEnd: new Date(debouncedDateEnd).toISOString(),
+        },
+      })
+    }
   }, [debouncedDateStart, debouncedDateEnd, order])
 
   useEffect(() => {

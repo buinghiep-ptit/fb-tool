@@ -365,17 +365,17 @@ export default function Feature({
                   <FormControlLabel
                     value={1}
                     control={<Radio />}
-                    label="Dễ di chuyển"
+                    label="Dễ đi"
                   />
                   <FormControlLabel
                     value={2}
                     control={<Radio />}
-                    label="Khó di chuyển"
+                    label="Khó đi"
                   />
                   <FormControlLabel
                     value={3}
                     control={<Radio />}
-                    label="Rất khó di chuyển"
+                    label="Rất khó đi"
                   />
                 </RadioGroup>
               </FormControl>

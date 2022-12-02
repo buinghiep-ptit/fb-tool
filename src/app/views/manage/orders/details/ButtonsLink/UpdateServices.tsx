@@ -71,7 +71,11 @@ export default function UpdateServices({ title }: Props) {
         .when('dateEnd', (dateEnd, yup) => {
           if (dateEnd && dateEnd != 'Invalid Date') {
             const dayAfter = new Date(dateEnd.getTime() - 86400000)
-            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+            const dayAfterMin = new Date(dateEnd.getTime() - 86400000 * 31)
+
+            return yup
+              .min(dayAfterMin, 'Tối đa 31 ngày so với ngày kết thúc')
+              .max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
           }
           return yup
         })
@@ -81,8 +85,11 @@ export default function UpdateServices({ title }: Props) {
       dateEnd: Yup.date()
         .when('dateStart', (dateStart, yup) => {
           if (dateStart && dateStart != 'Invalid Date') {
-            const dayAfter = new Date(dateStart.getTime() + 86400000)
-            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày bắt đầu')
+            const dayBefore = new Date(dateStart.getTime() + 86400000)
+            const dayBeforeMax = new Date(dateStart.getTime() + 86400000 * 31)
+            return yup
+              .min(dayBefore, 'Ngày kết thúc phải lớn hơn ngày bắt đầu')
+              .max(dayBeforeMax, 'Tối đa 31 ngày so với ngày bắt đầu')
           }
           return yup
         })
@@ -164,7 +171,12 @@ export default function UpdateServices({ title }: Props) {
 
     if (
       moment(new Date(debouncedDateStart)).unix() <
-      moment(new Date(debouncedDateEnd)).unix()
+        moment(new Date(debouncedDateEnd)).unix() &&
+      Math.abs(
+        moment(new Date(debouncedDateEnd)).unix() -
+          moment(new Date(debouncedDateStart)).unix(),
+      ) <=
+        31 * 86400
     ) {
       const d1 = dayjs(new Date(debouncedDateStart ?? '')).format('DD/MM/YYYY')
       const d2 = dayjs(new Date(debouncedDateEnd ?? '')).format('DD/MM/YYYY')

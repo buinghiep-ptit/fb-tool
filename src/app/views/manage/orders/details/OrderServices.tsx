@@ -14,6 +14,7 @@ import { Box } from '@mui/system'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import { MuiTypography } from 'app/components/common/MuiTypography'
+import useAuth from 'app/hooks/useAuth'
 import { IOrderDetail } from 'app/models/order'
 import { BoxImage, TooltipText } from 'app/utils/columns/columnsEvents'
 import { getDifferenceInDays } from 'app/utils/common'
@@ -21,6 +22,7 @@ import { getServiceNameByType } from 'app/utils/enums/order'
 import { CurrencyFormatter } from 'app/utils/formatters/currencyFormatter'
 import moment from 'moment'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { isReceiveOrder } from '../OrderDetail'
 
 export interface IOrderServicesProps {
   order?: IOrderDetail
@@ -28,6 +30,8 @@ export interface IOrderServicesProps {
 }
 
 export function OrderServices({ order, isViewer }: IOrderServicesProps) {
+  const { user } = useAuth()
+
   const navigate = useNavigate()
   // const getTotalAmount = (
   //   services?: {
@@ -192,7 +196,8 @@ export function OrderServices({ order, isViewer }: IOrderServicesProps) {
           {(!isViewer ||
             (order?.status === 3 &&
               order.cancelRequest &&
-              order.cancelRequest.status !== 2)) && (
+              order.cancelRequest.status !== 2 &&
+              isReceiveOrder(order, user))) && (
             <Box p={1}>
               <MuiButton
                 title="Cập nhật dịch vụ"

@@ -1,4 +1,4 @@
-import { Avatar, Chip, Grid, Icon, styled } from '@mui/material'
+import { Avatar, Chip, Grid, Icon, styled, Tooltip } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
 import {
@@ -19,6 +19,7 @@ import { toastSuccess } from 'app/helpers/toastNofication'
 import { useApproveFeed, useDeleteFeed } from 'app/hooks/queries/useFeedsData'
 import {
   IActionHistory,
+  IFeedDetail,
   Image,
   IMediaOverall,
   IReportDecline,
@@ -231,6 +232,32 @@ export default function FeedDetail(props: Props) {
     }
   }
 
+  const interactRender = (feed?: IFeedDetail) => {
+    return (
+      <>
+        <Stack direction={'row'} gap={1.5} alignItems="center">
+          <Tooltip title="Yêu thích" arrow>
+            <Icon sx={{ fontSize: '32px!important' }}>favorite</Icon>
+          </Tooltip>
+          <MuiTypography>{feed?.likeNum}</MuiTypography>
+        </Stack>
+        <Stack direction={'row'} gap={1.5} alignItems="center">
+          <Tooltip title="Lượt xem" arrow>
+            <Icon sx={{ fontSize: '32px!important' }}>remove_red_eye</Icon>
+          </Tooltip>
+          <MuiTypography>{feed?.viewNum}</MuiTypography>
+        </Stack>
+        <Stack direction={'row'} gap={1.5} alignItems="center">
+          <Tooltip title="Bình luận" arrow>
+            <Icon sx={{ fontSize: '32px!important' }}>chat</Icon>
+          </Tooltip>
+
+          <MuiTypography>{feed?.commentNum}</MuiTypography>
+        </Stack>
+      </>
+    )
+  }
+
   if (isLoading) return <MuiLoading />
 
   if (isError)
@@ -375,33 +402,43 @@ export default function FeedDetail(props: Props) {
               </Grid>
             </Grid>
 
-            <Stack flexDirection={'row'} justifyContent={'center'}>
+            <Stack direction={'row'} justifyContent={'center'} gap={3}>
               {feed.data?.type === 1 ? (
-                <Box width={'50%'} maxWidth={320}>
-                  <MediaViewItem
-                    media={feed.data.video as any}
-                    orientation="vertical"
-                  />
-                </Box>
+                <>
+                  <Box width={'50%'} maxWidth={320}>
+                    <MediaViewItem
+                      media={feed.data.video as any}
+                      orientation="vertical"
+                    />
+                  </Box>
+                  <Stack justifyContent="flex-end" gap={1.5} mb={3}>
+                    {interactRender(feed.data)}
+                  </Stack>
+                </>
               ) : (
-                <Box width={'75%'} maxWidth={{ md: '568px', xs: '568px' }}>
-                  {!!mediasSrcPreviewer.length && (
-                    <>
-                      <ImageListView
-                        medias={mediasSrcPreviewer as Image[]}
-                        onClickMedia={onClickMedia}
-                      />
-                      <ModalFullScreen
-                        mode="view"
-                        data={mediasSrcPreviewer as Image[]}
-                        open={open}
-                        onCloseModal={handleClose}
-                        // onSubmit={onRemoveMedia}
-                        initialIndexSlider={initialIndexSlider}
-                      />
-                    </>
-                  )}
-                </Box>
+                <>
+                  <Box width={'75%'} maxWidth={{ md: '568px', xs: '568px' }}>
+                    {!!mediasSrcPreviewer.length && (
+                      <>
+                        <ImageListView
+                          medias={mediasSrcPreviewer as Image[]}
+                          onClickMedia={onClickMedia}
+                        />
+                        <ModalFullScreen
+                          mode="view"
+                          data={mediasSrcPreviewer as Image[]}
+                          open={open}
+                          onCloseModal={handleClose}
+                          // onSubmit={onRemoveMedia}
+                          initialIndexSlider={initialIndexSlider}
+                        />
+                      </>
+                    )}
+                  </Box>
+                  <Stack justifyContent="flex-end" gap={1.5} mb={3}>
+                    {interactRender(feed.data)}
+                  </Stack>
+                </>
               )}
             </Stack>
           </Box>

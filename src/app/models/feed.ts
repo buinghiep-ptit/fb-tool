@@ -47,6 +47,9 @@ export interface IFeedDetail {
   dateUpdated?: string
   handledBy?: number
   handleExpireTime?: string | null
+  likeNum?: number
+  viewNum?: number
+  commentNum?: number
 }
 
 export interface ICustomerInfo {

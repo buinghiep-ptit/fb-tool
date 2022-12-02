@@ -81,15 +81,23 @@ export default function RefundOrder({ title }: Props) {
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
     const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-
-    refund({
-      orderId: Number(orderId ?? 0),
-      payload: {
+    let payload = null
+    if (values.refundType == 3) {
+      payload = {
+        refundType: Number(values.refundType),
+        note: values.note || null,
+      }
+    } else {
+      payload = {
         refundType: Number(values.refundType),
         transCode: values.refundType != 3 ? values.transCode : null,
         amount: values.refundType != 3 ? Number(amount) : null,
         note: values.note || null,
-      },
+      }
+    }
+    refund({
+      orderId: Number(orderId ?? 0),
+      payload,
     })
   }
 

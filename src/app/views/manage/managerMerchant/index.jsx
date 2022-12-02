@@ -34,7 +34,7 @@ export default function ManagerMerchant(props) {
   const [listMerchant, setListMerchant] = useState([])
   const [totalListMerchant, setTotalListMerchant] = useState()
   const navigate = useNavigate()
-
+  const tableRef = React.useRef()
   const fetchListMerchant = async param => {
     await getListMerchant(param)
       .then(data => {
@@ -134,10 +134,11 @@ export default function ManagerMerchant(props) {
               variant="contained"
               type="submit"
               onClick={() => {
+                tableRef.current.handleClickSearch()
                 fetchListMerchant({
                   search: search,
                   status: statusFilter,
-                  merchantType: merchantType == 0 ? '' : merchantType,
+                  merchantType: merchantType === 0 ? '' : merchantType,
                   page: 0,
                   size: 20,
                 })
@@ -184,6 +185,8 @@ export default function ManagerMerchant(props) {
           </Grid>
         </Grid>
         <TableCustom
+          key={tableModel}
+          ref={tableRef}
           title="Danh sách đối tác"
           dataTable={listMerchant || []}
           tableModel={tableModel}
@@ -194,7 +197,9 @@ export default function ManagerMerchant(props) {
           filter={{
             search: search,
             status: statusFilter,
-            merchantType: merchantType,
+            merchantType: merchantType === 0 ? '' : merchantType,
+            size: 20,
+            page: 0,
           }}
           onDeleteData={deleteMerchant}
         />

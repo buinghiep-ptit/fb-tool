@@ -157,7 +157,6 @@ export default function ManagerPlace(props) {
                 options={provinces}
                 getOptionLabel={option => option.name}
                 onChange={(_, data) => {
-                  console.log(data)
                   setProvinceId(data.id)
                 }}
                 renderInput={params => (

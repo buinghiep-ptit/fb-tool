@@ -13,7 +13,7 @@ import {
   Button,
   Typography,
 } from '@mui/material'
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 import { SimpleCard } from 'app/components'
 import { Link, useNavigate } from 'react-router-dom'
 import { cloneDeep, isNaN } from 'lodash'
@@ -352,7 +352,6 @@ const TableCustom = forwardRef(
                         const alight = !isNumeric(data[element])
                           ? 'left'
                           : 'center'
-                        console.log(parseInt(data[element]))
                         return (
                           <TableCell align={alight} key={`${element}${id}`}>
                             <div

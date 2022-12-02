@@ -48,7 +48,7 @@ export default function CreateMerchant(props) {
         .required('Vui lòng nhập password')
         .min(8, 'Có ít nhất 8 ký tự')
         .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
-        .max(255, 'Đã đạt số ký tự tối đa'),
+        .max(32, 'Đã đạt số ký tự tối đa'),
       nameMerchant: yup
         .string()
         .required('Vui lòng nhập tên đối tác')
@@ -62,7 +62,7 @@ export default function CreateMerchant(props) {
         .max(255, 'Email không được vượt quá 255 ký tự'),
       mobilePhone: yup
         .string()
-        .required('Vui nhập số điện thoại')
+        .required('Vui lòng nhập số điện thoại')
         .matches(/^[0-9]*$/, 'Chỉ nhập số')
         .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       status: yup.string().required('Vui lòng chọn trạng thái'),

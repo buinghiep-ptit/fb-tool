@@ -71,8 +71,6 @@ export default function UpdateServices({ title }: Props) {
         .when('dateEnd', (dateEnd, yup) => {
           if (dateEnd && dateEnd != 'Invalid Date') {
             const dayAfter = new Date(dateEnd.getTime() - 86400000)
-            console.log(dayAfter)
-
             return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
           }
           return yup

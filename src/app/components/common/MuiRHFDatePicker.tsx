@@ -42,6 +42,7 @@ export function MuiRHFDatePicker({
           {...rest}
           label={label}
           disabled={disabled}
+          views={['year', 'month', 'day']}
           disableFuture={false}
           value={value}
           inputFormat={inputFormat}

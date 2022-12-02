@@ -166,11 +166,13 @@ export default function UpdateServices({ title }: Props) {
       moment(new Date(debouncedDateStart)).unix() <
       moment(new Date(debouncedDateEnd)).unix()
     ) {
+      const d1 = dayjs(new Date(debouncedDateStart ?? '')).format('DD/MM/YYYY')
+      const d2 = dayjs(new Date(debouncedDateEnd ?? '')).format('DD/MM/YYYY')
       recalculate({
         orderId: Number(orderId ?? 0),
         payload: {
-          dateStart: new Date(debouncedDateStart).toISOString(),
-          dateEnd: new Date(debouncedDateEnd).toISOString(),
+          dateStart: convertDateToUTC(d1),
+          dateEnd: convertDateToUTC(d2),
         },
       })
     }

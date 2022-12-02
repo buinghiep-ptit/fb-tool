@@ -61,7 +61,11 @@ export default function InformationPlace(props) {
 
   const schema = yup
     .object({
-      namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
+      namePlace: yup
+        .string()
+        .required('Vui lòng nhập tên địa danh')
+        .trim()
+        .max(255, 'Đã đạt số ký tự tối đa'),
       province: yup.object().required(),
       description: yup.string().required(messages.MSG1),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),

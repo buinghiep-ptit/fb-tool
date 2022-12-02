@@ -431,7 +431,14 @@ export default function Feature({
           <Controller
             control={control}
             name="capacity"
-            render={({ field }) => <TextField variant="outlined" {...field} />}
+            render={({ field }) => (
+              <TextField
+                variant="outlined"
+                {...field}
+                error={!!errors.capacity}
+                helperText={errors.capacity?.message}
+              />
+            )}
           ></Controller>
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>

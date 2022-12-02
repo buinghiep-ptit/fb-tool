@@ -108,6 +108,10 @@ export default function InformationCampGround({ action }) {
       status: yup.string().required('Vui lòng chọn trạng thái'),
       campTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
+      capacity: yup
+        .string()
+        .matches(/^(\s*|\d+)$/, 'Vui lòng nhập số lượng')
+        .nullable(true),
       file: yup
         .mixed()
         .test('required', 'Vui lòng thêm ảnh/video', value => {
@@ -176,7 +180,7 @@ export default function InformationCampGround({ action }) {
       openTime: '',
       closeTime: '',
       topographic: '',
-      capacity: '',
+      capacity: ' ',
       status: '',
       viettel: false,
       mobiphone: false,

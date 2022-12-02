@@ -34,6 +34,7 @@ export default function ManagerLocation(props) {
   const [listCampGround, setListCampGround] = useState([])
   const [totalListCampGround, setTotalListCampground] = useState()
   const navigate = useNavigate()
+  const tableRef = React.useRef()
 
   const fetchListCampGround = async param => {
     const res = await getListCampGround(param)
@@ -147,6 +148,7 @@ export default function ManagerLocation(props) {
               variant="contained"
               type="submit"
               onClick={async () => {
+                tableRef.current.handleClickSearch()
                 const res = await fetchListCampGround({
                   name: inputFilter,
                   status: statusFilter,
@@ -202,6 +204,7 @@ export default function ManagerLocation(props) {
         </Grid>
         <TableCustom
           title="Danh sách địa điểm Camp"
+          ref={tableRef}
           dataTable={listCampGround || []}
           tableModel={tableModel}
           pagination={true}

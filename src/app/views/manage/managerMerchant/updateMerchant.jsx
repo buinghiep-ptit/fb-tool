@@ -60,7 +60,7 @@ export default function UpdateMerchant(props) {
         .max(255, 'Email không được vượt quá 255 ký tự'),
       mobilePhone: yup
         .string()
-        .required('Vui nhập số điện thoại')
+        .required('Vui lòng nhập số điện thoại')
         .matches(/^[0-9]*$/, 'Chỉ nhập số')
         .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       status: yup.string().required('Vui lòng chọn trạng thái'),
@@ -644,7 +644,7 @@ export default function UpdateMerchant(props) {
               </Grid>
             </Grid>
           </form>
-          <DialogCustom ref={dialogConfirm} title="Xác nhận" maxWidth="md">
+          <DialogCustom ref={dialogConfirm} title="Đổi mật khẩu" maxWidth="sm">
             <ChangePasswordMerchant
               handleClose={dialogConfirm?.current?.handleClose}
             />

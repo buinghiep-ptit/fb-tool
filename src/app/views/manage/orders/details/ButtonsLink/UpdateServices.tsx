@@ -521,11 +521,12 @@ export default function UpdateServices({ title }: Props) {
         setOpen={setOpenDialog}
         onSubmit={methods.handleSubmit(onSubmitHandler)}
         isLoading={isLoading}
-        cancelText="Hủy"
+        submitText="Có"
+        cancelText="Không"
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1">
-            Bạn có chắc muốn cập nhật thay đổi?
+            Bạn có chắc muốn cập nhật thông tin đơn hàng?
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

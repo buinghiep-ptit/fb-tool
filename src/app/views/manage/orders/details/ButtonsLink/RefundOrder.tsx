@@ -86,8 +86,8 @@ export default function RefundOrder({ title }: Props) {
       orderId: Number(orderId ?? 0),
       payload: {
         refundType: Number(values.refundType),
-        transCode: values.refundType !== 3 ? values.transCode : null,
-        amount: values.refundType !== 3 ? Number(amount) : null,
+        transCode: values.refundType != 3 ? values.transCode : null,
+        amount: values.refundType != 3 ? Number(amount) : null,
         note: values.note || null,
       },
     })

@@ -14,11 +14,15 @@ export interface IActionHistoryResponse extends IPagingResponse {
 export interface IFeed {
   content?: string
   reportedNum?: number
+  likeNum?: number
+  viewNum?: number
+  commentNum?: number
   feedId?: number
   customerType?: 1 | 2
   account?: string
   dateCreated?: string
   status?: 0 | 1 | -1 | -2
+  customerId?: number
 }
 
 export interface IFeedDetail {

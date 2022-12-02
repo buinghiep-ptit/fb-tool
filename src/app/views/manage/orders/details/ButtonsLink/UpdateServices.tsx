@@ -82,7 +82,7 @@ export default function UpdateServices({ title }: Props) {
         .when('dateStart', (dateStart, yup) => {
           if (dateStart && dateStart != 'Invalid Date') {
             const dayAfter = new Date(dateStart.getTime() + 86400000)
-            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày bắt đầu')
           }
           return yup
         })

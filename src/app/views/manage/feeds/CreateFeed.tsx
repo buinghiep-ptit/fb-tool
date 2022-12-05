@@ -263,7 +263,7 @@ function CreateFeed(props: any) {
     error,
   } = useQuery<ICustomerResponse, Error>(
     ['customers-food'],
-    () => fetchCustomers({ cusType: 3 }),
+    () => fetchCustomers({ cusType: 3, size: 500, page: 0 }),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,

@@ -1,4 +1,5 @@
 import { uploadApi } from 'app/apis/uploads/upload.service'
+import { compressImageFile } from 'app/helpers/compressFile'
 import axios from 'axios'
 import uploadFileTypes from './uploadFile.types'
 
@@ -43,8 +44,12 @@ export const uploadFile = files => dispatch => {
   if (files.length) {
     files.forEach(async file => {
       try {
+        let fileCompressed = file.file
+        if (file.file.type.includes('image')) {
+          fileCompressed = await compressImageFile(file.file)
+        }
         const fileResult = await uploadApi(
-          file.file,
+          fileCompressed,
           progress => {
             const { loaded, total } = progress
             const percentageProgress = Math.floor((loaded / total) * 100)
@@ -56,6 +61,7 @@ export const uploadFile = files => dispatch => {
           successUploadFile(file.id, {
             ...fileResult,
             mediaFormat: file.file.type.includes('video') ? 1 : 2,
+            mediaType: 3,
           }),
         )
       } catch (error) {

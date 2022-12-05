@@ -7,9 +7,11 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { uploadApi } from 'app/apis/uploads/upload.service'
+import { blobToFile } from 'app/helpers/compressFile'
 import { generateVideoThumbnails } from 'app/helpers/extractThumbnailVideo'
 import { IMediaOverall } from 'app/models'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -44,6 +46,7 @@ export interface Props {
   videos: IMediaOverall[]
   setUploadFile: (files: File[]) => void
   setInitialFile: (files: IMediaOverall[]) => void
+  setThumbnail?: (file: string) => void
 }
 
 export function VideoUploadPreviewer({
@@ -51,6 +54,7 @@ export function VideoUploadPreviewer({
   videos = [],
   setUploadFile,
   setInitialFile,
+  setThumbnail,
 }: Props) {
   const {
     setValue,
@@ -62,11 +66,20 @@ export function VideoUploadPreviewer({
 
   const fileInfos = useSelector((state: any) => state.UploadFile.fileInfos)
   const [thumbnailsPreviewer, setThumbnailPreviewer] = useState([])
+  const [thumbnailActive, setThumbnailActive] = useState(0)
 
   const getThumbnailsFromVideo = async (file: File) => {
     const thumbnails = await generateVideoThumbnails(file, 4)
     setThumbnailPreviewer(thumbnails)
-    console.log(thumbnails)
+    base64ToFile(thumbnails[0])
+  }
+
+  const base64ToFile = async (base64: any) => {
+    const blob = await fetch(base64).then(res => res.blob())
+    const myFile = blobToFile(blob, 'thumbnail.jpeg')
+    const thumbResult = await uploadApi(myFile)
+
+    setThumbnail && setThumbnail(thumbResult.url)
   }
 
   const onDrop = useCallback(
@@ -101,35 +114,38 @@ export function VideoUploadPreviewer({
       {!videos.length && (
         <div {...getRootProps({ className: 'dropzone' })}>
           <input {...getInputProps()} />
+          <Stack direction={'row'} width="100%">
+            <DropWrapper
+              sx={{
+                aspectRatio: 'auto 9 / 16',
+                borderRadius: 1.5,
+                display: 'flex',
+                flex: 1,
+              }}
+            >
+              <Stack flexDirection={'column'} alignItems="center" gap={1}>
+                <MuiTypography fontSize={'1.125rem'}>
+                  {'Chọn video để tải lên'}
+                </MuiTypography>
+                <MuiTypography variant="body2">
+                  Hoặc kéo và thả tập tin
+                </MuiTypography>
+                <Icon>backup</Icon>
+                <MuiTypography variant="body2">
+                  MP4, MOV, 3GP hoặc WebM
+                </MuiTypography>
+                <MuiTypography variant="body2">tối đa 3 phút</MuiTypography>
 
-          <DropWrapper
-            sx={{
-              aspectRatio: 'auto 9 / 16',
-              borderRadius: 1.5,
-              display: 'flex',
-            }}
-          >
-            <Stack flexDirection={'column'} alignItems="center" gap={1}>
-              <MuiTypography fontSize={'1.125rem'}>
-                {'Chọn video để tải lên'}
-              </MuiTypography>
-              <MuiTypography variant="body2">
-                Hoặc kéo và thả tập tin
-              </MuiTypography>
-              <Icon>backup</Icon>
-              <MuiTypography variant="body2">
-                MP4, MOV, 3GP hoặc WebM
-              </MuiTypography>
-              <MuiTypography variant="body2">tối đa 3 phút</MuiTypography>
-
-              <MuiButton
-                title="Chọn video"
-                variant="contained"
-                color="primary"
-                sx={{ mt: 2 }}
-              />
-            </Stack>
-          </DropWrapper>
+                <MuiButton
+                  title="Chọn video"
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 2 }}
+                />
+              </Stack>
+            </DropWrapper>
+            <Stack width={150} px={1.5} gap={1.5}></Stack>
+          </Stack>
         </div>
       )}
 
@@ -137,51 +153,87 @@ export function VideoUploadPreviewer({
         <FormHelperText error>{errors[name]?.message as string}</FormHelperText>
       )}
 
-      {!!videos.length && videos[0].url && (
-        <Stack direction={'row'}>
-          <PreviewerViewport
-            sx={{
-              aspectRatio: 'auto 9 / 16',
-              borderRadius: 1.5,
-              flex: 1,
-            }}
-          >
-            <MediaPlayer url={videos[0].url} setDuration={() => {}} />
-            <Stack
-              flexDirection={'row'}
-              gap={1.5}
+      {!!videos.length &&
+        !!videos[videos.length - 1] &&
+        videos[videos.length - 1].url && (
+          <Stack direction={'row'}>
+            <PreviewerViewport
               sx={{
-                position: 'absolute',
-                width: '100%',
-                top: 0,
-                left: 0,
-                py: 3,
-                px: 1,
-                zIndex: 1,
-                justifyContent: 'flex-end',
+                aspectRatio: 'auto 9 / 16',
+                borderRadius: 1.5,
+                flex: 1,
               }}
             >
-              <CustomIconButton
-                handleClick={open}
-                iconName={'cached'}
-                title={'Thay đổi video'}
+              <MediaPlayer
+                url={videos[videos.length - 1].url ?? videos[0].url ?? ''}
+                setDuration={() => {}}
               />
+              <Stack
+                flexDirection={'row'}
+                gap={1.5}
+                sx={{
+                  position: 'absolute',
+                  width: '100%',
+                  top: 0,
+                  left: 0,
+                  py: 3,
+                  px: 1,
+                  zIndex: 1,
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <CustomIconButton
+                  handleClick={open}
+                  iconName={'cached'}
+                  title={'Thay đổi video'}
+                />
 
-              <CustomIconButton
-                handleClick={handleRemoveAllMedias}
-                iconName={'delete'}
-                title={'Xoá'}
-              />
+                <CustomIconButton
+                  handleClick={handleRemoveAllMedias}
+                  iconName={'delete'}
+                  title={'Xoá'}
+                />
+              </Stack>
+            </PreviewerViewport>
+            <Stack width={150} bgcolor="grey" px={1.5} gap={1.5}>
+              {thumbnailsPreviewer.length ? (
+                thumbnailsPreviewer.map((thumb, index) => (
+                  <img
+                    key={index}
+                    onClick={() => {
+                      setThumbnailActive(index)
+                      base64ToFile(thumb)
+                    }}
+                    src={thumb}
+                    style={{
+                      cursor: 'pointer',
+                      width: '100%',
+                      height: 80,
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      border: `2px solid ${
+                        thumbnailActive === index ? '#2F9B42' : '#ffffff'
+                      }`,
+                    }}
+                  />
+                ))
+              ) : (
+                <></>
+              )}
+              {thumbnailsPreviewer.length ? (
+                <MuiTypography
+                  textAlign={'center'}
+                  variant="body2"
+                  fontWeight={500}
+                >
+                  Chọn thumbnail
+                </MuiTypography>
+              ) : (
+                <></>
+              )}
             </Stack>
-          </PreviewerViewport>
-          {thumbnailsPreviewer[0] && (
-            <img
-              src={thumbnailsPreviewer[0]}
-              style={{ width: 120, height: 80 }}
-            />
-          )}
-        </Stack>
-      )}
+          </Stack>
+        )}
     </Fragment>
   )
 }

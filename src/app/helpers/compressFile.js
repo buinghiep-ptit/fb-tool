@@ -1,3 +1,5 @@
+import { uploadApi } from 'app/apis/uploads/upload.service'
+
 export const importFileandPreview = (file, revoke) => {
   return new Promise((resolve, reject) => {
     window.URL = window.URL || window.webkitURL
@@ -117,47 +119,67 @@ export const getVideoDuration = videoFile => {
 }
 
 export const compressImageFile = async imageFile => {
-  let originalImage = new Image()
-  originalImage.src = await fileToDataUri(imageFile)
+  return new Promise(async resolve => {
+    let originalImage = new Image()
+    originalImage.src = await fileToDataUri(imageFile)
 
-  originalImage.addEventListener('load', () => {
-    compressImage(originalImage, 1, 1)
+    originalImage.addEventListener('load', () => {
+      compressImage(originalImage).then(file => resolve(file))
+    })
   })
 }
 
-const compressImage = (imgToCompress, resizingFactor, quality) => {
-  // showing the compressed image
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
+const compressImage = (imgToCompress, resizingFactor = 1, quality = 0.8) => {
+  return new Promise(resolve => {
+    const MAX_WIDTH = 1440
+    const MAX_HEIGHT = 812
 
-  const originalWidth = imgToCompress.width
-  const originalHeight = imgToCompress.height
+    // showing the compressed image
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
 
-  const canvasWidth = originalWidth * resizingFactor
-  const canvasHeight = originalHeight * resizingFactor
+    let originalWidth = imgToCompress.width
+    let originalHeight = imgToCompress.height
 
-  canvas.width = canvasWidth
-  canvas.height = canvasHeight
-
-  context.drawImage(
-    imgToCompress,
-    0,
-    0,
-    originalWidth * resizingFactor,
-    originalHeight * resizingFactor,
-  )
-
-  // reducing the quality of the image
-  canvas.toBlob(
-    blob => {
-      if (blob) {
-        let compressedImageBlob = blob
-        console.log(compressedImageBlob)
+    if (originalWidth > originalHeight) {
+      if (originalWidth * resizingFactor > MAX_WIDTH) {
+        originalHeight *= MAX_WIDTH / originalWidth
+        originalWidth = MAX_WIDTH
       }
-    },
-    'image/jpeg',
-    quality,
-  )
+    } else {
+      if (originalHeight * resizingFactor > MAX_HEIGHT) {
+        originalWidth *= MAX_HEIGHT / originalHeight
+        originalHeight = MAX_HEIGHT
+      }
+    }
+
+    const canvasWidth = originalWidth * resizingFactor
+    const canvasHeight = originalHeight * resizingFactor
+
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+
+    context.drawImage(
+      imgToCompress,
+      0,
+      0,
+      originalWidth * resizingFactor,
+      originalHeight * resizingFactor,
+    )
+
+    // reducing the quality of the image
+    canvas.toBlob(
+      async blob => {
+        if (blob) {
+          const compressedBlobToFile = blobToFile(blob, 'compressed.jpeg')
+
+          resolve(compressedBlobToFile)
+        }
+      },
+      'image/jpeg',
+      quality,
+    )
+  })
 }
 
 const fileToDataUri = field => {
@@ -168,4 +190,15 @@ const fileToDataUri = field => {
     })
     reader.readAsDataURL(field)
   })
+}
+
+export const blobToFile = (theBlob, fileName) => {
+  return new File(
+    [theBlob], // cast as any
+    fileName,
+    {
+      lastModified: new Date().getTime(),
+      type: theBlob.type,
+    },
+  )
 }

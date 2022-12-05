@@ -17,6 +17,7 @@ import { MuiTypography } from './MuiTypography'
 import { MuiButton } from './MuiButton'
 import { useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
+import { compressImageFile } from 'app/helpers/compressFile'
 
 export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
   ({ aspectRatio }) => ({
@@ -25,6 +26,7 @@ export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
     background: 'rgba(22, 24, 35, 0.03)',
     borderRadius: 1.5,
     justifyContent: 'center',
+    padding: '16px',
     alignItems: 'center',
     cursor: 'pointer',
     border: '2px dashed rgba(22, 24 , 35, 0.2)',
@@ -64,8 +66,13 @@ export function ImageUploadPreviewer({
   const files: File[] = watch(name)
 
   const onDrop = useCallback(
-    (droppedFiles: File[]) => {
+    async (droppedFiles: File[]) => {
       setValue(name, droppedFiles, { shouldValidate: true })
+      // const filesCompressedPromise = droppedFiles.map(async file => {
+      //   const data = await compressImageFile(file)
+      //   return data
+      // })
+      // const filesCompressed = await Promise.all(filesCompressedPromise)
       setUploadFile(droppedFiles)
     },
     [setValue, name, files],

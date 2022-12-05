@@ -117,7 +117,7 @@ const extraCustomer = (customer?: ICustomerDetail) => {
 function CreateFeed(props: any) {
   const navigate = useNavigate()
   const { feedId } = useParams()
-  const [thumbnail, setThumbnail] = useState<IMediaOverall>()
+  const [thumbnail, setThumbnail] = useState<string>()
   const [type, setType] = useState<number>(1)
 
   const audioRef = useRef() as any
@@ -190,7 +190,6 @@ function CreateFeed(props: any) {
         return !!media
       }),
       images: Yup.mixed().test('required', messages.MSG1, files => {
-        console.log('vaoday')
         const media = ((props.fileInfos ?? []) as IMediaOverall[]).find(
           media => media.mediaFormat === 2,
         )
@@ -217,8 +216,6 @@ function CreateFeed(props: any) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  console.log(methods.formState.errors)
 
   const fileType = methods.watch('type')
   const idSrcType = methods.watch('idSrcType')
@@ -331,6 +328,12 @@ function CreateFeed(props: any) {
         [],
     )
 
+    setThumbnail(
+      feed.video
+        ? feed.video.detail?.coverImgUrl
+        : feed.images?.find(f => f.mediaType === 2)?.url,
+    )
+
     if (feed.customerInfo?.type === 2) {
       const customer =
         customersKol?.content &&
@@ -374,6 +377,14 @@ function CreateFeed(props: any) {
   }, [audio])
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+    const videos = props.fileInfos.filter(
+      (file: IMediaOverall) => file.mediaFormat === 1,
+    )
+
+    const images = props.fileInfos.filter(
+      (file: IMediaOverall) => file.mediaFormat === 2,
+    )
+
     const payload: IFeedDetail = {
       type: Number(values.type ?? 0),
       idSrcType: values.idSrcType != 0 ? Number(values.idSrcType) : null,
@@ -393,8 +404,27 @@ function CreateFeed(props: any) {
           ? values.customerKol.customerId
           : values.customerFood.customerId,
       content: values.content,
-      video: {},
-      images: [],
+      video:
+        fileType === 1
+          ? {
+              ...videos[videos.length - 1],
+              detail: {
+                ...videos[videos.length - 1].detail,
+                coverImgUrl: thumbnail,
+              },
+            }
+          : {},
+      images:
+        fileType === 2
+          ? [
+              ...images,
+              {
+                mediaType: 2,
+                mediaFormat: 2,
+                url: images[images.length - 1].url,
+              },
+            ]
+          : [],
       idAudio: values.audio?.id ?? null,
       tags: values.hashtag ?? [],
       viewScope: 1,
@@ -402,13 +432,11 @@ function CreateFeed(props: any) {
       status: 1,
     }
 
-    console.log(payload, values)
-
-    // if (feedId) {
-    //   edit({ ...payload, id: Number(feedId) })
-    // } else {
-    //   add(payload)
-    // }
+    if (feedId) {
+      edit({ ...payload, id: Number(feedId) })
+    } else {
+      add(payload)
+    }
   }
 
   const onRowUpdateSuccess = (data: any, message: string) => {
@@ -655,6 +683,7 @@ function CreateFeed(props: any) {
                     )}
                     setUploadFile={props.setUploadFile}
                     setInitialFile={props.setInitialFile}
+                    setThumbnail={setThumbnail}
                   />
                 )}
                 {fileType == 2 && (

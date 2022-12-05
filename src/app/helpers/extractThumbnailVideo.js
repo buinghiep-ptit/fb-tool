@@ -121,18 +121,81 @@ export const getVideoDuration = videoFile => {
   })
 }
 
-const convertBase64 = imageFile => {
-  return new Promise(resolve => {
-    const fileReader = new FileReader()
-    fileReader.readAsDataURL(imageFile)
-    fileReader.onload = fileReaderEvent => {
-      const imageAsBase64 = fileReaderEvent.target.result
-      resolve(imageAsBase64)
-    }
+export const compressImageFile = async imageFile => {
+  return new Promise(async resolve => {
+    let originalImage = new Image()
+    originalImage.src = await fileToDataUri(imageFile)
+
+    originalImage.addEventListener('load', () => {
+      compressImage(originalImage).then(file => resolve(file))
+    })
   })
 }
 
-const blobToFile = (theBlob, fileName) => {
+const compressImage = (imgToCompress, resizingFactor = 1, quality = 0.8) => {
+  return new Promise(resolve => {
+    const MAX_WIDTH = 1440
+    const MAX_HEIGHT = 812
+
+    // showing the compressed image
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('2d')
+
+    let originalWidth = imgToCompress.width
+    let originalHeight = imgToCompress.height
+
+    if (originalWidth > originalHeight) {
+      if (originalWidth * resizingFactor > MAX_WIDTH) {
+        originalHeight *= MAX_WIDTH / originalWidth
+        originalWidth = MAX_WIDTH
+      }
+    } else {
+      if (originalHeight * resizingFactor > MAX_HEIGHT) {
+        originalWidth *= MAX_HEIGHT / originalHeight
+        originalHeight = MAX_HEIGHT
+      }
+    }
+
+    const canvasWidth = originalWidth * resizingFactor
+    const canvasHeight = originalHeight * resizingFactor
+
+    canvas.width = canvasWidth
+    canvas.height = canvasHeight
+
+    context.drawImage(
+      imgToCompress,
+      0,
+      0,
+      originalWidth * resizingFactor,
+      originalHeight * resizingFactor,
+    )
+
+    // reducing the quality of the image
+    canvas.toBlob(
+      async blob => {
+        if (blob) {
+          const compressedBlobToFile = blobToFile(blob, 'compressed.jpeg')
+
+          resolve(compressedBlobToFile)
+        }
+      },
+      'image/jpeg',
+      quality,
+    )
+  })
+}
+
+const fileToDataUri = field => {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.addEventListener('load', () => {
+      resolve(reader.result)
+    })
+    reader.readAsDataURL(field)
+  })
+}
+
+export const blobToFile = (theBlob, fileName) => {
   return new File(
     [theBlob], // cast as any
     fileName,
@@ -143,67 +206,89 @@ const blobToFile = (theBlob, fileName) => {
   )
 }
 
-export const compressImageFile = async (
-  imageFile,
-  maxWidth = 812,
-  maxHeight = 812,
-) => {
-  return new Promise(resolve => {
-    convertBase64(imageFile).then(imageAsBase64 => {
-      let img = new Image()
-      img.src = imageAsBase64
-      img.onload = async () => {
-        let canvas = document.createElement('canvas')
-        const MAX_WIDTH = maxWidth
-        const MAX_HEIGHT = maxHeight
-        let width = img.width
-        let height = img.height
+// const convertBase64 = imageFile => {
+//   return new Promise(resolve => {
+//     const fileReader = new FileReader()
+//     fileReader.readAsDataURL(imageFile)
+//     fileReader.onload = fileReaderEvent => {
+//       const imageAsBase64 = fileReaderEvent.target.result
+//       resolve(imageAsBase64)
+//     }
+//   })
+// }
 
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width
-            width = MAX_WIDTH
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height
-            height = MAX_HEIGHT
-          }
-        }
-        canvas.width = width
-        canvas.height = height
-        let ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0, width, height)
+// const blobToFile = (theBlob, fileName) => {
+//   return new File(
+//     [theBlob], // cast as any
+//     fileName,
+//     {
+//       lastModified: new Date().getTime(),
+//       type: theBlob.type,
+//     },
+//   )
+// }
 
-        const blob = await fetch(canvas.toDataURL()).then(res => res.blob())
+// export const compressImageFile = async (
+//   imageFile,
+//   maxWidth = 812,
+//   maxHeight = 812,
+// ) => {
+//   return new Promise(resolve => {
+//     convertBase64(imageFile).then(imageAsBase64 => {
+//       let img = new Image()
+//       img.src = imageAsBase64
+//       img.onload = async () => {
+//         let canvas = document.createElement('canvas')
+//         const MAX_WIDTH = maxWidth
+//         const MAX_HEIGHT = maxHeight
+//         let width = img.width
+//         let height = img.height
 
-        const image = canvas.toDataURL()
+//         if (width > height) {
+//           if (width > MAX_WIDTH) {
+//             height *= MAX_WIDTH / width
+//             width = MAX_WIDTH
+//           }
+//         } else {
+//           if (height > MAX_HEIGHT) {
+//             width *= MAX_HEIGHT / height
+//             height = MAX_HEIGHT
+//           }
+//         }
+//         canvas.width = width
+//         canvas.height = height
+//         let ctx = canvas.getContext('2d')
+//         ctx.drawImage(img, 0, 0, width, height)
 
-        const fileCompressed = blobToFile(blob, 'thumbnail.jpeg')
-        console.log(fileCompressed, image.length)
+//         const blob = await fetch(canvas.toDataURL()).then(res => res.blob())
 
-        resolve(fileCompressed)
-      }
-    })
-  })
+//         const image = canvas.toDataURL()
 
-  // const imageResizeWidth = 100
-  // // if (image.width <= imageResizeWidth) {
-  // //  return;
-  // // }
+//         const fileCompressed = blobToFile(blob, 'thumbnail.jpeg')
+//         console.log(fileCompressed, image.length)
 
-  // const canvas = document.createElement('canvas')
-  // canvas.width = imageResizeWidth
-  // canvas.height = ~~(image.height * (imageResizeWidth / image.width))
-  // const context = canvas.getContext('2d', { alpha: false })
-  // // if (!context) {
-  // //  return;
-  // // }
-  // context.drawImage(image, 0, 0, canvas.width, canvas.height)
+//         resolve(fileCompressed)
+//       }
+//     })
+//   })
 
-  // // const resizedImageBinary = canvas.toBlob()
-  // const resizedImageAsBase64 = canvas.toDataURL(mimeType)
-  // console.log('resizedImageAsBase64:', image.height)
-  // return resizedImageAsBase64
-  // }
-}
+//   // const imageResizeWidth = 100
+//   // // if (image.width <= imageResizeWidth) {
+//   // //  return;
+//   // // }
+
+//   // const canvas = document.createElement('canvas')
+//   // canvas.width = imageResizeWidth
+//   // canvas.height = ~~(image.height * (imageResizeWidth / image.width))
+//   // const context = canvas.getContext('2d', { alpha: false })
+//   // // if (!context) {
+//   // //  return;
+//   // // }
+//   // context.drawImage(image, 0, 0, canvas.width, canvas.height)
+
+//   // // const resizedImageBinary = canvas.toBlob()
+//   // const resizedImageAsBase64 = canvas.toDataURL(mimeType)
+//   // console.log('resizedImageAsBase64:', image.height)
+//   // return resizedImageAsBase64
+//   // }
+// }

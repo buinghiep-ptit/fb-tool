@@ -327,7 +327,7 @@ export default function AddAudio({ title }: Props) {
                                 variant="body2"
                                 fontSize={'0.75rem'}
                               >
-                                (MP3 / OGG hoặc WAV)
+                                (MP3 / OG / AAC MP4 hoặc WAV)
                               </MuiTypography>
                             </Stack>
                           </Stack>

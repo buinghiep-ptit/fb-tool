@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import { Box, Button, Grid, Icon, styled, TextField, Fab } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import InputLabel from '@mui/material/InputLabel'
@@ -34,7 +34,7 @@ export default function ManagerMerchant(props) {
   const [listMerchant, setListMerchant] = useState([])
   const [totalListMerchant, setTotalListMerchant] = useState()
   const navigate = useNavigate()
-
+  const tableRef = React.useRef()
   const fetchListMerchant = async param => {
     await getListMerchant(param)
       .then(data => {
@@ -134,10 +134,11 @@ export default function ManagerMerchant(props) {
               variant="contained"
               type="submit"
               onClick={() => {
+                tableRef.current.handleClickSearch()
                 fetchListMerchant({
                   search: search,
                   status: statusFilter,
-                  merchantType: merchantType == 0 ? '' : merchantType,
+                  merchantType: merchantType === 0 ? '' : merchantType,
                   page: 0,
                   size: 20,
                 })
@@ -160,16 +161,18 @@ export default function ManagerMerchant(props) {
               cursor: 'pointer',
             }}
           >
-            <Icon
-              fontSize="large"
+            <Fab
               color="primary"
-              sx={{ marginRight: '5px' }}
+              aria-label="Add"
+              className="button"
+              sx={{ marginRight: '15px', cursor: 'pointer' }}
+              size="small"
               onClick={() => {
                 navigate('/them-doi-tac')
               }}
             >
-              add_circle
-            </Icon>
+              <Icon>add</Icon>
+            </Fab>
             <Paragraph
               variant="h1"
               component="h2"
@@ -182,6 +185,8 @@ export default function ManagerMerchant(props) {
           </Grid>
         </Grid>
         <TableCustom
+          key={tableModel}
+          ref={tableRef}
           title="Danh sách đối tác"
           dataTable={listMerchant || []}
           tableModel={tableModel}
@@ -192,7 +197,9 @@ export default function ManagerMerchant(props) {
           filter={{
             search: search,
             status: statusFilter,
-            merchantType: merchantType,
+            merchantType: merchantType === 0 ? '' : merchantType,
+            size: 20,
+            page: 0,
           }}
           onDeleteData={deleteMerchant}
         />

@@ -61,7 +61,6 @@ export default function Feature({
       convertRes[item.idUtility] = item
     })
     setListUtility(convertRes)
-    console.log(convertRes)
   }
 
   React.useEffect(() => {
@@ -366,17 +365,17 @@ export default function Feature({
                   <FormControlLabel
                     value={1}
                     control={<Radio />}
-                    label="Dễ di chuyển"
+                    label="Dễ đi"
                   />
                   <FormControlLabel
                     value={2}
                     control={<Radio />}
-                    label="Khó di chuyển"
+                    label="Khó đi"
                   />
                   <FormControlLabel
                     value={3}
                     control={<Radio />}
-                    label="Rất khó di chuyển"
+                    label="Rất khó đi"
                   />
                 </RadioGroup>
               </FormControl>
@@ -432,7 +431,14 @@ export default function Feature({
           <Controller
             control={control}
             name="capacity"
-            render={({ field }) => <TextField variant="outlined" {...field} />}
+            render={({ field }) => (
+              <TextField
+                variant="outlined"
+                {...field}
+                error={!!errors.capacity}
+                helperText={errors.capacity?.message}
+              />
+            )}
           ></Controller>
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>
@@ -463,33 +469,39 @@ export default function Feature({
               <FormControlLabel
                 key={utility.idUtility}
                 control={
-                  <Checkbox
-                    onChange={e => {
-                      if (e.target.checked) {
-                        const newFeature = cloneDeep(feature)
-                        newFeature.utility.push(e.target.id)
-                        updateFeature(newFeature)
-                        const newUnlinked = cloneDeep(unlinkedUtilitys)
-                        newUnlinked[index].checked = e.target.checked
-                        setUnlinkedUtilitys(newUnlinked)
-                        console.log(e.target.id)
-                      } else {
-                        const newFeatureUtility = remove(
-                          cloneDeep(feature).utility,
-                          item => item !== e.target.id,
-                        )
-                        const newFeature = cloneDeep(feature)
-                        newFeature.utility = newFeatureUtility
-                        const newUnlinked = cloneDeep(unlinkedUtilitys)
-                        newUnlinked[index].checked = e.target.checked
-                        setUnlinkedUtilitys(newUnlinked)
-                        updateFeature(newFeature)
-                      }
-                    }}
-                    checked={utility.checked}
-                    name={utility.value}
-                    id={utility.idUtility.toString()}
-                  />
+                  <>
+                    <img
+                      src={utility.iconUrl}
+                      style={{ width: '30px', height: '30px' }}
+                    />
+                    <Checkbox
+                      onChange={e => {
+                        if (e.target.checked) {
+                          const newFeature = cloneDeep(feature)
+                          newFeature.utility.push(e.target.id)
+                          updateFeature(newFeature)
+                          const newUnlinked = cloneDeep(unlinkedUtilitys)
+                          newUnlinked[index].checked = e.target.checked
+                          setUnlinkedUtilitys(newUnlinked)
+                          console.log(e.target.id)
+                        } else {
+                          const newFeatureUtility = remove(
+                            cloneDeep(feature).utility,
+                            item => item !== e.target.id,
+                          )
+                          const newFeature = cloneDeep(feature)
+                          newFeature.utility = newFeatureUtility
+                          const newUnlinked = cloneDeep(unlinkedUtilitys)
+                          newUnlinked[index].checked = e.target.checked
+                          setUnlinkedUtilitys(newUnlinked)
+                          updateFeature(newFeature)
+                        }
+                      }}
+                      checked={utility.checked}
+                      name={utility.value}
+                      id={utility.idUtility.toString()}
+                    />
+                  </>
                 }
                 label={utility.value}
               />

@@ -31,7 +31,7 @@ const tableModel = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'name', 'address', 'des-status'],
+  bodyCell: ['index', 'linkDetail', 'address', 'des-status'],
 }
 
 const tableModelCampUnlinked = {
@@ -57,7 +57,7 @@ const tableModelCampUnlinked = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'name', 'address', 'des-status', 'action'],
+  bodyCell: ['index', 'linkDetail', 'address', 'des-status', 'action'],
 }
 
 const param = {
@@ -79,14 +79,17 @@ export default function ListCampPlace(props) {
   const [listCampUnlinked, setListCampUnlinked] = React.useState()
   const [totalCampUnlinked, setTotalCampUnlinked] = React.useState()
   const [filterCamp, setFilterCamp] = React.useState('')
-
+  const tableRef = React.useRef()
   const fetchListCamp = async (id, param) => {
     await getListCamp(id, param)
       .then(data => {
         const newList = cloneDeep(data.content).map(camp => {
           const convertCamp = {}
           convertCamp.id = camp.id
-          convertCamp.name = camp.name
+          convertCamp.linkDetail = {
+            link: camp.name,
+            path: '/chi-tiet-diem-camp/',
+          }
           convertCamp.address = camp.address
           convertCamp['des-status'] =
             camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'
@@ -105,7 +108,10 @@ export default function ListCampPlace(props) {
         const newList = cloneDeep(data.content).map(camp => {
           const convertCamp = {}
           convertCamp.id = camp.id
-          convertCamp.name = camp.name
+          convertCamp.linkDetail = {
+            link: camp.name,
+            path: '/chi-tiet-diem-camp/',
+          }
           convertCamp.address = camp.address
           convertCamp['des-status'] =
             camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'
@@ -173,7 +179,7 @@ export default function ListCampPlace(props) {
             alignItems: 'center',
             color: '#07bc0c',
             textDecoration: 'underline',
-          }}
+          }}tableRef
         >
           <Link to="/them-diem-camp" target="_blank">
             Thêm điểm camp
@@ -215,6 +221,7 @@ export default function ListCampPlace(props) {
             variant="contained"
             style={{ margin: '20px 0' }}
             onClick={() => {
+              tableRef.current.handleClickSearch()
               fetchListCampUnlinked(params.id, {
                 name: filterCamp,
                 size: 20,
@@ -226,6 +233,7 @@ export default function ListCampPlace(props) {
           </Button>
           <TableCustom
             title="Danh sách điểm camp"
+            ref={tableRef}
             tableModel={tableModelCampUnlinked}
             pagination={true}
             dataTable={listCampUnlinked || []}

@@ -82,6 +82,7 @@ export default function ListEventPlace(props) {
   const [listEventUnlinked, setListEventUnlinked] = React.useState()
   const [totalEventUnlinked, setTotalEventUnlinked] = React.useState()
   const [filterEvent, setFilterEvent] = React.useState('')
+  const tableRef = React.useState()
 
   const fetchListEvent = async (id, param) => {
     await getListEvent(id, param)
@@ -93,7 +94,7 @@ export default function ListEventPlace(props) {
           convertEvent.time = `${event.startDate} - ${event.endDate}`
           convertEvent['des-status'] =
             event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
-          convertEvent.action = ['delete']
+          convertEvent.action = ['unlinked']
           return convertEvent
         })
 
@@ -218,6 +219,7 @@ export default function ListEventPlace(props) {
             variant="contained"
             style={{ margin: '20px 0' }}
             onClick={() => {
+              tableRef.current.handleClickSearch()
               fetchListEventUnlinked(params.id, {
                 name: filterEvent,
                 size: 20,
@@ -230,6 +232,7 @@ export default function ListEventPlace(props) {
 
           <TableCustom
             title="Danh sách sự kiện"
+            ref={tableRef}
             tableModel={tableModelEventUnlinked}
             pagination={true}
             dataTable={listEventUnlinked || []}

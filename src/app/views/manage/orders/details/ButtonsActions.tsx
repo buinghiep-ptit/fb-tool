@@ -294,7 +294,7 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
           </>
         )}
 
-      {!order?.cancelRequest &&
+      {(!order?.cancelRequest || order.cancelRequest?.status === 2) &&
         order?.status === 3 &&
         isReceiveOrder(order, currentUser) && (
           <>
@@ -331,7 +331,8 @@ export function ButtonsActions({ order, currentUser }: IButtonsActionProps) {
 
       {isInprogressOrder(order) &&
         isReceiveOrder(order, currentUser) &&
-        order?.cancelRequest && (
+        order?.cancelRequest &&
+        order.cancelRequest?.status !== 2 && (
           <>
             <MuiButton
               title="Huỷ chỗ, hoàn tiền"

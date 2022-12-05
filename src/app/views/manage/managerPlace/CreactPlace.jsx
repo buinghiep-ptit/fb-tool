@@ -8,6 +8,7 @@ import {
   Stack,
   Icon,
   FormHelperText,
+  LinearProgress,
 } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
@@ -47,6 +48,7 @@ export default function CreatePlace(props) {
   const [provinces, setProvinces] = React.useState([])
   const [districts, setDistricts] = React.useState([])
   const [wards, setWards] = React.useState([])
+  const [isLoading, setIsLoading] = React.useState(false)
   const [createDegrees, setCreateDegrees] = React.useState({
     lat: 21.027161210811197,
     lng: 105.78872657468659,
@@ -55,10 +57,18 @@ export default function CreatePlace(props) {
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
     { label: 'Chạy bộ', id: 2 },
-    { label: 'Teambuiding', id: 3 },
+    { label: 'Teambuilding', id: 3 },
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
+
+  const hashtagTypeCamp = {
+    1: '#camtrai',
+    2: '#chaybo',
+    3: '#teambuilding',
+    4: '#luutru',
+    5: '#leonui',
+  }
 
   const uploadImageRef = React.useRef()
   const mapRef = React.useRef()
@@ -67,7 +77,11 @@ export default function CreatePlace(props) {
 
   const schema = yup
     .object({
-      namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
+      namePlace: yup
+        .string()
+        .required('Vui lòng nhập tên địa danh')
+        .trim()
+        .max(255, 'Đã đạt số ký tự tối đa'),
       province: yup.object().required('Vui lòng chọn tỉnh thành phố'),
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
@@ -80,7 +94,11 @@ export default function CreatePlace(props) {
         .test('fileSize', 'Dung lượng file quá lớn', value => {
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].size > 10000000) return false
+              if (
+                value[i].size > 10000000 &&
+                !value[i].type.startsWith('video')
+              )
+                return false
             }
             return true
           }
@@ -174,6 +192,7 @@ export default function CreatePlace(props) {
           })
           return await res
         } catch (e) {
+          setIsLoading(false)
           console.log(e)
         }
       }
@@ -182,8 +201,7 @@ export default function CreatePlace(props) {
     const fileUploadVideo = [...introData].map(async file => {
       if (file.type.startsWith('video/')) {
         const formData = new FormData()
-        const newFile = await compressImageFile(file)
-        formData.append('file', newFile)
+        formData.append('file', file)
         try {
           const token = window.localStorage.getItem('accessToken')
           const res = axios({
@@ -197,6 +215,7 @@ export default function CreatePlace(props) {
           })
           return await res
         } catch (e) {
+          setIsLoading(false)
           console.log(e)
         }
       }
@@ -215,6 +234,7 @@ export default function CreatePlace(props) {
   }
 
   const onSubmit = async data => {
+    setIsLoading(true)
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -260,8 +280,8 @@ export default function CreatePlace(props) {
       status: 1,
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
-
     const res = await createPlace(paramDetail)
+    setIsLoading(false)
     if (res) {
       toastSuccess({ message: 'Tạo địa danh thành công' })
       fetchGetProvinces()
@@ -297,6 +317,19 @@ export default function CreatePlace(props) {
 
   return (
     <Container>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
@@ -459,7 +492,9 @@ export default function CreatePlace(props) {
                     options={typeCamp}
                     getOptionLabel={option => option.label}
                     filterSelectedOptions
-                    onChange={(_, data) => field.onChange(data)}
+                    onChange={(_, data) => {
+                      field.onChange(data)
+                    }}
                     sx={{ width: 400, marginRight: 5 }}
                     renderInput={params => (
                       <TextField
@@ -539,7 +574,12 @@ export default function CreatePlace(props) {
               {errors.file?.message || 'acb'}
             </FormHelperText>
           )}
-          <Button color="primary" type="submit" variant="contained">
+          <Button
+            color="primary"
+            type="submit"
+            variant="contained"
+            disabled={isLoading}
+          >
             Lưu
           </Button>
           <Button

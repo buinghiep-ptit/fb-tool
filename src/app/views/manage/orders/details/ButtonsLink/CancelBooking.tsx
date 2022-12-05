@@ -94,7 +94,7 @@ export default function CancelBooking({ title }: Props) {
             </SelectDropDown>
             <Box>
               <MuiTypography variant="subtitle2" pb={1}>
-                Lý do:
+                Lý do*:
               </MuiTypography>
               <FormTextArea
                 name="reason"

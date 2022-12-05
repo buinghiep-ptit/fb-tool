@@ -21,7 +21,7 @@ import { ICampground, IOrderDetail } from 'app/models/order'
 import { getOrderStatusSpec } from 'app/utils/enums/order'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ActionsHistory } from './details/ActionsHistory'
 import { ButtonsActions } from './details/ButtonsActions'
 import { CampgroundInfo } from './details/CampgroundInfo'
@@ -72,7 +72,8 @@ export const isInprogressOrder = (order?: IOrderDetail) => {
   return (
     order?.status &&
     order?.status < 4 &&
-    order.cancelRequest?.status !== 2 &&
+    (order.cancelRequest?.status !== 2 ||
+      (order.cancelRequest?.status === 2 && order?.status === 3)) &&
     order?.status !== -1
   )
 }
@@ -90,6 +91,8 @@ export default function OrderDetail(props: Props) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { source, orderId } = useParams()
+
+  const prevRoute = useLocation()
 
   const [addressCampground, setAddressCampground] = useState('')
 
@@ -142,6 +145,11 @@ export default function OrderDetail(props: Props) {
 
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
+  }
+
+  const goBack = () => {
+    if (prevRoute && prevRoute?.state?.from) navigate(-1)
+    else navigate('/quan-ly-don-hang', {})
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
@@ -208,7 +216,7 @@ export default function OrderDetail(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigate(-1)}
+          onClick={() => goBack()}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
@@ -221,26 +229,41 @@ export default function OrderDetail(props: Props) {
           order={order}
           currentUser={user as unknown as IUserProfile}
         />
-        <Chip
-          label={
-            order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
-              : getOrderStatusSpec(order?.status ?? 0, 2).title
-          }
-          size="medium"
-          sx={{
-            px: 1,
-            fontSize: '1.125rem',
-            fontWeight: 500,
-            color: order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
-                  .textColor
-              : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
-            bgcolor: order.cancelRequest
-              ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).bgColor
-              : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
-          }}
-        />
+        {order.cancelRequest?.status == 2 && order.status === 3 ? (
+          <Chip
+            label="Đặt thành công"
+            size="medium"
+            sx={{
+              px: 1,
+              fontSize: '1.125rem',
+              fontWeight: 500,
+              color: '#2F9B42',
+              bgColor: '#EDFDEF',
+            }}
+          />
+        ) : (
+          <Chip
+            label={
+              order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3).title
+                : getOrderStatusSpec(order?.status ?? 0, 2).title
+            }
+            size="medium"
+            sx={{
+              px: 1,
+              fontSize: '1.125rem',
+              fontWeight: 500,
+              color: order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                    .textColor
+                : getOrderStatusSpec(order?.status ?? 0, 2).textColor,
+              bgcolor: order.cancelRequest
+                ? getOrderStatusSpec(order?.cancelRequest.status ?? 0, 3)
+                    .bgColor
+                : getOrderStatusSpec(order?.status ?? 0, 2).bgColor,
+            }}
+          />
+        )}
       </Stack>
 
       <form

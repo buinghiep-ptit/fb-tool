@@ -155,6 +155,7 @@ export default function ServiceDetail({
       Yup.array().of(
         Yup.object().shape({
           amount: Yup.number()
+            .typeError('Giá trị phải là một chữ số')
             .max(999999999, 'Chỉ được nhập tối đa 9 chữ số, max 100000000VNĐ')
             .required(messages.MSG1),
         }),
@@ -194,7 +195,6 @@ export default function ServiceDetail({
   }: UseQueryResult<DetailService, Error> = useQuery<DetailService, Error>(
     ['campService', serviceId],
     () => {
-      console.log(serviceId)
       return getServiceDetail(Number(serviceId ?? 0))
     },
     {
@@ -318,17 +318,14 @@ export default function ServiceDetail({
 
   React.useEffect(() => {
     if (idCampGround) {
-      console.log(campGrounds)
       const camp = (campGrounds?.content || []).find(
         (item: any) => idCampGround === item.id,
       )
-      console.log(camp)
       setCampGroundDefault(camp)
     }
   }, [campGrounds])
 
   React.useEffect(() => {
-    console.log(params.serviceId, idService)
     if (idService) {
       setServiceId(idService)
     } else {
@@ -403,7 +400,6 @@ export default function ServiceDetail({
         return 'Thứ 7'
     }
   }
-  console.log(methods.formState.errors)
   return (
     <Container>
       {isModal && (

@@ -8,13 +8,10 @@ import {
 } from '@mui/icons-material'
 import {
   Divider,
-  FormControl,
   Grid,
   Icon,
   IconButton,
-  InputLabel,
   MenuItem,
-  Select,
   Stack,
   styled,
 } from '@mui/material'
@@ -37,7 +34,7 @@ import { columnFeeds } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { NavLink, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
@@ -49,6 +46,16 @@ const Container = styled('div')<Props>(({ theme }) => ({
     [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
   },
 }))
+
+const extractFeeds = (feeds?: IFeed[]) => {
+  if (!feeds || !feeds.length) return []
+  return feeds.map(feed =>
+    Object.assign(feed, {
+      customerType:
+        feed.customerType === 2 ? 'KOL' : feed.customerId ? 'Thường' : 'Campdi',
+    }),
+  )
+}
 
 export interface Props {}
 
@@ -385,7 +392,7 @@ export default function ManagerFeed(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as IFeed[]) : []}
+            rows={data ? extractFeeds(data?.content as IFeed[]) : []}
             columns={columnFeeds}
             rowsPerPage={size}
             page={page}

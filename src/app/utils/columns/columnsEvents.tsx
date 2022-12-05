@@ -57,7 +57,11 @@ export const TooltipText = ({
   ...props
 }: TextProps) => {
   return (
-    <Tooltip arrow title={text} followCursor>
+    <Tooltip
+      arrow
+      title={<span style={{ whiteSpace: 'pre-line' }}>{text}</span>}
+      followCursor
+    >
       <Typography
         {...props}
         sx={{

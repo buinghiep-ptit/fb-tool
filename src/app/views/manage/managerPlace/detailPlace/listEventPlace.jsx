@@ -19,19 +19,19 @@ const tableModel = {
     },
     {
       name: 'Tên sự kiện',
-      width: null,
+      width: 150,
     },
     {
       name: 'Thời gian diễn ra',
-      width: null,
+      width: 150,
     },
     {
       name: 'Trạng thái',
-      width: null,
+      width: 100,
     },
     {
       name: '',
-      width: null,
+      width: 100,
     },
   ],
   bodyCell: ['index', 'name', 'time', 'des-status', 'action'],
@@ -45,19 +45,19 @@ const tableModelEventUnlinked = {
     },
     {
       name: 'Tên sự kiện',
-      width: null,
+      width: 150,
     },
     {
       name: 'Thời gian diễn ra sự kiện',
-      width: null,
+      width: 150,
     },
     {
       name: 'Trạng thái',
-      width: null,
+      width: 100,
     },
     {
       name: '',
-      width: null,
+      width: 100,
     },
   ],
   bodyCell: ['index', 'name', 'time', 'des-status', 'action'],
@@ -82,7 +82,7 @@ export default function ListEventPlace(props) {
   const [listEventUnlinked, setListEventUnlinked] = React.useState()
   const [totalEventUnlinked, setTotalEventUnlinked] = React.useState()
   const [filterEvent, setFilterEvent] = React.useState('')
-
+  const tableRef = React.useRef()
   const fetchListEvent = async (id, param) => {
     await getListEvent(id, param)
       .then(data => {
@@ -90,10 +90,12 @@ export default function ListEventPlace(props) {
           const convertEvent = {}
           convertEvent.id = event.id
           convertEvent.name = event.name
-          convertEvent.time = `${event.startDate} - ${event.endDate}`
+          convertEvent.time = `${event.startDate || ''} ${
+            event.startDate && event.endDate ? '-' : ''
+          } ${event.endDate || ''}`
           convertEvent['des-status'] =
             event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
-          convertEvent.action = ['delete']
+          convertEvent.action = ['unlinked']
           return convertEvent
         })
 
@@ -110,7 +112,9 @@ export default function ListEventPlace(props) {
           const convertEvent = {}
           convertEvent.id = event.id
           convertEvent.name = event.name
-          convertEvent.time = `${event.startDate} - ${event.endDate}`
+          convertEvent.time = `${event.startDate || ''} ${
+            event.startDate && event.endDate ? '-' : ''
+          } ${event.endDate || ''}`
           convertEvent['des-status'] =
             event.status === 1 ? 'Hoạt động' : 'Không hoạt động'
           convertEvent.action = ['add']
@@ -135,7 +139,6 @@ export default function ListEventPlace(props) {
 
   React.useEffect(() => {
     fetchListEvent(params.id, param)
-    // fetchListEventUnlinked(params.id, param)
   }, [])
 
   return (
@@ -218,6 +221,7 @@ export default function ListEventPlace(props) {
             variant="contained"
             style={{ margin: '20px 0' }}
             onClick={() => {
+              tableRef.current.handleClickSearch()
               fetchListEventUnlinked(params.id, {
                 name: filterEvent,
                 size: 20,
@@ -230,6 +234,7 @@ export default function ListEventPlace(props) {
 
           <TableCustom
             title="Danh sách sự kiện"
+            ref={tableRef}
             tableModel={tableModelEventUnlinked}
             pagination={true}
             dataTable={listEventUnlinked || []}

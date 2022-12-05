@@ -31,7 +31,9 @@ const useNoteDialogForm = (name = 'note', required = false) => {
         <>
           <FormProvider {...methods}>
             <Stack gap={1.5}>
-              <MuiTypography variant="subtitle2">Ghi chú*:</MuiTypography>
+              <MuiTypography variant="subtitle2">
+                Ghi chú{required ? '*' : ''}:
+              </MuiTypography>
               <FormTextArea
                 name={name}
                 defaultValue={''}

@@ -16,7 +16,7 @@ const ChangePasswordMerchant = ({ handleClose }) => {
         .required('Vui lòng nhập password mới')
         .min(8, 'Có ít nhất 8 ký tự')
         .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
-        .max(255, 'Đã đạt số ký tự tối đa'),
+        .max(32, 'Tối đa 32 ký tự'),
       note: yup.string().max(255, 'Đã đạt số ký tự tối đa'),
     })
     .required()
@@ -26,7 +26,7 @@ const ChangePasswordMerchant = ({ handleClose }) => {
       length: 8,
       numbers: true,
     })
-
+    clearErrors('password')
     setValue('password', password + Math.floor(Math.random() * 10))
   }
 
@@ -34,6 +34,7 @@ const ChangePasswordMerchant = ({ handleClose }) => {
     control,
     handleSubmit,
     setValue,
+    clearErrors,
     getValues,
     formState: { errors },
   } = useForm({
@@ -103,7 +104,7 @@ const ChangePasswordMerchant = ({ handleClose }) => {
               {...field}
               multiline
               rows={4}
-              label="Lưu chú"
+              label="Ghi chú"
               variant="outlined"
               margin="normal"
             />
@@ -119,7 +120,9 @@ const ChangePasswordMerchant = ({ handleClose }) => {
           variant="contained"
           type="button"
           style={{ marginLeft: '15px' }}
-          onClick={() => {}}
+          onClick={() => {
+            handleClose()
+          }}
         >
           Hủy
         </Button>

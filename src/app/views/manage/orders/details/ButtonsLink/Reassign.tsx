@@ -124,7 +124,7 @@ export default function Reassign({ title }: Props) {
             />
             <Box>
               <MuiTypography variant="subtitle2" pb={1}>
-                Lý do:
+                Lý do*:
               </MuiTypography>
               <FormTextArea
                 name="note"

@@ -84,6 +84,7 @@ export default function ListCampHandBook(props) {
       })
 
     const res = await addHandBookToCamp({
+      isAdd: 1,
       handbooksToLink: listHandBookWillLink,
     })
     if (res) {

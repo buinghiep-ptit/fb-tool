@@ -42,7 +42,7 @@ type SchemaType = {
   scaleAmount?: number
   minAmount?: number | null
   maxAmount?: number | null
-  note?: string
+  note?: string | null
 }
 
 export default function AddPolicy({ title }: Props) {
@@ -94,6 +94,7 @@ export default function AddPolicy({ title }: Props) {
       defaultValues.scaleAmount = policy.scaleAmount
       defaultValues.minAmount = policy.minAmount ?? null
       defaultValues.maxAmount = policy.maxAmount ?? null
+      defaultValues.note = policy.content ?? ''
 
       methods.reset({ ...defaultValues })
     }
@@ -172,6 +173,7 @@ export default function AddPolicy({ title }: Props) {
       scaleAmount: Number(scaleAmount ?? 0),
       minAmount: Number(minAmount) || null,
       maxAmount: Number(maxAmount) || null,
+      content: values.note || null,
     }
 
     if (policyId) {

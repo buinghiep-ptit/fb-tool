@@ -247,7 +247,7 @@ export default function ListHandbook(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'word') {
+    if (cell.id === 'word' || cell.id === 'title') {
       navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     } else if (cell.id === 'amountLinkedCampGround') {
       setDialogData(prev => ({
@@ -359,7 +359,7 @@ export default function ListHandbook(props: Props) {
               {
                 icon: 'data_saver_on',
                 color: 'primary',
-                tooltip: 'Điểm camping đã liên kết',
+                tooltip: 'Thêm điểm camping',
                 onClick: onRowAdd,
               },
               {

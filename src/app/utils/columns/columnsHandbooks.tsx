@@ -21,7 +21,7 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
     id: 'title',
     label: 'Tiêu đề',
     minWidth: 200,
-    action: (value: any) => (
+    link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
           sx={{
@@ -30,6 +30,7 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
             display: '-webkit-box',
             WebkitLineClamp: '1',
             WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
           }}
           color={'primary'}
         >

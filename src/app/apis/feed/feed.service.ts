@@ -104,9 +104,7 @@ export const fetchCampAreas = async (params: {
   page?: number
   size?: number
 }): Promise<ICampArea[]> => {
-  const { data } = await http.get<ICampArea[]>(
-    `/api/camp-areas/select-list-without-province`,
-  )
+  const { data } = await http.get<ICampArea[]>(`/api/camp-areas/select-list`)
   return data
 }
 

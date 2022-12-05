@@ -93,9 +93,21 @@ const extractCamps = (camps?: any[]) => {
     Object.assign(camp, {
       icon: () => (
         <Chip
-          label={camp.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
+          label={
+            camp.status !== -1
+              ? camp.status === 3
+                ? 'Tỉnh thành'
+                : 'Hoạt động'
+              : 'Không hoạt động'
+          }
           size="small"
-          color={camp.status === 1 ? 'primary' : 'default'}
+          color={
+            camp.status !== -1
+              ? camp.status === 3
+                ? 'warning'
+                : 'primary'
+              : 'default'
+          }
         />
       ),
     }),

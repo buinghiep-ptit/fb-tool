@@ -66,7 +66,7 @@ export const columnsHandbooks: readonly TableColumn<TitleHandbooks>[] = [
     align: 'center',
     status: (value: any) => (
       <Chip
-        label={value === 1 ? 'Hoạt động' : 'Khoá'}
+        label={value === 1 ? 'Hoạt động' : 'Không hoạt động'}
         size="small"
         color={value === 1 ? 'primary' : 'error'}
       />

@@ -261,6 +261,7 @@ const ManagementRoutes = [
       {
         index: true,
         element: <Navigate to="xu-ly" replace />,
+        auth: [ROLES.ADMIN, ROLES.CS],
       },
       {
         path: ':source',
@@ -268,6 +269,7 @@ const ManagementRoutes = [
           { index: true, element: <OrdersHistory /> },
           // { path: ':orderId', element: <OrderDetail /> },
         ],
+        auth: [ROLES.ADMIN, ROLES.CS],
       },
       {
         path: ':source/:orderId',
@@ -317,6 +319,7 @@ const ManagementRoutes = [
             element: <UpdateServices title="Cập nhật đơn hàng" />,
           },
         ],
+        auth: [ROLES.ADMIN, ROLES.CS],
       },
     ],
     auth: [ROLES.ADMIN, ROLES.CS],

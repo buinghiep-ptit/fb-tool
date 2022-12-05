@@ -22,6 +22,17 @@ export const regexImgUrl =
 export const getDifferenceInDays = (date1: string, date2: string) => {
   const d1 = new Date(date1)
   const d2 = new Date(date2)
-  const diffInMs = Math.abs(d2.getTime() - d1.getTime())
+  const diffInMs = d2.getTime() - d1.getTime()
+  if (diffInMs <= 0) return 0
   return diffInMs / (1000 * 60 * 60 * 24)
+}
+
+export const convertDateToUTC = (date: string) => {
+  const [day, month, year] = date.split('/')
+  const d = new Date(
+    Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)),
+  )
+  const result = d.toISOString()
+
+  return result
 }

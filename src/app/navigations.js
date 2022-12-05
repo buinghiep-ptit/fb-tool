@@ -30,13 +30,12 @@ export const navigations = [
     name: 'Quản lý âm nhạc',
     path: '/quan-ly-audios',
     icon: 'library_music',
-    auth: [ROLES.ADMIN, ROLES.CS],
+    auth: [ROLES.ADMIN],
   },
   {
     name: 'Quản lý sự kiện',
     path: '/quan-ly-su-kien',
     icon: 'event',
-    auth: [ROLES.ADMIN, ROLES.CS],
   },
   {
     name: 'Quản lý đơn hàng',

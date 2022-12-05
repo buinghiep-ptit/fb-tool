@@ -75,9 +75,9 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'customerType',
     label: 'Loại TK',
-    minWidth: 80,
+    minWidth: 120,
     align: 'center',
-    format: (value: number) => LabelFormatter(value, 'customerType'),
+    format: (value: any) => value,
   },
   {
     id: 'dateCreated',
@@ -125,6 +125,24 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'reportedNum',
     label: 'Số BCVP',
+    minWidth: 80,
+    align: 'center',
+  },
+  {
+    id: 'likeNum',
+    label: 'Lượt thích',
+    minWidth: 80,
+    align: 'center',
+  },
+  {
+    id: 'viewNum',
+    label: 'Lượt xem',
+    minWidth: 80,
+    align: 'center',
+  },
+  {
+    id: 'commentNum',
+    label: 'Comment',
     minWidth: 80,
     align: 'center',
   },

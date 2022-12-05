@@ -365,17 +365,17 @@ export default function Feature({
                   <FormControlLabel
                     value={1}
                     control={<Radio />}
-                    label="Dễ di chuyển"
+                    label="Dễ đi"
                   />
                   <FormControlLabel
                     value={2}
                     control={<Radio />}
-                    label="Khó di chuyển"
+                    label="Khó đi"
                   />
                   <FormControlLabel
                     value={3}
                     control={<Radio />}
-                    label="Rất khó di chuyển"
+                    label="Rất khó đi"
                   />
                 </RadioGroup>
               </FormControl>
@@ -431,7 +431,14 @@ export default function Feature({
           <Controller
             control={control}
             name="capacity"
-            render={({ field }) => <TextField variant="outlined" {...field} />}
+            render={({ field }) => (
+              <TextField
+                variant="outlined"
+                {...field}
+                error={!!errors.capacity}
+                helperText={errors.capacity?.message}
+              />
+            )}
           ></Controller>
         </Grid>
         <Grid item xs={2} md={2} style={{ marginTop: '15px' }}>

@@ -83,7 +83,7 @@ export default function ListCampPlace(props) {
   const [listCampUnlinked, setListCampUnlinked] = React.useState()
   const [totalCampUnlinked, setTotalCampUnlinked] = React.useState()
   const [filterCamp, setFilterCamp] = React.useState('')
-
+  const tableRef = React.useState()
   const fetchListCamp = async (id, param) => {
     await getListCamp(id, param)
       .then(data => {
@@ -227,6 +227,7 @@ export default function ListCampPlace(props) {
             variant="contained"
             style={{ margin: '20px 0' }}
             onClick={() => {
+              tableRef.current.handleClickSearch()
               fetchListCampUnlinked(params.id, {
                 name: filterCamp,
                 size: 20,
@@ -237,6 +238,7 @@ export default function ListCampPlace(props) {
             Tìm kiếm
           </Button>
           <TableCustom
+            ref={tableRef}
             title="Danh sách điểm camp"
             tableModel={tableModelCampUnlinked}
             pagination={true}

@@ -18,7 +18,7 @@ import { toastWarning } from 'app/helpers/toastNofication'
 import { IMediaOverall } from 'app/models'
 import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
+import { DropEvent, FileRejection, useDropzone } from 'react-dropzone'
 import { useFormContext } from 'react-hook-form'
 import { AbsoluteFillObject } from './AbsoluteFillObjectBox'
 import { CircularProgressWithLabel, ImageListView } from './ImageListCustomize'
@@ -246,7 +246,12 @@ export function UploadPreviewer({
   }
 
   const onDrop = useCallback(
-    async (droppedFiles: File[]) => {
+    async (
+      droppedFiles: File[],
+      rejectedFiles: FileRejection[],
+      // event: DropEvent[],
+    ) => {
+      console.log(droppedFiles, rejectedFiles)
       if (isFileDialogOpen && setIsFileDialogOpen) setIsFileDialogOpen(false)
 
       let extractUnixFiles = extractUnixDroppedFiles(

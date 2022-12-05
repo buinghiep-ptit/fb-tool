@@ -73,6 +73,22 @@ export default function ManagerLocation(props) {
     return res
   }
 
+  const handleSearch = async () => {
+    tableRef.current.handleClickSearch()
+    const res = await fetchListCampGround({
+      name: inputFilter,
+      status: statusFilter,
+      isSupportBooking: isBooking,
+      page: 0,
+      size: 20,
+    })
+    if (res.length === 0) {
+      toastWarning({
+        message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
+      })
+    }
+  }
+
   React.useEffect(() => {
     const param = {
       name: inputFilter,
@@ -104,6 +120,11 @@ export default function ManagerLocation(props) {
                 sx={{ mb: 3 }}
                 onChange={e => {
                   setInputFilter(e.target.value)
+                }}
+                onKeyDown={async e => {
+                  if (e.keyCode === 13) {
+                    handleSearch()
+                  }
                 }}
               />
               <FormControl fullWidth>
@@ -148,19 +169,7 @@ export default function ManagerLocation(props) {
               variant="contained"
               type="submit"
               onClick={async () => {
-                tableRef.current.handleClickSearch()
-                const res = await fetchListCampGround({
-                  name: inputFilter,
-                  status: statusFilter,
-                  isSupportBooking: isBooking,
-                  page: 0,
-                  size: 20,
-                })
-                if (res.length === 0) {
-                  toastWarning({
-                    message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
-                  })
-                }
+                handleSearch()
               }}
             >
               <Icon style={{ fontSize: '20px' }}>search</Icon>{' '}

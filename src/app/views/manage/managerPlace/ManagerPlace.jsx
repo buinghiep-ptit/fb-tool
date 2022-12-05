@@ -77,18 +77,13 @@ export default function ManagerPlace(props) {
 
   const handleSearch = async () => {
     tableRef.current.handleClickSearch()
-    const res = fetchListPlace({
+    fetchListPlace({
       name: inputNamePlace,
       page: 0,
       size: 20,
       status: statusFilter === 0 ? null : statusFilter,
       idProvince: provinceId,
     })
-    if (res.length === 0) {
-      toastWarning({
-        message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
-      })
-    }
   }
 
   const fetchProvinces = async () => {
@@ -214,6 +209,7 @@ export default function ManagerPlace(props) {
         </Grid>
         <TableCustom
           ref={tableRef}
+          msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${inputNamePlace}"`}
           msgDelete="Sau khi xóa, toàn bộ thông tin về địa danh sẽ được loại bỏ khỏi hệ thống. Bạn có chắc muốn xóa địa danh?"
           title="Danh sách địa danh Camp"
           dataTable={listPlace || []}

@@ -110,7 +110,7 @@ export default function InformationCampGround({ action }) {
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       capacity: yup
         .string()
-        .matches(/^(\s*|\d+)$/, 'Vui lòng nhập số lượng')
+        .matches(/^(\s*|\d+)$/, 'Vui lòng nhập đúng định dạng')
         .nullable(true),
       file: yup
         .mixed()

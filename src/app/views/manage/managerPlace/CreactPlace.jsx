@@ -79,10 +79,10 @@ export default function CreatePlace(props) {
     .object({
       namePlace: yup
         .string()
-        .required('Vui lòng nhập tên địa danh')
+        .required(messages.MSG1)
         .trim()
         .max(255, 'Đã đạt số ký tự tối đa'),
-      province: yup.object().required('Vui lòng chọn tỉnh thành phố'),
+      province: yup.object().required(messages.MSG1),
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       description: yup.string().required(messages.MSG1),
@@ -144,7 +144,6 @@ export default function CreatePlace(props) {
       address: '',
       description: '',
       hashtag: [],
-      campAreaTypes: [],
       file: [],
     },
   })
@@ -490,6 +489,7 @@ export default function CreatePlace(props) {
                     multiple
                     {...field}
                     options={typeCamp}
+                    defaultValue={[{ label: 'Cắm trại', id: 1 }]}
                     getOptionLabel={option => option.label}
                     filterSelectedOptions
                     onChange={(_, data) => {

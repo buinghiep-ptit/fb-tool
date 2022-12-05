@@ -59,16 +59,11 @@ export default function ManagerPlaceProvince(props) {
 
   const handleSearch = async () => {
     tableRef.current.handleClickSearch()
-    const res = fetchListPlace({
+    fetchListPlace({
       name: inputNamePlace,
       page: 0,
       size: 20,
     })
-    if (res.length === 0) {
-      toastWarning({
-        message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
-      })
-    }
   }
 
   React.useEffect(() => {
@@ -125,6 +120,7 @@ export default function ManagerPlaceProvince(props) {
 
         <TableCustom
           ref={tableRef}
+          msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${inputNamePlace}"`}
           title="Danh sách địa danh tỉnh thành"
           dataTable={listPlace || []}
           tableModel={tableModel}

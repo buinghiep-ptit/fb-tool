@@ -80,6 +80,7 @@ export const navigations = [
     name: 'Quản lý từ khoá yêu thích',
     path: '/quan-ly-tu-khoa-yeu-thich',
     icon: 'travel_explore',
+    auth: [ROLES.ADMIN, ROLES.MKT],
   },
   {
     name: 'Quản lý cẩm nang',
@@ -90,6 +91,7 @@ export const navigations = [
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
+    auth: [ROLES.ADMIN, ROLES.MKT],
   },
   // {
   //   name: 'Quản lý từ cấm',

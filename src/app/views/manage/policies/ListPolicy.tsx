@@ -295,7 +295,7 @@ export default function ListPolicy(props: Props) {
             actions={[
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },

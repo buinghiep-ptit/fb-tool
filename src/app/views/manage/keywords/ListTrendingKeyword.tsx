@@ -316,7 +316,7 @@ export default function ListTrendingKeyword(props: Props) {
             actions={[
               {
                 icon: 'push_pin',
-                color: 'warning',
+                color: 'inherit',
                 tooltip: 'Ghim',
                 onClick: onRowUpdate,
                 disableKey: 'isRequired',
@@ -330,7 +330,7 @@ export default function ListTrendingKeyword(props: Props) {
                         height: 24,
                         color: '#FFB020',
                         filter:
-                          'invert(85%) sepia(53%) saturate(5926%) hue-rotate(339deg) brightness(100%) contrast(103%)',
+                          'invert(24%) sepia(6%) saturate(3792%) hue-rotate(186deg) brightness(91%) contrast(93%)',
                       }}
                       loading="lazy"
                       alt="icon"

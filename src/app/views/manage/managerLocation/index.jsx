@@ -93,6 +93,7 @@ export default function ManagerLocation(props) {
     const param = {
       name: inputFilter,
       status: statusFilter,
+      isSupportBooking: isBooking,
       page: 0,
       size: 20,
     }
@@ -223,6 +224,7 @@ export default function ManagerLocation(props) {
           filter={{
             name: inputFilter,
             status: statusFilter,
+            isSupportBooking: isBooking,
             page: 0,
             size: 20,
           }}

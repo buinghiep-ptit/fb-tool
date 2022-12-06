@@ -22,7 +22,11 @@ const StyledTable = styled(Table)(() => ({
   },
 }))
 
-const ListHandBookUnlinked = ({ tableData, handleLinkedHandbook }) => {
+const ListHandBookUnlinked = ({
+  tableData,
+  handleLinkedHandbook,
+  msgNoContent,
+}) => {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [arrCheck, setArrCheck] = useState([])
@@ -63,6 +67,13 @@ const ListHandBookUnlinked = ({ tableData, handleLinkedHandbook }) => {
           </TableRow>
         </TableHead>
         <TableBody>
+          {tableData.length === 0 && (
+            <tr>
+              <td colSpan={3} style={{ textAlign: 'center', padding: '20px' }}>
+                {msgNoContent}
+              </td>
+            </tr>
+          )}
           {tableData
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((handbook, index) => (

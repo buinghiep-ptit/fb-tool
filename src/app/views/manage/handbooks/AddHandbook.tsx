@@ -100,6 +100,10 @@ export default function AddEvent(props: Props) {
     initDefaultValues(handbook)
   }, [handbook])
 
+  useEffect(() => {
+    if (!openDialog) setSelectedCamps([])
+  }, [openDialog])
+
   const initDefaultValues = (handbook?: IHandbookDetail) => {
     if (handbook) {
       defaultValues.title = handbook.title

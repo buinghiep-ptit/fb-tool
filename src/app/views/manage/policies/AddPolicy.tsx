@@ -30,6 +30,7 @@ import React, { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 import ListCampgroundsPolicy from './ListCampgroundsPolicy'
 
 type Props = {
@@ -59,6 +60,7 @@ export default function AddPolicy({ title }: Props) {
     cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   const [defaultValues] = useState<SchemaType>({
     scope: 2,
@@ -331,8 +333,12 @@ export default function AddPolicy({ title }: Props) {
         title={title}
         open={isModal}
         onCloseModal={handleClose}
-        isLoading={createLoading || updateLoading}
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
+        isLoading={createLoading}
+        onSubmit={
+          policyId
+            ? () => setOpenConfirm(true)
+            : methods.handleSubmit(onSubmitHandler)
+        }
         submitText="Lưu"
         cancelText="Quay lại"
       >
@@ -351,6 +357,23 @@ export default function AddPolicy({ title }: Props) {
           <ListCampgroundsPolicy policyId={Number(policyId)} />
         </MuiStyledModal>
       )}
+
+      <DiagLogConfirm
+        title={'Xác nhận'}
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        onSubmit={methods.handleSubmit(onSubmitHandler)}
+        submitText={'Có'}
+        cancelText={'Không'}
+        maxWidth={'xs'}
+        isLoading={updateLoading}
+      >
+        <Stack py={5} justifyContent={'center'} alignItems="center">
+          <MuiTypography variant="subtitle1">
+            {'Bạn có chắc muốn cập nhật?'}
+          </MuiTypography>
+        </Stack>
+      </DiagLogConfirm>
     </React.Fragment>
   )
 }

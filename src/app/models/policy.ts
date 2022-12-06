@@ -13,6 +13,7 @@ export interface IPolicyOverall {
   minAmount?: number | null
   maxAmount?: number | null
   scope?: number
+  content?: string | null
 }
 
 export type TitlePolicies = keyof IPolicyOverall | 'order' | 'action'

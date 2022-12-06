@@ -172,7 +172,8 @@ export default function ListPolicy(props: Props) {
     setDialogData(prev => ({
       ...prev,
       title: 'Xoá chính sách',
-      message: 'Bạn có chắc chắn muốn xoá chính sách',
+      message:
+        'Sau khi xóa, [Số điểm camp đang liên kết] điểm camp đang sử dụng chính sách sẻ tự động đổi về chính sách chung. Bạn có chắc muốn muốn xóa Chính sách?',
       type: 'delete',
     }))
     setOpenDialog(true)
@@ -294,7 +295,7 @@ export default function ListPolicy(props: Props) {
             actions={[
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },
@@ -325,13 +326,15 @@ export default function ListPolicy(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
-        submitText={'Xoá'}
-        cancelText={'Huỷ'}
+        submitText={'Có'}
+        cancelText={'Không'}
         isLoading={deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
+          <MuiTypography variant="subtitle1" textAlign={'center'}>
+            {row.amountCampGrounds
+              ? `Sau khi xóa, ${row.amountCampGrounds} điểm camp đang sử dụng chính sách sẻ tự động đổi về chính sách chung. Bạn có chắc muốn muốn xóa Chính sách?`
+              : 'Bạn có chắc muốn muốn xóa Chính sách'}
           </MuiTypography>
           <MuiTypography variant="subtitle1" color="primary">
             {row.name}

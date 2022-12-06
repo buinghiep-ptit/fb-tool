@@ -183,11 +183,13 @@ export default function ListRating() {
     setFilters(prevFilters => {
       return {
         ...prevFilters,
+        scope: queryParams.scope,
         page: +newPage,
       }
     })
     navigate('', {
       ...filters,
+      scope: queryParams.scope,
       page: +newPage,
     } as any)
   }
@@ -270,19 +272,25 @@ export default function ListRating() {
     onSuccess(null, 'Cập nhật thành công'),
   )
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id}/chi-tiet`, {})
+  }
+
+  const onToggleStatus = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: row.status === 1 ? 'Chặn' : 'Hợp lệ',
+      message: (toggleLoading?: boolean) => getContentNote(toggleLoading),
+      type: 'toggle-status',
+      submitText: row.status === 1 ? 'Chặn' : 'Hợp lệ',
+      cancelText: 'Huỷ',
+    }))
+    setRow(row)
+    setOpenDialog(true)
+  }
+
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'status') {
-      setDialogData(prev => ({
-        ...prev,
-        title: row.status === 1 ? 'Chặn' : 'Hợp lệ',
-        message: (toggleLoading?: boolean) => getContentNote(toggleLoading),
-        type: 'toggle-status',
-        submitText: row.status === 1 ? 'Chặn' : 'Hợp lệ',
-        cancelText: 'Huỷ',
-      }))
-      setRow(row)
-      setOpenDialog(true)
-    } else if (cell.id === 'customer') {
+    if (cell.id === 'customer') {
       window.open(
         `/quan-ly-tai-khoan-khach-hang/${row?.idCustomer}/thong-tin`,
         '_blank',
@@ -419,21 +427,58 @@ export default function ListRating() {
               onClickRow={onClickRow}
               isFetching={isFetching}
               error={isError ? error : null}
-              actions={[
-                {
-                  icon: 'warning_amber',
-                  color: 'error',
-                  tooltip: 'Vi phạm',
-                  onClick: undefined,
-                  disableKey: 'status',
-                },
-                {
-                  icon: 'close',
-                  color: 'primary',
-                  tooltip: 'Bỏ qua',
-                  onClick: undefined,
-                },
-              ]}
+              actions={
+                currentTab === 0
+                  ? [
+                      {
+                        icon: 'warning_amber',
+                        color: 'error',
+                        tooltip: 'Vi phạm',
+                        onClick: undefined,
+                        disableKey: 'status',
+                      },
+                      {
+                        icon: 'close',
+                        color: 'primary',
+                        tooltip: 'Bỏ qua',
+                        onClick: undefined,
+                      },
+                    ]
+                  : [
+                      {
+                        icon: 'push_pin',
+                        color: 'primary',
+                        tooltip: 'Chặn',
+                        onClick: onToggleStatus,
+                        disableKey: 'status',
+                        disableActions: (status?: number) =>
+                          status === 1 ? false : true,
+                        contrastIcon: {
+                          icon: (
+                            <img
+                              src={'/assets/images/app/pin_off_icon.svg'}
+                              style={{
+                                width: 24,
+                                height: 24,
+                                color: '#FFB020',
+                                filter:
+                                  'invert(85%) sepia(53%) saturate(5926%) hue-rotate(339deg) brightness(100%) contrast(103%)',
+                              }}
+                              loading="lazy"
+                              alt="icon"
+                            />
+                          ),
+                          tooltip: 'Hợp lệ',
+                        },
+                      },
+                      {
+                        icon: 'edit',
+                        color: 'action',
+                        tooltip: 'Chi tiết',
+                        onClick: onRowUpdate,
+                      },
+                    ]
+              }
             />
             <MuiStyledPagination
               component="div"

@@ -1,7 +1,6 @@
-import { Tooltip, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import { TableColumn } from 'app/models'
 import { TitleCampgrounds } from 'app/models/camp'
-import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
 
 export const columnsUnlinkedCampgrounds: readonly TableColumn<TitleCampgrounds>[] =
   [
@@ -19,7 +18,7 @@ export const columnsUnlinkedCampgrounds: readonly TableColumn<TitleCampgrounds>[
       },
     },
     {
-      id: 'campAreaName',
+      id: 'campGroundName',
       label: 'Tên địa điểm camping',
       minWidth: 200,
       format: (value: number) => (
@@ -38,7 +37,7 @@ export const columnsUnlinkedCampgrounds: readonly TableColumn<TitleCampgrounds>[
       ),
     },
     {
-      id: 'campGroundName',
+      id: 'campAreaName',
       label: 'Địa danh',
       minWidth: 200,
       format: (value: number) => (

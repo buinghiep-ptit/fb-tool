@@ -100,6 +100,10 @@ export default function AddEvent(props: Props) {
     initDefaultValues(handbook)
   }, [handbook])
 
+  useEffect(() => {
+    if (!openDialog) setSelectedCamps([])
+  }, [openDialog])
+
   const initDefaultValues = (handbook?: IHandbookDetail) => {
     if (handbook) {
       defaultValues.title = handbook.title
@@ -311,7 +315,7 @@ export default function AddEvent(props: Props) {
               <Grid item sm={3}>
                 <SelectDropDown name="status" label="Trạng thái">
                   <MenuItem value="1">Hoạt động</MenuItem>
-                  <MenuItem value="0">Khoá</MenuItem>
+                  <MenuItem value="0">Không hoạt động</MenuItem>
                 </SelectDropDown>
               </Grid>
             </Grid>

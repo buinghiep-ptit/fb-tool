@@ -142,8 +142,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
 
   return (
     <Stack gap={3}>
-      <Box sx={{ position: 'sticky', top: 0, zIndex: 9999 }}>
-        {' '}
+      <Box sx={{ position: 'sticky', top: -16, zIndex: 9999 }}>
         <SimpleCard>
           <form
             onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -200,7 +199,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
           actions={[
             {
               icon: 'double_arrow',
-              color: 'primary',
+              color: 'action',
               tooltip: 'Xem chi tiết',
               onClick: onRowDetail,
             },

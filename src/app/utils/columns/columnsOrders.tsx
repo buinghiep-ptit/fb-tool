@@ -179,7 +179,10 @@ export const columnOrdersOverall: readonly TableColumn<TitleOrders>[] = [
     minWidth: 90,
     align: 'center',
     action: (value?: any) => (
-      <Typography variant="subtitle2" color="primary">
+      <Typography
+        variant="subtitle2"
+        color={value === 0 ? 'primary' : 'royalblue'}
+      >
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
@@ -352,7 +355,10 @@ export const columnOrdersProcess: readonly TableColumn<TitleOrders>[] = [
     minWidth: 90,
     align: 'center',
     action: (value?: any) => (
-      <Typography variant="subtitle2" color="primary">
+      <Typography
+        variant="subtitle2"
+        color={value === 0 ? 'primary' : 'royalblue'}
+      >
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),
@@ -517,7 +523,10 @@ export const columnOrdersCancel: readonly TableColumn<TitleOrders>[] = [
     minWidth: 90,
     align: 'center',
     action: (value?: any) => (
-      <Typography variant="subtitle2" color="primary">
+      <Typography
+        variant="subtitle2"
+        color={value === 0 ? 'primary' : 'royalblue'}
+      >
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),

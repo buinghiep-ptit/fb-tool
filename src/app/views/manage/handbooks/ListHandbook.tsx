@@ -20,7 +20,7 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IHandbookOverall, IHandbookResponse } from 'app/models/handbook'
 import { columnsHandbooks } from 'app/utils/columns/columnsHandbooks'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -78,7 +78,9 @@ export default function ListHandbook(props: Props) {
   const [row, setRow] = useState<any>({})
   const [selectedCamps, setSelectedCamps] = useState<readonly number[]>([])
 
-  console.log(selectedCamps)
+  useEffect(() => {
+    if (!openDialog) setSelectedCamps([])
+  }, [openDialog])
 
   const validationSchema = Yup.object().shape({
     title: Yup.string()
@@ -233,7 +235,7 @@ export default function ListHandbook(props: Props) {
     setDialogData(prev => ({
       ...prev,
       title: 'Xoá cẩm nang',
-      message: 'Bạn có chắc chắn muốn xoá cẩm nang',
+      message: 'Bạn có chắc chắn muốn xoá cẩm nang?',
       type: 'delete',
       submitText: 'Xoá',
       cancelText: 'Huỷ',
@@ -247,7 +249,7 @@ export default function ListHandbook(props: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'word') {
+    if (cell.id === 'word' || cell.id === 'title') {
       navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
     } else if (cell.id === 'amountLinkedCampGround') {
       setDialogData(prev => ({
@@ -255,7 +257,7 @@ export default function ListHandbook(props: Props) {
         title: 'Điểm camping đã liên kết',
         type: 'linked',
         isLinked: 1,
-        submitText: 'Xoá',
+        submitText: 'Lưu',
         cancelText: 'Huỷ',
       }))
       setOpenDialog(true)
@@ -359,12 +361,12 @@ export default function ListHandbook(props: Props) {
               {
                 icon: 'data_saver_on',
                 color: 'primary',
-                tooltip: 'Điểm camping đã liên kết',
+                tooltip: 'Thêm điểm camping',
                 onClick: onRowAdd,
               },
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },
@@ -397,6 +399,7 @@ export default function ListHandbook(props: Props) {
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
         isLoading={toggleLoading || deleteLoading}
+        disabled={!selectedCamps.length && dialogData.type !== 'delete'}
       >
         {dialogData.type !== 'delete' ? (
           <UnlinkedCampgrounds

@@ -570,7 +570,7 @@ export default function AddEvent(props: Props) {
                       /> */}
                     </Stack>
                   </Stack>
-                  <Stack>
+                  {/* <Stack>
                     <SelectDropDown
                       name="type"
                       label="Loại file tải lên"
@@ -579,7 +579,7 @@ export default function AddEvent(props: Props) {
                       <MenuItem value={1}>Video</MenuItem>
                       <MenuItem value={2}>Ảnh</MenuItem>
                     </SelectDropDown>
-                  </Stack>
+                  </Stack> */}
                   <Stack>
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
                   </Stack>

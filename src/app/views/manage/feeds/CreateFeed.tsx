@@ -365,7 +365,11 @@ function CreateFeed(props: any) {
     }
     if (audios && audios.content) {
       const audio = audios.content.find(a => a.id == feed.idAudio)
-      defaultValues.audio = audio ?? undefined
+      defaultValues.audio = audio
+        ? audio
+        : feed.type == 1
+        ? { name: 'Âm thanh của video' }
+        : undefined
     }
     if (campGrounds && campGrounds.content && campAreas) {
       if (feed.idSrcType == 1) {

@@ -73,6 +73,7 @@ export default function AdminAccounts(props: Props) {
     email: queryParams.email ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
+    sort: 'updateDate,desc',
   })
 
   const [filters, setFilters] = useState<ISearchFilters>(

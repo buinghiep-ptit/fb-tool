@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Icon, styled, TextField } from '@mui/material'
+import { Box, Button, Grid, Icon, Fab, TextField } from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 
@@ -12,7 +12,7 @@ import {
   getListHandBookUnLinked,
   addHandBookToCamp,
 } from 'app/apis/campGround/ground.service'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 import { useParams } from 'react-router-dom'
 import DialogCustom from 'app/components/common/DialogCustom'
 import { Stack } from '@mui/system'
@@ -34,7 +34,8 @@ export default function ListCampHandBook(props) {
           convertHandBook.id = handbook.id
           convertHandBook.nameHandBook = handbook.title
           convertHandBook.creator = handbook.userName
-          convertHandBook.status = handbook.status == 1 ? true : false
+          convertHandBook.statusHandBook =
+            handbook.status == 1 ? 'Hoạt động' : 'Không hoạt động'
           convertHandBook.action = ['delete']
           return convertHandBook
         })
@@ -84,10 +85,12 @@ export default function ListCampHandBook(props) {
       })
 
     const res = await addHandBookToCamp({
+      isAdd: 1,
       handbooksToLink: listHandBookWillLink,
     })
     if (res) {
       toastSuccess({ message: 'Liên kết thành công' })
+      setFilterHandBook('')
       dialogCustomRef.current.handleClose()
       fetchListHandBookLinked({
         page: 0,
@@ -118,10 +121,12 @@ export default function ListCampHandBook(props) {
             cursor: 'pointer',
           }}
         >
-          <Icon
-            fontSize="large"
+          <Fab
             color="primary"
-            sx={{ marginRight: '5px' }}
+            aria-label="Add"
+            className="button"
+            sx={{ marginRight: '15px', cursor: 'pointer' }}
+            size="small"
             onClick={() => {
               const params = {
                 page: 0,
@@ -131,8 +136,8 @@ export default function ListCampHandBook(props) {
               dialogCustomRef.current.handleClickOpen()
             }}
           >
-            add_circle
-          </Icon>
+            <Icon>add</Icon>
+          </Fab>
           <Paragraph
             variant="h1"
             component="h2"
@@ -160,6 +165,9 @@ export default function ListCampHandBook(props) {
         ref={dialogCustomRef}
         title="Liên kết cẩm nang"
         maxWidth="md"
+        fetchData={() => {
+          setFilterHandBook('')
+        }}
       >
         <>
           <Stack direction="row" mb={4}>
@@ -170,6 +178,16 @@ export default function ListCampHandBook(props) {
               placeholder="Nhập tên cẩm nang ..."
               onChange={e => {
                 setFilterHandBook(e.target.value)
+              }}
+              onKeyDown={async e => {
+                if (e.keyCode === 13) {
+                  const param = {
+                    page: 0,
+                    size: 20,
+                    title: filterHandBook,
+                  }
+                  fetchListHandBookUnLinked(param)
+                }
               }}
             />
             <Button
@@ -189,13 +207,15 @@ export default function ListCampHandBook(props) {
           </Stack>
 
           <ListHandBookUnlinked
+            msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${filterHandBook}"`}
             tableData={listHandBookUnLinked}
             handleLinkedHandbook={handleLinkedHandbook}
-          ></ListHandBookUnlinked>
+          />
           <Stack spacing={2} direction="row" mt={2}>
             <Button
               variant="outlined"
               onClick={() => {
+                setFilterHandBook('')
                 dialogCustomRef.current.handleClose()
               }}
             >

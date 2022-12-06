@@ -56,6 +56,7 @@ const TableCustom = forwardRef(
       filter,
       updateStatus,
       msgDelete,
+      msgNoContent,
     },
     ref,
   ) => {
@@ -152,7 +153,7 @@ const TableCustom = forwardRef(
                     colSpan={tableModel.headCell.length}
                     style={{ textAlign: 'center', padding: '20px' }}
                   >
-                    Không tồn tại bản ghi
+                    {msgNoContent}
                   </td>
                 </tr>
               )}

@@ -76,6 +76,8 @@ export default function ManagerEvents(props: Props) {
     title?: string
     message?: string
     type?: string
+    submitText?: string
+    cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
@@ -191,6 +193,8 @@ export default function ManagerEvents(props: Props) {
       title: 'Xoá sự kiện',
       message: 'Bạn có chắc chắn muốn xoá sự kiện',
       type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
     }))
     setOpenDialog(true)
     setRow(row)
@@ -208,6 +212,8 @@ export default function ManagerEvents(props: Props) {
             ? 'Bạn có chắc chắn muốn ẩn sự kiện'
             : 'Bạn có đồng ý mở lại sự kiện',
         type: 'toggle-status',
+        submitText: 'Có',
+        cancelText: 'Không',
       }))
       setOpenDialog(true)
       setRow(row)
@@ -314,7 +320,7 @@ export default function ManagerEvents(props: Props) {
             actions={[
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },
@@ -343,8 +349,8 @@ export default function ManagerEvents(props: Props) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
-        submitText={'Xoá'}
-        cancelText={'Huỷ'}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
         isLoading={updateLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">

@@ -112,7 +112,7 @@ export const tableModelHandBook = {
       width: null,
     },
     {
-      name: 'Ngưởi thêm',
+      name: 'Người thêm',
       width: null,
     },
     {
@@ -120,7 +120,7 @@ export const tableModelHandBook = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'nameHandBook', 'status', 'creator', 'action'],
+  bodyCell: ['index', 'nameHandBook', 'statusHandBook', 'creator', 'action'],
 }
 
 export const tableModelHandBookUnLinked = {

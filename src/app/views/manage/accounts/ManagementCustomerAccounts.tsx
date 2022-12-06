@@ -264,7 +264,7 @@ export default function CustomerAccounts(props: Props) {
             actions={[
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },

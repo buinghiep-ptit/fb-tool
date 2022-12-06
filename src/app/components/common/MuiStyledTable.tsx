@@ -136,7 +136,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         <EnhancedTableToolbar numSelected={selected.length} />
       ) : null}
       <TableContainer sx={{ maxHeight: maxHeight ?? null }}>
-        <Table stickyHeader aria-label="sticky table">
+        <Table stickyHeader aria-label="sticky table" size="medium">
           {!isFetching && (
             <TableHead>
               <TableRow>
@@ -151,6 +151,9 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                       padding: '4px',
                       backgroundColor: 'white',
                       ...column.sticky,
+                      pb: 2,
+                      fontWeight: 600,
+                      // color: '#101426',
                     }}
                   >
                     {column.label}

@@ -369,7 +369,7 @@ export default function ListAudios(props: Props) {
             actions={[
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },

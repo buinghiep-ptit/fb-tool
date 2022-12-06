@@ -235,7 +235,7 @@ export default function ListHandbook(props: Props) {
     setDialogData(prev => ({
       ...prev,
       title: 'Xoá cẩm nang',
-      message: 'Bạn có chắc chắn muốn xoá cẩm nang',
+      message: 'Bạn có chắc chắn muốn xoá cẩm nang?',
       type: 'delete',
       submitText: 'Xoá',
       cancelText: 'Huỷ',
@@ -366,7 +366,7 @@ export default function ListHandbook(props: Props) {
               },
               {
                 icon: 'edit',
-                color: 'warning',
+                color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },
@@ -399,7 +399,7 @@ export default function ListHandbook(props: Props) {
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
         isLoading={toggleLoading || deleteLoading}
-        disabled={!selectedCamps.length}
+        disabled={!selectedCamps.length && dialogData.type !== 'delete'}
       >
         {dialogData.type !== 'delete' ? (
           <UnlinkedCampgrounds

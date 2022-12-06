@@ -225,7 +225,7 @@ export default function UnlinkedCampgrounds({
             },
             {
               icon: 'double_arrow',
-              color: 'primary',
+              color: 'action',
               tooltip: 'Xem điểm chi tiết điểm camp',
               onClick: onRowDetail,
             },

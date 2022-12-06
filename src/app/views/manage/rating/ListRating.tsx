@@ -473,7 +473,7 @@ export default function ListRating() {
                       },
                       {
                         icon: 'edit',
-                        color: 'warning',
+                        color: 'action',
                         tooltip: 'Chi tiết',
                         onClick: onRowUpdate,
                       },

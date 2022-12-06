@@ -8,8 +8,9 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { uploadApi } from 'app/apis/uploads/upload.service'
-import { blobToFile } from 'app/helpers/compressFile'
+import { blobToFile, getVideoDuration } from 'app/helpers/compressFile'
 import { generateVideoThumbnails } from 'app/helpers/extractThumbnailVideo'
+import { toastError } from 'app/helpers/toastNofication'
 import { IMediaOverall } from 'app/models'
 import { Fragment, useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -83,7 +84,18 @@ export function VideoUploadPreviewer({
   }
 
   const onDrop = useCallback(
-    (droppedFiles: File[]) => {
+    async (droppedFiles: File[]) => {
+      if (!droppedFiles[0].type?.includes('video')) return
+      const duration = await getVideoDuration(droppedFiles[0])
+
+      if (duration && duration > 180) {
+        toastError({
+          message: 'Dung lượng video không được vượt quá 3 phút',
+        })
+
+        return
+      }
+
       setValue(name, droppedFiles, { shouldValidate: true })
       setUploadFile(droppedFiles)
       getThumbnailsFromVideo(droppedFiles[0])
@@ -91,7 +103,7 @@ export function VideoUploadPreviewer({
     [setValue, name, files],
   )
 
-  const { getRootProps, getInputProps, open } = useDropzone({
+  const { getRootProps, getInputProps, open, fileRejections } = useDropzone({
     multiple: false,
     accept: {
       'video/mp4': ['.mp4'],
@@ -101,6 +113,21 @@ export function VideoUploadPreviewer({
     },
     onDrop,
     maxSize: 500 * 1024 * 1024,
+  })
+
+  const fileRejectionItems = fileRejections.map(({ file, errors }: any) => {
+    return (
+      <li key={file.path}>
+        {file.path} - {file.size} bytes
+        <ul>
+          {errors.map((e: any) => (
+            <li key={e.code}>
+              <span style={{ color: '#FF6868' }}>{e.message}</span>
+            </li>
+          ))}
+        </ul>
+      </li>
+    )
   })
 
   const handleRemoveAllMedias = () => {
@@ -234,6 +261,15 @@ export function VideoUploadPreviewer({
             </Stack>
           </Stack>
         )}
+
+      {fileRejections.length ? (
+        <aside>
+          <h4>File không hợp lệ</h4>
+          <ul>{fileRejectionItems}</ul>
+        </aside>
+      ) : (
+        <></>
+      )}
     </Fragment>
   )
 }

@@ -161,16 +161,10 @@ export const columnsRatingAll: readonly TableColumn<TitleRating>[] = [
     format: (value: string) => ISODateTimeFormatter(value),
   },
   {
-    id: 'status',
+    id: 'actions',
     label: 'Thao tác',
     minWidth: 80,
     align: 'center',
-    action: (value: any) => (
-      <MuiSwitch
-        checked={value === 1 ? true : false}
-        sx={{ justifyContent: 'center', fontSize: '16px!important' }}
-      />
-    ),
     sticky: {
       position: 'sticky',
       right: 0,
@@ -179,6 +173,25 @@ export const columnsRatingAll: readonly TableColumn<TitleRating>[] = [
       clipPath: 'inset(0px 0px 0px -15px)',
     },
   },
+  // {
+  //   id: 'status',
+  //   label: 'Thao tác',
+  //   minWidth: 80,
+  //   align: 'center',
+  //   action: (value: any) => (
+  //     <MuiSwitch
+  //       checked={value === 1 ? true : false}
+  //       sx={{ justifyContent: 'center', fontSize: '16px!important' }}
+  //     />
+  //   ),
+  //   sticky: {
+  //     position: 'sticky',
+  //     right: 0,
+  //     background: 'white',
+  //     boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+  //     clipPath: 'inset(0px 0px 0px -15px)',
+  //   },
+  // },
 ]
 
 export const columnsRatingReported: readonly TableColumn<TitleRating>[] = [

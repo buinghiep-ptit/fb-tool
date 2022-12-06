@@ -11,13 +11,13 @@ import { Box } from '@mui/system'
 import { IMediaOverall } from 'app/models'
 import React, { Fragment, useCallback, useState } from 'react'
 import MuiStyledDialogEditor from './MuiStyledDialogEditor'
-import { useDropzone } from 'react-dropzone'
+import { FileRejection, useDropzone } from 'react-dropzone'
 import { ImageListView } from './ImageListCustomize'
 import { MuiTypography } from './MuiTypography'
 import { MuiButton } from './MuiButton'
 import { useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { compressImageFile } from 'app/helpers/compressFile'
+import { toastWarning } from 'app/helpers/toastNofication'
 
 export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
   ({ aspectRatio }) => ({
@@ -47,6 +47,7 @@ export interface Props {
   images: IMediaOverall[]
   setUploadFile: (files: File[]) => void
   setInitialFile: (files: IMediaOverall[]) => void
+  isLimitFiles?: boolean
 }
 
 export function ImageUploadPreviewer({
@@ -54,6 +55,7 @@ export function ImageUploadPreviewer({
   images = [],
   setUploadFile,
   setInitialFile,
+  isLimitFiles = false,
 }: Props) {
   const [openDialog, setOpenDialog] = useState(false)
   const fileInfos = useSelector((state: any) => state.UploadFile.fileInfos)
@@ -67,6 +69,17 @@ export function ImageUploadPreviewer({
 
   const onDrop = useCallback(
     async (droppedFiles: File[]) => {
+      if (true) {
+        if (fileInfos.length >= 15) {
+          toastWarning({ message: 'Số lượng ảnh của bài đã đạt tối đa (15)' })
+          return
+        } else {
+          droppedFiles = droppedFiles.slice(0, 15 - fileInfos.length)
+        }
+      }
+
+      if (!droppedFiles || !droppedFiles.length) return
+
       setValue(name, droppedFiles, { shouldValidate: true })
       // const filesCompressedPromise = droppedFiles.map(async file => {
       //   const data = await compressImageFile(file)
@@ -75,10 +88,10 @@ export function ImageUploadPreviewer({
       // const filesCompressed = await Promise.all(filesCompressedPromise)
       setUploadFile(droppedFiles)
     },
-    [setValue, name, files],
+    [setValue, name, files, fileInfos],
   )
 
-  const { getRootProps, getInputProps, open } = useDropzone({
+  const { getRootProps, getInputProps, open, fileRejections } = useDropzone({
     multiple: true,
     accept: {
       'image/png': ['.png', '.PNG'],
@@ -87,6 +100,21 @@ export function ImageUploadPreviewer({
     onDrop,
     maxFiles: 15,
     maxSize: 10 * 1024 * 1024,
+  })
+
+  const fileRejectionItems = fileRejections.map(({ file, errors }: any) => {
+    return (
+      <li key={file.path}>
+        {file.path} - {file.size} bytes
+        <ul>
+          {errors.map((e: any) => (
+            <li key={e.code}>
+              <span style={{ color: '#FF6868' }}>{e.message}</span>
+            </li>
+          ))}
+        </ul>
+      </li>
+    )
   })
 
   const handleRemoveMedia = (imgIdx?: number) => {
@@ -248,6 +276,16 @@ export function ImageUploadPreviewer({
           </Stack>
         </PreviewerViewport>
       )}
+
+      {fileRejections.length ? (
+        <aside>
+          <h4>File không hợp lệ</h4>
+          <ul>{fileRejectionItems}</ul>
+        </aside>
+      ) : (
+        <></>
+      )}
+
       <MuiStyledDialogEditor
         title={'Chỉnh sửa ảnh'}
         open={openDialog}

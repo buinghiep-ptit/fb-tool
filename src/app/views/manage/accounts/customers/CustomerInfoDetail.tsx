@@ -120,29 +120,38 @@ export default function CustomerDetail(props: Props) {
   })
 
   const [defaultValues] = useState<SchemaType>({ typeFile: EMediaFormat.IMAGE })
-
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
   const validationSchema = Yup.object().shape(
     {
-      email: Yup.string()
-        .email(messages.MSG12)
-        .when('mobilePhone', {
-          is: (phone: string) => !phone || phone.length === 0,
-          then: Yup.string().required(messages.MSG1).email(messages.MSG12),
-          otherwise: Yup.string(),
-        }),
+      // email: Yup.string()
+      //   .email(messages.MSG12)
+      //   .when('mobilePhone', {
+      //     is: (phone: string) => !phone || phone.length === 0,
+      //     then: Yup.string().required(messages.MSG1).email(messages.MSG12),
+      //     otherwise: Yup.string(),
+      //   }),
       mobilePhone: Yup.string()
-        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-          if (!phone) {
-            return true
-          }
-          return regex.test(phone as string)
-        })
         .when('email', {
           is: (email: string) => !email || email.length === 0,
-          then: Yup.string().required(messages.MSG1),
-          otherwise: Yup.string(),
-        }),
+          then: Yup.string()
+            .required(messages.MSG1)
+            .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
+            .min(10, 'Số điện thoại yêu cầu 10 ký tự')
+            .max(10, 'Số điện thoại yêu cầu 10 ký tự'),
+          otherwise: Yup.string()
+            .matches(phoneRegExp, {
+              message: 'Số điện thoại không hợp lệ',
+              excludeEmptyString: true,
+            })
+            .test('len', 'Số điện thoại yêu cầu 10 ký tự', val => {
+              if (val == undefined) {
+                return true
+              }
+              return val.length == 0 || val.length === 10
+            }),
+        })
+        .nullable(),
       fullName: Yup.string()
         .required(messages.MSG1)
         .min(0, 'email must be at least 0 characters')
@@ -546,15 +555,28 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
-                      <SelectDropDown
-                        label="Loại TK"
-                        name="type"
-                        defaultValue=""
-                        sx={{ minWidth: 120 }}
-                      >
-                        <MenuItem value={1}>Thường</MenuItem>
-                        <MenuItem value={2}>KOL</MenuItem>
-                      </SelectDropDown>
+                      {customer?.data?.type !== 3 ? (
+                        <SelectDropDown
+                          label="Loại TK"
+                          name="type"
+                          defaultValue=""
+                          sx={{ minWidth: 120 }}
+                        >
+                          <MenuItem value={1}>Thường</MenuItem>
+                          <MenuItem value={2}>KOL</MenuItem>
+                        </SelectDropDown>
+                      ) : (
+                        <SelectDropDown
+                          label="Loại TK"
+                          name="type"
+                          defaultValue=""
+                          sx={{ minWidth: 120 }}
+                          disabled
+                        >
+                          <MenuItem value={3}>Campdi</MenuItem>
+                        </SelectDropDown>
+                      )}
+
                       <Chip
                         label={getLabelByCusStatus(
                           customer.data?.status as number,

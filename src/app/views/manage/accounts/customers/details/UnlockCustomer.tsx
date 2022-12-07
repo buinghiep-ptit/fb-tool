@@ -13,6 +13,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { lockDetail } from 'app/apis/accounts/customer.service'
+import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 
 type Props = {
   title: string
@@ -51,8 +52,6 @@ export default function LockCustomer({ title }: Props) {
       enabled: !!customerId,
     },
   )
-
-  console.log(lock)
 
   const { mutate: unlockCustomer, isLoading } = useUnLockCustomer(onSuccess)
 
@@ -119,20 +118,31 @@ export default function LockCustomer({ title }: Props) {
       >
         <FormProvider {...methods}>
           <Stack gap={1.5}>
-            <Stack flexDirection={'row'} gap={2}>
+            <Stack flexDirection={'row'}>
               <MuiTypography variant="subtitle2">Loại khoá:</MuiTypography>
-              <Chip
-                label={getLabelByCusStatus(customer.status as number)}
-                size="small"
-                sx={{
-                  mx: 1,
-                  px: 1,
-                  backgroundColor: getColorByCusStatus(
-                    customer.status as number,
-                  ),
-                  color: '#FFFFFF',
-                }}
-              />
+              <Stack direction={'row'} flex={1} alignItems="center">
+                <Chip
+                  label={getLabelByCusStatus(customer.status as number)}
+                  size="small"
+                  sx={{
+                    mx: 0.5,
+                    backgroundColor: getColorByCusStatus(
+                      customer.status as number,
+                    ),
+                    color: '#FFFFFF',
+                  }}
+                />
+                {lock && lock.lockExpireTime && (
+                  <MuiTypography
+                    variant="body2"
+                    fontSize={'0.75rem'}
+                    color={'primary'}
+                  >
+                    (hiệu lực đến:{' '}
+                    {ISODateTimeFormatter((lock as any).lockExpireTime)})
+                  </MuiTypography>
+                )}
+              </Stack>
             </Stack>
 
             <Stack flexDirection={'row'} gap={2}>

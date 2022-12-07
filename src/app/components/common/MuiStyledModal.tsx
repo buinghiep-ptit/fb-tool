@@ -126,7 +126,7 @@ export default function MuiStyledModal({
                 color="primary"
                 type="submit"
                 sx={{ flex: !!onCloseModal ? 1 : null, minWidth: 200 }}
-                startIcon={<Icon>save</Icon>}
+                // startIcon={<Icon>save</Icon>}
                 onClick={() => onSubmit()}
                 loading={isLoading}
               />
@@ -140,7 +140,7 @@ export default function MuiStyledModal({
                 color="secondary"
                 type="submit"
                 sx={{ flex: onSubmit ? 1 : null, minWidth: 200 }}
-                startIcon={<Icon>cancel</Icon>}
+                // startIcon={<Icon>cancel</Icon>}
                 onClick={onCloseModal}
               />
             )}

@@ -9,13 +9,11 @@ export const columnLogsCustomer: readonly TableColumn<ILogsActionCustomer>[] = [
     id: 'email',
     label: 'Người thực hiện',
     minWidth: 150,
-    align: 'center',
   },
   {
     id: 'note',
     label: 'Lý do',
     minWidth: 170,
-    align: 'center',
   },
   {
     id: 'actionDate',

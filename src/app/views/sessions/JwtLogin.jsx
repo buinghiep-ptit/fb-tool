@@ -59,7 +59,7 @@ const defaultValues = {
 // form field validation schema
 const validationSchema = Yup.object().shape({
   email: Yup.string().email(messages.MSG12).required(messages.MSG1),
-  password: Yup.string(),
+  password: Yup.string().required(messages.MSG1),
   // .required(messages.MSG1)
   // .test('latinChars', messages.MSG21, value => {
   //   const regexStr = /^[\x20-\x7E]+$/

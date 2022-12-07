@@ -101,7 +101,7 @@ const ForgotPassword = () => {
         return regexStr.test(value)
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20)
+      .matches(/^(?=.*?[a-zA-Z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20)
       .required(messages.MSG1),
     passwordConfirmation: Yup.string()
       .oneOf([Yup.ref('password'), null], messages.MSG11)

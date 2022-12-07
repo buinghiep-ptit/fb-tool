@@ -64,7 +64,6 @@ export const columnsAdminAccounts: readonly TableColumn<TitleUsers>[] = [
     id: 'updateBy',
     label: 'Người cập nhật',
     minWidth: 150,
-    align: 'center',
   },
   {
     id: 'status',

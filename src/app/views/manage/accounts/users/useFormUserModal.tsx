@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { LinearProgress, MenuItem, Stack } from '@mui/material'
+import { MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
@@ -12,7 +12,8 @@ const useFormUserModal = (data?: any) => {
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Email không hợp lệ')
-      .required('Email là bắt buộc'),
+      .required('Email là bắt buộc')
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<any>({

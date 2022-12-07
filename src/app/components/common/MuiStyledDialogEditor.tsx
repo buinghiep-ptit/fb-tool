@@ -100,7 +100,7 @@ export default function MuiStyledDialogEditor({
               variant="contained"
               color="primary"
               type="submit"
-              startIcon={<ApprovalRounded />}
+              // startIcon={<ApprovalRounded />}
               sx={{ minWidth: 100 }}
               onClick={() => onSubmit()}
               loading={isLoading}
@@ -114,7 +114,7 @@ export default function MuiStyledDialogEditor({
               color="secondary"
               type="submit"
               sx={{ minWidth: 100 }}
-              startIcon={<CancelOutlined />}
+              // startIcon={<CancelOutlined />}
               onClick={onCloseModal}
             />
           )}

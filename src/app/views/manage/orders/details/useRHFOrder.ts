@@ -28,20 +28,21 @@ export const useRHFOrder = (order: IOrderDetail) => {
 
   const [defaultValues] = useState<SchemaType>({})
 
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+
   const validationSchema = Yup.object().shape({
     fullName: Yup.string()
       .required(messages.MSG1)
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     mobilePhone: Yup.string()
-      .required(messages.MSG1)
-      .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-        const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-        if (!phone) {
-          return true
-        }
-        return regex.test(phone as string)
-      }),
-    email: Yup.string().email(messages.MSG12),
+      .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
+      .min(10, 'Số điện thoại chứa ít nhất 10 chữ số')
+      .max(10, 'Số điện thoại vượt quá 10 chữ số')
+      .required(messages.MSG1),
+    email: Yup.string()
+      .email(messages.MSG12)
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

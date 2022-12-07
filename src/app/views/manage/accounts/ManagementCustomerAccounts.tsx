@@ -68,10 +68,10 @@ export default function CustomerAccounts(props: Props) {
   const validationSchema = Yup.object().shape({
     account: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     email: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(255, 'email must be at almost 256 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -162,7 +162,10 @@ export default function CustomerAccounts(props: Props) {
 
   const onClickRow = (cell: any, row: any) => {
     if (cell.action || cell.link) {
-      navigate(`${row.customerId}/thong-tin`, {})
+      window.open(
+        `/quan-ly-tai-khoan-khach-hang/${row.customerId}/thong-tin`,
+        '_blank',
+      )
     }
   }
 

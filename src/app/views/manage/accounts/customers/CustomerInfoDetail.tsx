@@ -120,7 +120,8 @@ export default function CustomerDetail(props: Props) {
   })
 
   const [defaultValues] = useState<SchemaType>({ typeFile: EMediaFormat.IMAGE })
-
+  const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
   const validationSchema = Yup.object().shape(
     {
       email: Yup.string()
@@ -130,19 +131,15 @@ export default function CustomerDetail(props: Props) {
           then: Yup.string().required(messages.MSG1).email(messages.MSG12),
           otherwise: Yup.string(),
         }),
-      mobilePhone: Yup.string()
-        .test('check valid', 'Số điện thoại không hợp lệ', phone => {
-          const regex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
-          if (!phone) {
-            return true
-          }
-          return regex.test(phone as string)
-        })
-        .when('email', {
-          is: (email: string) => !email || email.length === 0,
-          then: Yup.string().required(messages.MSG1),
-          otherwise: Yup.string(),
-        }),
+      mobilePhone: Yup.string().when('email', {
+        is: (email: string) => !email || email.length === 0,
+        then: Yup.string()
+          .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
+          .min(10, 'Số điện thoại chứa ít nhất 10 chữ số')
+          .max(10, 'Số điện thoại vượt quá 10 chữ số')
+          .required(messages.MSG1),
+        otherwise: Yup.string(),
+      }),
       fullName: Yup.string()
         .required(messages.MSG1)
         .min(0, 'email must be at least 0 characters')

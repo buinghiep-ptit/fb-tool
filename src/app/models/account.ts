@@ -33,6 +33,7 @@ export interface ICustomer {
 }
 
 export interface ICustomerDetail {
+  id?: number
   email?: string
   mobilePhone?: string
   fullName?: string

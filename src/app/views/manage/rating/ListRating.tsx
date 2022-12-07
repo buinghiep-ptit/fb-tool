@@ -311,7 +311,7 @@ export default function ListRating() {
   }> = (values: { note?: string }) => {
     note({
       rateId: Number(row.id ?? 0),
-      note: values.note ?? '',
+      note: values.note || undefined,
     })
   }
 

@@ -46,7 +46,7 @@ export const toggleRateStatus = async (
   payload: { note?: string },
 ): Promise<any> => {
   const { data } = await http.post<any>(
-    `/api/camp-rating/${rateId}/toogle-status`,
+    `/api/camp-rating/${rateId}/toggle-status`,
     payload,
   )
   return data

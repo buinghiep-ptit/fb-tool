@@ -25,6 +25,7 @@ import {
   columnsRateDetailReports,
 } from 'app/utils/columns/columnsRatings'
 import { ReactElement, useEffect, useState } from 'react'
+import { SubmitHandler } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
@@ -202,18 +203,21 @@ export default function RateDetail(props: Props) {
   const { mutate: toggleStatus, isLoading: dialogLoading } =
     useToggleRateStatus(() => onSuccess(null, 'Cập nhật thành công'))
 
-  const onSubmitDialog = (type?: string) => {
-    switch (type) {
-      case 'approve':
-        break
-      case 'reject':
-        break
-      default:
-        break
-    }
+  const [getContentNote, methodsNote] = useNoteDialogForm('note')
+
+  const onSubmitDialogHandler: SubmitHandler<{
+    note?: string
+  }> = (values: { note?: string }) => {
+    console.log('vao day')
+    toggleStatus({
+      rateId: Number(rateId ?? 0),
+      note: values.note || undefined,
+    })
   }
 
-  const [getContentNote, methodsNote] = useNoteDialogForm('note')
+  const onSubmitDialog = () => {
+    methodsNote.handleSubmit(onSubmitDialogHandler)()
+  }
 
   const approveDialog = () => {
     setDialogData(prev => ({
@@ -263,21 +267,26 @@ export default function RateDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
-        <MuiButton
-          title="Chặn"
-          variant="contained"
-          color="warning"
-          onClick={rejectDialog}
-          startIcon={<Icon>clear</Icon>}
-        />
-        <MuiButton
-          title="Hợp lệ"
-          variant="contained"
-          color="primary"
-          onClick={approveDialog}
-          loading={false}
-          startIcon={<Icon>done</Icon>}
-        />
+        {rate.data?.status === 1 && (
+          <MuiButton
+            title="Chặn"
+            variant="contained"
+            color="warning"
+            onClick={rejectDialog}
+            startIcon={<Icon>clear</Icon>}
+          />
+        )}
+
+        {rate.data?.status === -1 && (
+          <MuiButton
+            title="Hợp lệ"
+            variant="contained"
+            color="primary"
+            onClick={approveDialog}
+            loading={false}
+            startIcon={<Icon>done</Icon>}
+          />
+        )}
 
         <MuiButton
           title="Quay lại"
@@ -341,7 +350,7 @@ export default function RateDetail(props: Props) {
                 justifyContent="flex-end"
               >
                 <Chip
-                  label={rate.data?.status === 1 ? 'Hoạt động' : 'Chặn'}
+                  label={rate.data?.status === 1 ? 'Hoạt động' : 'Đã chặn'}
                   size="small"
                   color={rate.data?.status === 1 ? 'primary' : 'default'}
                   sx={{
@@ -428,7 +437,7 @@ export default function RateDetail(props: Props) {
         title={dialogData.title}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={() => onSubmitDialog(dialogData.type)}
+        onSubmit={() => onSubmitDialog()}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
       >

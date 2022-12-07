@@ -124,13 +124,13 @@ export default function CustomerDetail(props: Props) {
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
   const validationSchema = Yup.object().shape(
     {
-      email: Yup.string()
-        .email(messages.MSG12)
-        .when('mobilePhone', {
-          is: (phone: string) => !phone || phone.length === 0,
-          then: Yup.string().required(messages.MSG1).email(messages.MSG12),
-          otherwise: Yup.string(),
-        }),
+      // email: Yup.string()
+      //   .email(messages.MSG12)
+      //   .when('mobilePhone', {
+      //     is: (phone: string) => !phone || phone.length === 0,
+      //     then: Yup.string().required(messages.MSG1).email(messages.MSG12),
+      //     otherwise: Yup.string(),
+      //   }),
       mobilePhone: Yup.string().when('email', {
         is: (email: string) => !email || email.length === 0,
         then: Yup.string()

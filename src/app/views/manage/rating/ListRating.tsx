@@ -203,12 +203,14 @@ export default function ListRating() {
       return {
         ...prevFilters,
         page: 0,
+        scope: queryParams.scope,
         size: +event.target.value,
       }
     })
     navigate('', {
       ...filters,
       page: 0,
+      scope: queryParams.scope,
       size: +event.target.value,
     } as any)
   }

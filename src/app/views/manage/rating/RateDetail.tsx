@@ -16,7 +16,6 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import useNoteDialogForm from 'app/hooks/components/useNoteDialogForm'
-import { useApproveFeed, useDeleteFeed } from 'app/hooks/queries/useFeedsData'
 import { useToggleRateStatus } from 'app/hooks/queries/useRatingData'
 import { IActionHistory, Image, IMediaOverall, IRateReport } from 'app/models'
 import { ICustomerOrder } from 'app/models/order'
@@ -45,11 +44,9 @@ export const convertDisplayCustomer = (
   splitChar?: string,
 ) => {
   if (!customer) return ''
-  const displayText = `${
-    customer.fullName ? customer.fullName + splitChar + ' ' : ''
-  }${customer.mobilePhone ? customer.mobilePhone + splitChar + ' ' : ''}${
-    customer.email
-  }`
+  const displayText = `${customer.fullName ? customer.fullName : ''}${
+    customer.mobilePhone ? splitChar + ' ' + customer.mobilePhone : ''
+  }${customer.email ? splitChar + ' ' + customer.email : ''}`
   return displayText
 }
 

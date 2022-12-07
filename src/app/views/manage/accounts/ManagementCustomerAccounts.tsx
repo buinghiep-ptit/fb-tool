@@ -220,6 +220,7 @@ export default function CustomerAccounts(props: Props) {
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Thường</MenuItem>
                     <MenuItem value={2}>KOL</MenuItem>
+                    <MenuItem value={3}>Campdi</MenuItem>
                   </SelectDropDown>
                 </Grid>
                 <Grid item sm={4} xs={12}>

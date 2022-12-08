@@ -58,7 +58,7 @@ export const uploadApi = async (
     headers.idSrc = 0
   } else if (scrTypeModule && scrTypeModule.srcType === 9) {
     headers.srcType = 9
-    headers.idSrc = 0
+    headers.idSrc = scrTypeModule.idSrc
   } else {
     headers.srcType = scrTypeModule.srcType ?? 0
   }

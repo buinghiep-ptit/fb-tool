@@ -2,8 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import {
   AddBox,
   ChangeCircleSharp,
-  CheckCircleOutlineRounded,
-  ClearSharp,
   LockClockSharp,
   LockOpenSharp,
 } from '@mui/icons-material'
@@ -16,6 +14,7 @@ import {
   LinearProgress,
   MenuItem,
   Stack,
+  Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQueries, UseQueryResult } from '@tanstack/react-query'
@@ -23,7 +22,9 @@ import {
   fetchLogsCustomer,
   getCustomerDetail,
 } from 'app/apis/accounts/customer.service'
+import { uploadApi } from 'app/apis/uploads/upload.service'
 import { SimpleCard } from 'app/components'
+import { DropWrapper } from 'app/components/common/ImageUploadPreviewer'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -31,13 +32,12 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import { compressImageFile } from 'app/helpers/compressFile'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
 } from 'app/hooks/queries/useCustomersData'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IMediaOverall } from 'app/models'
 import { ILogsActionCustomer, OtpCount } from 'app/models/account'
 import { columnLogsCustomer } from 'app/utils/columns/columnsLogsCustomer'
@@ -49,7 +49,8 @@ import {
   getLabelByCusStatus,
 } from 'app/utils/formatters/labelFormatter'
 import { messages } from 'app/utils/messages'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -60,7 +61,7 @@ type SchemaType = {
   fullName?: string
   otp?: number
   typeFile?: number
-  files?: any
+  imageFile?: any
   type?: string | number
 }
 
@@ -104,15 +105,12 @@ export default function CustomerDetail(props: Props) {
   const { customerId } = useParams()
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(10)
-  const [fileConfigs] = useState({
-    mediaType: EMediaType.AVATAR,
-    mediaFormat: EMediaFormat.IMAGE,
-    accept: 'image/*',
-    multiple: false,
-  })
-  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
-    [],
+
+  const [imagePreviewer, setImagePreviewer] = useState<IMediaOverall | null>(
+    null,
   )
+  const dropzoneImgRef = useRef(null) as any
+
   const [filters, setFilters] = useState({
     customerId,
     page,
@@ -196,13 +194,11 @@ export default function CustomerDetail(props: Props) {
       defaultValues.type = customer.data.type ?? 1
 
       if (customer.data.avatar) {
-        setMediasSrcPreviewer([
-          {
-            mediaType: EMediaType.AVATAR,
-            mediaFormat: EMediaFormat.IMAGE,
-            url: customer.data.avatar,
-          },
-        ])
+        setImagePreviewer({
+          mediaType: EMediaType.AVATAR,
+          mediaFormat: EMediaFormat.IMAGE,
+          url: customer.data.avatar,
+        })
       }
 
       methods.reset({ ...defaultValues })
@@ -227,17 +223,15 @@ export default function CustomerDetail(props: Props) {
     }
   }, [email, phone])
 
-  const [
-    selectFiles,
-    uploadFiles,
-    removeUploadedFiles,
-    cancelUploading,
-    uploading,
-    progressInfos,
-    message,
-    setInitialFileInfos,
-    fileInfos,
-  ] = useUploadFiles()
+  const openDialogFileImage = () => {
+    if (dropzoneImgRef.current) {
+      dropzoneImgRef.current.open()
+    }
+  }
+  const removeImageSelected = () => {
+    setImagePreviewer(null)
+    methods.setValue('imageFile', undefined)
+  }
 
   const onSuccess = (data: any) => {
     toastSuccess({ message: 'Cập nhật thành công' })
@@ -249,14 +243,27 @@ export default function CustomerDetail(props: Props) {
   const { mutate: addOtpCount, isLoading: addOtpLoading } =
     useAddOtpCountCustomer(onSuccess)
 
-  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
+  const onSubmitHandler: SubmitHandler<SchemaType> = async (
+    values: SchemaType,
+  ) => {
+    let imgData
+    if (values.imageFile) {
+      const fileCompressed = await compressImageFile(values.imageFile)
+
+      imgData = await uploadApi(fileCompressed, () => {}, null, {
+        srcType: 9,
+        idSrc: customerId,
+      })
+    }
+
     updateCustomer({
-      ...values,
-      avatar:
-        (fileInfos[fileInfos.length - 1] &&
-          fileInfos[fileInfos.length - 1].url) ??
-        '',
-      cusId: customerId,
+      cusId: Number(customerId ?? 0),
+      payload: {
+        mobilePhone: values.mobilePhone,
+        fullName: values.fullName,
+        avatar: imgData?.url || null,
+        type: Number(values.type ?? 0),
+      },
     })
   }
 
@@ -311,27 +318,6 @@ export default function CustomerDetail(props: Props) {
               onClick={methods.handleSubmit(onSubmitHandler)}
               startIcon={<Icon>done</Icon>}
             />
-            {/* <MuiButton
-              title="Huỷ"
-              variant="contained"
-              color="warning"
-              onClick={() => {
-                removeUploadedFiles(undefined, fileConfigs.mediaFormat)
-                setMediasSrcPreviewer(
-                  customer?.data?.avatar
-                    ? [
-                        {
-                          mediaType: EMediaType.AVATAR,
-                          mediaFormat: EMediaFormat.IMAGE,
-                          url: customer?.data?.avatar,
-                        },
-                      ]
-                    : [],
-                )
-                methods.reset()
-              }}
-              startIcon={<Icon>clear</Icon>}
-            /> */}
           </>
         )}
         <MuiButton
@@ -480,60 +466,130 @@ export default function CustomerDetail(props: Props) {
                 <Stack alignItems={'center'} justifyContent={'center'}>
                   <Stack alignItems={'center'} px={3} gap={2}>
                     <>
-                      <UploadPreviewer
-                        name="files"
-                        initialMedias={[]}
-                        fileInfos={fileInfos}
-                        mediasSrcPreviewer={mediasSrcPreviewer}
-                        setMediasSrcPreviewer={setMediasSrcPreviewer}
-                        mediaConfigs={fileConfigs}
-                        selectFiles={selectFiles}
-                        uploadFiles={uploadFiles}
-                        removeUploadedFiles={removeUploadedFiles}
-                        cancelUploading={cancelUploading}
-                        uploading={uploading}
-                        progressInfos={progressInfos}
-                      />
+                      <Dropzone
+                        ref={dropzoneImgRef}
+                        onDrop={acceptedFiles => {
+                          if (!acceptedFiles || !acceptedFiles.length) return
+                          setImagePreviewer({
+                            url: URL.createObjectURL(acceptedFiles[0]),
+                          })
+                          methods.setValue('imageFile', acceptedFiles[0])
+                        }}
+                        accept={{
+                          'image/png': ['.png', '.PNG'],
+                          'image/jpeg': ['.jpg', '.jpeg'],
+                        }}
+                        multiple={false}
+                        maxSize={10 * 1024 * 1024}
+                      >
+                        {({ getRootProps, getInputProps }) => (
+                          <>
+                            <div {...getRootProps({ className: 'dropzone' })}>
+                              <input {...getInputProps()} />
+                              {!imagePreviewer && (
+                                <DropWrapper
+                                  sx={{
+                                    aspectRatio: 'auto 1 / 1',
+                                    borderRadius: 1.5,
+                                    display: 'flex',
+                                    width: 200,
+                                    height: 200,
+                                  }}
+                                >
+                                  <Stack
+                                    sx={{
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <MuiTypography
+                                      variant="body2"
+                                      textAlign={'center'}
+                                    >
+                                      Chọn hoặc kéo thả ảnh làm avatar
+                                    </MuiTypography>
+                                    <Icon>backup</Icon>
+                                    <MuiTypography
+                                      variant="body2"
+                                      fontSize={'0.75rem'}
+                                    >
+                                      PNG / JPEG hoặc JPG
+                                    </MuiTypography>
+                                    <MuiTypography
+                                      variant="body2"
+                                      fontSize={'0.75rem'}
+                                    >
+                                      nhỏ hơn 10MB/ảnh
+                                    </MuiTypography>
+                                  </Stack>
+                                </DropWrapper>
+                              )}
+                            </div>
+                            {imagePreviewer && (
+                              <Box
+                                sx={{
+                                  width: 200,
+                                  height: 200,
+                                  position: 'relative',
+                                  aspectRatio: 'auto 1 / 1',
+                                  borderRadius: 1.5,
+                                  overflow: 'hidden',
+                                  boxShadow:
+                                    '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
+                                }}
+                              >
+                                <Stack
+                                  flexDirection={'row'}
+                                  sx={{
+                                    position: 'absolute',
+                                    top: '6px',
+                                    right: '6px',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Tooltip arrow title={'Chọn lại'}>
+                                    <IconButton
+                                      sx={{
+                                        bgcolor: '#303030',
+                                        borderRadius: 1,
+                                      }}
+                                      onClick={openDialogFileImage}
+                                    >
+                                      <Icon sx={{ color: 'white' }}>
+                                        cached
+                                      </Icon>
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip arrow title={'Xóa'}>
+                                    <IconButton
+                                      sx={{
+                                        bgcolor: '#303030',
+                                        borderRadius: 1,
+                                      }}
+                                      onClick={removeImageSelected}
+                                    >
+                                      <Icon sx={{ color: 'white' }}>
+                                        delete
+                                      </Icon>
+                                    </IconButton>
+                                  </Tooltip>
+                                </Stack>
 
-                      {methods.getValues('files') && !uploading && (
-                        <Stack
-                          maxWidth={'100%'}
-                          flexDirection={'row'}
-                          gap={0.5}
-                          alignItems={'center'}
-                        >
-                          <CheckCircleOutlineRounded color="primary" />
-                          <MuiTypography fontSize="0.75rem">
-                            {
-                              (methods.getValues('files')[0].name ??
-                                '') as string
-                            }
-                          </MuiTypography>
-                          <IconButton
-                            onClick={() => {
-                              methods.clearErrors('files')
-                              methods.setValue('files', null)
-                              removeUploadedFiles(
-                                undefined,
-                                fileConfigs.mediaFormat,
-                              )
-                              setMediasSrcPreviewer(
-                                customer?.data?.avatar
-                                  ? [
-                                      {
-                                        mediaType: EMediaType.AVATAR,
-                                        mediaFormat: EMediaFormat.IMAGE,
-                                        url: customer?.data?.avatar,
-                                      },
-                                    ]
-                                  : [],
-                              )
-                            }}
-                          >
-                            <ClearSharp color="error" />
-                          </IconButton>
-                        </Stack>
-                      )}
+                                <img
+                                  src={imagePreviewer.url}
+                                  alt="thumb"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                  }}
+                                />
+                              </Box>
+                            )}
+                          </>
+                        )}
+                      </Dropzone>
                     </>
 
                     <Stack flexDirection={'row'}>

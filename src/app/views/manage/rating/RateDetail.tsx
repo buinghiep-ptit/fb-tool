@@ -319,7 +319,11 @@ export default function RateDetail(props: Props) {
                     <MuiTypography variant="subtitle2">
                       Nội dung đánh giá:
                     </MuiTypography>
-                    <MuiTypography variant="body2" flex={1}>
+                    <MuiTypography
+                      variant="body2"
+                      flex={1}
+                      sx={{ whiteSpace: 'pre-line' }}
+                    >
                       {rate.data?.comment}
                     </MuiTypography>
                   </Stack>
@@ -361,8 +365,8 @@ export default function RateDetail(props: Props) {
               <Box
                 width={{
                   xs: '100%',
-                  sm: '50%',
-                  md: '25%',
+                  sm: '75%',
+                  md: '50%',
                 }}
               >
                 {!!mediasSrcPreviewer.length && (

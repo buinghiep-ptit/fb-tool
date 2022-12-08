@@ -36,9 +36,9 @@ export default function ListCampService(props) {
           const convertCampGroundService = {}
           convertCampGroundService.id = campGroundService.id
           convertCampGroundService.image = campGroundService.imageUrl
-          convertCampGroundService.linkDetail = {
+          convertCampGroundService.linkView = {
             link: campGroundService.name,
-            path: `/chi-tiet-diem-camp/${params.id}/sua-dich-vu/`,
+            path: `/quan-ly-dich-vu/`,
           }
           convertCampGroundService.type = typeService[campGroundService.type]
 

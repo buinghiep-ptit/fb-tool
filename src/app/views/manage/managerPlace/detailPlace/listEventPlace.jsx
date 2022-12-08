@@ -34,7 +34,7 @@ const tableModel = {
       width: 100,
     },
   ],
-  bodyCell: ['index', 'name', 'time', 'des-status', 'action'],
+  bodyCell: ['index', 'linkView', 'time', 'des-status', 'action'],
 }
 
 const tableModelEventUnlinked = {
@@ -89,7 +89,10 @@ export default function ListEventPlace(props) {
         const newList = cloneDeep(data.content).map(event => {
           const convertEvent = {}
           convertEvent.id = event.id
-          convertEvent.name = event.name
+          convertEvent.linkView = {
+            link: event.name,
+            path: '/quan-ly-su-kien/',
+          }
           convertEvent.time = `${event.startDate || ''} ${
             event.startDate && event.endDate ? '-' : ''
           } ${event.endDate || ''}`

@@ -131,28 +131,25 @@ export default function ListRating() {
   )
 
   useEffect(() => {
-    if (tabRef && tabRef.current != -1) {
-      onResetFilters()
-    }
     navigate('', {
+      search: queryParams.search ?? '',
+      status: queryParams.status ?? 1,
+      star: queryParams.star ?? 'all',
       scope: queryParams.scope ?? 'reported',
-    } as any)
-    tabRef.current = currentTab
-    setTabName(navOrdersHistory.items[currentTab].label)
-    methods.reset({ ...defaultValues, scope: queryParams.scope })
-  }, [currentTab])
-
-  useEffect(() => {
-    if (tabRef && tabRef.current != -1) {
-      onResetFilters()
-    }
-    navigate('', {
-      scope: queryParams.scope ?? 'reported',
+      page: queryParams.page ? +queryParams.page : 0,
+      size: queryParams.size ? +queryParams.size : 20,
     } as any)
     tabRef.current = currentTab
     setTabName(navOrdersHistory.items[currentTab].label)
     setCurrentTab(getCurrentTabIndex(queryParams.scope ?? ''))
-    methods.reset({ ...defaultValues, scope: queryParams.scope })
+    methods.reset({
+      search: queryParams.search ?? '',
+      status: queryParams.status ?? 1,
+      star: queryParams.star ?? 'all',
+      scope: queryParams.scope ?? 'reported',
+      page: queryParams.page ? +queryParams.page : 0,
+      size: queryParams.size ? +queryParams.size : 20,
+    })
   }, [queryParams.scope])
 
   const {

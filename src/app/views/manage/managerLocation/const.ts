@@ -89,7 +89,7 @@ export const tableModelService = {
   bodyCell: [
     'index',
     'image',
-    'linkDetail',
+    'linkView',
     'type',
     'quantity',
     'status',

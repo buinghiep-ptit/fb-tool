@@ -141,6 +141,15 @@ export default function ListCampPlace(props) {
     return res
   }
 
+  const handleSearch = () => {
+    tableRef.current.handleClickSearch()
+    fetchListCampUnlinked(params.id, {
+      name: filterCamp,
+      size: 20,
+      page: 0,
+    })
+  }
+
   React.useEffect(() => {
     fetchListCamp(params.id, param)
     fetchListCampUnlinked(params.id, param)
@@ -222,23 +231,24 @@ export default function ListCampPlace(props) {
             onChange={e => {
               setFilterCamp(e.target.value)
             }}
+            onKeyDown={async e => {
+              if (e.keyCode === 13) {
+                handleSearch()
+              }
+            }}
           />
           <Button
             variant="contained"
             style={{ margin: '20px 0' }}
             onClick={() => {
-              tableRef.current.handleClickSearch()
-              fetchListCampUnlinked(params.id, {
-                name: filterCamp,
-                size: 20,
-                page: 0,
-              })
+              handleSearch()
             }}
           >
             Tìm kiếm
           </Button>
           <TableCustom
             ref={tableRef}
+            msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${filterCamp}"`}
             title="Danh sách điểm camp"
             tableModel={tableModelCampUnlinked}
             pagination={true}

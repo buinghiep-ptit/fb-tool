@@ -82,11 +82,6 @@ export default function ManagerLocation(props) {
       page: 0,
       size: 20,
     })
-    if (res.length === 0) {
-      toastWarning({
-        message: `Không tìm được kết quả nào phù hợp với từ khóa “${inputFilter}”`,
-      })
-    }
   }
 
   React.useEffect(() => {
@@ -215,6 +210,7 @@ export default function ManagerLocation(props) {
         <TableCustom
           title="Danh sách địa điểm Camp"
           ref={tableRef}
+          msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${inputFilter}"`}
           dataTable={listCampGround || []}
           tableModel={tableModel}
           pagination={true}

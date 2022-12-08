@@ -523,7 +523,7 @@ function CreateFeed(props: any) {
       <TopRightButtonList
         isLoading={createLoading || editLoading}
         onSave={methods.handleSubmit(onSubmitHandler)}
-        onCancel={() => initDefaultValues(feed)}
+        // onCancel={() => initDefaultValues(feed)}
         onDelete={!!feedId ? openDeleteDialog : undefined}
         onGoBack={() => navigate(-1)}
       />
@@ -700,6 +700,10 @@ function CreateFeed(props: any) {
                     setUploadFile={props.setUploadFile}
                     setInitialFile={props.setInitialFile}
                     setThumbnail={setThumbnail}
+                    srcTypeModule={{
+                      srcType: 3,
+                      idSrc: 0,
+                    }}
                   />
                 )}
                 {fileType == 2 && (
@@ -710,6 +714,11 @@ function CreateFeed(props: any) {
                     )}
                     setUploadFile={props.setUploadFile}
                     setInitialFile={props.setInitialFile}
+                    srcTypeModule={{
+                      srcType: 3,
+                      idSrc: 0,
+                    }}
+                    isLimitFiles
                   />
                 )}
 

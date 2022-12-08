@@ -92,6 +92,18 @@ export default function ManagerMerchant(props) {
                 onChange={e => {
                   setSearch(e.target.value)
                 }}
+                onKeyDown={async e => {
+                  if (e.keyCode === 13) {
+                    tableRef.current.handleClickSearch()
+                    fetchListMerchant({
+                      search: search,
+                      status: statusFilter,
+                      merchantType: merchantType === 0 ? '' : merchantType,
+                      page: 0,
+                      size: 20,
+                    })
+                  }
+                }}
               />
               <FormControl fullWidth style={{ marginRight: '50px' }}>
                 <InputLabel id="demo-simple-select-label">
@@ -188,6 +200,7 @@ export default function ManagerMerchant(props) {
           key={tableModel}
           ref={tableRef}
           title="Danh sách đối tác"
+          msgNoContent={`Không tìm được kết quả nào phù hợp với từ khóa "${search}"`}
           dataTable={listMerchant || []}
           tableModel={tableModel}
           pagination={true}

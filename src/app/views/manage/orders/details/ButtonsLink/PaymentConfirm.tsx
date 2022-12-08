@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { uploadFileAll } from 'app/apis/uploads/upload.service'
+import { uploadApi, uploadFileAll } from 'app/apis/uploads/upload.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
@@ -92,7 +92,10 @@ export default function PaymentConfirm({ title }: Props) {
     // const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
     let fileResponse
     try {
-      if (values.files) fileResponse = await uploadFileAll(values.files)
+      if (values.files)
+        fileResponse = await uploadApi(values.files, () => {}, null, {
+          srcType: 12,
+        })
     } catch (error) {
       methods.setValue('files', undefined)
     }

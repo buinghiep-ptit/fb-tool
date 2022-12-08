@@ -14,6 +14,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchCampGrounds } from 'app/apis/feed/feed.service'
 import { getServiceDetail } from 'app/apis/services/services.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { ImageUploadPreviewer } from 'app/components/common/ImageUploadPreviewer'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -21,15 +22,12 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
-import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import UploadProgress from 'app/components/common/UploadProgress/UploadProgress'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import {
   useCreateService,
   useUpdateService,
 } from 'app/hooks/queries/useServicesData'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IMediaOverall } from 'app/models'
 import {
   ICampAreaResponse,
@@ -37,7 +35,10 @@ import {
   ICampGroundResponse,
 } from 'app/models/camp'
 import { DetailService, WeekdayPrices } from 'app/models/service'
-import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import {
+  setInitialFile,
+  setUploadFile,
+} from 'app/redux/reducers/upload/uploadFile.actions'
 import { messages } from 'app/utils/messages'
 import * as React from 'react'
 import { useState } from 'react'
@@ -47,6 +48,7 @@ import {
   useFieldArray,
   useForm,
 } from 'react-hook-form'
+import { connect } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 const Container = styled('div')(({ theme }) => ({
@@ -66,7 +68,7 @@ export interface Props {
 }
 type TypeElement = {
   camp?: ICampGround
-  files?: any
+  images?: any
   description?: string
   rentalType?: number | string
   capacity?: number
@@ -74,22 +76,21 @@ type TypeElement = {
   status?: number | string
   weekdayPrices?: WeekdayPrices[]
 }
-export default function ServiceDetail({
+
+function ServiceDetail({
   isModal = true,
   idCampGround = null,
   handleCloseModal,
   extendFunction,
   idService,
-}: Props) {
+  ...props
+}: Props & any) {
   const params = useParams()
   const navigate = useNavigate()
   const [serviceId, setServiceId] = useState<any>()
   // const { serviceId } = useParams()
   const [loading, setLoading] = useState(false)
   const [campGroundDefault, setCampGroundDefault] = useState<any>('')
-  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
-    [],
-  )
 
   const calendar = [
     { day: 2 },
@@ -101,12 +102,6 @@ export default function ServiceDetail({
     { day: 1 },
   ]
 
-  const [fileConfigs, setFileConfigs] = useState({
-    mediaType: EMediaType.POST,
-    mediaFormat: EMediaFormat.IMAGE,
-    accept: 'image/*',
-    multiple: true,
-  })
   const [defaultValues] = useState<TypeElement>({
     status: '',
     rentalType: 1,
@@ -126,31 +121,15 @@ export default function ServiceDetail({
     description: Yup.string()
       .max(1000, 'Chỉ được nhập tối đa 1000 ký tự')
       .required(messages.MSG1),
-    files: Yup.mixed()
-      .test('empty', messages.MSG1, files => {
-        // if (!!Number(eventId ?? 0)) {
-        const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-          media =>
-            media.mediaFormat === fileConfigs.mediaFormat &&
-            media.mediaType === 3,
-        )
+    images: Yup.mixed().test('required', messages.MSG1, files => {
+      const media = ((props.fileInfos ?? []) as IMediaOverall[]).find(
+        media => media.mediaFormat === 2,
+      )
 
-        if (files && files.length) {
-          return true
-        }
+      if (files && files.length) return true
 
-        return !!media
-        // }
-        // const isError = files && !!files.length
-        // return isError
-      })
-      .test(
-        'fileSize',
-        fileConfigs.mediaFormat === EMediaFormat.VIDEO
-          ? 'Dung lượng video tối đa 3 phút'
-          : 'Dung lượng ảnh tối đa 10MB/ảnh',
-        files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-      ),
+      return !!media
+    }),
     weekdayPrices: Yup.lazy(() =>
       Yup.array().of(
         Yup.object().shape({
@@ -173,18 +152,6 @@ export default function ServiceDetail({
     name: 'weekdayPrices',
     control: methods.control,
   })
-
-  const [
-    selectFiles,
-    uploadFiles,
-    removeUploadedFiles,
-    cancelUploading,
-    uploading,
-    progressInfos,
-    message,
-    setInitialFileInfos,
-    fileInfos,
-  ] = useUploadFiles()
 
   const {
     data: campService,
@@ -214,60 +181,9 @@ export default function ServiceDetail({
       })) as any
     }
 
-    const files = (fileInfos as IMediaOverall[])
-      .filter(
-        (f: IMediaOverall) =>
-          f.mediaFormat === fileConfigs.mediaFormat &&
-          !f.thumbnail &&
-          f.mediaType === 3,
-      )
-      .map((file: IMediaOverall) => ({
-        mediaType: EMediaType.POST,
-        mediaFormat: fileConfigs.mediaFormat,
-        url: file.url,
-        detail: file.detail ?? null,
-      }))
-
-    let thumbnails = (fileInfos as IMediaOverall[]).filter(
-      (f: IMediaOverall) => f.thumbnail,
+    const images = props.fileInfos.filter(
+      (file: IMediaOverall) => file.mediaFormat === 2,
     )
-
-    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
-      thumbnails = thumbnails
-        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
-        .map((file: IMediaOverall) => ({
-          mediaType: EMediaType.COVER,
-          mediaFormat: EMediaFormat.IMAGE,
-          url: file.url,
-        }))
-    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
-      thumbnails = thumbnails
-        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
-        .map((file: IMediaOverall) => ({
-          mediaType: EMediaType.COVER,
-          mediaFormat: EMediaFormat.IMAGE,
-          url: file.url,
-        }))
-    }
-
-    let medias: IMediaOverall[] = []
-    if (fileConfigs.mediaFormat === EMediaFormat.VIDEO) {
-      medias = [
-        {
-          ...files[files.length - 1],
-          detail:
-            thumbnails && thumbnails.length
-              ? {
-                  ...files[files.length - 1].detail,
-                  coverImgUrl: thumbnails[thumbnails.length - 1].url,
-                }
-              : null,
-        },
-      ]
-    } else if (fileConfigs.mediaFormat === EMediaFormat.IMAGE) {
-      medias =
-        thumbnails && thumbnails.length ? [thumbnails[0], ...files] : files
-    }
 
     const payload: DetailService = {
       name: values.name,
@@ -275,7 +191,7 @@ export default function ServiceDetail({
       rentalType: Number(values.rentalType),
       capacity: Number(capacity),
       description: values.description ?? '',
-      images: medias,
+      images: [...images], //medias,
       status: Number(values.status ?? -1),
       weekdayPrices: values.weekdayPrices ?? [],
     }
@@ -347,16 +263,11 @@ export default function ServiceDetail({
         )
         defaultValues.camp = getCamp ?? {}
       }
-      setMediasSrcPreviewer([
-        ...(campService?.images?.filter(f => f.mediaType === 3) ?? []),
-      ])
-      setInitialFileInfos([
-        ...(campService?.images?.filter(f => f.mediaType === 3) ?? []),
-      ])
-    } else {
-      setMediasSrcPreviewer([])
-    }
 
+      props.setInitialFile(
+        campService.images?.filter(f => f.mediaType === 3) ?? [],
+      )
+    }
     methods.reset({ ...defaultValues })
   }, [campService, campGrounds])
 
@@ -425,13 +336,13 @@ export default function ServiceDetail({
           disabled={createLoading}
         />
 
-        <MuiButton
+        {/* <MuiButton
           onClick={() => methods.reset()}
           title="Huỷ"
           variant="contained"
           color="warning"
           startIcon={<Icon>cached</Icon>}
-        />
+        /> */}
 
         <MuiButton
           title="Quay lại"
@@ -533,21 +444,18 @@ export default function ServiceDetail({
                       Hình ảnh:
                     </MuiTypography>
                     <Box flex={1}>
-                      <UploadPreviewer
-                        name="files"
-                        initialMedias={campService?.images ?? []}
-                        fileInfos={fileInfos}
-                        mediasSrcPreviewer={mediasSrcPreviewer}
-                        setMediasSrcPreviewer={setMediasSrcPreviewer}
-                        mediaConfigs={fileConfigs as any}
-                        selectFiles={selectFiles}
-                        uploadFiles={uploadFiles}
-                        removeUploadedFiles={removeUploadedFiles}
-                        cancelUploading={cancelUploading}
-                        uploading={uploading}
-                        progressInfos={progressInfos}
-                        message={message}
+                      <ImageUploadPreviewer
+                        name={'images'}
+                        images={props.fileInfos.filter(
+                          (file: IMediaOverall) => file.mediaFormat === 2,
+                        )}
+                        setUploadFile={props.setUploadFile}
+                        setInitialFile={props.setInitialFile}
+                        srcTypeModule={{
+                          srcType: 6,
+                        }}
                       />
+                      <UploadProgress />
                     </Box>
                   </Stack>
                 </Stack>
@@ -603,3 +511,13 @@ export default function ServiceDetail({
     </Container>
   )
 }
+
+const mapStateToProps = (state: any) => ({
+  fileInfos: state.UploadFile.fileInfos,
+})
+const mapDispatchToProps = (dispatch: any) => ({
+  setUploadFile: (files: any) => dispatch(setUploadFile(files)),
+  setInitialFile: (files: any) => dispatch(setInitialFile(files)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(ServiceDetail)

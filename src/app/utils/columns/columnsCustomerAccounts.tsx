@@ -41,7 +41,6 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     id: 'email',
     label: 'Email',
     minWidth: 200,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography
@@ -64,7 +63,6 @@ export const columnCustomerAccounts: readonly TableColumn<TitleCustomers>[] = [
     id: 'fullName',
     label: 'Tên hiển thị',
     minWidth: 150,
-    align: 'center',
     link: (value: any) => (
       <Tooltip arrow title={value}>
         <Typography

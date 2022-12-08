@@ -199,7 +199,7 @@ export default function ListCampgroundsPolicy({ policyId }: Props) {
           actions={[
             {
               icon: 'double_arrow',
-              color: 'primary',
+              color: 'action',
               tooltip: 'Xem chi tiết',
               onClick: onRowDetail,
             },

@@ -24,7 +24,7 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiSnackBar from 'app/components/common/MuiSnackBar'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import { messages } from 'app/utils/messages'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
@@ -101,7 +101,7 @@ const ForgotPassword = () => {
         return regexStr.test(value)
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,20}$/g, messages.MSG20)
+      .matches(/^(?=.*?[a-zA-Z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20)
       .required(messages.MSG1),
     passwordConfirmation: Yup.string()
       .oneOf([Yup.ref('password'), null], messages.MSG11)
@@ -122,7 +122,13 @@ const ForgotPassword = () => {
           key: queryParams.key ?? '',
         })
         if (response.isValid) setStep(2)
-        else navigate('/session/signin')
+        else {
+          toastError({
+            message:
+              'Link đặt lại mật khẩu đã hết hạn! Vui lòng vào trang Đăng nhập để gửi lại yêu cầu đặt lại mật khẩu.',
+          })
+          navigate('/session/signin')
+        }
       } catch (error) {}
     })()
   }, [])
@@ -137,8 +143,7 @@ const ForgotPassword = () => {
       if (step === 1) {
         await resetPasswordInit(values)
         toastSuccess({
-          message:
-            'Gửi yêu cầu thành công. Vui lòng kiểm tra email để tiếp tục!',
+          message: 'Đã gửi mail làm mới mật khẩu tới email của bạn',
         })
         setLoading(false)
       } else if (step === 2) {

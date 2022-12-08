@@ -118,7 +118,7 @@ export default function ChangePassword({ title }: Props) {
                 name="password"
                 size="small"
                 label={'Mật khẩu mới:*'}
-                placeholder="Nhập mật khẩu"
+                placeholder="Nhập mật khẩu mới"
                 defaultValue={customer?.email ? customer?.email : ''}
                 iconEnd={
                   <IconButton onClick={handleClickShowPassword} edge="end">

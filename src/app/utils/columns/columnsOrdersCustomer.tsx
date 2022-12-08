@@ -11,6 +11,28 @@ import { TooltipText } from './columnsEvents'
 export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
   { id: 'order', label: 'STT', minWidth: 50 },
   {
+    id: 'cusAccount',
+    label: 'Tài khoản đặt',
+    minWidth: 120,
+    link: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+            textDecorationLine: 'underline',
+          }}
+          color={'primary'}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
+  },
+  {
     id: 'campGroundName',
     label: 'Tên điểm camp',
     minWidth: 150,
@@ -111,6 +133,25 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
       ),
   },
   {
+    id: 'cancelRequestStatus',
+    label: 'Trạng thái y/c huỷ',
+    minWidth: 120,
+    align: 'center',
+    status: (value: any) =>
+      value !== null ? (
+        <Chip
+          label={getOrderStatusSpec(value, 3).title}
+          size="small"
+          sx={{
+            color: getOrderStatusSpec(value, 3).textColor,
+            bgcolor: getOrderStatusSpec(value, 3).bgColor,
+          }}
+        />
+      ) : (
+        <></>
+      ),
+  },
+  {
     id: 'handledBy',
     label: 'Người tiếp nhận',
     minWidth: 170,
@@ -124,7 +165,10 @@ export const columnsOrdersCustomer: readonly TableColumn<TitleOrders>[] = [
     minWidth: 90,
     align: 'center',
     action: (value?: any) => (
-      <Typography variant="subtitle2" color="primary">
+      <Typography
+        variant="subtitle2"
+        color={value === 0 ? 'primary' : 'royalblue'}
+      >
         {value === 0 ? 'Tiếp nhận' : 'Chi tiết'}
       </Typography>
     ),

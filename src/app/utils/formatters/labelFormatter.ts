@@ -7,6 +7,8 @@ export const LabelFormatter = (value?: number, key?: string) => {
         formatter = 'KOL'
       } else if (value === 1) {
         formatter = 'Thường'
+      } else if (value === 3) {
+        formatter = 'Campdi(food)'
       }
       break
 

@@ -132,7 +132,7 @@ export function CustomerInfo({ order, isViewer }: ICustomerInfoProps) {
                 <FormInputText
                   label={'Số điện thoại'}
                   required
-                  type="number"
+                  type="text"
                   name="mobilePhone"
                   defaultValue=""
                   fullWidth

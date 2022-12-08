@@ -47,6 +47,7 @@ const RHFInputLockTime = ({ methods, name }: RHFInputLockTimeProps) => {
       label="Thời gian"
       placeholder="Nhập giá"
       fullWidth
+      isAllowZeroFirst={false}
     />
   )
 }
@@ -64,12 +65,13 @@ export default function LockCustomer({ title }: Props) {
   }
   const validationSchema = Yup.object().shape({
     lockType: Yup.string(),
-    lockDuration: Yup.string().when('lockType', {
+    lockDuration: Yup.number().when('lockType', {
       is: (lockType: string) => lockType && lockType === '2',
-      then: Yup.string()
+      then: Yup.number()
         .required(messages.MSG1)
-        .max(10, 'Thời gian không hợp lệ (<= 10 số)')
-        .matches(/[0-9]{1,}/, 'Thời gian không hợp lệ'),
+        .typeError(messages.MSG1)
+        .positive() // Sso nguyen duong
+        .max(9999999999, 'Tối đa 10 chữ số'),
     }),
 
     reason: Yup.string()

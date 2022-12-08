@@ -36,9 +36,16 @@ export const useRHFOrder = (order: IOrderDetail) => {
       .required(messages.MSG1)
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     mobilePhone: Yup.string()
-      .matches(phoneRegExp, 'Số điện thoại không hợp lệ')
-      .min(10, 'Số điện thoại chứa ít nhất 10 chữ số')
-      .max(10, 'Số điện thoại vượt quá 10 chữ số')
+      .matches(phoneRegExp, {
+        message: 'Số điện thoại không hợp lệ',
+        excludeEmptyString: true,
+      })
+      .test('len', 'Số điện thoại yêu cầu 10 ký tự', val => {
+        if (val == undefined) {
+          return true
+        }
+        return val.length == 0 || val.length === 10
+      })
       .required(messages.MSG1),
     email: Yup.string()
       .email(messages.MSG12)

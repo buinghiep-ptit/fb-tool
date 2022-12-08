@@ -33,6 +33,7 @@ export const uploadApi = async (
   file?: any,
   onUploadProgress?: any,
   cancelToken?: any,
+  scrTypeModule?: any,
 ): Promise<any> => {
   const formData = new FormData()
   formData.append('file', file)
@@ -42,15 +43,29 @@ export const uploadApi = async (
     path = '/api/video/upload'
   } else if (file.type.includes('image')) {
     path = '/api/image/upload'
+  } else if (file.type.includes('audio')) {
+    path = '/api/audio/upload'
   } else {
     path = '/api/file/upload'
   }
 
+  const headers: any = {
+    'Content-Type': 'multipart/form-data',
+  }
+
+  if (scrTypeModule && scrTypeModule.srcType === 3) {
+    headers.srcType = 3
+    headers.idSrc = 0
+  } else if (scrTypeModule && scrTypeModule.srcType === 9) {
+    headers.srcType = 9
+    headers.idSrc = 0
+  } else {
+    headers.srcType = scrTypeModule.srcType ?? 0
+  }
+
   const { data }: any = await http.post(path, formData, {
     baseURL: process.env.REACT_APP_API_UPLOAD_URL,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+    headers: headers,
     onUploadProgress,
     cancelToken: cancelToken,
   })

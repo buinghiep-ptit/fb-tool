@@ -257,13 +257,13 @@ export default function AddEvent(props: Props) {
           loading={createLoading || editLoading}
           startIcon={<Icon>done</Icon>}
         />
-        <MuiButton
+        {/* <MuiButton
           title="Huỷ"
           variant="contained"
           color="warning"
           onClick={() => handbook && initDefaultValues(handbook)}
           startIcon={<Icon>cached</Icon>}
-        />
+        /> */}
 
         {handbookId && (
           <MuiButton
@@ -361,7 +361,7 @@ export default function AddEvent(props: Props) {
         maxWidth={dialogData.type !== 'delete' ? 'md' : 'sm'}
         submitText={dialogData.type === 'unlinked' ? 'Lưu' : 'Xoá'}
         cancelText={'Huỷ'}
-        disabled={!selectedCamps.length}
+        disabled={!selectedCamps.length && dialogData.type !== 'delete'}
         isLoading={
           toggleLoading || editLoading || deleteLoading || createLoading
         }

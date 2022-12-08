@@ -10,7 +10,11 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { checkExistedName } from 'app/apis/audio/audio.service'
-import { uploadAudio, uploadImage } from 'app/apis/uploads/upload.service'
+import {
+  uploadApi,
+  uploadAudio,
+  uploadImage,
+} from 'app/apis/uploads/upload.service'
 import { BoxWrapperDialog } from 'app/components/common/BoxWrapperDialog'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -18,6 +22,7 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { DropWrapper } from 'app/components/common/UploadPreviewer'
+import { compressImageFile } from 'app/helpers/compressFile'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useCreateAudio, useUpdateAudio } from 'app/hooks/queries/useAudiosData'
 import { getReturnValues } from 'app/hooks/useCountDown'
@@ -202,8 +207,17 @@ export default function AddAudio({ title }: Props) {
   ) => {
     let audData,
       imgData = null
-    if (values.audioFile) audData = await uploadAudio(values.audioFile)
-    if (values.imageFile) imgData = await uploadImage(values.imageFile)
+    if (values.audioFile)
+      audData = await uploadApi(values.audioFile, () => {}, null, {
+        srcType: 14,
+      })
+    if (values.imageFile) {
+      const fileCompressed = await compressImageFile(values.imageFile)
+
+      imgData = await uploadApi(fileCompressed, () => {}, null, {
+        srcType: 14,
+      })
+    }
 
     const payload: IAudioOverall = {
       name: values.name,

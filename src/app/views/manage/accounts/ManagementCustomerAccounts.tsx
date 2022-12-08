@@ -92,7 +92,7 @@ export default function CustomerAccounts(props: Props) {
   >(['customers', filters], () => fetchCustomers(filters), {
     refetchOnWindowFocus: false,
     keepPreviousData: true,
-    enabled: !!filters && isSubmitted,
+    enabled: !!filters && true, // isSubmitted,
   })
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -131,7 +131,7 @@ export default function CustomerAccounts(props: Props) {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
-    setIsSubmitted(true)
+    // setIsSubmitted(true)
     setPage(0)
     setSize(20)
 
@@ -170,7 +170,7 @@ export default function CustomerAccounts(props: Props) {
   }
 
   const onResetFilters = () => {
-    setIsSubmitted(false)
+    // setIsSubmitted(false)
 
     methods.reset({
       search: '',
@@ -220,7 +220,7 @@ export default function CustomerAccounts(props: Props) {
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Thường</MenuItem>
                     <MenuItem value={2}>KOL</MenuItem>
-                    <MenuItem value={3}>Campdi</MenuItem>
+                    <MenuItem value={3}>Campdi(food)</MenuItem>
                   </SelectDropDown>
                 </Grid>
                 <Grid item sm={4} xs={12}>

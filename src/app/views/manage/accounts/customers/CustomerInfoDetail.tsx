@@ -362,6 +362,8 @@ export default function CustomerDetail(props: Props) {
                     label={' Số điện thoại'}
                     type="text"
                     name="mobilePhone"
+                    disabled={customer.data?.id === 0}
+                    clearIcon={customer.data?.id !== 0}
                     placeholder="Nhập SĐT"
                     fullWidth
                     defaultValue=""
@@ -370,6 +372,8 @@ export default function CustomerDetail(props: Props) {
                     label={'Tên hiển thị'}
                     type="text"
                     name="fullName"
+                    disabled={customer.data?.id === 0}
+                    clearIcon={customer.data?.id !== 0}
                     placeholder="Nhập họ và tên"
                     fullWidth
                     defaultValue=""
@@ -380,6 +384,7 @@ export default function CustomerDetail(props: Props) {
                         label="OTP trong ngày"
                         name="otp"
                         defaultValue=""
+                        disabled={customer.data?.id === 0}
                       >
                         {customer?.data?.otpCount?.length ? (
                           customer?.data?.otpCount?.map(item => (
@@ -400,6 +405,7 @@ export default function CustomerDetail(props: Props) {
                     />
 
                     <MuiButton
+                      disabled={customer.data?.id === 0}
                       onClick={() =>
                         addOtpCount({
                           customerId: (customerId ?? 0) as number,
@@ -555,7 +561,7 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
-                      {customer?.data?.type !== 3 ? (
+                      {customer?.data?.type !== 3 && customer.data?.id ? (
                         <SelectDropDown
                           label="Loại TK"
                           name="type"
@@ -565,17 +571,32 @@ export default function CustomerDetail(props: Props) {
                           <MenuItem value={1}>Thường</MenuItem>
                           <MenuItem value={2}>KOL</MenuItem>
                         </SelectDropDown>
-                      ) : (
-                        <SelectDropDown
-                          label="Loại TK"
-                          name="type"
-                          defaultValue=""
-                          sx={{ minWidth: 120 }}
+                      ) : null}
+
+                      {!customer.data?.id ? (
+                        <FormInputText
+                          label={'Loại TK'}
+                          type="text"
+                          name=""
+                          placeholder="Nhập SĐT"
                           disabled
-                        >
-                          <MenuItem value={3}>Campdi</MenuItem>
-                        </SelectDropDown>
-                      )}
+                          sx={{ width: 150 }}
+                          required
+                          defaultValue="Campdi"
+                        />
+                      ) : null}
+                      {customer?.data?.type === 3 ? (
+                        <FormInputText
+                          label={'Loại TK'}
+                          type="text"
+                          name=""
+                          placeholder="Nhập SĐT"
+                          disabled
+                          sx={{ width: 150 }}
+                          required
+                          defaultValue="Campdi(food)"
+                        />
+                      ) : null}
 
                       <Chip
                         label={getLabelByCusStatus(
@@ -601,6 +622,7 @@ export default function CustomerDetail(props: Props) {
                       {customer.data?.status !== -2 && (
                         <>
                           <MuiButton
+                            disabled={customer.data?.id === 0}
                             title={'Khoá'}
                             variant="text"
                             color="error"
@@ -622,6 +644,7 @@ export default function CustomerDetail(props: Props) {
                       {customer.data?.status !== 1 && (
                         <>
                           <MuiButton
+                            disabled={customer.data?.id === 0}
                             title={'Mở khóa'}
                             variant="text"
                             color="primary"
@@ -640,6 +663,7 @@ export default function CustomerDetail(props: Props) {
                         </>
                       )}
                       <MuiButton
+                        disabled={customer.data?.id === 0}
                         onClick={() =>
                           navigation(`doi-mat-khau`, {
                             state: { modal: true },

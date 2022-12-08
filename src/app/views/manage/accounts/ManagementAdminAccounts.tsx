@@ -105,12 +105,12 @@ export default function AdminAccounts(props: Props) {
   }, [id])
 
   const validationSchema = Yup.object().shape({
-    account: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
+    // account: Yup.string()
+    //   .min(0, 'hashtag must be at least 0 characters')
+    //   .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     email: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(255, 'email must be at almost 256 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -168,14 +168,20 @@ export default function AdminAccounts(props: Props) {
 
     setFilters(prevFilters => {
       return {
-        ...extractMergeFiltersObject(prevFilters, values),
+        ...extractMergeFiltersObject(prevFilters, {
+          ...values,
+          email: values.email ? values.email?.trim() : '',
+        }),
         page: 0,
         size: 20,
       }
     })
 
     navigate('', {
-      ...extractMergeFiltersObject(filters, values),
+      ...extractMergeFiltersObject(filters, {
+        ...values,
+        email: values.email ? values.email?.trim() : '',
+      }),
       page: 0,
       size: 20,
     } as any)

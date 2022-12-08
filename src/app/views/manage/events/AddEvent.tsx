@@ -13,6 +13,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { getEventDetail } from 'app/apis/events/event.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { ImageUploadPreviewer } from 'app/components/common/ImageUploadPreviewer'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiAutocompleteWithTags } from 'app/components/common/MuiRHFAutocompleteWithTags'
@@ -23,22 +24,25 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
-import { UploadPreviewer } from 'app/components/common/UploadPreviewer'
+import UploadProgress from 'app/components/common/UploadProgress/UploadProgress'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { checkIfFilesAreTooBig } from 'app/helpers/validateUploadFiles'
 import {
   useCreateEvent,
   useDeleteEvent,
   useUpdateEvent,
 } from 'app/hooks/queries/useEventsData'
-import { useUploadFiles } from 'app/hooks/useFilesUpload'
 import { IEventDetail, IMediaOverall, ITags } from 'app/models'
-import { EMediaFormat, EMediaType } from 'app/utils/enums/medias'
+import {
+  setInitialFile,
+  setUploadFile,
+} from 'app/redux/reducers/upload/uploadFile.actions'
+import { EMediaFormat } from 'app/utils/enums/medias'
 import { GtmToYYYYMMDD } from 'app/utils/formatters/dateTimeFormatters'
 import { messages } from 'app/utils/messages'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { connect } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
@@ -48,7 +52,7 @@ export interface Props {}
 type SchemaType = {
   name?: string
   type?: number
-  files?: any
+  images?: any
   isEveryYear?: boolean
   startDate?: string
   endDate?: string
@@ -67,18 +71,11 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export default function AddEvent(props: Props) {
+function AddEvent(props: any) {
   const navigate = useNavigate()
   const { eventId } = useParams()
-  const [fileConfigs, setFileConfigs] = useState({
-    mediaType: EMediaType.POST,
-    mediaFormat: EMediaFormat.IMAGE,
-    accept: 'image/*',
-    multiple: true,
-  })
-  const [mediasSrcPreviewer, setMediasSrcPreviewer] = useState<IMediaOverall[]>(
-    [],
-  )
+
+  const [thumbnail, setThumbnail] = useState<string>()
 
   const [dialogData, setDialogData] = useState<{
     title?: string
@@ -86,8 +83,6 @@ export default function AddEvent(props: Props) {
     type?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
-
-  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false)
 
   const [defaultValues] = useState<SchemaType>({
     type: EMediaFormat.IMAGE,
@@ -126,31 +121,15 @@ export default function AddEvent(props: Props) {
       amount: Yup.number()
         .max(999999999, 'Chỉ được nhập tối đa 9 chữ số')
         .nullable(),
-      files: Yup.mixed()
-        .test('empty', messages.MSG1, files => {
-          // if (!!Number(eventId ?? 0)) {
-          const media = ((fileInfos ?? []) as IMediaOverall[]).find(
-            media =>
-              media.mediaFormat === fileConfigs.mediaFormat &&
-              media.mediaType === 3,
-          )
+      images: Yup.mixed().test('required', messages.MSG1, files => {
+        const media = ((props.fileInfos ?? []) as IMediaOverall[]).find(
+          media => media.mediaFormat === 2,
+        )
 
-          if (files && files.length) {
-            return true
-          }
+        if (files && files.length) return true
 
-          return !!media
-          // }
-          // const isError = files && !!files.length
-          // return isError
-        })
-        .test(
-          'fileSize',
-          fileConfigs.mediaFormat === EMediaFormat.VIDEO
-            ? 'Dung lượng video tối đa 3 phút'
-            : 'Dung lượng ảnh tối đa 10MB/ảnh',
-          files => checkIfFilesAreTooBig(files, fileConfigs.mediaFormat),
-        ),
+        return !!media
+      }),
       hashtag: Yup.array().max(50, 'Hashtag tối đa là 50').nullable(),
       editor_content: Yup.string().required(messages.MSG1),
     },
@@ -177,18 +156,6 @@ export default function AddEvent(props: Props) {
       methods.clearErrors('endDate')
     }
   }, [startDate, endDate])
-
-  const [
-    selectFiles,
-    uploadFiles,
-    removeUploadedFiles,
-    cancelUploading,
-    uploading,
-    progressInfos,
-    message,
-    setInitialFileInfos,
-    fileInfos,
-  ] = useUploadFiles()
 
   const {
     data: event,
@@ -262,101 +229,24 @@ export default function AddEvent(props: Props) {
       defaultValues.type =
         event.medias && event.medias.length && event.medias[0].mediaFormat
 
-      if (
-        event.medias &&
-        event.medias.length &&
-        event.medias[0].mediaFormat === EMediaFormat.IMAGE
-      ) {
-        setFileConfigs(prev => ({
-          ...prev,
-          mediaFormat: EMediaFormat.IMAGE,
-          multiple: true,
-          accept: 'image/*',
-        }))
-      } else {
-        setFileConfigs(prev => ({
-          ...prev,
-          mediaFormat: EMediaFormat.VIDEO,
-          accept: 'video/*',
-          multiple: false,
-        }))
-      }
-      setMediasSrcPreviewer([
-        ...(event.medias?.filter(f => f.mediaType === 3) ?? []),
-      ])
-      setInitialFileInfos([
-        ...(event.medias?.filter(f => f.mediaType === 3) ?? []),
-      ])
-    } else {
-      setMediasSrcPreviewer([])
+      props.setInitialFile(event.medias?.filter(f => f.mediaType === 3) ?? [])
+
+      setThumbnail(event.medias?.find(f => f.mediaType === 2)?.url)
     }
 
-    // removeUploadedFiles() // refactor here , remove this line ???
     methods.reset({ ...defaultValues })
   }
 
   const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {
-    const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
-
-    const files = (fileInfos as IMediaOverall[])
-      .filter(
-        (f: IMediaOverall) =>
-          f.mediaFormat === fileConfigs.mediaFormat &&
-          !f.thumbnail &&
-          f.mediaType === 3,
-      )
-      .map((file: IMediaOverall) => ({
-        mediaType: EMediaType.POST,
-        mediaFormat: fileConfigs.mediaFormat,
-        url: file.url,
-        detail: file.detail ?? null,
-      }))
-
-    let thumbnails = (fileInfos as IMediaOverall[]).filter(
-      (f: IMediaOverall) => f.thumbnail,
+    const images = props.fileInfos.filter(
+      (file: IMediaOverall) => file.mediaFormat === 2,
     )
-
-    if (fileConfigs.mediaFormat == EMediaFormat.IMAGE) {
-      thumbnails = thumbnails
-        .filter((f: IMediaOverall) => f.thumbnail?.type === 'image')
-        .map((file: IMediaOverall) => ({
-          mediaType: EMediaType.COVER,
-          mediaFormat: EMediaFormat.IMAGE,
-          url: file.url,
-        }))
-    } else if (fileConfigs.mediaFormat == EMediaFormat.VIDEO) {
-      thumbnails = thumbnails
-        .filter((f: IMediaOverall) => f.thumbnail?.type === 'video')
-        .map((file: IMediaOverall) => ({
-          mediaType: EMediaType.COVER,
-          mediaFormat: EMediaFormat.IMAGE,
-          url: file.url,
-        }))
-    }
-
-    let medias: IMediaOverall[] = []
-    if (fileConfigs.mediaFormat === EMediaFormat.VIDEO) {
-      medias = [
-        {
-          ...files[files.length - 1],
-          detail:
-            thumbnails && thumbnails.length
-              ? {
-                  ...files[files.length - 1].detail,
-                  coverImgUrl: thumbnails[thumbnails.length - 1].url,
-                }
-              : null,
-        },
-      ]
-    } else if (fileConfigs.mediaFormat === EMediaFormat.IMAGE) {
-      medias =
-        thumbnails && thumbnails.length ? [thumbnails[0], ...files] : files
-    }
+    const amount = values?.amount?.toString().replace(/,(?=\d{3})/g, '') ?? 0
 
     const payload: IEventDetail = {
       name: values.name,
       content: values.editor_content,
-      medias: medias,
+      medias: [...images], //medias,
       isEveryYear: values.isEveryYear ? 1 : 0,
       startDate: GtmToYYYYMMDD(values.startDate as string),
       endDate: GtmToYYYYMMDD(values.endDate as string),
@@ -364,6 +254,7 @@ export default function AddEvent(props: Props) {
       status: Number(values.status ?? -1),
       tags: values.hashtag ?? [],
     }
+
     if (eventId) {
       edit({ ...payload, id: Number(eventId) })
     } else {
@@ -401,25 +292,6 @@ export default function AddEvent(props: Props) {
     setOpenDialog(true)
   }
 
-  useEffect(() => {
-    if (Number(methods.watch('type') ?? 0) === EMediaFormat.IMAGE) {
-      setFileConfigs(prev => ({
-        ...prev,
-        mediaFormat: EMediaFormat.IMAGE,
-        multiple: true,
-        accept: 'image/*',
-      }))
-    } else {
-      setFileConfigs(prev => ({
-        ...prev,
-        mediaFormat: EMediaFormat.VIDEO,
-        accept: 'video/*',
-        multiple: false,
-      }))
-    }
-    methods.setValue('files', null)
-  }, [methods.watch('type')])
-
   if (isLoading && fetchStatus === 'fetching') return <MuiLoading />
 
   if (isError)
@@ -452,23 +324,12 @@ export default function AddEvent(props: Props) {
           onClick={methods.handleSubmit(onSubmitHandler)}
           loading={createLoading || editLoading}
           startIcon={<Icon>done</Icon>}
-          disabled={uploading}
-        />
-        <MuiButton
-          disabled={uploading}
-          title="Huỷ"
-          variant="contained"
-          color="warning"
-          onClick={() => {
-            removeUploadedFiles(undefined, fileConfigs.mediaFormat)
-            initDefaultValues(event)
-          }}
-          startIcon={<Icon>cached</Icon>}
+          // disabled={uploading}
         />
 
         {eventId && (
           <MuiButton
-            disabled={uploading}
+            // disabled={uploading}
             title="Xoá"
             variant="contained"
             color="error"
@@ -495,7 +356,7 @@ export default function AddEvent(props: Props) {
         >
           <FormProvider {...methods}>
             <Grid container spacing={3}>
-              <Grid item sm={5} xs={12}>
+              <Grid item sm={7} xs={12}>
                 <Stack gap={3}>
                   {(createLoading || editLoading) && (
                     <LinearProgress sx={{ mt: 0.5 }} />
@@ -606,46 +467,29 @@ export default function AddEvent(props: Props) {
 
               <Grid
                 item
-                sm={7}
+                sm={5}
                 xs={12}
                 justifyContent="center"
                 alignItems={'center'}
               >
-                <Stack
-                  gap={2}
-                  flexDirection={'column'}
-                  justifyContent={'center'}
-                  alignItems={'center'}
+                <Box
+                  width={{
+                    sx: '100%',
+                  }}
                 >
-                  <Box
-                    width={{
-                      sx: '100%',
-                      md:
-                        fileConfigs.mediaFormat === EMediaFormat.VIDEO
-                          ? 300
-                          : 450,
+                  <ImageUploadPreviewer
+                    name={'images'}
+                    images={props.fileInfos.filter(
+                      (file: IMediaOverall) => file.mediaFormat === 2,
+                    )}
+                    setUploadFile={props.setUploadFile}
+                    setInitialFile={props.setInitialFile}
+                    srcTypeModule={{
+                      srcType: 7,
                     }}
-                    position="relative"
-                  >
-                    <UploadPreviewer
-                      name="files"
-                      initialMedias={event?.medias ?? []}
-                      fileInfos={fileInfos}
-                      mediasSrcPreviewer={mediasSrcPreviewer}
-                      setMediasSrcPreviewer={setMediasSrcPreviewer}
-                      mediaConfigs={fileConfigs}
-                      selectFiles={selectFiles}
-                      uploadFiles={uploadFiles}
-                      removeUploadedFiles={removeUploadedFiles}
-                      cancelUploading={cancelUploading}
-                      uploading={uploading}
-                      progressInfos={progressInfos}
-                      isFileDialogOpen={isFileDialogOpen}
-                      setIsFileDialogOpen={setIsFileDialogOpen}
-                      message={message}
-                    />
-                  </Box>
-                </Stack>
+                  />
+                </Box>
+                <UploadProgress />
               </Grid>
 
               <Grid item sm={12}>
@@ -682,3 +526,13 @@ export default function AddEvent(props: Props) {
     </Container>
   )
 }
+
+const mapStateToProps = (state: any) => ({
+  fileInfos: state.UploadFile.fileInfos,
+})
+const mapDispatchToProps = (dispatch: any) => ({
+  setUploadFile: (files: any) => dispatch(setUploadFile(files)),
+  setInitialFile: (files: any) => dispatch(setInitialFile(files)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddEvent)

@@ -48,6 +48,7 @@ export const uploadFile = files => dispatch => {
         if (file.file.type.includes('image')) {
           fileCompressed = await compressImageFile(file.file)
         }
+
         const fileResult = await uploadApi(
           fileCompressed,
           progress => {
@@ -56,6 +57,7 @@ export const uploadFile = files => dispatch => {
             dispatch(setUploadProgress(file.id, percentageProgress))
           },
           file.cancelSource.token,
+          file.file.srcTypeModule,
         )
         dispatch(
           successUploadFile(file.id, {

@@ -311,7 +311,7 @@ export default function CustomerDetail(props: Props) {
               onClick={methods.handleSubmit(onSubmitHandler)}
               startIcon={<Icon>done</Icon>}
             />
-            <MuiButton
+            {/* <MuiButton
               title="Huỷ"
               variant="contained"
               color="warning"
@@ -331,7 +331,7 @@ export default function CustomerDetail(props: Props) {
                 methods.reset()
               }}
               startIcon={<Icon>clear</Icon>}
-            />
+            /> */}
           </>
         )}
         <MuiButton

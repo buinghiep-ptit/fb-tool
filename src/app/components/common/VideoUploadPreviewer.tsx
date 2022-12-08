@@ -48,6 +48,10 @@ export interface Props {
   setUploadFile: (files: File[]) => void
   setInitialFile: (files: IMediaOverall[]) => void
   setThumbnail?: (file: string) => void
+  srcTypeModule?: {
+    srcType?: number
+    idSrc?: number
+  }
 }
 
 export function VideoUploadPreviewer({
@@ -56,6 +60,7 @@ export function VideoUploadPreviewer({
   setUploadFile,
   setInitialFile,
   setThumbnail,
+  srcTypeModule,
 }: Props) {
   const {
     setValue,
@@ -96,8 +101,14 @@ export function VideoUploadPreviewer({
         return
       }
 
-      setValue(name, droppedFiles, { shouldValidate: true })
-      setUploadFile(droppedFiles)
+      const droppedFilesModule = droppedFiles.map(file =>
+        Object.assign(file, {
+          srcTypeModule,
+        }),
+      )
+
+      setValue(name, droppedFilesModule, { shouldValidate: true })
+      setUploadFile(droppedFilesModule)
       getThumbnailsFromVideo(droppedFiles[0])
     },
     [setValue, name, files],

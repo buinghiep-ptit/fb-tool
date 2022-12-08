@@ -135,7 +135,8 @@ const ForgotPassword = () => {
 
   const onSubmitHandler = async values => {
     if (step === 3) {
-      navigate(-1)
+      // navigate(-1)
+      navigate('/session/signin')
       return
     }
     setLoading(true)

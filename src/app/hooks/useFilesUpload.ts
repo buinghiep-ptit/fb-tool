@@ -1,4 +1,5 @@
 import { uploadFile } from 'app/apis/uploads/upload.service'
+import { compressImageFile } from 'app/helpers/compressFile'
 import { IMediaOverall } from 'app/models'
 import { useRef, useState } from 'react'
 
@@ -42,7 +43,7 @@ export const useUploadFiles = () => {
     setProgressInfos({ val: [] })
   }
 
-  const upload = (
+  const upload = async (
     file: any,
     idx: number,
     mediaFormat?: number,
@@ -54,10 +55,11 @@ export const useUploadFiles = () => {
 
     if (!progressInfosRef || !progressInfosRef.current) return
     const _progressInfos = [...progressInfosRef.current.val]
+    const fileCompressed = await compressImageFile(file)
 
     return uploadFile(
       mediaFormat,
-      file,
+      fileCompressed,
       (event: any) => {
         if (thumbnail) return
         _progressInfos[idx].percentage = Math.round(

@@ -13,6 +13,14 @@ const useFormUserModal = (data?: any) => {
     email: Yup.string()
       .email('Email không hợp lệ')
       .required('Email là bắt buộc')
+      .test(
+        'validate email',
+        'Số ký tự trước @ không thể vượt quá 64',
+        email => {
+          if (!email?.includes('@')) return true
+          return email.split('@')[0].length <= 64
+        },
+      )
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

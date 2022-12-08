@@ -8,16 +8,16 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { toastWarning } from 'app/helpers/toastNofication'
 import { IMediaOverall } from 'app/models'
-import React, { Fragment, useCallback, useState } from 'react'
-import MuiStyledDialogEditor from './MuiStyledDialogEditor'
-import { FileRejection, useDropzone } from 'react-dropzone'
-import { ImageListView } from './ImageListCustomize'
-import { MuiTypography } from './MuiTypography'
-import { MuiButton } from './MuiButton'
+import { Fragment, useCallback, useState } from 'react'
+import { useDropzone } from 'react-dropzone'
 import { useFormContext } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { toastWarning } from 'app/helpers/toastNofication'
+import { ImageListView } from './ImageListCustomize'
+import { MuiButton } from './MuiButton'
+import MuiStyledDialogEditor from './MuiStyledDialogEditor'
+import { MuiTypography } from './MuiTypography'
 
 export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
   ({ aspectRatio }) => ({
@@ -47,6 +47,10 @@ export interface Props {
   images: IMediaOverall[]
   setUploadFile: (files: File[]) => void
   setInitialFile: (files: IMediaOverall[]) => void
+  srcTypeModule?: {
+    srcType?: number
+    idSrc?: number
+  }
   isLimitFiles?: boolean
 }
 
@@ -55,6 +59,7 @@ export function ImageUploadPreviewer({
   images = [],
   setUploadFile,
   setInitialFile,
+  srcTypeModule,
   isLimitFiles = false,
 }: Props) {
   const [openDialog, setOpenDialog] = useState(false)
@@ -69,7 +74,7 @@ export function ImageUploadPreviewer({
 
   const onDrop = useCallback(
     async (droppedFiles: File[]) => {
-      if (true) {
+      if (isLimitFiles) {
         if (fileInfos.length >= 15) {
           toastWarning({ message: 'Số lượng ảnh của bài đã đạt tối đa (15)' })
           return
@@ -80,13 +85,20 @@ export function ImageUploadPreviewer({
 
       if (!droppedFiles || !droppedFiles.length) return
 
-      setValue(name, droppedFiles, { shouldValidate: true })
+      const droppedFilesModule = droppedFiles.map(file =>
+        Object.assign(file, {
+          srcTypeModule,
+        }),
+      )
+
+      setValue(name, droppedFilesModule, { shouldValidate: true })
       // const filesCompressedPromise = droppedFiles.map(async file => {
       //   const data = await compressImageFile(file)
       //   return data
       // })
       // const filesCompressed = await Promise.all(filesCompressedPromise)
-      setUploadFile(droppedFiles)
+
+      setUploadFile(droppedFilesModule)
     },
     [setValue, name, files, fileInfos],
   )

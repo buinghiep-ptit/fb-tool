@@ -30,6 +30,8 @@ export const useToggleRateStatus = (onSuccess?: any, onError?: any) => {
       onSettled: () => {
         queryClient.invalidateQueries(['ratings'])
         queryClient.invalidateQueries(['rate'])
+        queryClient.invalidateQueries(['rate-reports'])
+        queryClient.invalidateQueries(['rate-actions-history'])
       },
       onSuccess,
     },

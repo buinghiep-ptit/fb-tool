@@ -32,13 +32,16 @@ export function TopRightButtonList({
         onClick={onSave}
         startIcon={<Icon>done</Icon>}
       />
-      <MuiButton
-        title="Huỷ"
-        variant="contained"
-        color="warning"
-        onClick={onCancel}
-        startIcon={<Icon>cached</Icon>}
-      />
+      {onCancel && (
+        <MuiButton
+          title="Huỷ"
+          variant="contained"
+          color="warning"
+          onClick={onCancel}
+          startIcon={<Icon>cached</Icon>}
+        />
+      )}
+
       {onDelete && (
         <MuiButton
           title="Xoá"

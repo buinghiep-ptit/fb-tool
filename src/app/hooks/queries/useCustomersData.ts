@@ -29,17 +29,8 @@ export const useUpdatePasswordCustomer = (onSuccess?: any, onError?: any) => {
 export const useUpdateCustomer = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation(
-    (customer: Record<string, any>) =>
-      updateCustomer(
-        customer.cusId,
-        extractFromObject(customer, [
-          'email',
-          'mobilePhone',
-          'fullName',
-          'avatar',
-          'type',
-        ]) as ICustomerDetail,
-      ),
+    (params: { cusId?: any; payload?: any }) =>
+      updateCustomer(params.cusId, params.payload as ICustomerDetail),
     {
       onSettled: () => {
         queryClient.invalidateQueries(['customer'])

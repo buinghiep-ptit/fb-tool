@@ -35,7 +35,7 @@ const tableModel = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'linkDetail', 'address', 'des-status', 'action'],
+  bodyCell: ['index', 'linkDetailBlank', 'address', 'des-status', 'action'],
 }
 
 const tableModelCampUnlinked = {
@@ -61,7 +61,7 @@ const tableModelCampUnlinked = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'linkDetail', 'address', 'des-status', 'action'],
+  bodyCell: ['index', 'linkDetailBlank', 'address', 'des-status', 'action'],
 }
 
 const param = {
@@ -90,7 +90,7 @@ export default function ListCampPlace(props) {
         const newList = cloneDeep(data.content).map(camp => {
           const convertCamp = {}
           convertCamp.id = camp.id
-          convertCamp.linkDetail = {
+          convertCamp.linkDetailBlank = {
             link: camp.name,
             path: '/chi-tiet-diem-camp/',
           }
@@ -114,7 +114,7 @@ export default function ListCampPlace(props) {
         const newList = cloneDeep(data.content).map(camp => {
           const convertCamp = {}
           convertCamp.id = camp.id
-          convertCamp.linkDetail = {
+          convertCamp.linkDetailBlank = {
             link: camp.name,
             path: '/chi-tiet-diem-camp/',
           }

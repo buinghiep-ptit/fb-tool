@@ -16,7 +16,7 @@ import {
 import React, { forwardRef, useState } from 'react'
 import { SimpleCard } from 'app/components'
 import { Link, useNavigate } from 'react-router-dom'
-import { cloneDeep, isNaN } from 'lodash'
+import { cloneDeep } from 'lodash'
 import DialogCustom from '../DialogCustom'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import ServiceDetail from 'app/views/manage/managerServices/ServiceDetail'
@@ -292,6 +292,30 @@ const TableCustom = forwardRef(
                           </TableCell>
                         )
                       case 'linkDetail':
+                        return (
+                          <TableCell
+                            align="left"
+                            key={`${element}${id}`}
+                            style={{ wordBreak: 'normal' }}
+                          >
+                            <Link
+                              to={`${data[element].path}${data.id}`}
+                              style={{
+                                textDecoration: 'underline',
+                                color: '#07bc0c',
+                                wordBreak: 'normal',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                webkitLineClamp: '2',
+                                display: '-webkit-box',
+                                webkitBoxOrient: 'vertical',
+                              }}
+                            >
+                              {data[element].link}
+                            </Link>
+                          </TableCell>
+                        )
+                      case 'linkDetailBlank':
                         return (
                           <TableCell
                             align="left"

@@ -57,3 +57,14 @@ export const toggleLinkCamps = async (payload: any): Promise<any> => {
   )
   return data
 }
+
+export const checkExistedNameHandbook = async (params?: {
+  idHandbook?: number
+  name?: string
+}): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/handbooks/validate-handbook-name`,
+    { params },
+  )
+  return data
+}

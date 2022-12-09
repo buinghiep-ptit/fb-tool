@@ -9,7 +9,10 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { getHandbookDetail } from 'app/apis/handbook/handbook.service'
+import {
+  checkExistedNameHandbook,
+  getHandbookDetail,
+} from 'app/apis/handbook/handbook.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
@@ -24,6 +27,7 @@ import {
   useToggleLinkCampsHandbook,
   useUpdateHandbook,
 } from 'app/hooks/queries/useHandbooksData'
+import useDebounce from 'app/hooks/useDebounce.'
 import { IHandbookDetail } from 'app/models/handbook'
 import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
@@ -53,6 +57,7 @@ const Container = styled('div')<Props>(({ theme }) => ({
 export default function AddEvent(props: Props) {
   const navigate = useNavigate()
   const { handbookId } = useParams()
+  const [isExistedName, setIsExistedName] = useState(false)
 
   const [dialogData, setDialogData] = useState<{
     title?: string
@@ -71,7 +76,8 @@ export default function AddEvent(props: Props) {
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .required(messages.MSG1)
-      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự')
+      .test('existed', 'Tên cẩm nang đã tồn tại', () => !isExistedName),
     editor_content: Yup.string().required(messages.MSG1),
   })
 
@@ -150,6 +156,34 @@ export default function AddEvent(props: Props) {
           : 'Thêm liên kết thành công',
       ),
     )
+
+  const debouncedSearchQuery = useDebounce(methods.watch('title') ?? '', 400)
+
+  useEffect(() => {
+    if (
+      !debouncedSearchQuery ||
+      (handbook && handbook.title == methods.watch('title'))
+    )
+      return
+    checkName(debouncedSearchQuery.trim())
+  }, [debouncedSearchQuery])
+
+  const checkName = async (nameAudios: string) => {
+    try {
+      const result = await checkExistedNameHandbook({
+        idHandbook: handbookId ? Number(handbookId) : undefined,
+        name: nameAudios,
+      })
+      if (result) {
+        setIsExistedName(result.exist)
+        if (result.exist) {
+          methods.setError('title', { message: 'Tên cẩm nang đã tồn tại' })
+        } else {
+          methods.clearErrors('title')
+        }
+      }
+    } catch (error) {}
+  }
 
   const openDeleteDialog = () => {
     setDialogData(prev => ({

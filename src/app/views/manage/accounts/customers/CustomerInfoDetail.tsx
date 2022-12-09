@@ -52,7 +52,7 @@ import { messages } from 'app/utils/messages'
 import { useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 type SchemaType = {
@@ -102,6 +102,7 @@ export interface Props {}
 
 export default function CustomerDetail(props: Props) {
   const navigation = useNavigate()
+  const prevRoute = useLocation()
   const { customerId } = useParams()
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(10)
@@ -324,7 +325,10 @@ export default function CustomerDetail(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigation(-1)}
+          onClick={() => {
+            if (prevRoute && prevRoute?.state?.from) navigation(-1)
+            else navigation('/quan-ly-tai-khoan-khach-hang', {})
+          }}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
@@ -345,11 +349,11 @@ export default function CustomerDetail(props: Props) {
                     clearIcon={false}
                   />
                   <FormInputText
-                    label={' Số điện thoại'}
+                    label={'Số điện thoại'}
                     type="text"
                     name="mobilePhone"
                     disabled={
-                      customer.data?.id !== 0 || customer?.data?.status === 3
+                      customer.data?.id === 0 || customer?.data?.status === 3
                     }
                     clearIcon={
                       customer.data?.id !== 0 && customer?.data?.status !== 3
@@ -363,7 +367,7 @@ export default function CustomerDetail(props: Props) {
                     type="text"
                     name="fullName"
                     disabled={
-                      customer.data?.id !== 0 || customer?.data?.status === 3
+                      customer.data?.id === 0 || customer?.data?.status === 3
                     }
                     clearIcon={
                       customer.data?.id !== 0 && customer?.data?.status !== 3

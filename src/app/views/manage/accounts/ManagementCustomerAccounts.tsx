@@ -16,7 +16,7 @@ import { columnCustomerAccounts } from 'app/utils/columns/columnsCustomerAccount
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 const Container = styled('div')<Props>(({ theme }) => ({
@@ -40,6 +40,7 @@ type ISearchFilters = {
 }
 
 export default function CustomerAccounts(props: Props) {
+  const navigation = useNavigate()
   const navigate = useNavigateParams()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -157,7 +158,9 @@ export default function CustomerAccounts(props: Props) {
   }
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigate(`${row.customerId}/thong-tin`, {})
+    navigation(`${row.customerId}/thong-tin`, {
+      state: { from: 'customer-list' },
+    })
   }
 
   const onClickRow = (cell: any, row: any) => {

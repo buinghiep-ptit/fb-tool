@@ -154,7 +154,7 @@ export default function CustomerDetail(props: Props) {
       fullName: Yup.string()
         .required(messages.MSG1)
         .min(0, 'email must be at least 0 characters')
-        .max(255, 'email must be at almost 256 characters'),
+        .max(255, 'Tên hiển thị không được vượt quá 255 ký tự'),
     },
     [['email', 'mobilePhone']],
   )
@@ -260,8 +260,8 @@ export default function CustomerDetail(props: Props) {
     updateCustomer({
       cusId: Number(customerId ?? 0),
       payload: {
-        mobilePhone: values.mobilePhone,
-        fullName: values.fullName,
+        mobilePhone: values.mobilePhone || undefined,
+        fullName: values.fullName || undefined,
         avatar: imgData?.url || null,
         type: Number(values.type ?? 0),
       },
@@ -308,7 +308,7 @@ export default function CustomerDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
-        {customer.data?.status !== 3 && (
+        {customer.data?.status !== 3 && customer.data?.id !== 0 && (
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
@@ -382,7 +382,10 @@ export default function CustomerDetail(props: Props) {
                         label="OTP trong ngày"
                         name="otp"
                         defaultValue=""
-                        disabled={customer.data?.id === 0}
+                        disabled={
+                          customer.data?.id === 0 ||
+                          customer?.data?.status === 3
+                        }
                       >
                         {customer?.data?.otpCount?.length ? (
                           customer?.data?.otpCount?.map(item => (
@@ -403,7 +406,9 @@ export default function CustomerDetail(props: Props) {
                     />
 
                     <MuiButton
-                      disabled={customer.data?.id === 0}
+                      disabled={
+                        customer.data?.id === 0 || customer?.data?.status === 3
+                      }
                       onClick={() =>
                         addOtpCount({
                           customerId: (customerId ?? 0) as number,
@@ -693,12 +698,11 @@ export default function CustomerDetail(props: Props) {
                   </Stack>
 
                   <Stack flexDirection={'row'}>
-                    {customer.data?.status !== 3 && (
+                    {customer.data?.id !== 0 && customer.data?.status !== 3 && (
                       <>
                         {customer.data?.status !== -2 && (
                           <>
                             <MuiButton
-                              disabled={customer.data?.id === 0}
                               title={'Khoá'}
                               variant="text"
                               color="error"
@@ -724,7 +728,6 @@ export default function CustomerDetail(props: Props) {
                         {customer.data?.status !== 1 && (
                           <>
                             <MuiButton
-                              disabled={customer.data?.id === 0}
                               title={'Mở khóa'}
                               variant="text"
                               color="primary"
@@ -746,22 +749,20 @@ export default function CustomerDetail(props: Props) {
                             />
                           </>
                         )}
+                        <MuiButton
+                          onClick={() =>
+                            navigation(`doi-mat-khau`, {
+                              state: { modal: true },
+                            })
+                          }
+                          title="Đổi mật khẩu"
+                          variant="text"
+                          color="secondary"
+                          sx={{ flex: 1 }}
+                          startIcon={<ChangeCircleSharp />}
+                        />
                       </>
                     )}
-
-                    <MuiButton
-                      disabled={customer.data?.id === 0}
-                      onClick={() =>
-                        navigation(`doi-mat-khau`, {
-                          state: { modal: true },
-                        })
-                      }
-                      title="Đổi mật khẩu"
-                      variant="text"
-                      color="secondary"
-                      sx={{ flex: 1 }}
-                      startIcon={<ChangeCircleSharp />}
-                    />
                   </Stack>
                 </Stack>
               </SimpleCard>

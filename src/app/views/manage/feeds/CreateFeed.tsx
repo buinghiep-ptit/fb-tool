@@ -239,7 +239,8 @@ function CreateFeed(props: any) {
     () => fetchFeedDetail(Number(feedId ?? 0)),
     {
       enabled: !!feedId,
-      staleTime: 15 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: 30 * 60 * 1000,
     },
   )
 
@@ -247,7 +248,8 @@ function CreateFeed(props: any) {
     ['audios'],
     () => fetchAudios({ size: 500, page: 0, status: 1 }),
     {
-      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: 30 * 60 * 1000,
     },
   )
 
@@ -255,7 +257,8 @@ function CreateFeed(props: any) {
     ['camp-areas'],
     () => fetchCampAreas({ size: 500, page: 0 }),
     {
-      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: 30 * 60 * 1000,
     },
   )
 
@@ -263,7 +266,8 @@ function CreateFeed(props: any) {
     ['camp-grounds'],
     () => fetchCampGrounds({ size: 500, page: 0 }),
     {
-      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: 30 * 60 * 1000,
     },
   )
 

@@ -261,7 +261,7 @@ export default function CreatePlace(props) {
         }
       })
     }
-
+    console.log(data.campAreaTypes)
     const paramDetail = {
       medias: [...mediasUpdateImage, ...mediasUpdateVideo].filter(
         item => !!item,
@@ -279,6 +279,7 @@ export default function CreatePlace(props) {
       status: 1,
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
+    console.log(paramDetail)
     const res = await createPlace(paramDetail)
     setIsLoading(false)
     if (res) {
@@ -489,7 +490,6 @@ export default function CreatePlace(props) {
                     multiple
                     {...field}
                     options={typeCamp}
-                    defaultValue={[{ label: 'Cắm trại', id: 1 }]}
                     getOptionLabel={option => option.label}
                     filterSelectedOptions
                     onChange={(_, data) => {

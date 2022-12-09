@@ -101,6 +101,7 @@ export default function CreateMerchant(props) {
       businessModel: '',
       address: '',
       representative: '',
+      merchantType: 1,
     },
   })
 
@@ -275,7 +276,6 @@ export default function CreateMerchant(props) {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                       >
-                        <MenuItem value={0}></MenuItem>
                         <MenuItem value={1}>Điểm camp</MenuItem>
                         <MenuItem value={2}>Nhà cung cấp</MenuItem>
                       </Select>

@@ -32,7 +32,10 @@ export default function ListCampHandBook(props) {
         const newList = cloneDeep(data.content).map(handbook => {
           const convertHandBook = {}
           convertHandBook.id = handbook.id
-          convertHandBook.nameHandBook = handbook.title
+          convertHandBook.linkView = {
+            link: handbook.title,
+            path: '/quan-ly-cam-nang/',
+          }
           convertHandBook.creator = handbook.userName
           convertHandBook.statusHandBook =
             handbook.status == 1 ? 'Hoạt động' : 'Không hoạt động'
@@ -155,7 +158,6 @@ export default function ListCampHandBook(props) {
         tableModel={tableModelHandBook}
         pagination={true}
         onDeleteData={onRemoveHandBookWithCamp}
-        // updateStatus={updateCampGroundServiceStatus}
         totalData={parseInt(totalListHandBookLinked, 0)}
         fetchDataTable={fetchListHandBookLinked}
         filter={{}}

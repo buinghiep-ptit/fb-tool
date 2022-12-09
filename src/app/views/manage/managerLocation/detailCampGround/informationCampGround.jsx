@@ -576,6 +576,88 @@ export default function InformationCampGround({ action }) {
         </Box>
       )}
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div style={{ marginTop: '50px' }}>
+          {action === 'create' ? (
+            <>
+              {/* <Button
+              color="primary"
+              variant="contained"
+              type="submit"
+              style={{ marginRight: '10px' }}
+              onClick={() => {
+                setValue('status', 0)
+              }}
+            >
+              Lưu Nháp
+            </Button> */}
+              <Button
+                color="primary"
+                type="submit"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                disabled={isLoading}
+              >
+                Lưu
+              </Button>
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => {
+                  navigate('/quan-ly-thong-tin-diem-camp')
+                }}
+              >
+                Quay lại
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* {statusCamp === 0 && (
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={async () => {
+                  const res = await updateCampGroundStatus(params.id, 0)
+                  if (res) {
+                    toastSuccess({ message: 'Lưu nháp thành công' })
+                    navigate('/quan-ly-thong-tin-diem-camp')
+                  }
+                }}
+              >
+                Lưu Nháp
+              </Button>
+            )} */}
+              <Button
+                color="primary"
+                type="submit"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                disabled={isLoading}
+              >
+                Lưu
+              </Button>
+              {/* <Button
+              color="primary"
+              variant="contained"
+              onClick={() => handleDeleteCampGround()}
+              style={{ marginRight: '10px' }}
+            >
+              Xóa
+            </Button> */}
+              <Button
+                color="primary"
+                variant="contained"
+                style={{ marginRight: '10px' }}
+                onClick={() => {
+                  navigate('/quan-ly-thong-tin-diem-camp')
+                }}
+              >
+                Quay lại
+              </Button>
+            </>
+          )}
+        </div>
         <Accordion defaultExpanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}

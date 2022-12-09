@@ -9,6 +9,7 @@ import {
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TableColumn, TitleFeeds } from 'app/models'
 import moment from 'moment'
+import { CurrencyFormatter } from '../formatters/currencyFormatter'
 import { LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
@@ -127,24 +128,48 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     label: 'Số BCVP',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'likeNum',
     label: 'Lượt thích',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'viewNum',
     label: 'Lượt xem',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'commentNum',
     label: 'Comment',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'actions',

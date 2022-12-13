@@ -23,8 +23,6 @@ import {
   createCampGround,
   getListMerchant,
   deleteCampGround,
-  checkNameCampExist,
-  getListCampArea,
 } from 'app/apis/campGround/ground.service'
 import InformationBooking from './informationBooking'
 import Introduction from './introduction'
@@ -389,15 +387,6 @@ export default function InformationCampGround({ action }) {
 
   const onSubmit = async data => {
     setDataSubmit(data)
-    const param = {
-      name: data.nameCampground,
-      idCampGround: params.id,
-    }
-    const checkNameCamp = await checkNameCampExist(param)
-    if (checkNameCamp.exist) {
-      dialogCustomRef?.current.handleClickOpen()
-      return
-    }
 
     submitRequest(data)
   }

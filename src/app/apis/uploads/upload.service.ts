@@ -53,14 +53,14 @@ export const uploadApi = async (
     'Content-Type': 'multipart/form-data',
   }
 
-  if (scrTypeModule && scrTypeModule.srcType === 3) {
+  if (scrTypeModule && scrTypeModule?.srcType === 3) {
     headers.srcType = 3
     headers.idSrc = 0
-  } else if (scrTypeModule && scrTypeModule.srcType === 9) {
+  } else if (scrTypeModule && scrTypeModule?.srcType === 9) {
     headers.srcType = 9
     headers.idSrc = scrTypeModule.idSrc
   } else {
-    headers.srcType = scrTypeModule.srcType ?? 0
+    headers.srcType = scrTypeModule?.srcType ?? 0
   }
 
   const { data }: any = await http.post(path, formData, {

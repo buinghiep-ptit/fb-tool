@@ -233,7 +233,7 @@ export function VideoUploadPreviewer({
                 />
               </Stack>
             </PreviewerViewport>
-            <Stack width={150} bgcolor="grey" px={1.5} gap={1.5}>
+            <Stack width={150} px={1.5} gap={1.5}>
               {thumbnailsPreviewer.length ? (
                 thumbnailsPreviewer.map((thumb, index) => (
                   <img

@@ -87,7 +87,7 @@ export const getLabelByCusStatus = (status: number) => {
   switch (status) {
     case 1:
       return 'Hoạt động'
-    case 3:
+    case -4:
       return 'Xoá'
 
     case -2:

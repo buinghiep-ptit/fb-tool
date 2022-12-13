@@ -8,14 +8,33 @@ import {
 } from 'app/models'
 import moment from 'moment'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
-import { LabelFormatter } from '../formatters/labelFormatter'
+import { labelFeedStatus, LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 40,
-    align: 'center',
+    minWidth: 50,
+    // align: 'center',
+    format: (value: number) => (
+      <Tooltip
+        arrow
+        title={value}
+        disableHoverListener={value >= 1000 ? false : true}
+      >
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
     sticky: {
       position: 'sticky',
       left: 0,
@@ -113,13 +132,41 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     label: 'Trạng thái',
     minWidth: 120,
     align: 'center',
-    status: (value: any) => LabelFormatter(value, 'feed'),
+    // status: (value: any) => LabelFormatter(value, 'feed'),
+    status: (value: any) =>
+      value !== null ? (
+        <Chip
+          label={labelFeedStatus(value).title}
+          size="small"
+          sx={{
+            color: labelFeedStatus(value).textColor,
+            bgcolor: labelFeedStatus(value).bgColor,
+          }}
+        />
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'handler',
     label: 'Người tiếp nhận',
     minWidth: 150,
     align: 'center',
+    format: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
   },
   {
     id: 'reportedNum',

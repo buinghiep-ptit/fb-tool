@@ -230,7 +230,7 @@ export default function CustomerAccounts(props: Props) {
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value={1}>Hoạt động</MenuItem>
-                    <MenuItem value={3}>Xoá</MenuItem>
+                    <MenuItem value={-4}>Xoá</MenuItem>
                     <MenuItem value={-2}>Khoá</MenuItem>
                     <MenuItem value={-3}>Khoá tạm thời</MenuItem>
                   </SelectDropDown>

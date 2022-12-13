@@ -25,7 +25,7 @@ import * as Yup from 'yup'
 export interface Props {
   handbook?: IHandbookOverall
   isLinked?: number
-  setSelectedCamps?: (items: readonly number[]) => void
+  setSelectedCamps?: (items: readonly IUnlinkedCampgrounds[]) => void
 }
 
 type ISearchFilters = {
@@ -62,7 +62,7 @@ export default function UnlinkedCampgrounds({
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 255 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({

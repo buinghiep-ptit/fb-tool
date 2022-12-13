@@ -5,11 +5,7 @@ import {
   IFeedResponse,
   IReportDeclineResponse,
 } from 'app/models'
-import {
-  ICampArea,
-  ICampAreaResponse,
-  ICampGroundResponse,
-} from 'app/models/camp'
+import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
 
 type Props = {
   feedId?: number
@@ -100,18 +96,19 @@ export const unLockCustomer = async (
   return data
 }
 
-export const fetchCampAreas = async (params: {
-  page?: number
-  size?: number
-}): Promise<ICampArea[]> => {
-  const { data } = await http.get<ICampArea[]>(`/api/camp-areas/select-list`)
+export const fetchCampAreas = async (
+  params: any,
+): Promise<ICampAreaResponse> => {
+  const { data } = await http.get<ICampAreaResponse>(
+    `/api/camp-areas/select-list-with-filter`,
+    { params },
+  )
   return data
 }
 
-export const fetchCampGrounds = async (params: {
-  page?: number
-  size?: number
-}): Promise<ICampGroundResponse> => {
+export const fetchCampGrounds = async (
+  params: any,
+): Promise<ICampGroundResponse> => {
   const { data } = await http.get<ICampGroundResponse>(`/api/camp-grounds`, {
     params,
   })

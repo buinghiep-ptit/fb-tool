@@ -33,7 +33,7 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { compressImageFile } from 'app/helpers/compressFile'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
@@ -308,7 +308,7 @@ export default function CustomerDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
-        {customer.data?.status !== 3 && customer.data?.id !== 0 && (
+        {customer.data?.status !== -4 && customer.data?.id !== 0 && (
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
@@ -353,10 +353,10 @@ export default function CustomerDetail(props: Props) {
                     type="text"
                     name="mobilePhone"
                     disabled={
-                      customer.data?.id === 0 || customer?.data?.status === 3
+                      customer.data?.id === 0 || customer?.data?.status === -4
                     }
                     clearIcon={
-                      customer.data?.id !== 0 && customer?.data?.status !== 3
+                      customer.data?.id !== 0 && customer?.data?.status !== -4
                     }
                     placeholder="Nhập SĐT"
                     fullWidth
@@ -367,10 +367,10 @@ export default function CustomerDetail(props: Props) {
                     type="text"
                     name="fullName"
                     disabled={
-                      customer.data?.id === 0 || customer?.data?.status === 3
+                      customer.data?.id === 0 || customer?.data?.status === -4
                     }
                     clearIcon={
-                      customer.data?.id !== 0 && customer?.data?.status !== 3
+                      customer.data?.id !== 0 && customer?.data?.status !== -4
                     }
                     placeholder="Nhập họ và tên"
                     fullWidth
@@ -384,7 +384,7 @@ export default function CustomerDetail(props: Props) {
                         defaultValue=""
                         disabled={
                           customer.data?.id === 0 ||
-                          customer?.data?.status === 3
+                          customer?.data?.status === -4
                         }
                       >
                         {customer?.data?.otpCount?.length ? (
@@ -407,7 +407,7 @@ export default function CustomerDetail(props: Props) {
 
                     <MuiButton
                       disabled={
-                        customer.data?.id === 0 || customer?.data?.status === 3
+                        customer.data?.id === 0 || customer?.data?.status === -4
                       }
                       onClick={() =>
                         addOtpCount({
@@ -485,7 +485,17 @@ export default function CustomerDetail(props: Props) {
                     <>
                       <Dropzone
                         ref={dropzoneImgRef}
-                        onDrop={acceptedFiles => {
+                        onDrop={(acceptedFiles, fileRejections) => {
+                          console.log(fileRejections)
+                          if (fileRejections.length) {
+                            toastError({
+                              message:
+                                fileRejections[0].errors[0].code ===
+                                'file-too-large'
+                                  ? 'Ảnh tải lên không được vượt quá 10MB'
+                                  : fileRejections[0].errors[0].message,
+                            })
+                          }
                           if (!acceptedFiles || !acceptedFiles.length) return
                           setImagePreviewer({
                             url: URL.createObjectURL(acceptedFiles[0]),
@@ -497,7 +507,8 @@ export default function CustomerDetail(props: Props) {
                           'image/jpeg': ['.jpg', '.jpeg'],
                         }}
                         disabled={
-                          customer.data?.status === 3 || customer.data?.id === 0
+                          customer.data?.status === -4 ||
+                          customer.data?.id === 0
                         }
                         multiple={false}
                         maxSize={10 * 1024 * 1024}
@@ -559,7 +570,7 @@ export default function CustomerDetail(props: Props) {
                                     '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
                                 }}
                               >
-                                {customer.data?.status !== 3 &&
+                                {customer.data?.status !== -4 &&
                                   customer.data?.id !== 0 && (
                                     <Stack
                                       flexDirection={'row'}
@@ -640,13 +651,13 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
-                      {customer?.data?.type !== 3 && customer.data?.id ? (
+                      {customer?.data?.type !== -4 && customer.data?.id ? (
                         <SelectDropDown
                           label="Loại TK"
                           name="type"
                           defaultValue=""
                           sx={{ minWidth: 120 }}
-                          disabled={customer.data?.status === 3}
+                          disabled={customer.data?.status === -4}
                         >
                           <MenuItem value={1}>Thường</MenuItem>
                           <MenuItem value={2}>KOL</MenuItem>
@@ -665,7 +676,7 @@ export default function CustomerDetail(props: Props) {
                           defaultValue="Campdi"
                         />
                       ) : null}
-                      {customer?.data?.type === 3 ? (
+                      {customer?.data?.type === -4 ? (
                         <FormInputText
                           label={'Loại TK'}
                           type="text"
@@ -698,7 +709,7 @@ export default function CustomerDetail(props: Props) {
                   </Stack>
 
                   <Stack flexDirection={'row'}>
-                    {customer.data?.id !== 0 && customer.data?.status !== 3 && (
+                    {customer.data?.id !== 0 && customer.data?.status !== -4 && (
                       <>
                         {customer.data?.status !== -2 && (
                           <>

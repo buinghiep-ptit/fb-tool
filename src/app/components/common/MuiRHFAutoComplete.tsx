@@ -1,3 +1,4 @@
+import { ArrowDropDown } from '@mui/icons-material'
 import {
   Autocomplete,
   Chip,
@@ -39,6 +40,7 @@ export interface Props {
   getOptionLabel?: (option: any) => string
   rightIcon?: ReactElement
   required?: boolean
+  disabled?: boolean
 }
 
 export function MuiRHFAutoComplete({
@@ -50,6 +52,7 @@ export function MuiRHFAutoComplete({
   getOptionLabel,
   rightIcon,
   required,
+  disabled = false,
 }: Props) {
   const {
     control,
@@ -78,7 +81,9 @@ export function MuiRHFAutoComplete({
       render={({ field }) => (
         <Autocomplete
           {...field}
+          disabled={disabled}
           fullWidth
+          popupIcon={disabled ? '' : <ArrowDropDown />}
           options={options}
           // componentsProps={{ paper: { elevation: 20 } }}
           ListboxProps={{

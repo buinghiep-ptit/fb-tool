@@ -1,21 +1,17 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, Icon, Stack } from '@mui/material'
+import { Grid, Icon, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchUnlinkedCampgrounds } from 'app/apis/handbook/handbook.service'
+import { useQuery } from '@tanstack/react-query'
+import { fetchCampAreas } from 'app/apis/feed/feed.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { MuiTypography } from 'app/components/common/MuiTypography'
-import {
-  IUnlinkedCampgrounds,
-  IUnlinkedCampgroundsResponse,
-} from 'app/models/camp'
-import { IHandbookOverall } from 'app/models/handbook'
-import { columnsUnlinkedCampgrounds } from 'app/utils/columns/columnsUnlinkedCampgrounds'
+import { ICampArea, ICampAreaResponse } from 'app/models/camp'
+import { columnsCampAreas } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -23,23 +19,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {
-  handbook?: IHandbookOverall
-  isLinked?: number
-  setSelectedCamps?: (items: readonly number[]) => void
+  setSelectedCamps?: (items: readonly ICampArea[]) => void
 }
 
 type ISearchFilters = {
-  search?: string
+  isProvince?: number | string
+  name?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function CampAreaList({
-  handbook,
-  isLinked = -1,
-  setSelectedCamps,
-}: Props) {
+export default function CampAreaList({ setSelectedCamps }: Props) {
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -50,7 +41,8 @@ export default function CampAreaList({
     queryParams.size ? +queryParams.size : 20,
   )
   const [defaultValues] = useState<ISearchFilters>({
-    search: queryParams.search ?? '',
+    name: queryParams.search ?? '',
+    isProvince: queryParams.isProvince ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -60,9 +52,9 @@ export default function CampAreaList({
   )
 
   const validationSchema = Yup.object().shape({
-    search: Yup.string()
+    name: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 255 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -72,24 +64,18 @@ export default function CampAreaList({
   })
 
   const {
-    data: campGrounds,
+    data: campAreas,
     isFetching,
     isError,
     error,
-  }: UseQueryResult<IUnlinkedCampgroundsResponse, Error> = useQuery<
-    IUnlinkedCampgroundsResponse,
-    Error
-  >(
-    ['linked-campgrounds', handbook, filters, isLinked],
+  } = useQuery<ICampAreaResponse, Error>(
+    ['camp-areas', filters],
     () =>
-      fetchUnlinkedCampgrounds({
+      fetchCampAreas({
         ...filters,
-        id: handbook?.id ? Number(handbook?.id) : -1,
-        isLinked: isLinked,
       }),
     {
       refetchOnWindowFocus: false,
-      refetchOnMount: true,
       keepPreviousData: true,
       enabled: !!filters,
     },
@@ -134,7 +120,7 @@ export default function CampAreaList({
   }
 
   const onRowDetail = (cell: any, row: any) => {
-    window.open(`/chi-tiet-diem-camp/${row.id}`, '_blank')
+    window.open(`/chi-tiet-dia-danh/${row.id}`, '_blank')
   }
 
   const onClickRow = (cell: any, row: any) => {
@@ -145,7 +131,8 @@ export default function CampAreaList({
 
   const onResetFilters = () => {
     methods.reset({
-      search: '',
+      name: '',
+      isProvince: 'all',
       page: 0,
       size: 20,
     })
@@ -161,11 +148,7 @@ export default function CampAreaList({
 
   return (
     <Stack gap={3} position="relative">
-      {handbook?.title && (
-        <MuiTypography variant="h6">{handbook?.title}</MuiTypography>
-      )}
-
-      <Box sx={{ position: 'sticky', top: 0, zIndex: 9999 }}>
+      <Box sx={{ position: 'sticky', top: -16, zIndex: 9999 }}>
         <SimpleCard>
           <form
             onSubmit={methods.handleSubmit(onSubmitHandler)}
@@ -176,15 +159,22 @@ export default function CampAreaList({
               <Grid container spacing={2}>
                 <Grid item sm={6} xs={12}>
                   <FormInputText
-                    label={'Địa điêm camping, địa danh'}
+                    label={'Địa danh'}
                     type="text"
-                    name="search"
+                    name="name"
                     defaultValue=""
-                    placeholder="Nhập tên địa điểm camping, địa danh..."
+                    placeholder="Nhập tên địa danh"
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
+                  <SelectDropDown name="isProvince" label="Loại">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Tỉnh thành</MenuItem>
+                    <MenuItem value="0">Địa danh</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -194,7 +184,7 @@ export default function CampAreaList({
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={3} xs={12}>
+                <Grid item sm={2} xs={12}>
                   <MuiButton
                     title="Làm mới"
                     variant="outlined"
@@ -212,8 +202,8 @@ export default function CampAreaList({
 
       <SimpleCard>
         <MuiStyledTable
-          rows={(campGrounds?.content as IUnlinkedCampgrounds[]) ?? []}
-          columns={columnsUnlinkedCampgrounds}
+          rows={(campAreas?.content as ICampArea[]) ?? []}
+          columns={columnsCampAreas as any}
           rowsPerPage={size}
           page={page}
           onClickRow={onClickRow}
@@ -226,16 +216,17 @@ export default function CampAreaList({
             {
               icon: 'double_arrow',
               color: 'action',
-              tooltip: 'Xem điểm chi tiết điểm camp',
+              tooltip: 'Xem điểm chi tiết địa điểm',
               onClick: onRowDetail,
             },
           ]}
           setSelectedItems={setSelectedCamps}
+          multipleSelect={false}
         />
         <MuiStyledPagination
           component="div"
           rowsPerPageOptions={[20, 50, 100]}
-          count={campGrounds?.totalElements ?? 0}
+          count={campAreas?.totalElements ?? 0}
           rowsPerPage={size}
           page={page}
           onPageChange={handleChangePage}

@@ -28,6 +28,7 @@ import {
   useUpdateHandbook,
 } from 'app/hooks/queries/useHandbooksData'
 import useDebounce from 'app/hooks/useDebounce.'
+import { IUnlinkedCampgrounds } from 'app/models/camp'
 import { IHandbookDetail } from 'app/models/handbook'
 import { messages } from 'app/utils/messages'
 import { useEffect, useState } from 'react'
@@ -68,7 +69,9 @@ export default function AddEvent(props: Props) {
     cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
-  const [selectedCamps, setSelectedCamps] = useState<readonly number[]>([])
+  const [selectedCamps, setSelectedCamps] = useState<
+    readonly IUnlinkedCampgrounds[]
+  >([])
   const [defaultValues] = useState<SchemaType>({
     status: 1,
   })
@@ -219,12 +222,12 @@ export default function AddEvent(props: Props) {
     setOpenDialog(true)
   }
 
-  const handbooksToLink = (selectedCamps: readonly number[]) => {
+  const handbooksToLink = (selectedCamps: readonly IUnlinkedCampgrounds[]) => {
     const selectedCampsExtra = selectedCamps.map(camp =>
       Object.assign(
         {},
         {
-          idCampGround: camp,
+          idCampGround: camp.id,
           idHandBook: Number(handbookId ?? 0),
         },
       ),

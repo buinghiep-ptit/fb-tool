@@ -66,7 +66,8 @@ type MuiPagingTableProps<T extends Record<string, any>> = {
     disableKey?: string
     disableActions?: (key?: number) => boolean
   }[]
-  setSelectedItems?: (items: readonly number[]) => void
+  setSelectedItems?: (items: readonly T[]) => void
+  multipleSelect?: boolean
 }
 
 export default function MuiPagingTable<T extends Record<string, any>>({
@@ -81,6 +82,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
   actionKeys = ['status'],
   actions = [],
   setSelectedItems,
+  multipleSelect = true,
 }: MuiPagingTableProps<T>) {
   const memoizedData = React.useMemo(() => rows, [rows])
   const memoizedColumns = React.useMemo(() => columns, [columns])
@@ -106,14 +108,15 @@ export default function MuiPagingTable<T extends Record<string, any>>({
     return cell.format ? cell.format(value) : value
   }
 
-  const [selected, setSelected] = React.useState<readonly number[]>([])
+  const [selected, setSelected] = React.useState<readonly T[]>([])
 
-  const handleClick = (event: React.MouseEvent<unknown>, name: number) => {
-    const selectedIndex = selected.indexOf(name)
-    let newSelected: readonly number[] = []
+  const handleClick = (event: React.MouseEvent<unknown>, row: T) => {
+    const selectedIndex = selected.findIndex(s => s.id === row.id)
+    let newSelected: readonly T[] = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name)
+      if (multipleSelect) newSelected = newSelected.concat(selected, row)
+      else newSelected = newSelected.concat([], row)
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
@@ -124,11 +127,12 @@ export default function MuiPagingTable<T extends Record<string, any>>({
         selected.slice(selectedIndex + 1),
       )
     }
+    console.log(row, selectedIndex)
     setSelectedItems && setSelectedItems(newSelected)
     setSelected(newSelected)
   }
 
-  const isSelected = (name: number) => selected.indexOf(name) !== -1
+  const isSelected = (row: T) => selected.findIndex(s => s.id === row.id) !== -1
 
   return (
     <>
@@ -166,7 +170,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
           <TableBody>
             {!isFetching ? (
               memoizedData.map((row, index) => {
-                const isItemSelected = isSelected(row.id ? row.id : 0)
+                const isItemSelected = isSelected(row)
                 const labelId = `enhanced-table-checkbox-${index}`
 
                 return (
@@ -231,7 +235,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                                       <IconButton
                                         size="small"
                                         onClick={event =>
-                                          handleClick(event, row.id)
+                                          handleClick(event, row)
                                         }
                                       >
                                         <Icon

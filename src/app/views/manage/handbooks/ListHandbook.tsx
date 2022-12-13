@@ -17,6 +17,7 @@ import {
 } from 'app/hooks/queries/useHandbooksData'
 import { useTogglePinKeyword } from 'app/hooks/queries/useKeywordsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { IUnlinkedCampgrounds } from 'app/models/camp'
 import { IHandbookOverall, IHandbookResponse } from 'app/models/handbook'
 import { columnsHandbooks } from 'app/utils/columns/columnsHandbooks'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
@@ -76,7 +77,9 @@ export default function ListHandbook(props: Props) {
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
   const [row, setRow] = useState<any>({})
-  const [selectedCamps, setSelectedCamps] = useState<readonly number[]>([])
+  const [selectedCamps, setSelectedCamps] = useState<
+    readonly IUnlinkedCampgrounds[]
+  >([])
 
   useEffect(() => {
     if (!openDialog) setSelectedCamps([])
@@ -85,7 +88,7 @@ export default function ListHandbook(props: Props) {
   const validationSchema = Yup.object().shape({
     title: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 255 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({
@@ -126,12 +129,12 @@ export default function ListHandbook(props: Props) {
   const { mutate: deleteHandbook, isLoading: deleteLoading } =
     useDeleteHandbook(() => onRowUpdateSuccess(null, 'Xoá thành công'))
 
-  const handbooksToLink = (selectedCamps: readonly number[]) => {
+  const handbooksToLink = (selectedCamps: readonly IUnlinkedCampgrounds[]) => {
     const selectedCampsExtra = selectedCamps.map(camp =>
       Object.assign(
         {},
         {
-          idCampGround: camp,
+          idCampGround: camp.id,
           idHandBook: row.id,
         },
       ),

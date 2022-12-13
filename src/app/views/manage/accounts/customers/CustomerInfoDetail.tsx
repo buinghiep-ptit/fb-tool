@@ -33,7 +33,7 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { compressImageFile } from 'app/helpers/compressFile'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import {
   useAddOtpCountCustomer,
   useUpdateCustomer,
@@ -52,7 +52,7 @@ import { messages } from 'app/utils/messages'
 import { useEffect, useRef, useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm, useWatch } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 type SchemaType = {
@@ -102,6 +102,7 @@ export interface Props {}
 
 export default function CustomerDetail(props: Props) {
   const navigation = useNavigate()
+  const prevRoute = useLocation()
   const { customerId } = useParams()
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(10)
@@ -153,7 +154,7 @@ export default function CustomerDetail(props: Props) {
       fullName: Yup.string()
         .required(messages.MSG1)
         .min(0, 'email must be at least 0 characters')
-        .max(255, 'email must be at almost 256 characters'),
+        .max(255, 'Tên hiển thị không được vượt quá 255 ký tự'),
     },
     [['email', 'mobilePhone']],
   )
@@ -259,8 +260,8 @@ export default function CustomerDetail(props: Props) {
     updateCustomer({
       cusId: Number(customerId ?? 0),
       payload: {
-        mobilePhone: values.mobilePhone,
-        fullName: values.fullName,
+        mobilePhone: values.mobilePhone || undefined,
+        fullName: values.fullName || undefined,
         avatar: imgData?.url || null,
         type: Number(values.type ?? 0),
       },
@@ -307,7 +308,7 @@ export default function CustomerDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
       >
-        {customer.data?.status !== -1 && (
+        {customer.data?.status !== -4 && customer.data?.id !== 0 && (
           <>
             <MuiButton
               disabled={!!Object.keys(methods.formState.errors).length}
@@ -324,7 +325,10 @@ export default function CustomerDetail(props: Props) {
           title="Quay lại"
           variant="contained"
           color="inherit"
-          onClick={() => navigation(-1)}
+          onClick={() => {
+            if (prevRoute && prevRoute?.state?.from) navigation(-1)
+            else navigation('/quan-ly-tai-khoan-khach-hang', {})
+          }}
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
@@ -345,11 +349,15 @@ export default function CustomerDetail(props: Props) {
                     clearIcon={false}
                   />
                   <FormInputText
-                    label={' Số điện thoại'}
+                    label={'Số điện thoại'}
                     type="text"
                     name="mobilePhone"
-                    disabled={customer.data?.id === 0}
-                    clearIcon={customer.data?.id !== 0}
+                    disabled={
+                      customer.data?.id === 0 || customer?.data?.status === -4
+                    }
+                    clearIcon={
+                      customer.data?.id !== 0 && customer?.data?.status !== -4
+                    }
                     placeholder="Nhập SĐT"
                     fullWidth
                     defaultValue=""
@@ -358,8 +366,12 @@ export default function CustomerDetail(props: Props) {
                     label={'Tên hiển thị'}
                     type="text"
                     name="fullName"
-                    disabled={customer.data?.id === 0}
-                    clearIcon={customer.data?.id !== 0}
+                    disabled={
+                      customer.data?.id === 0 || customer?.data?.status === -4
+                    }
+                    clearIcon={
+                      customer.data?.id !== 0 && customer?.data?.status !== -4
+                    }
                     placeholder="Nhập họ và tên"
                     fullWidth
                     defaultValue=""
@@ -370,7 +382,10 @@ export default function CustomerDetail(props: Props) {
                         label="OTP trong ngày"
                         name="otp"
                         defaultValue=""
-                        disabled={customer.data?.id === 0}
+                        disabled={
+                          customer.data?.id === 0 ||
+                          customer?.data?.status === -4
+                        }
                       >
                         {customer?.data?.otpCount?.length ? (
                           customer?.data?.otpCount?.map(item => (
@@ -391,7 +406,9 @@ export default function CustomerDetail(props: Props) {
                     />
 
                     <MuiButton
-                      disabled={customer.data?.id === 0}
+                      disabled={
+                        customer.data?.id === 0 || customer?.data?.status === -4
+                      }
                       onClick={() =>
                         addOtpCount({
                           customerId: (customerId ?? 0) as number,
@@ -468,7 +485,17 @@ export default function CustomerDetail(props: Props) {
                     <>
                       <Dropzone
                         ref={dropzoneImgRef}
-                        onDrop={acceptedFiles => {
+                        onDrop={(acceptedFiles, fileRejections) => {
+                          console.log(fileRejections)
+                          if (fileRejections.length) {
+                            toastError({
+                              message:
+                                fileRejections[0].errors[0].code ===
+                                'file-too-large'
+                                  ? 'Ảnh tải lên không được vượt quá 10MB'
+                                  : fileRejections[0].errors[0].message,
+                            })
+                          }
                           if (!acceptedFiles || !acceptedFiles.length) return
                           setImagePreviewer({
                             url: URL.createObjectURL(acceptedFiles[0]),
@@ -479,6 +506,10 @@ export default function CustomerDetail(props: Props) {
                           'image/png': ['.png', '.PNG'],
                           'image/jpeg': ['.jpg', '.jpeg'],
                         }}
+                        disabled={
+                          customer.data?.status === -4 ||
+                          customer.data?.id === 0
+                        }
                         multiple={false}
                         maxSize={10 * 1024 * 1024}
                       >
@@ -539,42 +570,45 @@ export default function CustomerDetail(props: Props) {
                                     '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
                                 }}
                               >
-                                <Stack
-                                  flexDirection={'row'}
-                                  sx={{
-                                    position: 'absolute',
-                                    top: '6px',
-                                    right: '6px',
-                                    gap: 1,
-                                  }}
-                                >
-                                  <Tooltip arrow title={'Chọn lại'}>
-                                    <IconButton
+                                {customer.data?.status !== -4 &&
+                                  customer.data?.id !== 0 && (
+                                    <Stack
+                                      flexDirection={'row'}
                                       sx={{
-                                        bgcolor: '#303030',
-                                        borderRadius: 1,
+                                        position: 'absolute',
+                                        top: '6px',
+                                        right: '6px',
+                                        gap: 1,
                                       }}
-                                      onClick={openDialogFileImage}
                                     >
-                                      <Icon sx={{ color: 'white' }}>
-                                        cached
-                                      </Icon>
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip arrow title={'Xóa'}>
-                                    <IconButton
-                                      sx={{
-                                        bgcolor: '#303030',
-                                        borderRadius: 1,
-                                      }}
-                                      onClick={removeImageSelected}
-                                    >
-                                      <Icon sx={{ color: 'white' }}>
-                                        delete
-                                      </Icon>
-                                    </IconButton>
-                                  </Tooltip>
-                                </Stack>
+                                      <Tooltip arrow title={'Chọn lại'}>
+                                        <IconButton
+                                          sx={{
+                                            bgcolor: '#303030',
+                                            borderRadius: 1,
+                                          }}
+                                          onClick={openDialogFileImage}
+                                        >
+                                          <Icon sx={{ color: 'white' }}>
+                                            cached
+                                          </Icon>
+                                        </IconButton>
+                                      </Tooltip>
+                                      <Tooltip arrow title={'Xóa'}>
+                                        <IconButton
+                                          sx={{
+                                            bgcolor: '#303030',
+                                            borderRadius: 1,
+                                          }}
+                                          onClick={removeImageSelected}
+                                        >
+                                          <Icon sx={{ color: 'white' }}>
+                                            delete
+                                          </Icon>
+                                        </IconButton>
+                                      </Tooltip>
+                                    </Stack>
+                                  )}
 
                                 <img
                                   src={imagePreviewer.url}
@@ -617,12 +651,13 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
-                      {customer?.data?.type !== 3 && customer.data?.id ? (
+                      {customer?.data?.type !== -4 && customer.data?.id ? (
                         <SelectDropDown
                           label="Loại TK"
                           name="type"
                           defaultValue=""
                           sx={{ minWidth: 120 }}
+                          disabled={customer.data?.status === -4}
                         >
                           <MenuItem value={1}>Thường</MenuItem>
                           <MenuItem value={2}>KOL</MenuItem>
@@ -641,7 +676,7 @@ export default function CustomerDetail(props: Props) {
                           defaultValue="Campdi"
                         />
                       ) : null}
-                      {customer?.data?.type === 3 ? (
+                      {customer?.data?.type === -4 ? (
                         <FormInputText
                           label={'Loại TK'}
                           type="text"
@@ -673,66 +708,73 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
                   </Stack>
 
-                  {customer.data?.status !== -1 && (
-                    <Stack flexDirection={'row'}>
-                      {customer.data?.status !== -2 && (
-                        <>
-                          <MuiButton
-                            disabled={customer.data?.id === 0}
-                            title={'Khoá'}
-                            variant="text"
-                            color="error"
-                            onClick={() =>
-                              navigation('khoa-tai-khoan', {
-                                state: { modal: true, data: customer.data },
-                              })
-                            }
-                            startIcon={<LockClockSharp />}
-                          />
-                          <Divider
-                            orientation="vertical"
-                            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 2 }}
-                            flexItem
-                          />
-                        </>
-                      )}
+                  <Stack flexDirection={'row'}>
+                    {customer.data?.id !== 0 && customer.data?.status !== -4 && (
+                      <>
+                        {customer.data?.status !== -2 && (
+                          <>
+                            <MuiButton
+                              title={'Khoá'}
+                              variant="text"
+                              color="error"
+                              onClick={() =>
+                                navigation('khoa-tai-khoan', {
+                                  state: { modal: true, data: customer.data },
+                                })
+                              }
+                              startIcon={<LockClockSharp />}
+                            />
+                            <Divider
+                              orientation="vertical"
+                              sx={{
+                                backgroundColor: '#D9D9D9',
+                                mx: 2,
+                                my: 2,
+                              }}
+                              flexItem
+                            />
+                          </>
+                        )}
 
-                      {customer.data?.status !== 1 && (
-                        <>
-                          <MuiButton
-                            disabled={customer.data?.id === 0}
-                            title={'Mở khóa'}
-                            variant="text"
-                            color="primary"
-                            onClick={() =>
-                              navigation('mo-khoa-tai-khoan', {
-                                state: { modal: true, data: customer.data },
-                              })
-                            }
-                            startIcon={<LockOpenSharp />}
-                          />
-                          <Divider
-                            orientation="vertical"
-                            sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
-                            flexItem
-                          />
-                        </>
-                      )}
-                      <MuiButton
-                        disabled={customer.data?.id === 0}
-                        onClick={() =>
-                          navigation(`doi-mat-khau`, {
-                            state: { modal: true },
-                          })
-                        }
-                        title="Đổi mật khẩu"
-                        variant="text"
-                        color="secondary"
-                        sx={{ flex: 1 }}
-                        startIcon={<ChangeCircleSharp />}
-                      />
-                    </Stack>
-                  )}
+                        {customer.data?.status !== 1 && (
+                          <>
+                            <MuiButton
+                              title={'Mở khóa'}
+                              variant="text"
+                              color="primary"
+                              onClick={() =>
+                                navigation('mo-khoa-tai-khoan', {
+                                  state: { modal: true, data: customer.data },
+                                })
+                              }
+                              startIcon={<LockOpenSharp />}
+                            />
+                            <Divider
+                              orientation="vertical"
+                              sx={{
+                                backgroundColor: '#D9D9D9',
+                                mx: 2,
+                                my: 1,
+                              }}
+                              flexItem
+                            />
+                          </>
+                        )}
+                        <MuiButton
+                          onClick={() =>
+                            navigation(`doi-mat-khau`, {
+                              state: { modal: true },
+                            })
+                          }
+                          title="Đổi mật khẩu"
+                          variant="text"
+                          color="secondary"
+                          sx={{ flex: 1 }}
+                          startIcon={<ChangeCircleSharp />}
+                        />
+                      </>
+                    )}
+                  </Stack>
                 </Stack>
               </SimpleCard>
             </Grid>

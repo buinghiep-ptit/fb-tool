@@ -21,7 +21,7 @@ export function TopRightButtonList({
     <Stack
       flexDirection={'row'}
       gap={2}
-      sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 1 }}
+      sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
     >
       <MuiButton
         title="Lưu"

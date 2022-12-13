@@ -110,7 +110,7 @@ export function ImageUploadPreviewer({
       'image/jpeg': ['.jpg', '.jpeg'],
     },
     onDrop,
-    maxFiles: 15,
+    // maxFiles: 15,
     maxSize: 10 * 1024 * 1024,
   })
 

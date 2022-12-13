@@ -1,22 +1,40 @@
-import {
-  Chip,
-  Icon,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material'
+import { Chip, Stack, Tooltip, Typography } from '@mui/material'
 import { MuiTypography } from 'app/components/common/MuiTypography'
-import { TableColumn, TitleFeeds } from 'app/models'
+import {
+  TableColumn,
+  TitleCampAreas,
+  TitleCampGrounds,
+  TitleFeeds,
+} from 'app/models'
 import moment from 'moment'
-import { LabelFormatter } from '../formatters/labelFormatter'
+import { CurrencyFormatter } from '../formatters/currencyFormatter'
+import { labelFeedStatus, LabelFormatter } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
     id: 'order',
     label: 'STT',
-    minWidth: 40,
-    align: 'center',
+    minWidth: 50,
+    // align: 'center',
+    format: (value: number) => (
+      <Tooltip
+        arrow
+        title={value}
+        disableHoverListener={value >= 1000 ? false : true}
+      >
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
     sticky: {
       position: 'sticky',
       left: 0,
@@ -114,42 +132,215 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
     label: 'Trạng thái',
     minWidth: 120,
     align: 'center',
-    status: (value: any) => LabelFormatter(value, 'feed'),
+    // status: (value: any) => LabelFormatter(value, 'feed'),
+    status: (value: any) =>
+      value !== null ? (
+        <Chip
+          label={labelFeedStatus(value).title}
+          size="small"
+          sx={{
+            color: labelFeedStatus(value).textColor,
+            bgcolor: labelFeedStatus(value).bgColor,
+          }}
+        />
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'handler',
     label: 'Người tiếp nhận',
     minWidth: 150,
     align: 'center',
+    format: (value: any) => (
+      <Tooltip arrow title={value}>
+        <Typography
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: '1',
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {value}
+        </Typography>
+      </Tooltip>
+    ),
   },
   {
     id: 'reportedNum',
     label: 'Số BCVP',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'likeNum',
     label: 'Lượt thích',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'viewNum',
     label: 'Lượt xem',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'commentNum',
     label: 'Comment',
     minWidth: 80,
     align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
   {
     id: 'actions',
     label: 'Hành động',
     minWidth: 80,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
+  },
+]
+
+export const columnsCampAreas: readonly TableColumn<TitleCampAreas>[] = [
+  {
+    id: 'order',
+    label: 'STT',
+    width: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
+  {
+    id: 'name',
+    label: 'Địa danh',
+    minWidth: 200,
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          pl: 1,
+        }}
+      >
+        {value}
+      </Typography>
+    ),
+  },
+  {
+    id: 'status',
+    label: 'Trạng thái',
+    width: 120,
+    align: 'center',
+    status: (value: any) => (
+      <Chip
+        label={value !== -1 ? 'Hoạt động' : 'Không hoạt động'}
+        size="small"
+        color={value !== -1 ? 'primary' : 'default'}
+      />
+    ),
+  },
+
+  {
+    id: 'actions',
+    label: 'Hành động',
+    width: 80,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      right: 0,
+      background: 'white',
+      boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
+      clipPath: 'inset(0px 0px 0px -15px)',
+    },
+  },
+]
+
+export const columnsCampgrounds: readonly TableColumn<TitleCampGrounds>[] = [
+  {
+    id: 'order',
+    label: 'STT',
+    width: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
+  {
+    id: 'name',
+    label: 'Tên địa điểm camping',
+    minWidth: 200,
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          pl: 1,
+        }}
+      >
+        {value}
+      </Typography>
+    ),
+  },
+  {
+    id: 'status',
+    label: 'Trạng thái',
+    width: 120,
+    align: 'center',
+    status: (value: any) => (
+      <Chip
+        label={value === 1 ? 'Hoạt động' : 'Không hoạt động'}
+        size="small"
+        color={value === 1 ? 'primary' : 'default'}
+      />
+    ),
+  },
+  {
+    id: 'actions',
+    label: 'Hành động',
+    width: 80,
     align: 'center',
     sticky: {
       position: 'sticky',

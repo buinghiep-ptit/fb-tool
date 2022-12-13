@@ -166,7 +166,7 @@ export default function ListRating() {
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'hashtag must be at almost 256 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<ISearchFilters>({

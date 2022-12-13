@@ -28,7 +28,12 @@ import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { messages } from 'app/utils/messages'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
 import { dateDefault } from '../../orders/OrdersHistory'
@@ -48,6 +53,8 @@ export interface Props {}
 export default function OrdersHistory() {
   const navigation = useNavigate()
   const navigate = useNavigateParams()
+  const prevRoute = useLocation()
+
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
 
@@ -168,6 +175,8 @@ export default function OrdersHistory() {
   const onSubmitHandler: SubmitHandler<ISearchFilters> = (
     values: ISearchFilters,
   ) => {
+    setPage(0)
+    setSize(20)
     values = {
       ...values,
       searchCamp: values.searchCamp?.trim(),
@@ -177,15 +186,15 @@ export default function OrdersHistory() {
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
-        page,
-        size,
+        page: 0,
+        size: 20,
       }
     })
 
     navigate('', {
       ...extractMergeFiltersObject(filters, values),
-      page,
-      size,
+      page: 0,
+      size: 20,
     } as any)
   }
 
@@ -280,7 +289,10 @@ export default function OrdersHistory() {
             title="Quay lại"
             variant="contained"
             color="inherit"
-            onClick={() => navigation(-1)}
+            onClick={() => {
+              if (prevRoute && prevRoute?.state?.from) navigation(-1)
+              else navigation('/quan-ly-tai-khoan-khach-hang', {})
+            }}
             startIcon={<Icon>keyboard_return</Icon>}
           />
         </Stack>

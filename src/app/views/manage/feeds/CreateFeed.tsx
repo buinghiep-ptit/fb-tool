@@ -815,39 +815,39 @@ function CreateFeed(props: any) {
                 <UploadProgress />
               </Grid>
             </Grid>
-            <DiagLogConfirm
-              title={dialogData.title ?? ''}
-              open={openDialog}
-              setOpen={setOpenDialog}
-              onSubmit={onSubmitDialog}
-              maxWidth={dialogData.type !== 'delete' ? 'lg' : 'sm'}
-              submitText={dialogData.type !== 'delete' ? 'Lưu' : 'Xoá'}
-              cancelText={'Huỷ'}
-              disabled={
-                ((!selectedCampAreas.length && idSrcType == 1) ||
-                  (!selectedCampgrounds.length && idSrcType == 2)) &&
-                dialogData.type !== 'delete'
-              }
-            >
-              <>
-                {dialogData.type === 'camp-areas' && (
-                  <CampAreaList setSelectedCamps={setSelectedCampAreas} />
-                )}
-                {dialogData.type === 'camp-grounds' && (
-                  <CampgroundList setSelectedCamps={setSelectedCampgrounds} />
-                )}
-                {dialogData.type === 'delete' && (
-                  <Stack py={5} justifyContent={'center'} alignItems="center">
-                    <MuiTypography variant="subtitle1">
-                      {dialogData.message ?? ''}
-                    </MuiTypography>
-                  </Stack>
-                )}
-              </>
-            </DiagLogConfirm>
           </FormProvider>
         </form>
       </SimpleCard>
+      <DiagLogConfirm
+        title={dialogData.title ?? ''}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={onSubmitDialog}
+        maxWidth={dialogData.type !== 'delete' ? 'lg' : 'sm'}
+        submitText={dialogData.type !== 'delete' ? 'Lưu' : 'Xoá'}
+        cancelText={'Huỷ'}
+        disabled={
+          ((!selectedCampAreas.length && idSrcType == 1) ||
+            (!selectedCampgrounds.length && idSrcType == 2)) &&
+          dialogData.type !== 'delete'
+        }
+      >
+        <>
+          {dialogData.type === 'camp-areas' && (
+            <CampAreaList setSelectedCamps={setSelectedCampAreas} />
+          )}
+          {dialogData.type === 'camp-grounds' && (
+            <CampgroundList setSelectedCamps={setSelectedCampgrounds} />
+          )}
+          {dialogData.type === 'delete' && (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                {dialogData.message ?? ''}
+              </MuiTypography>
+            </Stack>
+          )}
+        </>
+      </DiagLogConfirm>
     </Container>
   )
 }

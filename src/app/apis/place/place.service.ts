@@ -134,3 +134,11 @@ export const linkCamp = async (params: LinkCampBody): Promise<any> => {
   )
   return data
 }
+
+export const checkNamePlaceExist = async (params: any): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-areas/validate-camp-area-name`,
+    { params },
+  )
+  return data
+}

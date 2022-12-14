@@ -8,6 +8,8 @@ export interface Props {
   onCancel?: () => void
   onDelete?: () => void
   onGoBack?: () => void
+  onCallback?: () => void
+  titleCallback?: string
 }
 
 export function TopRightButtonList({
@@ -16,6 +18,8 @@ export function TopRightButtonList({
   onCancel,
   onDelete,
   onGoBack,
+  onCallback,
+  titleCallback = '',
 }: Props) {
   return (
     <Stack
@@ -23,6 +27,15 @@ export function TopRightButtonList({
       gap={2}
       sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 999 }}
     >
+      {onCallback && (
+        <MuiButton
+          title={titleCallback}
+          variant="contained"
+          color="warning"
+          onClick={onCallback}
+          startIcon={<Icon>send</Icon>}
+        />
+      )}
       <MuiButton
         title="Lưu"
         disabled={isLoading}

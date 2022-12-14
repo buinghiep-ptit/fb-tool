@@ -57,6 +57,18 @@ const ListHandbook = Loadable(lazy(() => import('./handbooks/ListHandbook')))
 const AddHandbook = Loadable(lazy(() => import('./handbooks/AddHandbook')))
 const ListRating = Loadable(lazy(() => import('./rating/ListRating')))
 const RateDetail = Loadable(lazy(() => import('./rating/RateDetail')))
+const PushNotificationList = Loadable(
+  lazy(() => import('./notifications/user/PushNotificationList')),
+)
+const NotiUserDetail = Loadable(
+  lazy(() => import('./notifications/user/NotiUserDetail')),
+)
+const PushNotificationHeadPageList = Loadable(
+  lazy(() => import('./notifications/head/PushNotificationHeadPageList')),
+)
+const NotiHeadPageDetail = Loadable(
+  lazy(() => import('./notifications/head/NotiHeadPageDetail')),
+)
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -454,6 +466,37 @@ const ManagementRoutes = [
     path: '/quan-ly-dich-vu',
     element: <ManagerServices />,
     auth: [ROLES.ADMIN, ROLES.SALE],
+  },
+  {
+    path: '/quan-ly-thong-bao/nguoi-dung',
+    element: <PushNotificationList />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-thong-bao/nguoi-dung/them-moi',
+    element: <NotiUserDetail />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-thong-bao/nguoi-dung/:notiId/chi-tiet',
+    element: <NotiUserDetail />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+
+  {
+    path: '/quan-ly-thong-bao/dau-trang',
+    element: <PushNotificationHeadPageList />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-thong-bao/dau-trang/them-moi',
+    element: <NotiHeadPageDetail />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-thong-bao/dau-trang/:notiId/chi-tiet',
+    element: <NotiHeadPageDetail />,
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
   },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
   {

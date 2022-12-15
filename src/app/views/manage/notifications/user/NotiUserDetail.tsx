@@ -238,16 +238,25 @@ function NotiUserDetail(props: any) {
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
     // navigate('/quan-ly-thong-bao/nguoi-dung', {})
+    if (openDialog) setOpenDialog(false)
+
     methods.reset()
   }
   const { mutate: send, isLoading: sendLoading } = useSendNotificationUser(() =>
     onRowUpdateSuccess(null, 'Gửi thông báo thành công.'),
   )
-  const { mutate: add, isLoading: createLoading } = useCreateNotiUser(() =>
-    onRowUpdateSuccess(
-      null,
-      'Thông báo đã được thêm, bạn cần thực hiện nhấn “Gửi ngay” để thực hiện gửi thông báo cho người dùng. ',
-    ),
+  const { mutate: add, isLoading: createLoading } = useCreateNotiUser(
+    (data: any) => {
+      if (data) {
+        onRowUpdateSuccess(
+          null,
+          'Thông báo đã được thêm, bạn cần thực hiện nhấn “Gửi ngay” để thực hiện gửi thông báo cho người dùng. ',
+        ),
+          navigate(`/quan-ly-thong-bao/nguoi-dung/${data.id}/chi-tiet`, {
+            replace: true,
+          })
+      }
+    },
   )
 
   const { mutate: edit, isLoading: editLoading } = useUpdateNotiUser(() =>
@@ -349,6 +358,19 @@ function NotiUserDetail(props: any) {
 
   return (
     <Container>
+      {(createLoading || editLoading) && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 999,
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
@@ -364,7 +386,11 @@ function NotiUserDetail(props: any) {
       <TopRightButtonList
         isLoading={createLoading || editLoading || sendLoading}
         onSave={() => methods.handleSubmit(onSubmitHandler)(0 as any)}
-        onCallback={() => methods.handleSubmit(onSubmitHandler)(1 as any)}
+        onCallback={
+          noti
+            ? () => methods.handleSubmit(onSubmitHandler)(1 as any)
+            : undefined
+        }
         titleCallback={'Gửi ngay'}
         // onCallback={() =>
         //   !!notiId
@@ -466,10 +492,6 @@ function NotiUserDetail(props: any) {
                         )}
                       </Box>
                     </Stack>
-                  )}
-
-                  {(createLoading || editLoading) && (
-                    <LinearProgress sx={{ mt: 0.5 }} />
                   )}
                 </Stack>
               </Grid>

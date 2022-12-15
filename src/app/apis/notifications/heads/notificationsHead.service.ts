@@ -26,7 +26,7 @@ export const notiHeadPageDetail = async (
   return data
 }
 
-export const createHeadPage = async (
+export const createNotiHeadPage = async (
   payload: INotificationDetail,
 ): Promise<any> => {
   const { data } = await http.post<INotificationDetail>(
@@ -36,30 +36,26 @@ export const createHeadPage = async (
   return data
 }
 
-export const editNotiUser = async (
+export const editNotiHeadPage = async (
   notiId: number,
   payload: any,
 ): Promise<any> => {
-  console.log('payload:', payload)
-
   const { data } = await http.put<any>(
-    `/api/manual-push-noti/${notiId}`,
+    `/api/manual-popup-noti/${notiId}`,
     payload,
   )
   return data
 }
 
-export const deleteNotiUser = async (notiId: number): Promise<any> => {
-  const { data } = await http.delete<INotification>(
-    `/api/manual-push-noti/${notiId}`,
-  )
+export const deleteNotiHeadPage = async (notiId: number): Promise<any> => {
+  const { data } = await http.delete<any>(`/api/manual-popup-noti/${notiId}`)
   return data
 }
 
-export const sendNotiUser = async (notiId: number): Promise<any> => {
-  const { data } = await http.post<INotification>(
-    `/api/manual-push-noti/${notiId}`,
-  )
+export const toggleStatusNotiHeadPage = async (
+  notiId: number,
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/manual-popup-noti/${notiId}`)
   return data
 }
 

@@ -1,18 +1,26 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Chip,
+  FormHelperText,
   Grid,
   Icon,
+  IconButton,
   LinearProgress,
   MenuItem,
   Stack,
   styled,
+  Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery } from '@tanstack/react-query'
 import { fetchCampAreas, fetchCampGrounds } from 'app/apis/feed/feed.service'
-import { notiHeadPageDetail } from 'app/apis/notifications/heads/notificationsHead.service'
+import {
+  checkExistActivePopup,
+  notiHeadPageDetail,
+} from 'app/apis/notifications/heads/notificationsHead.service'
+import { uploadApi } from 'app/apis/uploads/upload.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
+import { DropWrapper } from 'app/components/common/ImageUploadPreviewer'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
@@ -21,16 +29,20 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { TopRightButtonList } from 'app/components/common/TopRightButtonList'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { compressImageFile } from 'app/helpers/compressFile'
+import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import {
-  useCreateNotiUser,
-  useSendNotificationUser,
-  useUpdateNotiUser,
-} from 'app/hooks/queries/useNotificationsData'
+  useCreateNotiHeadPage,
+  useToggleStatusHeadPage,
+  useUpdateNotiHeadPage,
+} from 'app/hooks/queries/useNotificationsHeadPage'
+import { IMediaOverall } from 'app/models'
 import { ICampArea, ICampAreaResponse, ICampGround } from 'app/models/camp'
 import { INotificationDetail } from 'app/models/notification'
+import { EMediaFormat } from 'app/utils/enums/medias'
 import { messages } from 'app/utils/messages'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Dropzone from 'react-dropzone'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -48,6 +60,8 @@ type SchemaType = {
   campArea?: any
   webUrl?: string
   content?: string | null
+  imageFile?: File
+  urlImage?: string
 }
 
 const Container = styled('div')<Props>(({ theme }) => ({
@@ -67,6 +81,12 @@ function NotiHeadPageDetail(props: any) {
     scope: 1,
     srcType: 0,
   })
+
+  const [imagePreviewer, setImagePreviewer] = useState<IMediaOverall | null>(
+    null,
+  )
+
+  const dropzoneImgRef = useRef(null) as any
 
   const [dialogData, setDialogData] = useState<{
     title?: string
@@ -116,6 +136,9 @@ function NotiHeadPageDetail(props: any) {
         is: (idSrcType: any) => !!idSrcType && Number(idSrcType) === 13,
         then: Yup.string().required(messages.MSG1).nullable(),
       }),
+    imageFile: Yup.mixed().test('empty', messages.MSG1, () => {
+      return !!imagePreviewer
+    }),
   })
 
   const methods = useForm<SchemaType>({
@@ -189,6 +212,13 @@ function NotiHeadPageDetail(props: any) {
     defaultValues.content = noti.content
     defaultValues.webUrl = noti.webUrl ?? ''
 
+    if (noti.imgUrl) {
+      setImagePreviewer({
+        mediaFormat: EMediaFormat.IMAGE,
+        url: noti.imgUrl,
+      })
+    }
+
     if (campGrounds?.content && campAreas?.content) {
       if (noti.srcType == 1) {
         const campArea = campAreas.content.find(c => c.id == noti.idSrc)
@@ -202,10 +232,19 @@ function NotiHeadPageDetail(props: any) {
     methods.reset({ ...defaultValues })
   }
 
-  const onSubmitHandler: SubmitHandler<SchemaType> = (
+  const onSubmitHandler: SubmitHandler<SchemaType> = async (
     values: SchemaType,
     status?: any,
   ) => {
+    let imgData
+    if (values.imageFile) {
+      const fileCompressed = await compressImageFile(values.imageFile)
+
+      imgData = await uploadApi(fileCompressed, () => {}, null, {
+        srcType: 13,
+      })
+    }
+
     const payload: INotificationDetail = {
       title: values.title,
       scope: Number(values.scope),
@@ -217,6 +256,7 @@ function NotiHeadPageDetail(props: any) {
             )
           : null,
       webUrl: values.srcType == 4 ? values.webUrl : null,
+      imgUrl: imgData ? imgData.url : noti?.imgUrl || null,
       content: values.srcType == 13 ? values.content : null,
       status: (noti && noti.status) || (status as number) || 0,
     }
@@ -234,23 +274,47 @@ function NotiHeadPageDetail(props: any) {
     }
   }
 
+  const openDialogFileImage = () => {
+    if (dropzoneImgRef.current) {
+      dropzoneImgRef.current.open()
+    }
+  }
+  const removeImageSelected = () => {
+    setImagePreviewer(null)
+    methods.setValue('imageFile', undefined)
+  }
+
   const onRowUpdateSuccess = (data: any, message: string) => {
     toastSuccess({ message: message })
     // navigate('/quan-ly-thong-bao/nguoi-dung', {})
+    if (openDialog) setOpenDialog(false)
     methods.reset()
   }
-  const { mutate: send, isLoading: sendLoading } = useSendNotificationUser(() =>
-    onRowUpdateSuccess(null, 'Gửi thông báo thành công.'),
-  )
-  const { mutate: add, isLoading: createLoading } = useCreateNotiUser(() =>
-    onRowUpdateSuccess(
-      null,
-      'Thông báo đã được thêm, bạn cần thực hiện nhấn “Gửi ngay” để thực hiện gửi thông báo cho người dùng. ',
-    ),
+  const { mutate: toggleStatus, isLoading: toggleLoading } =
+    useToggleStatusHeadPage(() =>
+      onRowUpdateSuccess(
+        null,
+        noti?.status === 1
+          ? 'Tắt thông báo đầu trang thành công'
+          : 'Bật thông báo thành công',
+      ),
+    )
+  const { mutate: add, isLoading: createLoading } = useCreateNotiHeadPage(
+    (data: any) => {
+      if (data) {
+        onRowUpdateSuccess(
+          null,
+          'Thông báo đã được thêm, bạn cần thực hiện nhấn “Bật” để thực hiện gửi thông báo cho người dùng. ',
+        )
+        navigate(`/quan-ly-thong-bao/dau-trang/${data.id}/chi-tiet`, {
+          replace: true,
+        })
+      }
+    },
   )
 
-  const { mutate: edit, isLoading: editLoading } = useUpdateNotiUser(() =>
-    onRowUpdateSuccess(null, 'Cập nhật thông báo thành công'),
+  const { mutate: edit, isLoading: editLoading } = useUpdateNotiHeadPage(() =>
+    onRowUpdateSuccess(null, 'Cập nhật thông báo đầu trang thành công'),
   )
 
   //   const { mutate: deletedFeed } = useDeleteFeed(() =>
@@ -271,13 +335,19 @@ function NotiHeadPageDetail(props: any) {
     setOpenDialog(true)
   }
 
-  const openSendDialog = (payload?: INotificationDetail) => {
+  const openSendDialog = async (payload?: INotificationDetail) => {
+    const res = await checkExistActivePopup()
+
     setDialogData(prev => ({
       ...prev,
-      title: 'Xác nhận gửi thông báo',
+      title: noti?.status === 1 ? 'Tắt thông báo' : 'Bật thông báo',
       message:
-        'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
-      type: 'send',
+        noti?.status === 1
+          ? 'Sau khi tắt, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn tắt?'
+          : res?.existActivePopup
+          ? 'Sau khi bật sẽ thay thế cho thông báo lúc mở app hiện tại. Bạn có chắc muốn bật?'
+          : 'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
+      type: 'toggle-status',
       submitText: 'Có',
       cancelText: 'Không',
       payload: payload,
@@ -298,8 +368,8 @@ function NotiHeadPageDetail(props: any) {
 
   const onSubmitDialog = () => {
     switch (dialogData.type) {
-      case 'send':
-        !!notiId ? send(Number(notiId)) : add(dialogData.payload!)
+      case 'toggle-status':
+        !!notiId ? toggleStatus(Number(notiId)) : add(dialogData.payload!)
         break
       case 'delete':
         onDeleteFeed()
@@ -348,6 +418,20 @@ function NotiHeadPageDetail(props: any) {
 
   return (
     <Container>
+      {(createLoading || editLoading) && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 999,
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
+
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
@@ -361,14 +445,14 @@ function NotiHeadPageDetail(props: any) {
       </Box>
 
       <TopRightButtonList
-        isLoading={createLoading || editLoading || sendLoading}
+        isLoading={createLoading || editLoading || toggleLoading}
         onSave={() => methods.handleSubmit(onSubmitHandler)(0 as any)}
         onCallback={
-          true
+          noti
             ? () => methods.handleSubmit(onSubmitHandler)(1 as any)
             : undefined
         }
-        titleCallback={true ? 'Tắt' : 'Bật'}
+        titleCallback={noti && noti.status === 1 ? 'Tắt' : 'Bật'}
         onGoBack={() => navigate(-1)}
       />
 
@@ -396,6 +480,150 @@ function NotiHeadPageDetail(props: any) {
                     <MenuItem value="1">Toàn bộ</MenuItem>
                     <MenuItem value="2">Theo tệp</MenuItem>
                   </SelectDropDown>
+
+                  <Stack flexDirection={'row'} gap={3} my={2}>
+                    <MuiTypography variant="body2">
+                      Ảnh thông báo báo *:
+                    </MuiTypography>
+                    <Box width={200}>
+                      <Dropzone
+                        ref={dropzoneImgRef}
+                        onDrop={(acceptedFiles, fileRejections) => {
+                          if (fileRejections.length) {
+                            toastError({
+                              message:
+                                fileRejections[0].errors[0].code ===
+                                'file-too-large'
+                                  ? 'Ảnh tải lên không được vượt quá 10MB'
+                                  : fileRejections[0].errors[0].message,
+                            })
+                          }
+                          if (!acceptedFiles || !acceptedFiles.length) return
+                          setImagePreviewer({
+                            url: URL.createObjectURL(acceptedFiles[0]),
+                          })
+                          methods.setValue('imageFile', acceptedFiles[0])
+                          methods.clearErrors('imageFile')
+                        }}
+                        accept={{
+                          'image/png': ['.png', '.PNG'],
+                          'image/jpeg': ['.jpg', '.jpeg'],
+                        }}
+                        multiple={false}
+                        maxSize={10 * 1024 * 1024}
+                      >
+                        {({ getRootProps, getInputProps }) => (
+                          <>
+                            <div {...getRootProps({ className: 'dropzone' })}>
+                              <input {...getInputProps()} />
+                              {!imagePreviewer && (
+                                <DropWrapper
+                                  sx={{
+                                    aspectRatio: 'auto 1 / 1',
+                                    borderRadius: 1.5,
+                                    display: 'flex',
+                                  }}
+                                >
+                                  <Stack
+                                    sx={{
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
+                                      gap: 0.5,
+                                    }}
+                                  >
+                                    <MuiTypography variant="body2">
+                                      Chọn hoặc kéo thả ảnh
+                                    </MuiTypography>
+                                    <Icon>backup</Icon>
+                                    <MuiTypography
+                                      variant="body2"
+                                      fontSize={'0.75rem'}
+                                    >
+                                      PNG / JPEG hoặc JPG
+                                    </MuiTypography>
+                                    <MuiTypography
+                                      variant="body2"
+                                      fontSize={'0.75rem'}
+                                    >
+                                      tối đa 10MB/ảnh
+                                    </MuiTypography>
+                                  </Stack>
+                                </DropWrapper>
+                              )}
+                            </div>
+                            {imagePreviewer && (
+                              <Box
+                                sx={{
+                                  position: 'relative',
+                                  aspectRatio: 'auto 1 / 1',
+                                  borderRadius: 1.5,
+                                  overflow: 'hidden',
+                                  boxShadow:
+                                    '0 2px 6px 0 rgba(0, 0, 0, 0.1), 0 4px 10px 0 rgba(0, 0, 0, 0.16)',
+                                }}
+                              >
+                                <Stack
+                                  flexDirection={'row'}
+                                  sx={{
+                                    position: 'absolute',
+                                    top: '6px',
+                                    right: '6px',
+                                    gap: 1,
+                                  }}
+                                >
+                                  <Tooltip arrow title={'Chọn lại'}>
+                                    <IconButton
+                                      sx={{
+                                        bgcolor: '#303030',
+                                        borderRadius: 1,
+                                      }}
+                                      onClick={openDialogFileImage}
+                                    >
+                                      <Icon sx={{ color: 'white' }}>
+                                        cached
+                                      </Icon>
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip arrow title={'Xóa'}>
+                                    <IconButton
+                                      sx={{
+                                        bgcolor: '#303030',
+                                        borderRadius: 1,
+                                      }}
+                                      onClick={removeImageSelected}
+                                    >
+                                      <Icon sx={{ color: 'white' }}>
+                                        delete
+                                      </Icon>
+                                    </IconButton>
+                                  </Tooltip>
+                                </Stack>
+
+                                <img
+                                  src={imagePreviewer.url}
+                                  alt="thumb"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                  }}
+                                />
+                              </Box>
+                            )}
+                          </>
+                        )}
+                      </Dropzone>
+                      {methods.formState.errors.imageFile && (
+                        <FormHelperText error>
+                          {
+                            methods.formState.errors.imageFile
+                              ?.message as string
+                          }
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  </Stack>
+
                   <Stack>
                     <SelectDropDown name="srcType" label="Liên kết với">
                       <MenuItem value="0">Không liên kết</MenuItem>
@@ -464,10 +692,6 @@ function NotiHeadPageDetail(props: any) {
                       </Box>
                     </Stack>
                   )}
-
-                  {(createLoading || editLoading) && (
-                    <LinearProgress sx={{ mt: 0.5 }} />
-                  )}
                 </Stack>
               </Grid>
               <Grid item sm={6}>
@@ -507,7 +731,7 @@ function NotiHeadPageDetail(props: any) {
         open={openDialog}
         setOpen={setOpenDialog}
         onSubmit={onSubmitDialog}
-        maxWidth={dialogData.type !== 'send' ? 'lg' : 'sm'}
+        maxWidth={dialogData.type !== 'toggle-status' ? 'lg' : 'sm'}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
         disabled={

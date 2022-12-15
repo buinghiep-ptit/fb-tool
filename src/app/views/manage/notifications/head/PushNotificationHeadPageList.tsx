@@ -7,7 +7,6 @@ import {
   checkExistActivePopup,
   fetchNotificationsHeadPage,
 } from 'app/apis/notifications/heads/notificationsHead.service'
-import { fetchNotificationsUser } from 'app/apis/notifications/users/notificationsUser.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -16,17 +15,12 @@ import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import {
-  useDeleteNotificationUser,
-  useSendNotificationUser,
-} from 'app/hooks/queries/useNotificationsData'
+import { useSendNotificationUser } from 'app/hooks/queries/useNotificationsData'
+import { useDeleteNotificationHeadPage } from 'app/hooks/queries/useNotificationsHeadPage'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed } from 'app/models'
 import { INotification, INotificationResponse } from 'app/models/notification'
-import {
-  columnsNotifications,
-  columnsNotificationsHeadPage,
-} from 'app/utils/columns/columnsNotifications'
+import { columnsNotificationsHeadPage } from 'app/utils/columns/columnsNotifications'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
@@ -208,7 +202,9 @@ export default function PushNotificationHeadPageList(props: Props) {
     () => onRowUpdateSuccess(null, 'Gửi thành công'),
   )
   const { mutate: deleteNoti, isLoading: deleteLoading } =
-    useDeleteNotificationUser(() => onRowUpdateSuccess(null, 'Xoá thành công'))
+    useDeleteNotificationHeadPage(() =>
+      onRowUpdateSuccess(null, 'Xoá thông báo đầu trang thành công'),
+    )
 
   const onRowUpdate = (cell: any, row: any) => {
     navigation(`${row.id}/chi-tiet`, {})
@@ -252,7 +248,7 @@ export default function PushNotificationHeadPageList(props: Props) {
         message:
           row.status === 1
             ? 'Sau khi tắt, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn tắt?'
-            : res.existActivePopup
+            : res?.existActivePopup
             ? 'Sau khi bật sẽ thay thế cho thông báo lúc mở app hiện tại. Bạn có chắc muốn bật?'
             : 'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
         type: 'toggle-status',

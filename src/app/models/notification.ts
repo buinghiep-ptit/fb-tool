@@ -21,6 +21,7 @@ export interface INotificationDetail {
   srcType?: number | null
   idSrc?: number | null
   webUrl?: string | null
+  imgUrl?: string | null
   title?: string
   content?: string | null
   status?: number

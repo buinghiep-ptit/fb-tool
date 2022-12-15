@@ -341,6 +341,7 @@ const TableCustom = forwardRef(
                           </TableCell>
                         )
                       case 'linkView':
+                      case 'linkViewBlank':
                         return (
                           <TableCell
                             align="left"

@@ -142,7 +142,7 @@ export default function ManagerPlace(props) {
                   }}
                 >
                   <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
+                  <MenuItem value={-1}>Không hoạt động</MenuItem>
                   <MenuItem value={0}>Tất cả</MenuItem>
                 </Select>
               </FormControl>

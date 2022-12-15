@@ -117,7 +117,7 @@ export default function ListCampService(props) {
               >
                 <MenuItem value={0}>Tất cả</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={-1}>Không hoạt dộng</MenuItem>
+                <MenuItem value={-1}>Không hoạt động</MenuItem>
               </Select>
             </FormControl>
           </div>

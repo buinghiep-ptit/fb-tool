@@ -737,7 +737,7 @@ function NotiHeadPageDetail(props: any) {
         disabled={
           ((!selectedCampAreas.length && srcType == 1) ||
             (!selectedCampgrounds.length && srcType == 2)) &&
-          dialogData.type !== 'send'
+          dialogData.type !== 'toggle-status'
         }
       >
         <>

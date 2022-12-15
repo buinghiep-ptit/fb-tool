@@ -16,7 +16,10 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useSendNotificationUser } from 'app/hooks/queries/useNotificationsData'
-import { useDeleteNotificationHeadPage } from 'app/hooks/queries/useNotificationsHeadPage'
+import {
+  useDeleteNotificationHeadPage,
+  useToggleStatusHeadPage,
+} from 'app/hooks/queries/useNotificationsHeadPage'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed } from 'app/models'
 import { INotification, INotificationResponse } from 'app/models/notification'
@@ -198,9 +201,15 @@ export default function PushNotificationHeadPageList(props: Props) {
     setOpenDialog(false)
   }
 
-  const { mutate: sendNoti, isLoading: sendLoading } = useSendNotificationUser(
-    () => onRowUpdateSuccess(null, 'Gửi thành công'),
-  )
+  const { mutate: toggleStatus, isLoading: toggleLoading } =
+    useToggleStatusHeadPage(() =>
+      onRowUpdateSuccess(
+        null,
+        row?.status === 1
+          ? 'Tắt thông báo đầu trang thành công'
+          : 'Bật thông báo thành công',
+      ),
+    )
   const { mutate: deleteNoti, isLoading: deleteLoading } =
     useDeleteNotificationHeadPage(() =>
       onRowUpdateSuccess(null, 'Xoá thông báo đầu trang thành công'),
@@ -262,8 +271,8 @@ export default function PushNotificationHeadPageList(props: Props) {
 
   const onSubmitDialog = () => {
     switch (dialogData.type) {
-      case 'send':
-        sendNoti(row.id)
+      case 'toggle-status':
+        toggleStatus(row.id)
 
         break
 
@@ -389,7 +398,7 @@ export default function PushNotificationHeadPageList(props: Props) {
         onSubmit={onSubmitDialog}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
-        isLoading={sendLoading || deleteLoading}
+        isLoading={toggleLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
           <MuiTypography variant="subtitle1" textAlign={'center'}>

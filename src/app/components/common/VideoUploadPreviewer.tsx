@@ -159,6 +159,7 @@ export function VideoUploadPreviewer({
                 borderRadius: 1.5,
                 display: 'flex',
                 flex: 1,
+                maxWidth: 350,
               }}
             >
               <Stack flexDirection={'column'} alignItems="center" gap={1}>
@@ -200,6 +201,7 @@ export function VideoUploadPreviewer({
                 aspectRatio: 'auto 9 / 16',
                 borderRadius: 1.5,
                 flex: 1,
+                maxWidth: 350,
               }}
             >
               <MediaPlayer
@@ -233,7 +235,7 @@ export function VideoUploadPreviewer({
                 />
               </Stack>
             </PreviewerViewport>
-            <Stack width={150} bgcolor="grey" px={1.5} gap={1.5}>
+            <Stack width={150} px={1.5} gap={1.5}>
               {thumbnailsPreviewer.length ? (
                 thumbnailsPreviewer.map((thumb, index) => (
                   <img

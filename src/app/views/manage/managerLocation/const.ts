@@ -97,6 +97,53 @@ export const tableModelService = {
   ],
 }
 
+export const tableModelReview = {
+  headCell: [
+    {
+      name: 'STT',
+      width: 50,
+    },
+    {
+      name: 'Tài khoản',
+      width: 120,
+    },
+    {
+      name: 'Số sao',
+      width: 80,
+    },
+    {
+      name: 'Nội dung',
+      width: 150,
+    },
+    {
+      name: 'Ảnh',
+      width: 120,
+    },
+    {
+      name: 'Thời gian nhận xét',
+      width: 150,
+    },
+    {
+      name: 'Trạng thái',
+      width: 100,
+    },
+    {
+      name: 'Chi tiết',
+      width: 150,
+    },
+  ],
+  bodyCell: [
+    'index',
+    'linkView',
+    'star',
+    'description',
+    'image',
+    'time',
+    'status',
+    'linkViewBlank',
+  ],
+}
+
 export const tableModelHandBook = {
   headCell: [
     {
@@ -120,7 +167,7 @@ export const tableModelHandBook = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'nameHandBook', 'statusHandBook', 'creator', 'action'],
+  bodyCell: ['index', 'linkView', 'statusHandBook', 'creator', 'action'],
 }
 
 export const tableModelHandBookUnLinked = {
@@ -138,7 +185,7 @@ export const tableModelHandBookUnLinked = {
       width: null,
     },
   ],
-  bodyCell: ['index', 'nameHandBook', 'action'],
+  bodyCell: ['index', 'linkView', 'action'],
 }
 
 export const seasons = [

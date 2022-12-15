@@ -133,12 +133,12 @@ export default function ManagerLocation(props) {
                   label="Trạng thái"
                   style={{ marginRight: '50px' }}
                   onChange={e => {
-                    setStatusFilter(e.target.value)
+                    setStatusFilter(e.target.value == 0 ? null : e.target.value)
                   }}
                 >
+                  <MenuItem value={0}>Tất cả</MenuItem>
                   <MenuItem value={1}>Hoạt động</MenuItem>
-                  <MenuItem value={-1}>Không hoạt dộng</MenuItem>
-                  <MenuItem value={0}>Lưu nháp</MenuItem>
+                  <MenuItem value={-1}>Không hoạt động</MenuItem>
                 </Select>
               </FormControl>
               <FormControl fullWidth>

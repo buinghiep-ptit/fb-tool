@@ -14,7 +14,7 @@ import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import UploadImage from 'app/components/common/uploadImage'
 import Typography from '@mui/material/Typography'
-import { createPlace } from 'app/apis/place/place.service'
+import { checkNamePlaceExist, createPlace } from 'app/apis/place/place.service'
 import {
   getDistricts,
   getProvinces,
@@ -62,14 +62,6 @@ export default function CreatePlace(props) {
     { label: 'Leo núi', id: 5 },
   ]
 
-  const hashtagTypeCamp = {
-    1: '#camtrai',
-    2: '#chaybo',
-    3: '#teambuilding',
-    4: '#luutru',
-    5: '#leonui',
-  }
-
   const uploadImageRef = React.useRef()
   const mapRef = React.useRef()
   const dialogCustomRef = React.useRef(null)
@@ -81,7 +73,7 @@ export default function CreatePlace(props) {
         .string()
         .required(messages.MSG1)
         .trim()
-        .max(255, 'Đã đạt số ký tự tối đa'),
+        .max(255, 'Tên địa danh không được vượt quá 255 ký tự'),
       province: yup.object().required(messages.MSG1),
       campAreaTypes: yup.array().min(1, ''),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
@@ -261,7 +253,7 @@ export default function CreatePlace(props) {
         }
       })
     }
-    console.log(data.campAreaTypes)
+
     const paramDetail = {
       medias: [...mediasUpdateImage, ...mediasUpdateVideo].filter(
         item => !!item,
@@ -279,14 +271,18 @@ export default function CreatePlace(props) {
       status: 1,
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
-    console.log(paramDetail)
-    const res = await createPlace(paramDetail)
-    setIsLoading(false)
-    if (res) {
-      toastSuccess({ message: 'Tạo địa danh thành công' })
-      fetchGetProvinces()
-      navigate('/quan-ly-thong-tin-dia-danh')
+    try {
+      const res = await createPlace(paramDetail)
+      if (res) {
+        toastSuccess({ message: 'Tạo địa danh thành công' })
+        fetchGetProvinces()
+        navigate('/quan-ly-thong-tin-dia-danh')
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   React.useEffect(() => {
@@ -350,6 +346,20 @@ export default function CreatePlace(props) {
                     error={!!errors.namePlace}
                     helperText={errors.namePlace?.message}
                     {...field}
+                    onBlur={async e => {
+                      const res = await checkNamePlaceExist({
+                        name: e.target.value,
+                        idCampArea: null,
+                      })
+                      if (res.exist) {
+                        setError('namePlace', {
+                          type: 'nameExist',
+                          message: 'Tên địa danh đã được dùng',
+                        })
+                      } else {
+                        clearErrors(['namePlace'])
+                      }
+                    }}
                     label="Tên địa danh*"
                     variant="outlined"
                   />
@@ -571,7 +581,7 @@ export default function CreatePlace(props) {
           <UploadImage ref={uploadImageRef} setValue={setValue}></UploadImage>
           {errors?.file && (
             <FormHelperText error={true}>
-              {errors.file?.message || 'acb'}
+              {errors.file?.message || ''}
             </FormHelperText>
           )}
           <Button

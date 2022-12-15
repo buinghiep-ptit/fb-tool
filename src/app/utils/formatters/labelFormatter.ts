@@ -65,6 +65,68 @@ export const LabelFormatter = (value?: number, key?: string) => {
   return formatter
 }
 
+export const labelFeedStatus = (value?: number) => {
+  if (value === 0) {
+    return {
+      title: 'Chờ hậu kiểm',
+      textColor: '#FFFFFF',
+      bgColor: '#475985',
+    }
+  } else if (value === 1) {
+    return {
+      title: 'Hợp lệ',
+      textColor: '#2F9B42',
+      bgColor: '#EDFDEF',
+    }
+  } else if (value === -1) {
+    return {
+      title: 'Vi phạm',
+      textColor: '#FF4141',
+      bgColor: '#FFF5F5',
+    }
+  } else if (value === -2) {
+    return {
+      title: 'Bị báo cáo',
+      textColor: '#FB7800',
+      bgColor: '#FCF5ED',
+    }
+  } else if (value === -3) {
+    return {
+      title: 'Xóa',
+      textColor: '#FFFFFF',
+      bgColor: '#AAAAAA',
+    }
+  }
+  return { title: 'Chờ hậu kiểm', textColor: '#FFFFFF', bgColor: '#475985' }
+}
+
+export const labelNotificationStatus = (value?: number) => {
+  if (value === 0) {
+    return {
+      title: 'Chưa gửi',
+      textColor: '#FFFFFF',
+      bgColor: '#475985',
+    }
+  } else if (value === 1) {
+    return {
+      title: 'Đã gửi',
+      textColor: '#2F9B42',
+      bgColor: '#EDFDEF',
+    }
+  } else if (value === -3) {
+    return {
+      title: 'Dừng hoạt động',
+      textColor: '#FFFFFF',
+      bgColor: '#AAAAAA',
+    }
+  }
+  return {
+    title: 'Dừng hoạt động',
+    textColor: '#FFFFFF',
+    bgColor: '#AAAAAA',
+  }
+}
+
 export const convertOtpToLabel = (type: number) => {
   switch (type) {
     case 1:
@@ -87,7 +149,7 @@ export const getLabelByCusStatus = (status: number) => {
   switch (status) {
     case 1:
       return 'Hoạt động'
-    case 3:
+    case -4:
       return 'Xoá'
 
     case -2:

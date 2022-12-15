@@ -85,7 +85,7 @@ export default function ListAudios(props: Props) {
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'email must be at least 0 characters')
-      .max(255, 'email must be at almost 256 characters'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
   const methods = useForm<IAudiosFilters>({

@@ -1,29 +1,31 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { SearchSharp } from '@mui/icons-material'
-import { Grid, Icon, Stack, styled } from '@mui/material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchKeywords } from 'app/apis/keyword/keyword.service'
+import { useQuery } from '@tanstack/react-query'
+import { fetchNotificationsUser } from 'app/apis/notifications/users/notificationsUser.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
-  useDeleteKeyword,
-  useTogglePinKeyword,
-} from 'app/hooks/queries/useKeywordsData'
+  useDeleteNotificationUser,
+  useSendNotificationUser,
+} from 'app/hooks/queries/useNotificationsData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IKeyword, IKeywordResponse } from 'app/models/keyword'
-import { columnsTrendingKeywords } from 'app/utils/columns/columnsTrendingKeywords'
+import { IFeed } from 'app/models'
+import { INotification, INotificationResponse } from 'app/models/notification'
+import { columnsNotifications } from 'app/utils/columns/columnsNotifications'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
-import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -34,16 +36,26 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-export interface Props {}
-
+const extractFeeds = (feeds?: IFeed[]) => {
+  if (!feeds || !feeds.length) return []
+  return feeds.map(feed =>
+    Object.assign(feed, {
+      customerType:
+        feed.customerType === 2 ? 'KOL' : feed.customerId ? 'Thường' : 'Campdi',
+    }),
+  )
+}
 type ISearchFilters = {
   search?: string
+  status?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function ListTrendingKeyword(props: Props) {
+export interface Props {}
+
+export default function PushNotificationList(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -54,7 +66,10 @@ export default function ListTrendingKeyword(props: Props) {
   const [size, setSize] = useState<number>(
     queryParams.size ? +queryParams.size : 20,
   )
+  const [isReset, setIsReset] = useState<boolean>(false)
+
   const [defaultValues] = useState<ISearchFilters>({
+    status: queryParams.status ?? 'all',
     search: queryParams.search ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
@@ -68,6 +83,7 @@ export default function ListTrendingKeyword(props: Props) {
     title?: string
     message?: string
     type?: string
+    isLinked?: number
     submitText?: string
     cancelText?: string
   }>({})
@@ -76,7 +92,7 @@ export default function ListTrendingKeyword(props: Props) {
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
+      .min(0, 'email must be at least 0 characters')
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
@@ -86,60 +102,26 @@ export default function ListTrendingKeyword(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
-  const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    error,
-  }: UseQueryResult<IKeywordResponse, Error> = useQuery<
-    IKeywordResponse,
+  const { data, isLoading, isFetching, isError, error } = useQuery<
+    INotificationResponse,
     Error
-  >(['keywords', filters], () => fetchKeywords(filters), {
+  >(['notifications-user', filters], () => fetchNotificationsUser(filters), {
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
     keepPreviousData: true,
     enabled: !!filters,
   })
-  const onRowUpdateSuccess = (data: any, message?: string) => {
-    toastSuccess({ message: message ?? '' })
-    setOpenDialog(false)
-  }
-
-  const { mutate: togglePin, isLoading: toggleLoading } = useTogglePinKeyword(
-    () => onRowUpdateSuccess(null, 'Cập nhật thành công'),
-  )
-  const { mutate: deleteKeyword, isLoading: deleteLoading } = useDeleteKeyword(
-    () => onRowUpdateSuccess(null, 'Xoá thành công'),
-  )
-
-  const onSubmitDialog = () => {
-    switch (dialogData.type) {
-      case 'toggle-pin':
-        togglePin(row.id)
-        break
-
-      case 'delete':
-        deleteKeyword(row.id)
-        break
-        break
-
-      default:
-        break
-    }
-  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
       return {
         ...prevFilters,
-        page: newPage,
+        page: +newPage,
       }
     })
     navigate('', {
       ...filters,
-      page: newPage,
+      page: +newPage,
     } as any)
   }
 
@@ -152,13 +134,13 @@ export default function ListTrendingKeyword(props: Props) {
       return {
         ...prevFilters,
         page: 0,
-        size: parseInt(event.target.value, 10),
+        size: +event.target.value,
       }
     })
     navigate('', {
       ...filters,
       page: 0,
-      size: parseInt(event.target.value, 10),
+      size: +event.target.value,
     } as any)
   }
 
@@ -167,6 +149,7 @@ export default function ListTrendingKeyword(props: Props) {
   ) => {
     setPage(0)
     setSize(20)
+    setIsReset(false)
     setFilters(prevFilters => {
       return {
         ...extractMergeFiltersObject(prevFilters, values),
@@ -182,43 +165,10 @@ export default function ListTrendingKeyword(props: Props) {
     } as any)
   }
 
-  const onRowUpdate = (cell: any, row: any) => {
-    setDialogData(prev => ({
-      ...prev,
-      title: row.isRequired === 1 ? 'Bỏ ghim từ khoá' : 'Ghim từ khoá',
-      message:
-        row.isRequired === 1
-          ? 'Bạn có chắc chắn muốn bỏ ghim từ khoá?'
-          : 'Bạn có chắc chắn muốn ghim từ khoá?',
-      type: 'toggle-pin',
-      submitText: row.isRequired === 1 ? 'Bỏ ghim' : 'Ghim',
-      cancelText: 'Huỷ',
-    }))
-    setOpenDialog(true)
-    setRow(row)
-  }
-
-  const onRowDelete = (cell: any, row: any) => {
-    setDialogData(prev => ({
-      ...prev,
-      title: 'Xoá từ khoá',
-      message: 'Bạn có chắc chắn muốn xoá từ khoá',
-      type: 'delete',
-      submitText: 'Xoá',
-      cancelText: 'Huỷ',
-    }))
-    setOpenDialog(true)
-    setRow(row)
-  }
-
-  const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'word') {
-      // navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
-    }
-  }
-
   const onResetFilters = () => {
+    setIsReset(true)
     methods.reset({
+      status: 'all',
       search: '',
       page: 0,
       size: 20,
@@ -238,10 +188,74 @@ export default function ListTrendingKeyword(props: Props) {
     } as any)
   }
 
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
+    setOpenDialog(false)
+  }
+
+  const { mutate: sendNoti, isLoading: sendLoading } = useSendNotificationUser(
+    () => onRowUpdateSuccess(null, 'Gửi thành công'),
+  )
+  const { mutate: deleteNoti, isLoading: deleteLoading } =
+    useDeleteNotificationUser(() => onRowUpdateSuccess(null, 'Xoá thành công'))
+
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id}/chi-tiet`, {})
+  }
+
+  const onRowApprove = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Gửi thông báo',
+      type: 'send',
+      message:
+        'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá thông báo',
+      message:
+        'Sau khi xóa, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn xóa?',
+      type: 'delete',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
+    setOpenDialog(true)
+    setRow(row)
+  }
+
+  const onClickRow = (cell: any, row: any) => {
+    if (cell.id === 'title') {
+      navigation(`${row.id}/chi-tiet`, {})
+    }
+  }
+
+  const onSubmitDialog = () => {
+    switch (dialogData.type) {
+      case 'send':
+        sendNoti(row.id)
+
+        break
+
+      case 'delete':
+        deleteNoti(row.id)
+        break
+
+      default:
+        break
+    }
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý từ khoá yêu thích' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Gửi thông báo người dùng' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -249,38 +263,42 @@ export default function ListTrendingKeyword(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm từ khoá"
+          title="Thêm thông báo"
           variant="contained"
           color="primary"
-          onClick={() =>
-            navigation(`them-moi`, {
-              state: { modal: true },
-            })
-          }
+          type="submit"
+          onClick={() => navigation(`them-moi`, {})}
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
       <Stack gap={3}>
         <SimpleCard>
-          <form
-            onSubmit={methods.handleSubmit(onSubmitHandler)}
-            noValidate
-            autoComplete="off"
-          >
+          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Từ khoá'}
+                    label={'Tiêu đề'}
                     type="text"
                     name="search"
-                    defaultValue=""
-                    placeholder="Nhập từ khoá"
+                    size="small"
+                    placeholder="Nhập tiêu đề"
                     fullWidth
+                    defaultValue=""
                   />
                 </Grid>
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="0">Chưa gửi</MenuItem>
+                    <MenuItem value="1">Đã gửi</MenuItem>
+                    <MenuItem value="-3">Dừng sử dụng</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+
                 <Grid item sm={2} xs={12}>
                   <MuiButton
+                    loading={!isReset && isFetching}
                     title="Tìm kiếm"
                     variant="contained"
                     color="primary"
@@ -291,12 +309,13 @@ export default function ListTrendingKeyword(props: Props) {
                 </Grid>
                 <Grid item sm={2} xs={12}>
                   <MuiButton
+                    loading={isReset && isFetching}
                     title="Làm mới"
                     variant="outlined"
                     color="primary"
                     onClick={onResetFilters}
                     sx={{ width: '100%' }}
-                    startIcon={<Icon>cached</Icon>}
+                    startIcon={<ChangeCircleSharp />}
                   />
                 </Grid>
               </Grid>
@@ -306,8 +325,8 @@ export default function ListTrendingKeyword(props: Props) {
 
         <SimpleCard>
           <MuiStyledTable
-            rows={(data?.content as IKeyword[]) ?? []}
-            columns={columnsTrendingKeywords}
+            rows={data ? (data?.content as INotification[]) : []}
+            columns={columnsNotifications}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -315,29 +334,16 @@ export default function ListTrendingKeyword(props: Props) {
             error={isError ? error : null}
             actions={[
               {
-                icon: 'push_pin',
-                color: 'inherit',
-                tooltip: 'Ghim',
+                icon: 'send',
+                color: 'primary',
+                tooltip: 'Gửi',
+                onClick: onRowApprove,
+              },
+              {
+                icon: 'edit',
+                color: 'action',
+                tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
-                disableKey: 'isRequired',
-                disableActions: (isRequired?: number) => !!isRequired,
-                contrastIcon: {
-                  icon: (
-                    <img
-                      src={'/assets/images/app/pin_off_icon.svg'}
-                      style={{
-                        width: 24,
-                        height: 24,
-                        color: '#FFB020',
-                        filter:
-                          'invert(24%) sepia(6%) saturate(3792%) hue-rotate(186deg) brightness(91%) contrast(93%)',
-                      }}
-                      loading="lazy"
-                      alt="icon"
-                    />
-                  ),
-                  tooltip: 'Bỏ ghim',
-                },
               },
               {
                 icon: 'delete',
@@ -366,14 +372,11 @@ export default function ListTrendingKeyword(props: Props) {
         onSubmit={onSubmitDialog}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
-        isLoading={toggleLoading || deleteLoading}
+        isLoading={sendLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
-          </MuiTypography>
-          <MuiTypography variant="subtitle1" color="primary">
-            {row.name}
+          <MuiTypography variant="subtitle1" textAlign={'center'}>
+            {dialogData.message}
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

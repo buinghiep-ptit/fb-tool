@@ -189,8 +189,15 @@ export default function UpdateMerchant(props) {
         url: document.url,
       }
     })
-
-    const res = await updateDetailMerchant(params.id, newData)
+    try {
+      const res = await updateDetailMerchant(params.id, newData)
+      if (res.error) {
+        toastError({ message: res.errorDescription })
+        return
+      }
+    } catch (e) {
+      setIsLoading(false)
+    }
     setIsLoading(false)
     if (res.error) {
       toastError({ message: res.errorDescription })
@@ -264,13 +271,22 @@ export default function UpdateMerchant(props) {
         <SimpleCard title="Thông tin đối tác">
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container>
-              <Grid item xs={10} md={10}>
+              <Grid
+                item
+                xs={10}
+                md={10}
+                style={{
+                  textAlign: 'right',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
                 <Controller
                   name="nameMerchant"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '50%' }}
+                      style={{ width: '50%', marginRight: '20px' }}
                       error={errors.nameMerchant}
                       helperText={errors.nameMerchant?.message}
                       {...field}
@@ -280,8 +296,6 @@ export default function UpdateMerchant(props) {
                     />
                   )}
                 />
-              </Grid>
-              <Grid item xs={2} md={2} style={{ textAlign: 'right' }}>
                 {statusMerchant === 1 ? (
                   <Button variant="contained">Hoạt động</Button>
                 ) : (
@@ -290,6 +304,7 @@ export default function UpdateMerchant(props) {
                   </Button>
                 )}
               </Grid>
+
               <Grid item xs={12} md={12}>
                 <Controller
                   name="merchantType"
@@ -322,13 +337,13 @@ export default function UpdateMerchant(props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   name="email"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '30%' }}
+                      style={{ width: '50%' }}
                       error={errors.email}
                       helperText={errors.email?.message}
                       {...field}
@@ -339,13 +354,13 @@ export default function UpdateMerchant(props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   name="mobilePhone"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '30%' }}
+                      style={{ width: '50%' }}
                       error={errors.mobilePhone}
                       helperText={errors.mobilePhone?.message}
                       {...field}
@@ -356,13 +371,13 @@ export default function UpdateMerchant(props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   name="website"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '30%' }}
+                      style={{ width: '50%' }}
                       error={errors.website}
                       helperText={errors.website?.message}
                       {...field}
@@ -373,13 +388,13 @@ export default function UpdateMerchant(props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   name="taxCode"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '30%' }}
+                      style={{ width: '50%' }}
                       error={errors.taxCode}
                       helperText={errors.taxCode?.message}
                       {...field}
@@ -390,7 +405,7 @@ export default function UpdateMerchant(props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   control={control}
                   name="businessModel"
@@ -435,7 +450,6 @@ export default function UpdateMerchant(props) {
                     const file = await uploadFile(
                       document.getElementById('upload-contract').files[0],
                     )
-                    console.log(file)
                     if (file?.code === '400') {
                       e.target.value = null
                       toastError({ message: file?.errorDescription })
@@ -478,13 +492,13 @@ export default function UpdateMerchant(props) {
                   </div>
                 ))}
               </Grid>
-              <Grid item xs={12} md={12}>
+              <Grid item xs={10} md={10}>
                 <Controller
                   name="representative"
                   control={control}
                   render={({ field }) => (
                     <TextField
-                      style={{ width: '30%' }}
+                      style={{ width: '50%' }}
                       error={errors.representative}
                       helperText={errors.representative?.message}
                       {...field}

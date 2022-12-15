@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const StyledTable = styled(Table)(() => ({
   whiteSpace: 'pre',
@@ -79,7 +80,24 @@ const ListHandBookUnlinked = ({
             .map((handbook, index) => (
               <TableRow key={handbook.id}>
                 <TableCell align="left">{index + 1}</TableCell>
-                <TableCell align="center">{handbook.title}</TableCell>
+                <TableCell align="left">
+                  <Link
+                    to={`/quan-ly-cam-nang/${handbook.id}/chi-tiet`}
+                    target="_blank"
+                    style={{
+                      textDecoration: 'underline',
+                      color: '#07bc0c',
+                      wordBreak: 'normal',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      webkitLineClamp: '2',
+                      display: '-webkit-box',
+                      webkitBoxOrient: 'vertical',
+                    }}
+                  >
+                    {handbook.title}
+                  </Link>
+                </TableCell>
                 <TableCell align="center">
                   {!handbook.linked ? (
                     <Button

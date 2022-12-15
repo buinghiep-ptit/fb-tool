@@ -1,42 +1,35 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import {
-  ArticleSharp,
-  ChangeCircleSharp,
-  ClearOutlined,
-  ReportSharp,
-  SearchSharp,
-} from '@mui/icons-material'
-import {
-  Divider,
-  Grid,
-  Icon,
-  IconButton,
-  MenuItem,
-  Stack,
-  styled,
-} from '@mui/material'
+import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
+import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { fetchFeeds } from 'app/apis/feed/feed.service'
+import { useQuery } from '@tanstack/react-query'
+import {
+  checkExistActivePopup,
+  fetchNotificationsHeadPage,
+} from 'app/apis/notifications/heads/notificationsHead.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useApproveFeed } from 'app/hooks/queries/useFeedsData'
+import { useSendNotificationUser } from 'app/hooks/queries/useNotificationsData'
+import {
+  useDeleteNotificationHeadPage,
+  useToggleStatusHeadPage,
+} from 'app/hooks/queries/useNotificationsHeadPage'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
-import { columnFeeds } from 'app/utils/columns'
+import { IFeed } from 'app/models'
+import { INotification, INotificationResponse } from 'app/models/notification'
+import { columnsNotificationsHeadPage } from 'app/utils/columns/columnsNotifications'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
-import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -56,10 +49,17 @@ const extractFeeds = (feeds?: IFeed[]) => {
     }),
   )
 }
+type ISearchFilters = {
+  search?: string
+  status?: string
+  page?: number
+  size?: number
+  sort?: string
+}
 
 export interface Props {}
 
-export default function ManagerFeed(props: Props) {
+export default function PushNotificationHeadPageList(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -72,49 +72,46 @@ export default function ManagerFeed(props: Props) {
   )
   const [isReset, setIsReset] = useState<boolean>(false)
 
-  const [defaultValues] = useState<IFeedsFilters>({
+  const [defaultValues] = useState<ISearchFilters>({
     status: queryParams.status ?? 'all',
-    isCampdi: queryParams.isCampdi ? true : false,
-    // isReported: queryParams.isReported ? true : false,
     search: queryParams.search ?? '',
-    hashtag: queryParams.hashtag ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
 
-  const [filters, setFilters] = useState<IFeedsFilters>(
+  const [filters, setFilters] = useState<ISearchFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
 
-  const [titleDialog, setTitleDialog] = useState('')
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    isLinked?: number
+    submitText?: string
+    cancelText?: string
+  }>({})
   const [openDialog, setOpenDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
-  const [feedId, setFeedId] = useState(0)
+  const [row, setRow] = useState<any>({})
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'email must be at least 0 characters')
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
-    hashtag: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
-  const methods = useForm<IFeedsFilters>({
+  const methods = useForm<ISearchFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
 
-  const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    error,
-  }: UseQueryResult<IFeedResponse, Error> = useQuery<IFeedResponse, Error>(
-    ['feeds', filters],
-    () => fetchFeeds(filters),
+  const { data, isLoading, isFetching, isError, error } = useQuery<
+    INotificationResponse,
+    Error
+  >(
+    ['notifications-head', filters],
+    () => fetchNotificationsHeadPage(filters),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,
@@ -155,8 +152,8 @@ export default function ManagerFeed(props: Props) {
     } as any)
   }
 
-  const onSubmitHandler: SubmitHandler<IFeedsFilters> = (
-    values: IFeedsFilters,
+  const onSubmitHandler: SubmitHandler<ISearchFilters> = (
+    values: ISearchFilters,
   ) => {
     setPage(0)
     setSize(20)
@@ -180,10 +177,7 @@ export default function ManagerFeed(props: Props) {
     setIsReset(true)
     methods.reset({
       status: 'all',
-      isCampdi: false,
-      // isReported: false,
       search: '',
-      hashtag: '',
       page: 0,
       size: 20,
     })
@@ -202,44 +196,99 @@ export default function ManagerFeed(props: Props) {
     } as any)
   }
 
-  const onSuccess = (data: any) => {
-    toastSuccess({
-      message: dialogType === 1 ? 'Duyệt bài thành công' : '',
-    })
+  const onRowUpdateSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
     setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } =
-    useApproveFeed(onSuccess)
 
-  const approveConfirm = () => {
-    approve(feedId)
-  }
+  const { mutate: toggleStatus, isLoading: toggleLoading } =
+    useToggleStatusHeadPage(() =>
+      onRowUpdateSuccess(
+        null,
+        row?.status === 1
+          ? 'Tắt thông báo đầu trang thành công'
+          : 'Bật thông báo thành công',
+      ),
+    )
+  const { mutate: deleteNoti, isLoading: deleteLoading } =
+    useDeleteNotificationHeadPage(() =>
+      onRowUpdateSuccess(null, 'Xoá thông báo đầu trang thành công'),
+    )
 
   const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.feedId}`, {})
+    navigation(`${row.id}/chi-tiet`, {})
   }
 
   const onRowApprove = (cell: any, row: any) => {
-    setTitleDialog('Duyệt bài đăng')
-    setFeedId(row.feedId)
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Gửi thông báo',
+      type: 'send',
+      message:
+        'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
     setOpenDialog(true)
+    setRow(row)
   }
-  const onRowReport = (cell: any, row: any) => {
-    navigation(`ds/${row.feedId ?? 0}/vi-pham`, {
-      state: { modal: true },
-    })
+  const onRowDelete = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá thông báo',
+      message:
+        'Sau khi xóa, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn xóa?',
+      type: 'delete',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
+    setOpenDialog(true)
+    setRow(row)
   }
 
-  const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'account') {
-      navigation(`${row.feedId}`, {})
+  const onClickRow = async (cell: any, row: any) => {
+    if (cell.id === 'title') {
+      navigation(`${row.id}/chi-tiet`, {})
+    } else if (cell.id === 'status') {
+      const res = await checkExistActivePopup()
+      setDialogData(prev => ({
+        ...prev,
+        title: row.status === 1 ? 'Tắt thông báo' : 'Bật thông báo',
+        message:
+          row.status === 1
+            ? 'Sau khi tắt, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn tắt?'
+            : res?.existActivePopup
+            ? 'Sau khi bật sẽ thay thế cho thông báo lúc mở app hiện tại. Bạn có chắc muốn bật?'
+            : 'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
+        type: 'toggle-status',
+        submitText: 'Có',
+        cancelText: 'Không',
+      }))
+      setOpenDialog(true)
+      setRow(row)
+    }
+  }
+
+  const onSubmitDialog = () => {
+    switch (dialogData.type) {
+      case 'toggle-status':
+        toggleStatus(row.id)
+
+        break
+
+      case 'delete':
+        deleteNoti(row.id)
+        break
+
+      default:
+        break
     }
   }
 
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý Feed' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Thông báo đầu trang' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -247,11 +296,11 @@ export default function ManagerFeed(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm mới feed campdi"
+          title="Thêm"
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`them-moi-feed`, {})}
+          onClick={() => navigation(`them-moi`, {})}
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
@@ -262,78 +311,23 @@ export default function ManagerFeed(props: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Email, SĐT, Tên hiển thị'}
+                    label={'Tiêu đề'}
                     type="text"
                     name="search"
                     size="small"
-                    placeholder="Nhập email, sđt, tên"
+                    placeholder="Nhập tiêu đề"
                     fullWidth
                     defaultValue=""
-                    iconEnd={
-                      methods.watch('search')?.length ? (
-                        <IconButton
-                          onClick={() => methods.setValue('search', '')}
-                          edge="end"
-                        >
-                          <ClearOutlined fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <React.Fragment />
-                      )
-                    }
-                    // focused
-                    // required
-                  />
-                </Grid>
-                <Grid item sm={4} xs={12}>
-                  <FormInputText
-                    label={'Hashtag'}
-                    type="text"
-                    name="hashtag"
-                    placeholder="Nhập hashtag"
-                    size="small"
-                    fullWidth
-                    defaultValue=""
-                    iconEnd={
-                      methods.watch('hashtag')?.length ? (
-                        <IconButton
-                          onClick={() => methods.setValue('hashtag', '')}
-                          edge="end"
-                        >
-                          <ClearOutlined fontSize="small" />
-                        </IconButton>
-                      ) : (
-                        <React.Fragment />
-                      )
-                    }
                   />
                 </Grid>
                 <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="1">Hợp lệ</MenuItem>
-                    <MenuItem value="0">Chờ hậu kiểm</MenuItem>
-                    <MenuItem value="-1">Vi phạm</MenuItem>
-                    <MenuItem value="-2">Bị báo cáo</MenuItem>
-                    <MenuItem value="-3">Xoá</MenuItem>
+                    <MenuItem value="1">Hoat động</MenuItem>
+                    <MenuItem value="0">Không hoạt động</MenuItem>
                   </SelectDropDown>
                 </Grid>
-                {/* <Grid item sm={3} xs={12}>
-                  <SelectDropDown name="range" disabled defaultValue={'all'}>
-                    <MenuItem value="all">Công khai</MenuItem>
-                    <MenuItem value="friends">Bạn bè</MenuItem>
-                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                  </SelectDropDown>
-                </Grid> */}
-              </Grid>
-              <Grid item sm={4} xs={12} pt={2}>
-                <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                {/* <MuiCheckBox name="isReported" label="Báo cáo vi phạm" /> */}
-              </Grid>
-            </FormProvider>
 
-            <Box pt={3}>
-              <Grid container spacing={2}>
                 <Grid item sm={2} xs={12}>
                   <MuiButton
                     loading={!isReset && isFetching}
@@ -356,44 +350,15 @@ export default function ManagerFeed(props: Props) {
                     startIcon={<ChangeCircleSharp />}
                   />
                 </Grid>
-                <Grid item sm={8} xs={12}>
-                  <Stack flexDirection={'row'} justifyContent={'flex-end'}>
-                    <MuiButton
-                      title="Hậu kiểm"
-                      variant="text"
-                      color="secondary"
-                      onClick={() =>
-                        navigation(`hau-kiem`, { state: { type: 1 } })
-                      }
-                      startIcon={<ArticleSharp />}
-                    />
-                    <Divider
-                      orientation="vertical"
-                      sx={{ backgroundColor: '#D9D9D9', mx: 2, my: 1 }}
-                      flexItem
-                    />
-                    {/* <NavLink to={'/quan-ly-feeds/hau-kiem'}> */}
-                    <MuiButton
-                      title="Báo cáo vi phạm"
-                      variant="text"
-                      color="error"
-                      onClick={() =>
-                        navigation(`hau-kiem`, { state: { type: 2 } })
-                      }
-                      startIcon={<ReportSharp />}
-                    />
-                    {/* </NavLink> */}
-                  </Stack>
-                </Grid>
               </Grid>
-            </Box>
+            </FormProvider>
           </form>
         </SimpleCard>
 
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? extractFeeds(data?.content as IFeed[]) : []}
-            columns={columnFeeds}
+            rows={data ? (data?.content as INotification[]) : []}
+            columns={columnsNotificationsHeadPage}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -407,22 +372,10 @@ export default function ManagerFeed(props: Props) {
                 onClick: onRowUpdate,
               },
               {
-                icon: 'verified',
-                color: 'primary',
-                tooltip: 'Duyệt bài',
-                onClick: onRowApprove,
-                disableKey: 'status',
-                disableActions: (status?: number) =>
-                  [1, -3].includes(status ?? 0),
-              },
-              {
-                icon: 'warning_amber',
+                icon: 'delete',
                 color: 'error',
-                tooltip: 'Báo cáo vi phạm',
-                onClick: onRowReport,
-                disableKey: 'status',
-                disableActions: (status?: number) =>
-                  [-1, -3].includes(status ?? 0),
+                tooltip: 'Xoá',
+                onClick: onRowDelete,
               },
             ]}
           />
@@ -439,15 +392,17 @@ export default function ManagerFeed(props: Props) {
       </Stack>
 
       <DiagLogConfirm
-        title={titleDialog}
+        title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={approveConfirm}
-        isLoading={approveLoading}
+        onSubmit={onSubmitDialog}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
+        isLoading={toggleLoading || deleteLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            Đồng ý duyệt bài đăng?
+          <MuiTypography variant="subtitle1" textAlign={'center'}>
+            {dialogData.message}
           </MuiTypography>
         </Stack>
       </DiagLogConfirm>

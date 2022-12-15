@@ -12,6 +12,8 @@ import { Controller } from 'react-hook-form'
 import { seasons } from '../const'
 import DialogCustom from 'app/components/common/DialogCustom'
 import MapCustom from 'app/components/common/MapCustom/MapCustom'
+import { checkNameCampExist } from 'app/apis/campGround/ground.service'
+import { useParams } from 'react-router-dom'
 
 export default function GeneralInformation({
   control,
@@ -56,6 +58,7 @@ export default function GeneralInformation({
 
   const dialogCustomRef = React.useRef(null)
   const mapRef = React.useRef()
+  const params = useParams()
 
   return (
     <div>
@@ -67,6 +70,20 @@ export default function GeneralInformation({
             render={({ field }) => (
               <TextField
                 {...field}
+                onBlur={async e => {
+                  const res = await checkNameCampExist({
+                    name: e.target.value,
+                    idCampGround: params.id,
+                  })
+                  if (res.exist) {
+                    setError('nameCampground', {
+                      type: 'nameExist',
+                      message: 'Tên điểm camp đã được dùng',
+                    })
+                  } else {
+                    clearErrors(['nameCampground'])
+                  }
+                }}
                 fullWidth
                 label="Tên điểm camp*"
                 variant="outlined"

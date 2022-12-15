@@ -15,6 +15,7 @@ import {
   deletePlace,
   getDetailPlace,
   updateDetailPlace,
+  checkNamePlaceExist,
 } from 'app/apis/place/place.service'
 import { useNavigate, useParams } from 'react-router-dom'
 import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
@@ -65,7 +66,7 @@ export default function InformationPlace(props) {
         .string()
         .required('Vui lòng nhập tên địa danh')
         .trim()
-        .max(255, 'Đã đạt số ký tự tối đa'),
+        .max(255, 'Tên địa danh không được vượt quá 255 ký tự'),
       province: yup.object().required(),
       description: yup.string().required(messages.MSG1),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
@@ -330,13 +331,18 @@ export default function InformationPlace(props) {
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
     setIsLoading(true)
-    const res = await updateDetailPlace(params.id, paramDetail)
-    setIsLoading(false)
-    if (res) {
-      toastSuccess({ message: 'Lưu thành công' })
-      fetchInforPlace()
-      navigate('/quan-ly-thong-tin-dia-danh')
+    try {
+      const res = await updateDetailPlace(params.id, paramDetail)
+      if (res) {
+        toastSuccess({ message: 'Lưu thành công' })
+        fetchInforPlace()
+        navigate('/quan-ly-thong-tin-dia-danh')
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   React.useEffect(() => {
@@ -367,6 +373,20 @@ export default function InformationPlace(props) {
               render={({ field }) => (
                 <TextField
                   {...field}
+                  onBlur={async e => {
+                    const res = await checkNamePlaceExist({
+                      name: e.target.value,
+                      idCampArea: params.id,
+                    })
+                    if (res.exist) {
+                      setError('namePlace', {
+                        type: 'nameExist',
+                        message: 'Tên địa danh đã được dùng',
+                      })
+                    } else {
+                      clearErrors(['namePlace'])
+                    }
+                  }}
                   label="Tên địa danh"
                   variant="outlined"
                   error={errors.namePlace}

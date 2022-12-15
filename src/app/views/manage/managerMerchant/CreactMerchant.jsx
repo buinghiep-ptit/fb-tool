@@ -101,6 +101,7 @@ export default function CreateMerchant(props) {
       businessModel: '',
       address: '',
       representative: '',
+      merchantType: 1,
     },
   })
 
@@ -192,12 +193,17 @@ export default function CreateMerchant(props) {
         url: document.url,
       }
     })
-    const res = await createMerchant(newData)
-    setIsLoading(false)
-    if (res.error) {
-      toastError({ message: res.errorDescription })
-      return
+    try {
+      const res = await createMerchant(newData)
+      if (res.error) {
+        toastError({ message: res.errorDescription })
+        return
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
     toastSuccess({ message: 'Thêm đối tác thành công' })
     navigate('/quan-ly-thong-tin-doi-tac')
   }
@@ -275,7 +281,6 @@ export default function CreateMerchant(props) {
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                       >
-                        <MenuItem value={0}></MenuItem>
                         <MenuItem value={1}>Điểm camp</MenuItem>
                         <MenuItem value={2}>Nhà cung cấp</MenuItem>
                       </Select>

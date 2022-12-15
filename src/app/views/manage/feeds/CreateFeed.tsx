@@ -1,7 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Chip,
+  FormHelperText,
   Grid,
+  Icon,
   LinearProgress,
   MenuItem,
   Stack,
@@ -21,6 +23,7 @@ import {
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { ImageUploadPreviewer } from 'app/components/common/ImageUploadPreviewer'
+import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import { MuiAutocompleteWithTags } from 'app/components/common/MuiRHFAutocompleteWithTags'
@@ -46,7 +49,7 @@ import {
   ITags,
 } from 'app/models'
 import { IAudioOverall, IAudioResponse } from 'app/models/audio'
-import { ICampArea, ICampAreaResponse } from 'app/models/camp'
+import { ICampArea, ICampAreaResponse, ICampGround } from 'app/models/camp'
 import {
   setInitialFile,
   setUploadFile,
@@ -59,6 +62,8 @@ import { connect } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import CampAreaList from './detail/CampAreaList'
+import CampgroundList from './detail/CampgroundList'
 
 export interface Props {}
 
@@ -144,8 +149,17 @@ function CreateFeed(props: any) {
     title?: string
     message?: string
     type?: string
+    submitText?: string
+    cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
+
+  const [selectedCampAreas, setSelectedCampAreas] = useState<
+    readonly ICampArea[]
+  >([])
+  const [selectedCampgrounds, setSelectedCampgrounds] = useState<
+    readonly ICampGround[]
+  >([])
 
   const validationSchema = Yup.object().shape(
     {
@@ -233,6 +247,29 @@ function CreateFeed(props: any) {
   const idSrcType = methods.watch('idSrcType')
   const cusType = methods.watch('cusType')
   const audio = methods.watch('audio')
+  const campArea = methods.watch('campArea')
+  const campground = methods.watch('campground')
+
+  // useEffect(() => {
+  //   if (idSrcType == 1) {
+  //     methods.setValue('campArea', selectedCampAreas[0] || null)
+  //   } else if (idSrcType == 2) {
+  //     methods.setValue('campground', selectedCampgrounds[0] || null)
+  //   }
+  // }, [selectedCampAreas, selectedCampgrounds])
+
+  useEffect(() => {
+    if (selectedCampAreas.length) setSelectedCampAreas([])
+    if (selectedCampgrounds.length) setSelectedCampgrounds([])
+  }, [openDialog])
+
+  useEffect(() => {
+    if (campArea) {
+      methods.clearErrors('campArea')
+    } else if (campground) {
+      methods.clearErrors('campground')
+    }
+  }, [campArea, campground])
 
   const { data: feed } = useQuery<IFeedDetail, Error>(
     ['feed', feedId],
@@ -253,9 +290,9 @@ function CreateFeed(props: any) {
     },
   )
 
-  const { data: campAreas } = useQuery<ICampArea[], Error>(
+  const { data: campAreas } = useQuery<ICampAreaResponse, Error>(
     ['camp-areas'],
-    () => fetchCampAreas({ size: 500, page: 0 }),
+    () => fetchCampAreas({ size: 200, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
@@ -264,7 +301,7 @@ function CreateFeed(props: any) {
 
   const { data: campGrounds } = useQuery<ICampAreaResponse, Error>(
     ['camp-grounds'],
-    () => fetchCampGrounds({ size: 500, page: 0 }),
+    () => fetchCampGrounds({ size: 200, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
@@ -326,7 +363,7 @@ function CreateFeed(props: any) {
     customersKol,
   ])
 
-  const initDefaultValues = (feed?: IFeedDetail) => {
+  const initDefaultValues = async (feed?: IFeedDetail) => {
     if (!feed) {
       methods.reset()
       return
@@ -375,9 +412,9 @@ function CreateFeed(props: any) {
         ? { name: 'Âm thanh của video' }
         : undefined
     }
-    if (campGrounds && campGrounds.content && campAreas) {
+    if (campGrounds?.content && campAreas?.content) {
       if (feed.idSrcType == 1) {
-        const campArea = campAreas.find(c => c.id == feed.idSrc)
+        const campArea = campAreas.content.find(c => c.id == feed.idSrc)
         defaultValues.campArea = campArea ?? undefined
       } else if (feed.idSrcType == 2) {
         const campground = campGrounds.content.find(c => c.id == feed.idSrc)
@@ -488,6 +525,38 @@ function CreateFeed(props: any) {
       type: 'delete',
     }))
     setOpenDialog(true)
+  }
+
+  const openCampsList = () => {
+    setDialogData(prev => ({
+      ...prev,
+      title: idSrcType == 1 ? 'Chọn địa danh' : 'Chọn địa điểm',
+      type: idSrcType == 1 ? 'camp-areas' : 'camp-grounds',
+    }))
+    setOpenDialog(true)
+  }
+
+  const onSubmitDialog = () => {
+    switch (dialogData.type) {
+      case 'delete':
+        onDeleteFeed()
+
+        break
+      case 'camp-areas':
+        methods.setValue('campArea', selectedCampAreas[0] || null)
+        setOpenDialog(false)
+
+        break
+
+      case 'camp-grounds':
+        methods.setValue('campground', selectedCampgrounds[0] || null)
+        setOpenDialog(false)
+
+        break
+
+      default:
+        break
+    }
   }
 
   const getTitleLinked = (type?: number | string) => {
@@ -641,27 +710,44 @@ function CreateFeed(props: any) {
                       gap={1.5}
                       justifyContent="center"
                     >
-                      <MuiTypography fontSize="12px" fontStyle="italic">
-                        {getTitleLinked(Number(idSrcType))} *
-                      </MuiTypography>
+                      {idSrcType == 4 ? (
+                        <MuiTypography fontSize="12px" fontStyle="italic">
+                          {getTitleLinked(Number(idSrcType))} *
+                        </MuiTypography>
+                      ) : (
+                        <MuiButton
+                          title={getTitleLinked(Number(idSrcType)) + ' *'}
+                          disabled={isLoading}
+                          variant="contained"
+                          color="primary"
+                          onClick={() => openCampsList()}
+                          startIcon={<Icon>place</Icon>}
+                        />
+                      )}
 
                       <Box sx={{ flex: 1 }}>
                         {idSrcType == 1 && (
                           <MuiRHFAutoComplete
+                            label="Địa danh"
                             name="campArea"
-                            options={extractCamps(campAreas) ?? []}
+                            options={[campArea ?? {}]}
                             optionProperty="name"
                             getOptionLabel={option => option.name ?? ''}
                             defaultValue=""
+                            required
+                            disabled
                           />
                         )}
                         {idSrcType == 2 && (
                           <MuiRHFAutoComplete
+                            label="Điểm camping"
                             name="campground"
-                            options={extractCamps(campGrounds?.content) ?? []}
+                            options={[campground ?? {}]}
                             optionProperty="name"
                             getOptionLabel={option => option.name ?? ''}
                             defaultValue=""
+                            required
+                            disabled
                           />
                         )}
                         {idSrcType == 4 && (
@@ -736,15 +822,31 @@ function CreateFeed(props: any) {
         title={dialogData.title ?? ''}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={onDeleteFeed}
-        submitText={'Xoá'}
+        onSubmit={onSubmitDialog}
+        maxWidth={dialogData.type !== 'delete' ? 'lg' : 'sm'}
+        submitText={dialogData.type !== 'delete' ? 'Lưu' : 'Xoá'}
         cancelText={'Huỷ'}
+        disabled={
+          ((!selectedCampAreas.length && idSrcType == 1) ||
+            (!selectedCampgrounds.length && idSrcType == 2)) &&
+          dialogData.type !== 'delete'
+        }
       >
-        <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            {dialogData.message ?? ''}
-          </MuiTypography>
-        </Stack>
+        <>
+          {dialogData.type === 'camp-areas' && (
+            <CampAreaList setSelectedCamps={setSelectedCampAreas} />
+          )}
+          {dialogData.type === 'camp-grounds' && (
+            <CampgroundList setSelectedCamps={setSelectedCampgrounds} />
+          )}
+          {dialogData.type === 'delete' && (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                {dialogData.message ?? ''}
+              </MuiTypography>
+            </Stack>
+          )}
+        </>
       </DiagLogConfirm>
     </Container>
   )

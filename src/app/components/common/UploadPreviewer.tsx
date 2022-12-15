@@ -322,7 +322,7 @@ export function UploadPreviewer({
     accept: getFilesType(mediaFormat) as any,
     onDrop,
     maxFiles: 15,
-    maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 10 * 1024 * 1024,
+    maxSize: mediaFormat === EMediaFormat.VIDEO ? Infinity : 50 * 1024 * 1024,
   })
 
   useEffect(() => {
@@ -449,7 +449,7 @@ export function UploadPreviewer({
                     PNG / JPEG hoặc JPG
                   </MuiTypography>
                   <MuiTypography variant="body2">
-                    nhỏ hơn 10MB/ảnh
+                    nhỏ hơn 50MB/ảnh
                   </MuiTypography>
                   <MuiTypography variant="body2">
                     {isLimitFiles ? 'tối đa 15 ảnh' : 'tối đa 15 ảnh/lần chọn'}

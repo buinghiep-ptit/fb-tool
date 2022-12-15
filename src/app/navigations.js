@@ -77,6 +77,23 @@ export const navigations = [
     auth: [ROLES.ADMIN, ROLES.SALE],
   },
   {
+    name: 'Quản lý thông báo',
+    icon: 'circle_notifications',
+    children: [
+      {
+        name: 'Thông báo người dùng',
+        iconText: 'SI',
+        path: '/quan-ly-thong-bao/nguoi-dung',
+      },
+      {
+        name: 'Thông báo đầu trang',
+        iconText: 'SU',
+        path: '/quan-ly-thong-bao/dau-trang',
+      },
+    ],
+    auth: [ROLES.ADMIN, ROLES.SALE],
+  },
+  {
     name: 'Quản lý từ khoá yêu thích',
     path: '/quan-ly-tu-khoa-yeu-thich',
     icon: 'travel_explore',

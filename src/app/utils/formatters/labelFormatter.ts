@@ -100,6 +100,33 @@ export const labelFeedStatus = (value?: number) => {
   return { title: 'Chờ hậu kiểm', textColor: '#FFFFFF', bgColor: '#475985' }
 }
 
+export const labelNotificationStatus = (value?: number) => {
+  if (value === 0) {
+    return {
+      title: 'Chưa gửi',
+      textColor: '#FFFFFF',
+      bgColor: '#475985',
+    }
+  } else if (value === 1) {
+    return {
+      title: 'Đã gửi',
+      textColor: '#2F9B42',
+      bgColor: '#EDFDEF',
+    }
+  } else if (value === -3) {
+    return {
+      title: 'Dừng hoạt động',
+      textColor: '#FFFFFF',
+      bgColor: '#AAAAAA',
+    }
+  }
+  return {
+    title: 'Dừng hoạt động',
+    textColor: '#FFFFFF',
+    bgColor: '#AAAAAA',
+  }
+}
+
 export const convertOtpToLabel = (type: number) => {
   switch (type) {
     case 1:

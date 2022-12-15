@@ -189,8 +189,15 @@ export default function UpdateMerchant(props) {
         url: document.url,
       }
     })
-
-    const res = await updateDetailMerchant(params.id, newData)
+    try {
+      const res = await updateDetailMerchant(params.id, newData)
+      if (res.error) {
+        toastError({ message: res.errorDescription })
+        return
+      }
+    } catch (e) {
+      setIsLoading(false)
+    }
     setIsLoading(false)
     if (res.error) {
       toastError({ message: res.errorDescription })

@@ -4,7 +4,10 @@ import * as React from 'react'
 import './upload.css'
 
 const UploadImage = React.forwardRef(
-  ({ medias, setMedias, register, errors, setValue }, ref) => {
+  (
+    { medias, setMedias, register, errors, setValue, id = 'fileInput' },
+    ref,
+  ) => {
     const [files, setFiles] = React.useState([])
 
     React.useImperativeHandle(ref, () => ({
@@ -27,6 +30,7 @@ const UploadImage = React.forwardRef(
 
     React.useEffect(() => {
       setValue('file', files)
+      console.log(files)
     }, [files])
 
     return (
@@ -34,7 +38,7 @@ const UploadImage = React.forwardRef(
         <Grid container>
           <input
             type="file"
-            id="inputFile"
+            id={id}
             accept=".png, .jpg, .jpeg, .mp4, .webm"
             style={{ display: 'none' }}
             multiple
@@ -46,7 +50,7 @@ const UploadImage = React.forwardRef(
                 return newFiles.find(a => a.name === name)
               })
               setFiles(uniqueFiles)
-              document.getElementById('inputFile').value = null
+              document.getElementById(id).value = null
             }}
           />
 
@@ -109,7 +113,7 @@ const UploadImage = React.forwardRef(
                 id="content"
                 className="content"
                 onClick={() => {
-                  document.getElementById('inputFile').click()
+                  document.getElementById(id).click()
                 }}
               >
                 <Icon color="primary" style={{ fontSize: 50 }}>

@@ -271,14 +271,18 @@ export default function CreatePlace(props) {
       status: 1,
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
-
-    const res = await createPlace(paramDetail)
-    setIsLoading(false)
-    if (res) {
-      toastSuccess({ message: 'Tạo địa danh thành công' })
-      fetchGetProvinces()
-      navigate('/quan-ly-thong-tin-dia-danh')
+    try {
+      const res = await createPlace(paramDetail)
+      if (res) {
+        toastSuccess({ message: 'Tạo địa danh thành công' })
+        fetchGetProvinces()
+        navigate('/quan-ly-thong-tin-dia-danh')
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   React.useEffect(() => {
@@ -577,7 +581,7 @@ export default function CreatePlace(props) {
           <UploadImage ref={uploadImageRef} setValue={setValue}></UploadImage>
           {errors?.file && (
             <FormHelperText error={true}>
-              {errors.file?.message || 'acb'}
+              {errors.file?.message || ''}
             </FormHelperText>
           )}
           <Button

@@ -193,12 +193,17 @@ export default function CreateMerchant(props) {
         url: document.url,
       }
     })
-    const res = await createMerchant(newData)
-    setIsLoading(false)
-    if (res.error) {
-      toastError({ message: res.errorDescription })
-      return
+    try {
+      const res = await createMerchant(newData)
+      if (res.error) {
+        toastError({ message: res.errorDescription })
+        return
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
     toastSuccess({ message: 'Thêm đối tác thành công' })
     navigate('/quan-ly-thong-tin-doi-tac')
   }

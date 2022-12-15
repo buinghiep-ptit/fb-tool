@@ -150,3 +150,31 @@ export const checkNameCampExist = async (params: any): Promise<any> => {
   )
   return data
 }
+
+export const getListReview = async (id: any, params: any): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-grounds/${id}/camp-rating-list`,
+    {
+      params,
+    },
+  )
+  return data
+}
+
+export const getListCustomCampdi = async (): Promise<any> => {
+  const { data } = await http.get<any>(`/api/camp-grounds/campdi-customer-list`)
+  return data
+}
+
+export const changeStatusReview = async (id: any): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/camp-rating/${id}/toggle-status`,
+    { note: null },
+  )
+  return data
+}
+
+export const addReview = async (params: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/camp-grounds/ratings`, params)
+  return data
+}

@@ -331,13 +331,18 @@ export default function InformationPlace(props) {
       campAreaTypes: data.campAreaTypes.map(type => type.id),
     }
     setIsLoading(true)
-    const res = await updateDetailPlace(params.id, paramDetail)
-    setIsLoading(false)
-    if (res) {
-      toastSuccess({ message: 'Lưu thành công' })
-      fetchInforPlace()
-      navigate('/quan-ly-thong-tin-dia-danh')
+    try {
+      const res = await updateDetailPlace(params.id, paramDetail)
+      if (res) {
+        toastSuccess({ message: 'Lưu thành công' })
+        fetchInforPlace()
+        navigate('/quan-ly-thong-tin-dia-danh')
+      }
+    } catch (e) {
+      setIsLoading(false)
     }
+
+    setIsLoading(false)
   }
 
   React.useEffect(() => {

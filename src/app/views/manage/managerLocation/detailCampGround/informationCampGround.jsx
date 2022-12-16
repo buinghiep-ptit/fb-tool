@@ -303,7 +303,7 @@ export default function InformationCampGround({ action }) {
       ...mediasUpdateImage,
       ...mediasUpdateVideo,
     ].filter(item => !!item)
-    dataUpdate.description = introductionRef.current.getValueEditor()
+    dataUpdate.description = description
     dataUpdate.campGroundInternets = []
 
     arrInternet.forEach((item, index) => {

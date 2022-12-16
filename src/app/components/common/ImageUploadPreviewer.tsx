@@ -111,7 +111,7 @@ export function ImageUploadPreviewer({
     },
     onDrop,
     // maxFiles: 15,
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 50 * 1024 * 1024,
   })
 
   const fileRejectionItems = fileRejections.map(({ file, errors }: any) => {
@@ -232,7 +232,7 @@ export function ImageUploadPreviewer({
               </MuiTypography>
               <Icon>backup</Icon>
               <MuiTypography variant="body2">PNG / JPEG hoặc JPG</MuiTypography>
-              <MuiTypography variant="body2">nhỏ hơn 10MB/ảnh</MuiTypography>
+              <MuiTypography variant="body2">nhỏ hơn 50MB/ảnh</MuiTypography>
               <MuiTypography variant="body2">
                 {true ? 'tối đa 15 ảnh' : 'tối đa 15 ảnh/lần chọn'}
               </MuiTypography>

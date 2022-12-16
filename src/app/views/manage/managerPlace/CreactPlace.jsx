@@ -564,16 +564,20 @@ export default function CreatePlace(props) {
             <Grid item xs={12} md={12}>
               Mô tả*:
               <Controller
-                render={({ field }) => <WYSIWYGEditor {...field} />}
                 name="description"
                 control={control}
-                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={6}
+                    error={!!errors.description}
+                    helperText={errors.description?.message}
+                    {...field}
+                    variant="outlined"
+                  />
+                )}
               />
-              {errors.description && (
-                <FormHelperText error>
-                  {errors.description?.message}
-                </FormHelperText>
-              )}
             </Grid>
           </Grid>
 

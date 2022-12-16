@@ -197,6 +197,7 @@ export default function UpdateMerchant(props) {
       }
     } catch (e) {
       setIsLoading(false)
+      return
     }
     setIsLoading(false)
     if (res.error) {

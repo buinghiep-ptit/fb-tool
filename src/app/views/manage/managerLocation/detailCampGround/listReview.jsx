@@ -264,6 +264,18 @@ export default function ListReview(props) {
               onChange={e => {
                 setInputFilter(e.target.value)
               }}
+              onKeyDown={() => {
+                if (key.code === 13) {
+                  const param = {
+                    search: inputFilter,
+                    star: starFilter == 0 ? null : starFilter,
+                    status: statusFilter == 0 ? null : statusFilter,
+                    page: 0,
+                    size: 20,
+                  }
+                  fetchListCampGroundReview(param)
+                }
+              }}
             />
             <FormControl fullWidth style={{ marginRight: '50px' }}>
               <InputLabel id="demo-simple-select-label">Số sao</InputLabel>

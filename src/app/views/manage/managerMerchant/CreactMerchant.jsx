@@ -201,6 +201,7 @@ export default function CreateMerchant(props) {
       }
     } catch (e) {
       setIsLoading(false)
+      return
     }
 
     setIsLoading(false)

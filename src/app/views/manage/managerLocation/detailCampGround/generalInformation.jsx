@@ -78,7 +78,8 @@ export default function GeneralInformation({
                   if (res.exist) {
                     setError('nameCampground', {
                       type: 'nameExist',
-                      message: 'Tên điểm camp đã được dùng',
+                      message:
+                        'Tên điểm Camp đã được sử dụng (chỉ mang tính chất thông báo, bạn vẫn có thể thêm điểm Camp)',
                     })
                   } else {
                     clearErrors(['nameCampground'])

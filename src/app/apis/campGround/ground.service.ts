@@ -161,8 +161,11 @@ export const getListReview = async (id: any, params: any): Promise<any> => {
   return data
 }
 
-export const getListCustomCampdi = async (): Promise<any> => {
-  const { data } = await http.get<any>(`/api/camp-grounds/campdi-customer-list`)
+export const getListCustomCampdi = async (params: any): Promise<any> => {
+  const { data } = await http.get<any>(
+    `/api/camp-grounds/campdi-customer-list`,
+    { params },
+  )
   return data
 }
 

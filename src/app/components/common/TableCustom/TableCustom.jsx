@@ -340,6 +340,31 @@ const TableCustom = forwardRef(
                             </Link>
                           </TableCell>
                         )
+                      case 'linkInfoBlank':
+                        return (
+                          <TableCell
+                            align="left"
+                            key={`${element}${id}`}
+                            style={{ wordBreak: 'normal' }}
+                          >
+                            <Link
+                              to={`${data[element].path}${data.idInfor}/thong-tin`}
+                              target="_blank"
+                              style={{
+                                textDecoration: 'underline',
+                                color: '#07bc0c',
+                                wordBreak: 'normal',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                webkitLineClamp: '2',
+                                display: '-webkit-box',
+                                webkitBoxOrient: 'vertical',
+                              }}
+                            >
+                              {data[element].link}
+                            </Link>
+                          </TableCell>
+                        )
                       case 'linkView':
                       case 'linkViewBlank':
                         return (

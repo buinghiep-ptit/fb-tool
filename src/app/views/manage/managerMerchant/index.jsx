@@ -135,8 +135,8 @@ export default function ManagerMerchant(props) {
                   }}
                 >
                   <MenuItem value={''}>Tất cả</MenuItem>
-                  <MenuItem value={1}>Hoạt dộng</MenuItem>
-                  <MenuItem value={-2}>Khóa</MenuItem>
+                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  <MenuItem value={-2}>Không hoạt động</MenuItem>
                 </Select>
               </FormControl>
             </div>

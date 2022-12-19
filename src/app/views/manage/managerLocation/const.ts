@@ -134,7 +134,7 @@ export const tableModelReview = {
   ],
   bodyCell: [
     'index',
-    'linkView',
+    'linkInfoBlank',
     'star',
     'description',
     'image',

@@ -15,7 +15,7 @@ import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
-
+import { messages } from 'app/utils/messages'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -45,10 +45,17 @@ export default function CreateMerchant(props) {
     .object({
       password: yup
         .string()
-        .required('Vui lòng nhập password')
-        .min(8, 'Có ít nhất 8 ký tự')
-        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
-        .max(32, 'Đã đạt số ký tự tối đa'),
+        .required(messages.MSG1)
+        .test('latinChars', messages.MSG21, value => {
+          const regexStr = /^[\x20-\x7E]+$/
+          if (value) {
+            return regexStr.test(value)
+          } else return false
+        })
+        .matches(/^\S*$/, messages.MSG21)
+        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, messages.MSG20)
+        .min(8, messages.MSG20)
+        .max(32, messages.MSG20),
       nameMerchant: yup
         .string()
         .required('Vui lòng nhập tên đối tác')

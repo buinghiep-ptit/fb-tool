@@ -52,7 +52,7 @@ export default function ListReview(props) {
   const schema = yup
     .object({
       account: yup.object().required(messages.MSG1),
-      noteReview: yup.string().trim().max(255, 'Không được vượt quá 255 ký tự'),
+      noteReview: yup.string().trim().max(150, 'Không được vượt quá 150 ký tự'),
       file: yup
         .mixed()
         .test('fileSize', 'Dung lượng file quá lớn', value => {
@@ -105,7 +105,7 @@ export default function ListReview(props) {
   })
 
   const fetchListCustomerCampdi = async () => {
-    await getListCustomCampdi().then(data => {
+    await getListCustomCampdi({ idCampGround: params.id }).then(data => {
       setListAccount(data)
     })
   }
@@ -116,13 +116,13 @@ export default function ListReview(props) {
         const newList = cloneDeep(data.content).map(campGroundReview => {
           const convertCampGroundReview = {}
           convertCampGroundReview.id = campGroundReview.id
+          convertCampGroundReview.idInfor = campGroundReview.idCustomer
           convertCampGroundReview.image = campGroundReview.imgUrl
-          convertCampGroundReview.linkView = {
+          convertCampGroundReview.linkInfoBlank = {
             link: campGroundReview.cusName,
-            path: `/quan-ly-dich-vu/`,
+            path: `/quan-ly-tai-khoan-khach-hang/`,
           }
           convertCampGroundReview.star = campGroundReview.rating
-
           convertCampGroundReview.description = campGroundReview.comment
           convertCampGroundReview.time = moment(
             campGroundReview.dateCreated,
@@ -189,7 +189,7 @@ export default function ListReview(props) {
       mediasUpdateImage = (listUrl?.image || []).map((url, index) => {
         if (url) {
           const media = new Object()
-          media.mediaType = 1
+          media.mediaType = 3
           media.mediaFormat = 2
           media.url = url
           return media
@@ -440,6 +440,8 @@ export default function ListReview(props) {
                 render={({ field }) => (
                   <TextField
                     fullWidth
+                    multiline
+                    rows={3}
                     error={!!errors.noteReview}
                     helperText={errors.noteReview?.message}
                     {...field}

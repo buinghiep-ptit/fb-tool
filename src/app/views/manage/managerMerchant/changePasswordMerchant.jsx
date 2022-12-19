@@ -7,17 +7,25 @@ import * as yup from 'yup'
 import { updateMerchantPassword } from 'app/apis/merchant/merchant.service'
 import { useParams } from 'react-router-dom'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { messages } from 'app/utils/messages'
 const ChangePasswordMerchant = ({ handleClose }) => {
   const params = useParams()
   const schema = yup
     .object({
       password: yup
         .string()
-        .required('Vui lòng nhập password mới')
-        .min(8, 'Có ít nhất 8 ký tự')
-        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, 'Có chữ và số')
-        .max(32, 'Tối đa 32 ký tự'),
-      note: yup.string().max(255, 'Đã đạt số ký tự tối đa'),
+        .required(messages.MSG1)
+        .test('latinChars', messages.MSG21, value => {
+          const regexStr = /^[\x20-\x7E]+$/
+          if (value) {
+            return regexStr.test(value)
+          } else return false
+        })
+        .matches(/^\S*$/, messages.MSG21)
+        .matches(/^(?=.*[a-zA-Z])(?=.*[0-9])/, messages.MSG20)
+        .min(8, messages.MSG20)
+        .max(32, messages.MSG20),
+      note: yup.string().max(255, 'Ghi chú không được vượt quá 255 ký tự'),
     })
     .required()
 

@@ -200,10 +200,6 @@ export default function UpdateMerchant(props) {
       return
     }
     setIsLoading(false)
-    if (res.error) {
-      toastError({ message: res.errorDescription })
-      return
-    }
     toastSuccess({ message: 'Thông tin đã cập nhật thành công' })
     navigate('/quan-ly-thong-tin-doi-tac')
   }

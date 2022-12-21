@@ -40,11 +40,11 @@ const Footer = () => {
       <AppBar color="primary" position="static" sx={{ zIndex: 96 }}>
         <AppFooter>
           <FooterContent>
-            <a href="">
+            {/* <a href="">
               <Button variant="contained" color="secondary">
                 campdi
               </Button>
-            </a>
+            </a> */}
             <Span sx={{ m: 'auto' }}></Span>
             <Paragraph sx={{ m: 0 }}>
               Design and Developed by <a href="">DSC</a>

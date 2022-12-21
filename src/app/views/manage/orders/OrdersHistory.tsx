@@ -61,7 +61,7 @@ export const navOrdersHistory = {
     },
     {
       tab: 'yeu-cau-huy',
-      label: 'Yêu cầu huỷ',
+      label: 'Yêu cầu huỷ đặt chỗ',
     },
   ],
 }

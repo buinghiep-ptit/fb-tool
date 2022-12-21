@@ -115,6 +115,21 @@ export interface IReportDecline {
   reason?: string
 }
 
+export interface IComment {
+  comment?: string
+  userCommentImage?: string
+  commentLikeCount?: number
+  totalChildComment?: number
+  commentId?: number
+  userCommentId?: number
+  userCommentName?: string
+  isCurUserLike?: number
+  isCommentPinned?: number
+  isAuthor?: number
+  dateCreated?: number
+  dateUpdated?: number
+}
+
 export type TitleFeeds = keyof IFeed | 'order' | 'action'
 export type TitleReportsDecline = keyof IReportDecline | 'order' | 'action'
 export type TitleActionsHistory = keyof IActionHistory | 'order' | 'action'

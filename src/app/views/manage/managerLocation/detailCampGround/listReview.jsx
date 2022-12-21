@@ -386,7 +386,7 @@ export default function ListReview(props) {
           star: starFilter === 0 ? null : starFilter,
         }}
       />
-      <DialogCustom ref={dialogCustomRef} title="Tạo đánh giá" maxWidth="ml">
+      <DialogCustom ref={dialogCustomRef} title="Tạo đánh giá" maxWidth="md">
         <SimpleCard>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Paragraph> Chọn tài khoản*:</Paragraph>

@@ -135,7 +135,7 @@ export const likeFeed = async (
   feedId: number,
   payload: { customerId: number },
 ): Promise<any> => {
-  const { data } = await http.put<any>(`/api/feed/${feedId}/like`, payload)
+  const { data } = await http.post<any>(`/api/feed/${feedId}/like`, payload)
   return data
 }
 
@@ -143,7 +143,7 @@ export const bookmarkFeed = async (
   feedId: number,
   payload: { customerId: number },
 ): Promise<any> => {
-  const { data } = await http.put<any>(`/api/feed/${feedId}/bookmark`, payload)
+  const { data } = await http.post<any>(`/api/feed/${feedId}/bookmark`, payload)
   return data
 }
 
@@ -186,8 +186,15 @@ export const editComment = async (
   return data
 }
 
-export const toggleLike = async (commentId: number): Promise<any> => {
-  const { data } = await http.post<any>(`/api/feed/comments/${commentId}/like`)
+export const toggleLike = async (
+  commentId: number,
+  payload?: { customerId: number },
+): Promise<any> => {
+  console.log('commentId:', commentId)
+  const { data } = await http.post<any>(
+    `/api/feed/comments/${commentId}/like`,
+    payload,
+  )
   return data
 }
 

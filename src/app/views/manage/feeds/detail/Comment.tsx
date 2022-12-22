@@ -14,7 +14,7 @@ import {
   usePostComment,
   useToggleLikeComment,
 } from 'app/hooks/queries/useFeedsData'
-import { IComment } from 'app/models'
+import { IComment, ICustomerDetail } from 'app/models'
 import { DateTimeFullConverter } from 'app/utils/formatters/dateTimeFormatters'
 import { CommentForm } from './CommentForm'
 import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
@@ -22,9 +22,10 @@ import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
 type IProps = {
   commentDetail: IComment
   isChildren?: boolean
+  customer?: ICustomerDetail
 }
 
-export function Comment({ commentDetail, isChildren }: IProps) {
+export function Comment({ commentDetail, isChildren, customer }: IProps) {
   const {
     commentId,
     comment,
@@ -151,7 +152,7 @@ export function Comment({ commentDetail, isChildren }: IProps) {
 
   function onCommentReply(message: string) {
     postCmt({
-      idCustomer: 0,
+      idCustomer: customer?.customerId,
       idParent: Number(commentId),
       comment: message,
       parentType: 2,
@@ -174,7 +175,10 @@ export function Comment({ commentDetail, isChildren }: IProps) {
   }
 
   function onToggleCommentLike() {
-    toggleLike(Number(commentId))
+    toggleLike({
+      commentId: Number(commentId),
+      payload: { customerId: customer?.customerId ?? 0 },
+    })
   }
 
   function onTogglePinComment() {

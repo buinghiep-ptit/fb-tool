@@ -158,15 +158,19 @@ export const useEditComment = (onSuccess?: any, onError?: any) => {
 
 export const useToggleLikeComment = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
-  return useMutation((commentId: number) => toggleLike(commentId), {
-    onSettled: () => {
-      queryClient.invalidateQueries(['feeds'])
-      queryClient.invalidateQueries(['feed'])
-      queryClient.invalidateQueries(['comments'])
-      queryClient.invalidateQueries(['comments-child'])
+  return useMutation(
+    (params: { commentId: number; payload: { customerId: number } }) =>
+      toggleLike(params.commentId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['comments'])
+        queryClient.invalidateQueries(['comments-child'])
+      },
+      onSuccess,
     },
-    onSuccess,
-  })
+  )
 }
 
 export const useDeleteComment = (onSuccess?: any, onError?: any) => {

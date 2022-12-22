@@ -36,7 +36,9 @@ import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
   useApproveFeed,
+  useBookmarkFeed,
   useDeleteFeed,
+  useLikeFeed,
   usePostComment,
 } from 'app/hooks/queries/useFeedsData'
 import {
@@ -127,16 +129,36 @@ export default function FeedDetail(props: Props) {
     resolver: yupResolver(validationSchema),
   })
 
+  const customer = methods.watch('customer') as ICustomerDetail
+
   const { mutate: postCmt, isLoading: postLoading } = usePostComment(() =>
     onSuccess(null, 'Bình luận thành công'),
   )
 
+  const { mutate: like } = useLikeFeed()
+
+  const { mutate: bookmark } = useBookmarkFeed()
+
   const onPostComment = (message: string) => {
     postCmt({
-      idCustomer: 0,
+      idCustomer: customer?.customerId,
       idParent: Number(feedId),
       comment: message,
       parentType: 1,
+    })
+  }
+
+  const onLikeFeed = () => {
+    like({
+      feedId: Number(feedId),
+      payload: { customerId: customer?.customerId ?? 0 },
+    })
+  }
+
+  const onBookmark = () => {
+    bookmark({
+      feedId: Number(feedId),
+      payload: { customerId: customer?.customerId ?? 0 },
     })
   }
 
@@ -188,7 +210,7 @@ export default function FeedDetail(props: Props) {
         customerCampdi,
         ...customersFood.content,
       ] as ICustomerDetail[]
-      console.log('customersMerge:', customersMerge)
+      methods.setValue('customer', customerCampdi)
       setCustomersCmt(customersMerge)
     }
   }, [customerCampdi, customersFood])
@@ -610,13 +632,14 @@ export default function FeedDetail(props: Props) {
         <SimpleCard title="Bình luận">
           <Stack gap={1.5} mb={3}>
             <Stack direction={'row'} justifyContent="space-between">
-              <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-                <FormProvider {...methods}>
-                  <Stack direction={'row'} gap={1}>
-                    <MuiTypography fontWeight={500}>
-                      Bình luận duới danh nghĩa:
-                    </MuiTypography>
+              {/* <form onSubmit={methods.handleSubmit(onSubmitHandler)}> */}
+              <FormProvider {...methods}>
+                <Stack direction={'row'} gap={1}>
+                  <MuiTypography fontWeight={500} whiteSpace="nowrap">
+                    Bình luận duới danh nghĩa:
+                  </MuiTypography>
 
+                  <Box width={250}>
                     <MuiRHFAutoComplete
                       name="customer"
                       label="Tài khoản post"
@@ -625,17 +648,18 @@ export default function FeedDetail(props: Props) {
                       getOptionLabel={option => option.fullName ?? ''}
                       defaultValue=""
                     />
-                  </Stack>
-                </FormProvider>
-              </form>
+                  </Box>
+                </Stack>
+              </FormProvider>
+              {/* </form> */}
               <Stack direction={'row'}>
                 <Tooltip arrow title="Thích">
-                  <IconButton onClick={() => {}}>
+                  <IconButton onClick={onLikeFeed}>
                     <Icon>favorite</Icon>
                   </IconButton>
                 </Tooltip>
                 <Tooltip arrow title="Đánh dấu">
-                  <IconButton onClick={() => {}}>
+                  <IconButton onClick={onBookmark}>
                     <Icon>bookmark</Icon>
                   </IconButton>
                 </Tooltip>
@@ -656,6 +680,7 @@ export default function FeedDetail(props: Props) {
               comments={
                 comments?.pages.map(group => group).flat() as IComment[]
               }
+              customer={customer}
             />
           )}
 

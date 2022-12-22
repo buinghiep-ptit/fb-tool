@@ -34,6 +34,7 @@ export interface ICustomer {
 
 export interface ICustomerDetail {
   id?: number
+  customerId?: number
   email?: string
   mobilePhone?: string
   fullName?: string

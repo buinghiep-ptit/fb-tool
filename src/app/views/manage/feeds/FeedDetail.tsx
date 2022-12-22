@@ -72,8 +72,7 @@ import {
 export interface Props {}
 
 type SchemaType = {
-  cusType?: number | string
-  customerFood?: any // idCustomer
+  customer?: any // idCustomer
 }
 
 const Container = styled('div')<Props>(({ theme }) => ({
@@ -116,19 +115,10 @@ export default function FeedDetail(props: Props) {
 
   const [customersCmt, setCustomersCmt] = useState<ICustomerDetail[]>([])
 
-  const [defaultValues] = useState<SchemaType>({
-    cusType: 1,
-  })
+  const [defaultValues] = useState<SchemaType>({})
 
   const validationSchema = Yup.object().shape({
-    cusType: Yup.string().required(messages.MSG1),
-
-    customerFood: Yup.object()
-      .nullable()
-      .when(['cusType'], {
-        is: (cusType: any) => cusType == 3,
-        then: Yup.object().required(messages.MSG1).nullable(),
-      }),
+    customer: Yup.object().nullable().required(messages.MSG1).nullable(),
   })
 
   const methods = useForm<SchemaType>({
@@ -136,8 +126,6 @@ export default function FeedDetail(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-
-  const cusType = methods.watch('cusType')
 
   const { mutate: postCmt, isLoading: postLoading } = usePostComment(() =>
     onSuccess(null, 'Bình luận thành công'),
@@ -628,26 +616,15 @@ export default function FeedDetail(props: Props) {
                     <MuiTypography fontWeight={500}>
                       Bình luận duới danh nghĩa:
                     </MuiTypography>
-                    <Stack>
-                      <SelectDropDown
-                        name="cusType"
-                        label="Loại tài khoản*"
-                        fullWidth
-                      >
-                        <MenuItem value="1">Campdi</MenuItem>
-                        <MenuItem value="3">Campdi (food)</MenuItem>
-                      </SelectDropDown>
-                    </Stack>
-                    {cusType == 3 && (
-                      <MuiRHFAutoComplete
-                        name="customerFood"
-                        label="Tài khoản post"
-                        options={customersCmt ?? []}
-                        optionProperty="fullName"
-                        getOptionLabel={option => option.fullName ?? ''}
-                        defaultValue=""
-                      />
-                    )}
+
+                    <MuiRHFAutoComplete
+                      name="customer"
+                      label="Tài khoản post"
+                      options={customersCmt ?? []}
+                      optionProperty="fullName"
+                      getOptionLabel={option => option.fullName ?? ''}
+                      defaultValue=""
+                    />
                   </Stack>
                 </FormProvider>
               </form>

@@ -1,11 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   approveFeed,
+  bookmarkFeed,
   createFeed,
+  deleteComment,
   deleteFeed,
+  editComment,
   editFeed,
   fetchPostsCheck,
   fetchPostsReported,
+  likeFeed,
+  pinComment,
+  postComment,
+  toggleLike,
   violateFeed,
 } from 'app/apis/feed/feed.service'
 import { IFeedDetail } from 'app/models'
@@ -87,4 +94,107 @@ export const useViolateFeed = (onSuccess?: any, onError?: any) => {
       onSuccess,
     },
   )
+}
+
+export const useLikeFeed = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { feedId: number; payload: any }) =>
+      likeFeed(params.feedId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['feeds'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useBookmarkFeed = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { feedId: number; payload: any }) =>
+      bookmarkFeed(params.feedId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['feeds'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const usePostComment = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((payload: any) => postComment(payload), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['feed'])
+      queryClient.invalidateQueries(['comments'])
+      queryClient.invalidateQueries(['comments-child'])
+    },
+    onSuccess,
+  })
+}
+
+export const useEditComment = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { commentId: number; payload: any }) =>
+      editComment(params.commentId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['comments'])
+        queryClient.invalidateQueries(['comments-child'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useToggleLikeComment = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (params: { commentId: number; payload: { customerId: number } }) =>
+      toggleLike(params.commentId, params.payload),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['feed'])
+        queryClient.invalidateQueries(['comments'])
+        queryClient.invalidateQueries(['comments-child'])
+      },
+      onSuccess,
+    },
+  )
+}
+
+export const useDeleteComment = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((commentId: number) => deleteComment(commentId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['feed'])
+      queryClient.invalidateQueries(['comments'])
+      queryClient.invalidateQueries(['comments-child'])
+    },
+    onSuccess,
+  })
+}
+
+export const usePinComment = (onSuccess?: any, onError?: any) => {
+  const queryClient = useQueryClient()
+  return useMutation((commentId: number) => pinComment(commentId), {
+    onSettled: () => {
+      queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['feed'])
+      queryClient.invalidateQueries(['comments'])
+      queryClient.invalidateQueries(['comments-child'])
+    },
+    onSuccess,
+  })
 }

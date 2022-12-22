@@ -47,7 +47,7 @@ const getBreadCrumbDetailName = (slug?: string) => {
     case 'tat-ca':
       return 'Tất cả'
     case 'yeu-cau-huy':
-      return 'Yêu cầu huỷ'
+      return 'Yêu cầu huỷ đặt chỗ'
 
     default:
       return 'Tất cả'

@@ -1,6 +1,7 @@
 import { http } from 'app/helpers/http-config'
 import {
   IActionHistoryResponse,
+  IComment,
   IFeedDetail,
   IFeedResponse,
   IReportDeclineResponse,
@@ -127,5 +128,82 @@ export const deleteFeed = async (feedId: number): Promise<any> => {
 
 export const editFeed = async (feedId: number, payload: any): Promise<any> => {
   const { data } = await http.put<IFeedDetail>(`/api/feed/${feedId}`, payload)
+  return data
+}
+
+export const likeFeed = async (
+  feedId: number,
+  payload: { customerId: number },
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/${feedId}/like`, payload)
+  return data
+}
+
+export const bookmarkFeed = async (
+  feedId: number,
+  payload: { customerId: number },
+): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/${feedId}/bookmark`, payload)
+  return data
+}
+
+export const fetchListCommentFeed = async (
+  feedId: number,
+  params?: { index?: number; size?: number },
+): Promise<IComment[]> => {
+  const { data } = await http.get<IComment[]>(`/api/feed/${feedId}/comments`, {
+    params,
+  })
+  return data
+}
+
+export const fetchListChildCommentFeed = async (
+  commentId: number,
+  params?: { index?: number; size?: number },
+): Promise<IComment[]> => {
+  const { data } = await http.get<IComment[]>(
+    `/api/feed/comments/${commentId}/child`,
+    {
+      params,
+    },
+  )
+  return data
+}
+
+export const postComment = async (payload: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/comments`, payload)
+  return data
+}
+
+export const editComment = async (
+  commentId: number,
+  payload: any,
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/feed/comments/${commentId}/edit`,
+    payload,
+  )
+  return data
+}
+
+export const toggleLike = async (
+  commentId: number,
+  payload?: { customerId: number },
+): Promise<any> => {
+  console.log('commentId:', commentId)
+  const { data } = await http.post<any>(
+    `/api/feed/comments/${commentId}/like`,
+    payload,
+  )
+  return data
+}
+
+export const pinComment = async (commentId: number): Promise<any> => {
+  const { data } = await http.post<any>(`/api/feed/comments/${commentId}/pin`)
+  return data
+}
+
+export const deleteComment = async (commentId: number): Promise<any> => {
+  const { data } = await http.delete<any>(`/api/feed/comments/${commentId}`)
   return data
 }

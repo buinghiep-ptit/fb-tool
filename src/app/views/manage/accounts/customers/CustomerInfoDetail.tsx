@@ -651,7 +651,7 @@ export default function CustomerDetail(props: Props) {
                     </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
-                      {customer?.data?.type !== -4 && customer.data?.id ? (
+                      {customer?.data?.type !== 3 && customer.data?.id ? (
                         <SelectDropDown
                           label="Loại TK"
                           name="type"
@@ -676,7 +676,7 @@ export default function CustomerDetail(props: Props) {
                           defaultValue="Campdi"
                         />
                       ) : null}
-                      {customer?.data?.type === -4 ? (
+                      {customer?.data?.type === 3 ? (
                         <FormInputText
                           label={'Loại TK'}
                           type="text"

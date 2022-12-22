@@ -1,9 +1,26 @@
-import { Avatar, Chip, Grid, Icon, styled, Tooltip } from '@mui/material'
+import {
+  Avatar,
+  Chip,
+  Grid,
+  Icon,
+  IconButton,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  styled,
+  Tooltip,
+} from '@mui/material'
 import { Box, Stack } from '@mui/system'
-import { useQueries, UseQueryResult } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useQueries,
+  useQuery,
+  UseQueryResult,
+} from '@tanstack/react-query'
 import {
   fetchActionsHistory,
   fetchFeedDetail,
+  fetchListCommentFeed,
   fetchReportsDecline,
 } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
@@ -12,13 +29,24 @@ import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useApproveFeed, useDeleteFeed } from 'app/hooks/queries/useFeedsData'
+import {
+  useApproveFeed,
+  useBookmarkFeed,
+  useDeleteFeed,
+  useLikeFeed,
+  usePostComment,
+} from 'app/hooks/queries/useFeedsData'
 import {
   IActionHistory,
+  IComment,
+  ICustomerDetail,
+  ICustomerResponse,
+  ICustomerTiny,
   IFeedDetail,
   Image,
   IMediaOverall,
@@ -28,11 +56,26 @@ import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
-import { useEffect, useState } from 'react'
+import { messages } from 'app/utils/messages'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import { CommentForm } from './detail/CommentForm'
+import { CommentList } from './detail/CommentList'
+import * as Yup from 'yup'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
+import {
+  customerSystemDefault,
+  fetchCustomers,
+} from 'app/apis/accounts/customer.service'
 
 export interface Props {}
+
+type SchemaType = {
+  customer?: any // idCustomer
+}
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -72,6 +115,53 @@ export default function FeedDetail(props: Props) {
   const [openDialog, setOpenDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
 
+  const [customersCmt, setCustomersCmt] = useState<ICustomerDetail[]>([])
+
+  const [defaultValues] = useState<SchemaType>({})
+
+  const validationSchema = Yup.object().shape({
+    customer: Yup.object().nullable().required(messages.MSG1).nullable(),
+  })
+
+  const methods = useForm<SchemaType>({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+  })
+
+  const customer = methods.watch('customer') as ICustomerDetail
+
+  const { mutate: postCmt, isLoading: postLoading } = usePostComment(() =>
+    onSuccess(null, 'Bình luận thành công'),
+  )
+
+  const { mutate: like } = useLikeFeed()
+
+  const { mutate: bookmark } = useBookmarkFeed()
+
+  const onPostComment = (message: string) => {
+    postCmt({
+      idCustomer: customer?.customerId,
+      idParent: Number(feedId),
+      comment: message,
+      parentType: 1,
+    })
+  }
+
+  const onLikeFeed = () => {
+    like({
+      feedId: Number(feedId),
+      payload: { customerId: customer?.customerId ?? 0 },
+    })
+  }
+
+  const onBookmark = () => {
+    bookmark({
+      feedId: Number(feedId),
+      payload: { customerId: customer?.customerId ?? 0 },
+    })
+  }
+
   const queryResults = useQueries({
     queries: [
       {
@@ -97,7 +187,63 @@ export default function FeedDetail(props: Props) {
     ],
   })
 
+  const { data: customerCampdi } = useQuery<ICustomerTiny, Error>(
+    ['customer-campdi'],
+    () => customerSystemDefault(),
+    {
+      refetchOnWindowFocus: false,
+    },
+  )
+
+  const { data: customersFood } = useQuery<ICustomerResponse, Error>(
+    ['customers-food'],
+    () => fetchCustomers({ cusType: 3, size: 500, page: 0 }),
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+    },
+  )
+
+  useEffect(() => {
+    if (customerCampdi && customersFood && customersFood.content) {
+      const customersMerge = [
+        customerCampdi,
+        ...customersFood.content,
+      ] as ICustomerDetail[]
+      methods.setValue('customer', customerCampdi)
+      setCustomersCmt(customersMerge)
+    }
+  }, [customerCampdi, customersFood])
+
   const [feed, reportsDecline, actionsHistory] = queryResults
+
+  const {
+    data: comments,
+    fetchNextPage,
+    hasNextPage,
+    isFetching: isFetchingComments,
+    isFetchingNextPage,
+  } = useInfiniteQuery(
+    ['comments', feedId],
+    ({ pageParam }) =>
+      fetchListCommentFeed(Number(feedId ?? 0), {
+        size: 10,
+        index: pageParam ? (pageParam - 1) * 10 : 0,
+      }),
+    {
+      getNextPageParam: (_lastPage, pages) => {
+        if (_lastPage.length) {
+          return pages.length + 1
+        } else {
+          return undefined
+        }
+      },
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      enabled: !!feedId,
+      staleTime: 30 * 60 * 1000,
+    },
+  )
 
   const isLoading = queryResults.some(
     (query: UseQueryResult) => query.isLoading,
@@ -166,25 +312,22 @@ export default function FeedDetail(props: Props) {
     setOpen(true)
   }
 
-  const onRemoveMedia = (imgIndex?: number) => {
-    mediasSrcPreviewer.splice(imgIndex ?? 0, 1)
-    setMediasSrcPreviewer([...mediasSrcPreviewer])
-  }
-
   const handleClose = () => {
     setOpen(false)
   }
 
-  const onSuccess = (data: any) => {
+  const onSuccess = (data: any, message: string) => {
     toastSuccess({
-      message: dialogType === 1 ? 'Duyệt bài thành công' : 'Xoá bài thành công',
+      message: message,
     })
-    setOpenDialog(false)
+    if (openDialog) setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } =
-    useApproveFeed(onSuccess)
-  const { mutate: deletedFeed, isLoading: deleteLoading } =
-    useDeleteFeed(onSuccess)
+  const { mutate: approve, isLoading: approveLoading } = useApproveFeed(() =>
+    onSuccess(null, 'Duyệt bài thành công'),
+  )
+  const { mutate: deletedFeed, isLoading: deleteLoading } = useDeleteFeed(() =>
+    onSuccess(null, 'Xoá bài thành công'),
+  )
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
@@ -197,6 +340,8 @@ export default function FeedDetail(props: Props) {
   const OnDeleteFeed = () => {
     deletedFeed(Number(feedId ?? 0))
   }
+
+  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {}
 
   const getColorByCusStatus = (status: number) => {
     switch (status) {
@@ -482,6 +627,73 @@ export default function FeedDetail(props: Props) {
             onPageChange={handleChangePageActions}
             onRowsPerPageChange={handleChangeRowsPerPageActions}
           />
+        </SimpleCard>
+
+        <SimpleCard title="Bình luận">
+          <Stack gap={1.5} mb={3}>
+            <Stack direction={'row'} justifyContent="space-between">
+              {/* <form onSubmit={methods.handleSubmit(onSubmitHandler)}> */}
+              <FormProvider {...methods}>
+                <Stack direction={'row'} gap={1}>
+                  <MuiTypography fontWeight={500} whiteSpace="nowrap">
+                    Bình luận duới danh nghĩa:
+                  </MuiTypography>
+
+                  <Box width={250}>
+                    <MuiRHFAutoComplete
+                      name="customer"
+                      label="Tài khoản post"
+                      options={customersCmt ?? []}
+                      optionProperty="fullName"
+                      getOptionLabel={option => option.fullName ?? ''}
+                      defaultValue=""
+                    />
+                  </Box>
+                </Stack>
+              </FormProvider>
+              {/* </form> */}
+              <Stack direction={'row'}>
+                <Tooltip arrow title="Thích">
+                  <IconButton onClick={onLikeFeed}>
+                    <Icon>favorite</Icon>
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="Đánh dấu">
+                  <IconButton onClick={onBookmark}>
+                    <Icon>bookmark</Icon>
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+
+            <CommentForm
+              autoFocus
+              initialValue={''}
+              onSubmit={onPostComment}
+              loading={postLoading}
+              error={''}
+            />
+          </Stack>
+
+          {comments && comments?.pages && comments.pages.length > 0 && (
+            <CommentList
+              comments={
+                comments?.pages.map(group => group).flat() as IComment[]
+              }
+              customer={customer}
+            />
+          )}
+
+          {hasNextPage && (
+            <MuiButton
+              onClick={() => fetchNextPage()}
+              title={isFetchingComments ? 'Đang tải...' : `Tải thêm bình luận`}
+              variant="text"
+              color="primary"
+              sx={{ flex: 1, textDecorationLine: 'underline' }}
+              startIcon={<Icon>subdirectory_arrow_right</Icon>} //
+            />
+          )}
         </SimpleCard>
       </Stack>
 

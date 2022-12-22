@@ -251,21 +251,23 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
 
             {/* {userCommentId === (currentUser as any)?.id && ( */}
             <>
-              <IconButton
-                size="small"
-                onClick={() => setIsEditing(prev => !prev)}
-              >
-                <MuiTypography
-                  sx={{
-                    fontSize: '0.75rem',
-                    color: isEditing
-                      ? 'hsl(235, 100%, 67%)'
-                      : 'hsl(235, 50%, 67%)',
-                  }}
+              {(customer?.id == 0 || customer?.customerType === 3) && (
+                <IconButton
+                  size="small"
+                  onClick={() => setIsEditing(prev => !prev)}
                 >
-                  {isEditing ? 'Huỷ chỉnh sửa' : 'Chỉnh sửa'}
-                </MuiTypography>
-              </IconButton>
+                  <MuiTypography
+                    sx={{
+                      fontSize: '0.75rem',
+                      color: isEditing
+                        ? 'hsl(235, 100%, 67%)'
+                        : 'hsl(235, 50%, 67%)',
+                    }}
+                  >
+                    {isEditing ? 'Huỷ chỉnh sửa' : 'Chỉnh sửa'}
+                  </MuiTypography>
+                </IconButton>
+              )}
 
               <IconButton size="small" onClick={openToggleDialog}>
                 <MuiTypography
@@ -346,6 +348,7 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
               comments={
                 childComments?.pages.map(group => group).flat() as IComment[]
               }
+              customer={customer}
             />
           </div>
         </div>

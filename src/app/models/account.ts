@@ -45,6 +45,7 @@ export interface ICustomerDetail {
   following?: number
   followers?: number
   type?: number
+  customerType?: number
   status?: number
   otpCount?: OtpCount[]
   labelText?: string

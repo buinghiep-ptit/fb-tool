@@ -42,7 +42,9 @@ import {
 import {
   IActionHistory,
   IComment,
+  ICustomerDetail,
   ICustomerResponse,
+  ICustomerTiny,
   IFeedDetail,
   Image,
   IMediaOverall,
@@ -62,7 +64,10 @@ import * as Yup from 'yup'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
-import { fetchCustomers } from 'app/apis/accounts/customer.service'
+import {
+  customerSystemDefault,
+  fetchCustomers,
+} from 'app/apis/accounts/customer.service'
 
 export interface Props {}
 
@@ -108,6 +113,8 @@ export default function FeedDetail(props: Props) {
   const [titleDialog, setTitleDialog] = useState('')
   const [openDialog, setOpenDialog] = useState(false)
   const [dialogType, setDialogType] = useState(1)
+
+  const [customersCmt, setCustomersCmt] = useState<ICustomerDetail[]>([])
 
   const [defaultValues] = useState<SchemaType>({
     cusType: 1,
@@ -170,6 +177,14 @@ export default function FeedDetail(props: Props) {
     ],
   })
 
+  const { data: customerCampdi } = useQuery<ICustomerTiny, Error>(
+    ['customer-campdi'],
+    () => customerSystemDefault(),
+    {
+      refetchOnWindowFocus: false,
+    },
+  )
+
   const { data: customersFood } = useQuery<ICustomerResponse, Error>(
     ['customers-food'],
     () => fetchCustomers({ cusType: 3, size: 500, page: 0 }),
@@ -178,6 +193,17 @@ export default function FeedDetail(props: Props) {
       keepPreviousData: true,
     },
   )
+
+  useEffect(() => {
+    if (customerCampdi && customersFood && customersFood.content) {
+      const customersMerge = [
+        customerCampdi,
+        ...customersFood.content,
+      ] as ICustomerDetail[]
+      console.log('customersMerge:', customersMerge)
+      setCustomersCmt(customersMerge)
+    }
+  }, [customerCampdi, customersFood])
 
   const [feed, reportsDecline, actionsHistory] = queryResults
 
@@ -594,10 +620,10 @@ export default function FeedDetail(props: Props) {
         </SimpleCard>
 
         <SimpleCard title="Bình luận">
-          <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
-            <FormProvider {...methods}>
-              <Stack gap={1.5} mb={3}>
-                <Stack direction={'row'} justifyContent="space-between">
+          <Stack gap={1.5} mb={3}>
+            <Stack direction={'row'} justifyContent="space-between">
+              <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+                <FormProvider {...methods}>
                   <Stack direction={'row'} gap={1}>
                     <MuiTypography fontWeight={500}>
                       Bình luận duới danh nghĩa:
@@ -616,46 +642,45 @@ export default function FeedDetail(props: Props) {
                       <MuiRHFAutoComplete
                         name="customerFood"
                         label="Tài khoản post"
-                        options={customersFood?.content ?? []}
+                        options={customersCmt ?? []}
                         optionProperty="fullName"
                         getOptionLabel={option => option.fullName ?? ''}
                         defaultValue=""
                       />
                     )}
                   </Stack>
-
-                  <Stack direction={'row'}>
-                    <Tooltip arrow title="Thích">
-                      <IconButton onClick={() => {}}>
-                        <Icon>favorite</Icon>
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip arrow title="Đánh dấu">
-                      <IconButton onClick={() => {}}>
-                        <Icon>bookmark</Icon>
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </Stack>
-
-                {/* <CommentForm
-                  autoFocus
-                  initialValue={''}
-                  onSubmit={onPostComment}
-                  loading={postLoading}
-                  error={''}
-                /> */}
+                </FormProvider>
+              </form>
+              <Stack direction={'row'}>
+                <Tooltip arrow title="Thích">
+                  <IconButton onClick={() => {}}>
+                    <Icon>favorite</Icon>
+                  </IconButton>
+                </Tooltip>
+                <Tooltip arrow title="Đánh dấu">
+                  <IconButton onClick={() => {}}>
+                    <Icon>bookmark</Icon>
+                  </IconButton>
+                </Tooltip>
               </Stack>
+            </Stack>
 
-              {/* {comments && comments?.pages && comments.pages.length > 0 && (
-                <CommentList
-                  comments={
-                    comments?.pages.map(group => group).flat() as IComment[]
-                  }
-                />
-              )} */}
-            </FormProvider>
-          </form>
+            <CommentForm
+              autoFocus
+              initialValue={''}
+              onSubmit={onPostComment}
+              loading={postLoading}
+              error={''}
+            />
+          </Stack>
+
+          {comments && comments?.pages && comments.pages.length > 0 && (
+            <CommentList
+              comments={
+                comments?.pages.map(group => group).flat() as IComment[]
+              }
+            />
+          )}
 
           {hasNextPage && (
             <MuiButton

@@ -207,10 +207,13 @@ export default function FeedDetail(props: Props) {
   useEffect(() => {
     if (customerCampdi && customersFood && customersFood.content) {
       const customersMerge = [
-        customerCampdi,
+        { ...customerCampdi, customerId: customerCampdi.id },
         ...customersFood.content,
       ] as ICustomerDetail[]
-      methods.setValue('customer', customerCampdi)
+      methods.setValue('customer', {
+        ...customerCampdi,
+        customerId: customerCampdi.id,
+      })
       setCustomersCmt(customersMerge)
     }
   }, [customerCampdi, customersFood])
@@ -224,11 +227,12 @@ export default function FeedDetail(props: Props) {
     isFetching: isFetchingComments,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ['comments', feedId],
+    ['comments', feedId, customer],
     ({ pageParam }) =>
       fetchListCommentFeed(Number(feedId ?? 0), {
         size: 10,
         index: pageParam ? (pageParam - 1) * 10 : 0,
+        customerId: customer?.customerId ?? 0,
       }),
     {
       getNextPageParam: (_lastPage, pages) => {
@@ -240,7 +244,7 @@ export default function FeedDetail(props: Props) {
       },
       refetchOnWindowFocus: false,
       keepPreviousData: true,
-      enabled: !!feedId,
+      enabled: !!feedId && !!customer,
       staleTime: 30 * 60 * 1000,
     },
   )
@@ -340,8 +344,6 @@ export default function FeedDetail(props: Props) {
   const OnDeleteFeed = () => {
     deletedFeed(Number(feedId ?? 0))
   }
-
-  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {}
 
   const getColorByCusStatus = (status: number) => {
     switch (status) {

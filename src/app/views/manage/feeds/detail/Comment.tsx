@@ -61,11 +61,12 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery(
-    ['comments-child', commentId, enabled],
+    ['comments-child', commentId, enabled, customer?.customerId],
     ({ pageParam }) =>
       fetchListChildCommentFeed(Number(commentId ?? 0), {
         size: 10,
         index: pageParam ? (pageParam - 1) * 10 : 0,
+        customerId: customer?.customerId ?? 0,
       }),
     {
       getNextPageParam: (_lastPage, pages) => {

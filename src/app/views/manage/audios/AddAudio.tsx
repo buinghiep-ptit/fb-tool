@@ -51,7 +51,7 @@ type SchemaType = {
   urlImage?: string
   author?: string
   performer?: string
-  status?: 0 | 1
+  status?: number
 }
 
 export default function AddAudio({ title }: Props) {
@@ -89,6 +89,7 @@ export default function AddAudio({ title }: Props) {
       defaultValues.author = audio.author ?? ''
       defaultValues.isDefault = audio.isDefault === 1 ? true : false
       defaultValues.duration = audio.duration ?? 0
+      defaultValues.status = audio?.status
 
       if (audio.urlAudio) {
         setAudioPreviewer({

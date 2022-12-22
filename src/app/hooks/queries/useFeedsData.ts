@@ -34,6 +34,7 @@ export const useCreateFeed = (onSuccess?: any, onError?: any) => {
   return useMutation((payload: IFeedDetail) => createFeed(payload), {
     onSettled: () => {
       queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })
@@ -46,6 +47,7 @@ export const useApproveFeed = (onSuccess?: any, onError?: any) => {
       queryClient.invalidateQueries(['posts-check'])
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })
@@ -57,6 +59,7 @@ export const useDeleteFeed = (onSuccess?: any, onError?: any) => {
     onSettled: () => {
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['feeds'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })
@@ -70,6 +73,7 @@ export const useUpdateFeed = (onSuccess?: any, onError?: any) => {
       onSettled: () => {
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -90,6 +94,7 @@ export const useViolateFeed = (onSuccess?: any, onError?: any) => {
         queryClient.invalidateQueries(['posts-check'])
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -105,6 +110,7 @@ export const useLikeFeed = (onSuccess?: any, onError?: any) => {
       onSettled: () => {
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -120,6 +126,7 @@ export const useBookmarkFeed = (onSuccess?: any, onError?: any) => {
       onSettled: () => {
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['feeds'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -134,6 +141,7 @@ export const usePostComment = (onSuccess?: any, onError?: any) => {
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['comments'])
       queryClient.invalidateQueries(['comments-child'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })
@@ -150,6 +158,7 @@ export const useEditComment = (onSuccess?: any, onError?: any) => {
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['comments'])
         queryClient.invalidateQueries(['comments-child'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -167,6 +176,7 @@ export const useToggleLikeComment = (onSuccess?: any, onError?: any) => {
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['comments'])
         queryClient.invalidateQueries(['comments-child'])
+        queryClient.invalidateQueries(['actions-history'])
       },
       onSuccess,
     },
@@ -181,6 +191,7 @@ export const useDeleteComment = (onSuccess?: any, onError?: any) => {
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['comments'])
       queryClient.invalidateQueries(['comments-child'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })
@@ -194,6 +205,7 @@ export const usePinComment = (onSuccess?: any, onError?: any) => {
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['comments'])
       queryClient.invalidateQueries(['comments-child'])
+      queryClient.invalidateQueries(['actions-history'])
     },
     onSuccess,
   })

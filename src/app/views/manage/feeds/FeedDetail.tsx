@@ -207,10 +207,13 @@ export default function FeedDetail(props: Props) {
   useEffect(() => {
     if (customerCampdi && customersFood && customersFood.content) {
       const customersMerge = [
-        customerCampdi,
+        { ...customerCampdi, customerId: customerCampdi.id },
         ...customersFood.content,
       ] as ICustomerDetail[]
-      methods.setValue('customer', customerCampdi)
+      methods.setValue('customer', {
+        ...customerCampdi,
+        customerId: customerCampdi.id,
+      })
       setCustomersCmt(customersMerge)
     }
   }, [customerCampdi, customersFood])

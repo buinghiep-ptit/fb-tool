@@ -163,7 +163,7 @@ export const fetchListCommentFeed = async (
 
 export const fetchListChildCommentFeed = async (
   commentId: number,
-  params?: { index?: number; size?: number },
+  params?: { index?: number; size?: number; customerId?: number },
 ): Promise<IComment[]> => {
   const { data } = await http.get<IComment[]>(
     `/api/feed/comments/${commentId}/child`,
@@ -174,7 +174,7 @@ export const fetchListChildCommentFeed = async (
   return data
 }
 
-export const postComment = async (payload: number): Promise<any> => {
+export const postComment = async (payload: any): Promise<any> => {
   const { data } = await http.post<any>(`/api/feed/comments`, payload)
   return data
 }

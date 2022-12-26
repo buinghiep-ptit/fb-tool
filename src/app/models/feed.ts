@@ -51,6 +51,7 @@ export interface IFeedDetail {
   likeNum?: number
   viewNum?: number
   commentNum?: number
+  bookmarkNum?: number
 }
 
 export interface ICustomerInfo {
@@ -121,6 +122,7 @@ export interface IComment {
   commentLikeCount?: number
   totalChildComment?: number
   commentId?: number
+  customerType?: number
   userCommentId?: number
   userCommentName?: string
   isCurUserLike?: number

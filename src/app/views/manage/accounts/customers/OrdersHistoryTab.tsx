@@ -324,10 +324,10 @@ export default function OrdersHistory() {
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Grid item sm={3} xs={12} mt={-1}>
-                    <MuiRHFDatePicker name="from" label="Ngày bắt đầu" />
+                    <MuiRHFDatePicker name="from" label="Từ ngày" />
                   </Grid>
                   <Grid item sm={3} xs={12} mt={-1}>
-                    <MuiRHFDatePicker name="to" label="Ngày kết thúc" />
+                    <MuiRHFDatePicker name="to" label="Đến ngày" />
                   </Grid>
                 </LocalizationProvider>
               </Grid>

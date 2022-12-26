@@ -7,6 +7,7 @@ import {
   SearchSharp,
 } from '@mui/icons-material'
 import {
+  Autocomplete,
   Divider,
   Grid,
   Icon,
@@ -14,13 +15,18 @@ import {
   MenuItem,
   Stack,
   styled,
+  TextField,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { fetchFeeds } from 'app/apis/feed/feed.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
+import { MuiRHFAutocompleteMultiple } from 'app/components/common/MuiRHFAutocompleteMultiple'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
@@ -32,11 +38,20 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { IFeed, IFeedResponse, IFeedsFilters } from 'app/models'
 import { columnFeeds } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import React, { useState } from 'react'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { messages } from 'app/utils/messages'
+import { format } from 'date-fns'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
+import { dateDefault } from '../orders/OrdersHistory'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -57,6 +72,28 @@ const extractFeeds = (feeds?: IFeed[]) => {
   )
 }
 
+const optionsStatus = [
+  { name: 'Chờ hậu kiểm', value: 0 },
+  { name: 'Hợp lệ', value: 1 },
+  { name: 'Vi phạm', value: -1 },
+  { name: 'Bị báo cáo', value: -2 },
+  { name: 'Xoá', value: -3 },
+]
+
+const convertOptionToValues = (options: { name: string; value: number }[]) => {
+  return options.map(o => o.value).join(',')
+}
+
+const convertValuesToOptions = (values: string[]) => {
+  return values.map(v => {
+    if (Number(v) == 0) return { name: 'Chờ hậu kiểm', value: 0 }
+    else if (Number(v) == 1) return { name: 'Hợp lệ', value: 1 }
+    else if (Number(v) == -1) return { name: 'Vi phạm', value: -1 }
+    else if (Number(v) == -2) return { name: 'Bị báo cáo', value: -2 }
+    else return { name: 'Xoá', value: -3 }
+  })
+}
+
 export interface Props {}
 
 export default function ManagerFeed(props: Props) {
@@ -73,17 +110,34 @@ export default function ManagerFeed(props: Props) {
   const [isReset, setIsReset] = useState<boolean>(false)
 
   const [defaultValues] = useState<IFeedsFilters>({
-    status: queryParams.status ?? 'all',
+    // status: queryParams.status ?? 'all',
     isCampdi: queryParams.isCampdi ? true : false,
-    // isReported: queryParams.isReported ? true : false,
+    isReported: queryParams.isReported ? true : false,
+    viewScope: 1,
+    from:
+      queryParams.from ??
+      (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
+    to: queryParams.to ?? (dateDefault() as any).endDate?.format('YYYY-MM-DD'),
     search: queryParams.search ?? '',
     hashtag: queryParams.hashtag ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
+    sort: 'dateCreated,desc',
+    status: queryParams.status
+      ? convertValuesToOptions(queryParams.status.split(','))
+      : [
+          { name: 'Chờ hậu kiểm', value: 0 },
+          { name: 'Hợp lệ', value: 1 },
+          { name: 'Vi phạm', value: -1 },
+          { name: 'Bị báo cáo', value: -2 },
+        ],
   })
 
   const [filters, setFilters] = useState<IFeedsFilters>(
-    extractMergeFiltersObject(defaultValues, {}),
+    extractMergeFiltersObject(
+      { ...defaultValues, status: convertOptionToValues(defaultValues.status) },
+      {},
+    ),
   )
 
   const [titleDialog, setTitleDialog] = useState('')
@@ -91,20 +145,57 @@ export default function ManagerFeed(props: Props) {
   const [dialogType, setDialogType] = useState(1)
   const [feedId, setFeedId] = useState(0)
 
-  const validationSchema = Yup.object().shape({
-    search: Yup.string()
-      .min(0, 'email must be at least 0 characters')
-      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
-    hashtag: Yup.string()
-      .min(0, 'hashtag must be at least 0 characters')
-      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
-  })
+  const validationSchema = Yup.object().shape(
+    {
+      search: Yup.string()
+        .min(0, 'email must be at least 0 characters')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      hashtag: Yup.string()
+        .min(0, 'hashtag must be at least 0 characters')
+        .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      from: Yup.date()
+        .when('to', (to, yup) => {
+          if (to && to != 'Invalid Date') {
+            const dayAfter = new Date(to.getTime())
+            return yup.max(dayAfter, 'Ngày đắt đầu không lớn hơn ngày kết thúc')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+      to: Yup.date()
+        .when('from', (from, yup) => {
+          if (from && from != 'Invalid Date') {
+            const dayAfter = new Date(from.getTime())
+            return yup.min(dayAfter, 'Ngày kết thúc phải lớn hơn ngày đắt đầu')
+          }
+          return yup
+        })
+        .typeError('Sai định dạng.')
+        .nullable()
+        .required(messages.MSG1),
+    },
+    [['from', 'to']],
+  )
 
   const methods = useForm<IFeedsFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
+  const from = methods.watch('from')
+  const to = methods.watch('to')
+
+  useEffect(() => {
+    if (!from || !to) return
+
+    if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
+      methods.clearErrors('from')
+      methods.clearErrors('to')
+    }
+  }, [from, to])
 
   const {
     data,
@@ -163,14 +254,24 @@ export default function ManagerFeed(props: Props) {
     setIsReset(false)
     setFilters(prevFilters => {
       return {
-        ...extractMergeFiltersObject(prevFilters, values),
+        ...extractMergeFiltersObject(prevFilters, {
+          ...values,
+          from: format(new Date(values.from ?? ''), 'yyyy-MM-dd'),
+          to: format(new Date(values.to ?? ''), 'yyyy-MM-dd'),
+          status: convertOptionToValues(values.status),
+        }),
         page: 0,
         size: 20,
       }
     })
 
     navigate('', {
-      ...extractMergeFiltersObject(filters, values),
+      ...extractMergeFiltersObject(filters, {
+        ...values,
+        from: format(new Date(values.from ?? ''), 'yyyy-MM-dd'),
+        to: format(new Date(values.to ?? ''), 'yyyy-MM-dd'),
+        status: convertOptionToValues(values.status),
+      }),
       page: 0,
       size: 20,
     } as any)
@@ -179,13 +280,17 @@ export default function ManagerFeed(props: Props) {
   const onResetFilters = () => {
     setIsReset(true)
     methods.reset({
-      status: 'all',
       isCampdi: false,
-      // isReported: false,
+      isReported: false,
       search: '',
       hashtag: '',
+      viewScope: 1,
       page: 0,
       size: 20,
+      from: (dateDefault() as any).startDate?.toISOString(),
+      to: (dateDefault() as any).endDate.toISOString(),
+      sort: 'dateCreated,desc',
+      status: defaultValues.status,
     })
 
     setPage(0)
@@ -194,11 +299,17 @@ export default function ManagerFeed(props: Props) {
     setFilters({
       page: 0,
       size: 20,
+      from: (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
+      to: (dateDefault() as any).endDate?.format('YYYY-MM-DD'),
+      sort: 'dateCreated,desc',
+      status: convertOptionToValues(defaultValues.status),
     })
 
     navigate('', {
       page: 0,
       size: 20,
+      sort: 'dateCreated,desc',
+      status: convertOptionToValues(defaultValues.status),
     } as any)
   }
 
@@ -235,6 +346,16 @@ export default function ManagerFeed(props: Props) {
       navigation(`${row.feedId}`, {})
     }
   }
+
+  const top100Films = [
+    { title: 'The Shawshank Redemption', year: 1994 },
+    { title: 'The Godfather', year: 1972 },
+    { title: 'The Godfather: Part II', year: 1974 },
+    { title: 'The Dark Knight', year: 2008 },
+    { title: '12 Angry Men', year: 1957 },
+    { title: "Schindler's List", year: 1993 },
+    { title: 'Pulp Fiction', year: 1994 },
+  ]
 
   return (
     <Container>
@@ -308,7 +429,7 @@ export default function ManagerFeed(props: Props) {
                     }
                   />
                 </Grid>
-                <Grid item sm={4} xs={12}>
+                {/* <Grid item sm={3} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hợp lệ</MenuItem>
@@ -317,19 +438,75 @@ export default function ManagerFeed(props: Props) {
                     <MenuItem value="-2">Bị báo cáo</MenuItem>
                     <MenuItem value="-3">Xoá</MenuItem>
                   </SelectDropDown>
-                </Grid>
-                {/* <Grid item sm={3} xs={12}>
-                  <SelectDropDown name="range" disabled defaultValue={'all'}>
-                    <MenuItem value="all">Công khai</MenuItem>
-                    <MenuItem value="friends">Bạn bè</MenuItem>
-                    <MenuItem value="me">Chỉ mình tôi</MenuItem>
-                  </SelectDropDown>
                 </Grid> */}
+                <Grid item sm={4} xs={12}>
+                  <Controller
+                    control={methods.control}
+                    name={`status`}
+                    render={({ field: { onChange, value } }) => (
+                      <Autocomplete
+                        value={value || null}
+                        multiple
+                        limitTags={2}
+                        id="multiple-limit-tags"
+                        options={optionsStatus}
+                        getOptionLabel={option => option.name}
+                        onChange={(event, item) => {
+                          const result = item.reduce((unique, o) => {
+                            if (
+                              !unique.some((obj: any) => obj.value === o.value)
+                            ) {
+                              unique.push(o)
+                            }
+                            return unique
+                          }, [])
+                          onChange(result)
+                        }}
+                        renderInput={params => (
+                          <TextField
+                            {...params}
+                            label="Trạng thái"
+                            placeholder="Trạng thái"
+                          />
+                        )}
+                        sx={{ width: '100%' }}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                {/* <Grid item sm={3} xs={12}>
+                  <Stack>
+                    <SelectDropDown name="viewScope" label="Ai có thể xem">
+                      <MenuItem value="1">Mọi người</MenuItem>
+                      <MenuItem value="2">Những người theo dõi bạn</MenuItem>
+                      <MenuItem value="3">Chỉ mình tôi</MenuItem>
+                    </SelectDropDown>
+                  </Stack>
+                </Grid> */}
+
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="sort" label="Sắp xếp theo">
+                    <MenuItem value="dateCreated,desc">Ngày đăng</MenuItem>
+                    <MenuItem value="viewNum,desc">Lượt xem</MenuItem>
+                    <MenuItem value="likeNum,desc">Lượt thích</MenuItem>
+                    <MenuItem value="commentNum,desc">Lượt bình luận</MenuItem>
+                    <MenuItem value="bookMarkNum,desc">Lượt bookmark</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Grid item sm={4} xs={12} mt={-1}>
+                    <MuiRHFDatePicker name="from" label="Từ ngày" />
+                  </Grid>
+                  <Grid item sm={4} xs={12} mt={-1}>
+                    <MuiRHFDatePicker name="to" label="Đến ngày" />
+                  </Grid>
+                </LocalizationProvider>
               </Grid>
-              <Grid item sm={4} xs={12} pt={2}>
+              {/* <Grid item sm={4} xs={12} pt={2}>
                 <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                {/* <MuiCheckBox name="isReported" label="Báo cáo vi phạm" /> */}
-              </Grid>
+                <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
+              </Grid> */}
             </FormProvider>
 
             <Box pt={3}>

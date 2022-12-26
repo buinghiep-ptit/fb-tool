@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { CommentList } from './CommentList'
 import { Avatar, Icon, IconButton, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -15,9 +13,11 @@ import {
   useToggleLikeComment,
 } from 'app/hooks/queries/useFeedsData'
 import { IComment, ICustomerDetail } from 'app/models'
-import { DateTimeFullConverter } from 'app/utils/formatters/dateTimeFormatters'
-import { CommentForm } from './CommentForm'
+import { timeSince } from 'app/utils/common'
+import { useState } from 'react'
 import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
+import { CommentForm } from './CommentForm'
+import { CommentList } from './CommentList'
 
 type IProps = {
   commentDetail: IComment
@@ -38,6 +38,8 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
     isCommentPinned,
     userCommentName,
     isCurUserLike,
+    customerType,
+    dateUpdated,
   } = commentDetail
   const [areChildrenHidden, setAreChildrenHidden] = useState(true)
   const [isReplying, setIsReplying] = useState(false)
@@ -203,9 +205,7 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
             <span className="name">{userCommentName}</span>
           </Stack>
 
-          <span className="date">
-            {DateTimeFullConverter((dateCreated ?? 0) * 1000)}
-          </span>
+          <span className="date">{timeSince((dateCreated ?? 0) * 1000)}</span>
         </div>
         {isEditing ? (
           <CommentForm
@@ -251,7 +251,8 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
 
             {/* {userCommentId === (currentUser as any)?.id && ( */}
             <>
-              {(customer?.id == 0 || customer?.customerType === 3) && (
+              {((customerType === 1 && userCommentId == 0) ||
+                customerType === 3) && (
                 <IconButton
                   size="small"
                   onClick={() => setIsEditing(prev => !prev)}

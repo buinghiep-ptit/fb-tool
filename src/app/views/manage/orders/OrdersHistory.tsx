@@ -61,7 +61,7 @@ export const navOrdersHistory = {
     },
     {
       tab: 'yeu-cau-huy',
-      label: 'Yêu cầu huỷ đặt chỗ',
+      label: 'Yêu cầu huỷ',
     },
   ],
 }
@@ -459,10 +459,10 @@ export default function OrdersHistory() {
                   <Grid container spacing={2}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <Grid item sm={4} xs={12}>
-                        <MuiRHFDatePicker name="from" label="Ngày bắt đầu" />
+                        <MuiRHFDatePicker name="from" label="Từ ngày" />
                       </Grid>
                       <Grid item sm={4} xs={12}>
-                        <MuiRHFDatePicker name="to" label="Ngày kết thúc" />
+                        <MuiRHFDatePicker name="to" label="Đến ngày" />
                       </Grid>
                     </LocalizationProvider>
                     <Grid item sm={2} xs={12} mt={1}>

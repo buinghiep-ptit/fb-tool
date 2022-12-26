@@ -217,6 +217,18 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
       ),
   },
   {
+    id: 'bookmarkNum',
+    label: 'Đánh dấu',
+    minWidth: 80,
+    align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
+  },
+  {
     id: 'actions',
     label: 'Hành động',
     minWidth: 80,

@@ -1,12 +1,10 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Avatar,
   Chip,
   Grid,
   Icon,
   IconButton,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   styled,
   Tooltip,
 } from '@mui/material'
@@ -17,6 +15,10 @@ import {
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query'
+import {
+  customerSystemDefault,
+  fetchCustomers,
+} from 'app/apis/accounts/customer.service'
 import {
   fetchActionsHistory,
   fetchFeedDetail,
@@ -29,9 +31,10 @@ import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
+import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
@@ -56,20 +59,15 @@ import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
+import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { messages } from 'app/utils/messages'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
+import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 import { CommentForm } from './detail/CommentForm'
 import { CommentList } from './detail/CommentList'
-import * as Yup from 'yup'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
-import {
-  customerSystemDefault,
-  fetchCustomers,
-} from 'app/apis/accounts/customer.service'
 
 export interface Props {}
 
@@ -446,7 +444,7 @@ export default function FeedDetail(props: Props) {
           feed.data?.status !== -3 && (
             <MuiButton
               title="Chỉnh sửa"
-              variant="outlined"
+              variant="contained"
               color="primary"
               onClick={() => navigate(`chinh-sua-feed`, {})}
               loading={approveLoading}
@@ -492,7 +490,7 @@ export default function FeedDetail(props: Props) {
           <Box>
             <Grid container spacing={2}>
               <Grid item sm={8} xs={12}>
-                <Stack flexDirection={'row'} gap={2} alignItems="center">
+                <Stack flexDirection={'row'} gap={2}>
                   <Avatar
                     alt="avatar"
                     src={
@@ -502,14 +500,44 @@ export default function FeedDetail(props: Props) {
                     }
                     sx={{ width: 56, height: 56 }}
                   />
-                  <Stack flexDirection={'column'}>
+                  <Stack flexDirection={'column'} gap={0.5}>
                     <MuiTypography variant="subtitle2">
                       {feed.data?.customerInfo?.fullName}
                     </MuiTypography>
                     <MuiTypography variant="body2">
-                      {feed.data?.content}
+                      {feed.data?.dateCreated
+                        ? ISODateTimeFormatter(feed.data?.dateCreated)
+                        : null}
                     </MuiTypography>
                   </Stack>
+                </Stack>
+                <Stack mt={3}>
+                  <Stack flexDirection={'row'} gap={3}>
+                    <Stack flexDirection={'row'} gap={0.5}>
+                      <MuiTypography variant="subtitle2" fontStyle={'italic'}>
+                        Ai có thể xem:
+                      </MuiTypography>
+                      <MuiTypography variant="body2">
+                        {feed.data?.viewScope === 1
+                          ? 'Công khai'
+                          : feed.data?.viewScope === 2
+                          ? 'Những người theo dõi bạn'
+                          : 'Chỉ mình tôi'}
+                      </MuiTypography>
+                    </Stack>
+                    <Stack flexDirection={'row'} gap={0.5}>
+                      <MuiTypography variant="subtitle2" fontStyle={'italic'}>
+                        Cho phép bình luận:
+                      </MuiTypography>
+                      <MuiSwitch
+                        checked={feed.data?.isAllowComment === 1 ? true : false}
+                        sx={{ justifyContent: 'center' }}
+                      />
+                    </Stack>
+                  </Stack>
+                  <MuiTypography variant="body2" mt={1.5}>
+                    {feed.data?.content}
+                  </MuiTypography>
                 </Stack>
                 <Stack flexDirection={'row'} gap={1} my={2}>
                   {feed.data?.tags?.map(tag => (
@@ -654,17 +682,25 @@ export default function FeedDetail(props: Props) {
                 </Stack>
               </FormProvider>
               {/* </form> */}
-              <Stack direction={'row'}>
-                <Tooltip arrow title="Thích">
-                  <IconButton onClick={onLikeFeed}>
-                    <Icon>favorite</Icon>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip arrow title="Đánh dấu">
-                  <IconButton onClick={onBookmark}>
-                    <Icon>bookmark</Icon>
-                  </IconButton>
-                </Tooltip>
+              <Stack direction={'row'} gap={1.5}>
+                <Stack direction={'row'} alignItems="center">
+                  <MuiTypography>{feed.data?.likeNum}</MuiTypography>
+
+                  <Tooltip arrow title="Thích">
+                    <IconButton onClick={onLikeFeed}>
+                      <Icon>favorite</Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+
+                <Stack direction={'row'} alignItems="center">
+                  <MuiTypography>{feed.data?.bookmarkNum}</MuiTypography>
+                  <Tooltip arrow title="Đánh dấu">
+                    <IconButton onClick={onBookmark}>
+                      <Icon>bookmark</Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
             </Stack>
 

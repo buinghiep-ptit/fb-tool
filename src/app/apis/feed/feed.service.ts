@@ -4,6 +4,7 @@ import {
   IComment,
   IFeedDetail,
   IFeedResponse,
+  IReactFeedResponse,
   IReportDeclineResponse,
 } from 'app/models'
 import { ICampAreaResponse, ICampGroundResponse } from 'app/models/camp'
@@ -21,8 +22,13 @@ export const fetchFeeds = async (params: any): Promise<IFeedResponse> => {
   return data
 }
 
-export const fetchFeedDetail = async (feedId: number): Promise<IFeedDetail> => {
-  const { data } = await http.get<IFeedDetail>(`/api/feed/${feedId}`)
+export const fetchFeedDetail = async (
+  feedId: number,
+  params?: { customerId: number },
+): Promise<IFeedDetail> => {
+  const { data } = await http.get<IFeedDetail>(`/api/feed/${feedId}`, {
+    params,
+  })
   return data
 }
 
@@ -128,6 +134,19 @@ export const deleteFeed = async (feedId: number): Promise<any> => {
 
 export const editFeed = async (feedId: number, payload: any): Promise<any> => {
   const { data } = await http.put<IFeedDetail>(`/api/feed/${feedId}`, payload)
+  return data
+}
+
+export const fetchListReactFeed = async (
+  feedId: number,
+  params?: { page?: number; size?: number; reactionType?: string },
+): Promise<IReactFeedResponse> => {
+  const { data } = await http.get<IReactFeedResponse>(
+    `/api/feed/${feedId}/list-customer-reacted`,
+    {
+      params,
+    },
+  )
   return data
 }
 

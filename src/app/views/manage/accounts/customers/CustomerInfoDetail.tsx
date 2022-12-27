@@ -649,6 +649,26 @@ export default function CustomerDetail(props: Props) {
                         </MuiTypography>
                       </Stack>
                     </Stack>
+                    <Stack flexDirection={'row'} width="100%" gap={1.5}>
+                      <MuiTypography variant="subtitle2">
+                        Ngày sinh:
+                      </MuiTypography>
+                      <MuiTypography variant="body2" color="primary">
+                        {customer?.data?.birthday}
+                      </MuiTypography>
+                    </Stack>
+                    <Stack flexDirection={'row'} width="100%" gap={1.5} mb={1}>
+                      <MuiTypography variant="subtitle2">
+                        Giới tính:
+                      </MuiTypography>
+                      <MuiTypography variant="body2" color="primary">
+                        {customer?.data?.gender === 1
+                          ? 'Nam'
+                          : customer?.data?.gender === 2
+                          ? 'Nữ'
+                          : 'Khác'}
+                      </MuiTypography>
+                    </Stack>
 
                     <Stack flexDirection={'row'} alignItems="center" gap={1}>
                       {customer?.data?.type !== 3 && customer.data?.id ? (

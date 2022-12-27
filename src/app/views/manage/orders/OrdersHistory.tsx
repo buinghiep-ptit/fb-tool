@@ -352,7 +352,7 @@ export default function OrdersHistory() {
       }
     } else if (cell.id === 'cusAccount') {
       window.open(
-        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/lich-su-dat-cho`,
+        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/thong-tin`,
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {

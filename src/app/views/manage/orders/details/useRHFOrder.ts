@@ -49,7 +49,15 @@ export const useRHFOrder = (order: IOrderDetail) => {
       .required(messages.MSG1),
     email: Yup.string()
       .email(messages.MSG12)
-      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
+      .max(255, 'Nội dung không được vượt quá 255 ký tự')
+      .test(
+        'validate email',
+        'Số ký tự trước @ không thể vượt quá 64',
+        email => {
+          if (!email?.includes('@')) return true
+          return email.split('@')[0].length <= 64
+        },
+      ),
     note: Yup.string().max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 

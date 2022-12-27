@@ -71,7 +71,7 @@ export default function LockCustomer({ title }: Props) {
         .required(messages.MSG1)
         .typeError(messages.MSG1)
         .positive() // Sso nguyen duong
-        .max(9999999999, 'Tối đa 10 chữ số'),
+        .max(132000, 'Tối đa 132000 giờ'),
     }),
 
     reason: Yup.string()

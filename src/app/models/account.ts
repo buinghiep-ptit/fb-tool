@@ -49,6 +49,8 @@ export interface ICustomerDetail {
   status?: number
   otpCount?: OtpCount[]
   labelText?: string
+  birthday?: string
+  gender?: number
 }
 
 export interface ICustomerTiny {

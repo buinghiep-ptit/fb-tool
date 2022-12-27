@@ -201,14 +201,14 @@ export default function OrderDetail(props: Props) {
                 onClick={methods.handleSubmit(onSubmitHandler)}
                 startIcon={<Icon>done</Icon>}
               />
-              <MuiButton
+              {/* <MuiButton
                 title="Huỷ"
                 variant="contained"
                 color="warning"
                 disabled={editLoading}
                 onClick={() => methods.reset()}
                 startIcon={<Icon>clear</Icon>}
-              />
+              /> */}
             </>
           )}
 

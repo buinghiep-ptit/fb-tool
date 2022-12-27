@@ -113,7 +113,7 @@ export default function ManagerFeed(props: Props) {
     // status: queryParams.status ?? 'all',
     isCampdi: queryParams.isCampdi ? true : false,
     isReported: queryParams.isReported ? true : false,
-    viewScope: 1,
+    // viewScope: 1,
     from:
       queryParams.from ??
       (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
@@ -284,7 +284,7 @@ export default function ManagerFeed(props: Props) {
       isReported: false,
       search: '',
       hashtag: '',
-      viewScope: 1,
+      // viewScope: 1,
       page: 0,
       size: 20,
       from: (dateDefault() as any).startDate?.toISOString(),
@@ -381,7 +381,7 @@ export default function ManagerFeed(props: Props) {
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
-                <Grid item sm={4} xs={12}>
+                <Grid item sm={6} xs={12}>
                   <FormInputText
                     label={'Email, SĐT, Tên hiển thị'}
                     type="text"
@@ -406,7 +406,7 @@ export default function ManagerFeed(props: Props) {
                     // required
                   />
                 </Grid>
-                <Grid item sm={4} xs={12}>
+                <Grid item sm={6} xs={12}>
                   <FormInputText
                     label={'Hashtag'}
                     type="text"
@@ -439,7 +439,7 @@ export default function ManagerFeed(props: Props) {
                     <MenuItem value="-3">Xoá</MenuItem>
                   </SelectDropDown>
                 </Grid> */}
-                <Grid item sm={4} xs={12}>
+                <Grid item sm={6} xs={12}>
                   <Controller
                     control={methods.control}
                     name={`status`}
@@ -447,7 +447,7 @@ export default function ManagerFeed(props: Props) {
                       <Autocomplete
                         value={value || null}
                         multiple
-                        limitTags={2}
+                        limitTags={3}
                         id="multiple-limit-tags"
                         options={optionsStatus}
                         getOptionLabel={option => option.name}
@@ -485,7 +485,7 @@ export default function ManagerFeed(props: Props) {
                   </Stack>
                 </Grid> */}
 
-                <Grid item sm={4} xs={12}>
+                <Grid item sm={6} xs={12}>
                   <SelectDropDown name="sort" label="Sắp xếp theo">
                     <MenuItem value="dateCreated,desc">Ngày đăng</MenuItem>
                     <MenuItem value="viewNum,desc">Lượt xem</MenuItem>
@@ -501,12 +501,12 @@ export default function ManagerFeed(props: Props) {
                   <Grid item sm={4} xs={12} mt={-1}>
                     <MuiRHFDatePicker name="to" label="Đến ngày" />
                   </Grid>
+                  <Grid item sm={4} xs={12} mt={2}>
+                    <MuiCheckBox name="isCampdi" label="Feed Campdi" />
+                    <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
+                  </Grid>
                 </LocalizationProvider>
               </Grid>
-              {/* <Grid item sm={4} xs={12} pt={2}>
-                <MuiCheckBox name="isCampdi" label="Feed Campdi" />
-                <MuiCheckBox name="isReported" label="Báo cáo vi phạm" />
-              </Grid> */}
             </FormProvider>
 
             <Box pt={3}>

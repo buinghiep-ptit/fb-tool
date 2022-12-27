@@ -95,33 +95,6 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-const extractCamps = (camps?: any[]) => {
-  if (!camps || !camps.length) return
-  return camps.map(camp =>
-    Object.assign(camp, {
-      icon: () => (
-        <Chip
-          label={
-            camp.status !== -1
-              ? camp.status === 3
-                ? 'Tỉnh thành'
-                : 'Hoạt động'
-              : 'Không hoạt động'
-          }
-          size="small"
-          color={
-            camp.status !== -1
-              ? camp.status === 3
-                ? 'warning'
-                : 'primary'
-              : 'default'
-          }
-        />
-      ),
-    }),
-  )
-}
-
 const extraCustomer = (customer?: ICustomerDetail) => {
   if (!customer) return
   return Object.assign(customer, {

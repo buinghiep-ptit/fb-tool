@@ -23,7 +23,7 @@ import MuiStyledModal from 'app/components/common/MuiStyledModal'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { DropWrapper } from 'app/components/common/UploadPreviewer'
 import { compressImageFile } from 'app/helpers/compressFile'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import { useCreateAudio, useUpdateAudio } from 'app/hooks/queries/useAudiosData'
 import { getReturnValues } from 'app/hooks/useCountDown'
 import useDebounce from 'app/hooks/useDebounce.'
@@ -118,8 +118,8 @@ export default function AddAudio({ title }: Props) {
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .max(255, 'Nội dung không được vượt quá 255 ký tự')
-      .required(messages.MSG1)
-      .test('existed', 'Tên bài hát đã tồn tại', () => !isExistedName),
+      .required(messages.MSG1),
+    // .test('existed', 'Tên bài hát đã tồn tại', () => !isExistedName),
     audioFile: Yup.mixed().test('empty', messages.MSG1, () => {
       return !!audioPreviewer
     }),
@@ -188,11 +188,11 @@ export default function AddAudio({ title }: Props) {
       })
       if (result) {
         setIsExistedName(result.used)
-        if (result.used) {
-          methods.setError('name', { message: 'Tên bài hát đã tồn tại' })
-        } else {
-          methods.clearErrors('name')
-        }
+        // if (result.used) {
+        //   methods.setError('name', { message: 'Tên bài hát đã tồn tại' })
+        // } else {
+        //   methods.clearErrors('name')
+        // }
       }
     } catch (error) {}
   }
@@ -257,6 +257,12 @@ export default function AddAudio({ title }: Props) {
                   defaultValue=""
                   required
                 />
+                {isExistedName && (
+                  <FormHelperText sx={{ color: '#f9a352', mt: -1.5 }}>
+                    Tên nhạc nền đã được sử dụng (chỉ mang tính chất thông báo,
+                    bạn vẫn có thể thêm)
+                  </FormHelperText>
+                )}
 
                 <FormInputText
                   type="text"
@@ -287,7 +293,18 @@ export default function AddAudio({ title }: Props) {
               <Box flex={1}>
                 <Dropzone
                   ref={dropzoneAudioRef}
-                  onDrop={acceptedFiles => {
+                  onDrop={(acceptedFiles, fileRejections) => {
+                    if (fileRejections.length) {
+                      toastError({
+                        message:
+                          fileRejections[0].errors[0].code ===
+                          'file-invalid-type'
+                            ? 'Nhạc nền chứa định dạng không hợp lệ'
+                            : fileRejections[0].errors[0].message,
+                      })
+
+                      return
+                    }
                     if (audioRef.current) {
                       audioRef.current.pause()
                       audioRef.current.load()

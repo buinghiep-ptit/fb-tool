@@ -12,6 +12,10 @@ export interface IActionHistoryResponse extends IPagingResponse {
   content?: IActionHistory[]
 }
 
+export interface IReactFeedResponse extends IPagingResponse {
+  content?: IReactFeed[]
+}
+
 export interface IFeed {
   content?: string
   reportedNum?: number
@@ -52,6 +56,9 @@ export interface IFeedDetail {
   viewNum?: number
   commentNum?: number
   bookmarkNum?: number
+  isLiked?: boolean
+  isBookmarked?: boolean
+  srcName?: string
 }
 
 export interface ICustomerInfo {
@@ -116,6 +123,16 @@ export interface IReportDecline {
   reason?: string
 }
 
+export interface IReactFeed {
+  id?: number
+  fullName?: string
+  total?: number
+  mobilePhone?: string
+  dateCreated?: string
+  userType?: number
+  email?: string
+}
+
 export interface IComment {
   comment?: string
   userCommentImage?: string
@@ -137,3 +154,4 @@ export type TitleReportsDecline = keyof IReportDecline | 'order' | 'action'
 export type TitleActionsHistory = keyof IActionHistory | 'order' | 'action'
 export type TitleCampAreas = keyof ICampArea | 'order' | 'action'
 export type TitleCampGrounds = keyof ICampGround | 'order' | 'action'
+export type TitleReactsFeed = keyof IReactFeed | 'order' | 'action'

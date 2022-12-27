@@ -270,7 +270,7 @@ function CreateFeed(props: any) {
 
   const { data: campAreas } = useQuery<ICampAreaResponse, Error>(
     ['camp-areas'],
-    () => fetchCampAreas({ size: 200, page: 0 }),
+    () => fetchCampAreas({ size: 1000, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
@@ -279,7 +279,7 @@ function CreateFeed(props: any) {
 
   const { data: campGrounds } = useQuery<ICampAreaResponse, Error>(
     ['camp-grounds'],
-    () => fetchCampGrounds({ size: 200, page: 0 }),
+    () => fetchCampGrounds({ size: 1000, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,

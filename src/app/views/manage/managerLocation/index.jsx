@@ -1,4 +1,13 @@
-import { Box, Button, Grid, Icon, styled, TextField, Fab } from '@mui/material'
+import {
+  Box,
+  Button,
+  Grid,
+  Icon,
+  styled,
+  TextField,
+  Fab,
+  Autocomplete,
+} from '@mui/material'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import * as React from 'react'
 import InputLabel from '@mui/material/InputLabel'
@@ -14,6 +23,7 @@ import {
   getListCampGround,
   updateCampGroundStatus,
 } from 'app/apis/campGround/ground.service'
+import { getProvinces } from 'app/apis/common/common.service'
 import { cloneDeep } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
@@ -33,6 +43,8 @@ export default function ManagerLocation(props) {
   const [isBooking, setIsBooking] = useState()
   const [listCampGround, setListCampGround] = useState([])
   const [totalListCampGround, setTotalListCampground] = useState()
+  const [provinces, setProvinces] = useState()
+  const [provinceId, setProvinceId] = useState(null)
   const navigate = useNavigate()
   const tableRef = React.useRef()
 
@@ -73,15 +85,21 @@ export default function ManagerLocation(props) {
     return res
   }
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     tableRef.current.handleClickSearch()
-    const res = await fetchListCampGround({
+    fetchListCampGround({
       name: inputFilter,
       status: statusFilter,
       isSupportBooking: isBooking,
+      idProvince: provinceId,
       page: 0,
       size: 20,
     })
+  }
+
+  const fetchProvinces = async () => {
+    const res = await getProvinces()
+    setProvinces(res)
   }
 
   React.useEffect(() => {
@@ -89,10 +107,12 @@ export default function ManagerLocation(props) {
       name: inputFilter,
       status: statusFilter,
       isSupportBooking: isBooking,
+      idProvince: provinceId,
       page: 0,
       size: 20,
     }
     fetchListCampGround(param)
+    fetchProvinces()
   }, [])
 
   return (
@@ -102,7 +122,7 @@ export default function ManagerLocation(props) {
       </Box>
       <SimpleCard>
         <Grid container>
-          <Grid item sm={6} xs={6}>
+          <Grid item sm={8} xs={8}>
             <div style={{ display: 'flex' }}>
               <TextField
                 style={{ marginRight: '50px' }}
@@ -158,6 +178,18 @@ export default function ManagerLocation(props) {
                   <MenuItem value={0}>Không</MenuItem>
                 </Select>
               </FormControl>
+              <Autocomplete
+                disablePortal
+                sx={{ minWidth: 200, ml: 10 }}
+                options={provinces}
+                getOptionLabel={option => option.name}
+                onChange={(_, data) => {
+                  setProvinceId(data.id)
+                }}
+                renderInput={params => (
+                  <TextField {...params} fullWidth label="Tỉnh/thành phố" />
+                )}
+              />
             </div>
 
             <Button
@@ -221,6 +253,7 @@ export default function ManagerLocation(props) {
             name: inputFilter,
             status: statusFilter,
             isSupportBooking: isBooking,
+            idProvince: provinceId,
             page: 0,
             size: 20,
           }}

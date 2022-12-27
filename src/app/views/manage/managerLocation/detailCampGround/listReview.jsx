@@ -61,7 +61,7 @@ export default function ListReview(props) {
           }
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].size > 10000000) return false
+              if (value[i].size > 50000000) return false
             }
             return true
           }
@@ -161,6 +161,7 @@ export default function ListReview(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 11,
             },
           })
           return await res

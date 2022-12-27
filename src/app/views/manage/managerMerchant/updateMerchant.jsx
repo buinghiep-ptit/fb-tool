@@ -120,6 +120,7 @@ export default function UpdateMerchant(props) {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
+          srcType: 5,
         },
       })
       if (res) {

@@ -41,6 +41,7 @@ export default function ManagerLocation(props) {
   const [inputFilter, setInputFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState(null)
   const [isBooking, setIsBooking] = useState()
+  const [isPriority, setIsPriority] = useState()
   const [listCampGround, setListCampGround] = useState([])
   const [totalListCampGround, setTotalListCampground] = useState()
   const [provinces, setProvinces] = useState()
@@ -92,6 +93,7 @@ export default function ManagerLocation(props) {
       status: statusFilter,
       isSupportBooking: isBooking,
       idProvince: provinceId,
+      isPriority: isPriority,
       page: 0,
       size: 20,
     })
@@ -108,6 +110,7 @@ export default function ManagerLocation(props) {
       status: statusFilter,
       isSupportBooking: isBooking,
       idProvince: provinceId,
+      isPriority: isPriority,
       page: 0,
       size: 20,
     }
@@ -122,7 +125,7 @@ export default function ManagerLocation(props) {
       </Box>
       <SimpleCard>
         <Grid container>
-          <Grid item sm={8} xs={8}>
+          <Grid item sm={12} xs={12}>
             <div style={{ display: 'flex' }}>
               <TextField
                 style={{ marginRight: '50px' }}
@@ -166,6 +169,7 @@ export default function ManagerLocation(props) {
                   Hỗ trợ đặt chỗ
                 </InputLabel>
                 <Select
+                  style={{ marginRight: '50px' }}
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Hỗ trợ booking"
@@ -176,6 +180,21 @@ export default function ManagerLocation(props) {
                   <MenuItem value={null}>Tất cả</MenuItem>
                   <MenuItem value={1}>Có</MenuItem>
                   <MenuItem value={0}>Không</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Đối tác</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Đối tác"
+                  onChange={e => {
+                    setIsPriority(e.target.value)
+                  }}
+                >
+                  <MenuItem value={null}>Tất cả</MenuItem>
+                  <MenuItem value={1}>Ưu tiên</MenuItem>
+                  <MenuItem value={0}>Không ưu tiên</MenuItem>
                 </Select>
               </FormControl>
               <Autocomplete
@@ -254,6 +273,7 @@ export default function ManagerLocation(props) {
             status: statusFilter,
             isSupportBooking: isBooking,
             idProvince: provinceId,
+            isPriority: isPriority,
             page: 0,
             size: 20,
           }}

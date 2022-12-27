@@ -4,6 +4,8 @@ import {
   Icon,
   Fab,
   TextField,
+  Box,
+  LinearProgress,
   Autocomplete,
   FormHelperText,
 } from '@mui/material'
@@ -183,7 +185,7 @@ export default function ListReview(props) {
   }
 
   const onSubmit = async data => {
-    console.log(data)
+    setIsLoading(true)
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -215,13 +217,12 @@ export default function ListReview(props) {
           size: 20,
         }
         fetchListCampGroundReview(param)
+        setIsLoading(false)
         dialogCustomRef.current.handleClose()
       }
     } catch (e) {
       setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   React.useEffect(() => {

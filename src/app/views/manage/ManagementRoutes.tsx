@@ -411,7 +411,7 @@ const ManagementRoutes = [
   {
     path: '/quan-ly-danh-gia',
     element: <ListRating />,
-    auth: [ROLES.ADMIN, ROLES.MKT],
+    // auth: [ROLES.ADMIN, ROLES.MKT],
   },
   {
     path: '/quan-ly-danh-gia/:rateId/chi-tiet',

@@ -108,7 +108,7 @@ export const navigations = [
     name: 'Quản lý  đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
-    auth: [ROLES.ADMIN, ROLES.MKT],
+    // auth: [ROLES.ADMIN, ROLES.MKT],
   },
   // {
   //   name: 'Quản lý từ cấm',

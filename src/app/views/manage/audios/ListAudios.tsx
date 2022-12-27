@@ -248,12 +248,12 @@ export default function ListAudios(props: Props) {
         ...prev,
         title: row.isDefault === 1 ? 'Bỏ làm nhạc hay' : 'Đặt làm nhạc hay',
         message:
-          row.status === 1
-            ? 'Bạn có chắc chắn muốn bỏ làm nhạc hay'
-            : 'Bạn có chắc chắn muốn chọn làm nhạc hay',
+          row.isDefault === 1
+            ? 'Bạn có chắc muốn bỏ khỏi danh sách nhạc hay?'
+            : 'Bạn có chắc muốn thêm bài hát vào danh sách nhạc hay?',
         type: 'toggle-isDefault',
-        submitText: 'Xác nhận',
-        cancelText: 'Huỷ',
+        submitText: 'Có',
+        cancelText: 'Không',
       }))
       setAudioId(row.id)
       setOpenDialog(true)
@@ -266,8 +266,8 @@ export default function ListAudios(props: Props) {
             ? 'Bạn có chắc chắn muốn ẩn nhạc nền?'
             : 'Bạn có chắc chắn muốn mở lại nhạc nền?',
         type: 'toggle-status',
-        submitText: 'Xác nhận',
-        cancelText: 'Huỷ',
+        submitText: 'Có',
+        cancelText: 'Không',
       }))
       setAudioId(row.id)
       setOpenDialog(true)

@@ -80,7 +80,7 @@ export default function InformationCampGround({ action }) {
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
     { label: 'Chạy bộ', id: 2 },
-    { label: 'Teambuiding', id: 3 },
+    { label: 'Teambuilding', id: 3 },
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
@@ -121,7 +121,7 @@ export default function InformationCampGround({ action }) {
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
               if (
-                value[i].size > 10000000 &&
+                value[i].size > 50000000 &&
                 !value[i].type.startsWith('video')
               )
                 return false
@@ -224,6 +224,7 @@ export default function InformationCampGround({ action }) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 2,
             },
           })
           return await res
@@ -246,6 +247,7 @@ export default function InformationCampGround({ action }) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 2,
             },
           })
           return await res

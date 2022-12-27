@@ -55,7 +55,7 @@ export default function InformationPlace(props) {
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
     { label: 'Chạy bộ', id: 2 },
-    { label: 'Teambuiding', id: 3 },
+    { label: 'Teambuilding', id: 3 },
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
@@ -77,12 +77,11 @@ export default function InformationPlace(props) {
           return value.length > 0
         })
         .test('fileSize', 'Dung lượng file quá lớn', value => {
-          console.log(value)
           if (medias.length > 0 && value.length === 0) return true
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
               if (
-                value[i].size > 10000000 &&
+                value[i].size > 50000000 &&
                 !value[i].type.startsWith('video')
               )
                 return false
@@ -228,6 +227,7 @@ export default function InformationPlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res
@@ -251,6 +251,7 @@ export default function InformationPlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res

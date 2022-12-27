@@ -125,6 +125,7 @@ export default function CreateMerchant(props) {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
+          srcType: 5,
         },
       })
       setIsLoading(false)

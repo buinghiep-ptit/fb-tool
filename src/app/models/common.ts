@@ -80,11 +80,16 @@ export interface IUserProfile {
 export interface IFeedsFilters {
   search?: string
   hashtag?: string
-  status?: 0 | 1 | -1 | -2 | -3 | 'all' | string | undefined //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
+  status?: 0 | 1 | -1 | -2 | -3 | 'all' | string | undefined | any //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
   isCampdi?: 1 | number | boolean | string | undefined
   isReported?: 1 | number | boolean | string | undefined
   page?: number | 0
   size?: number | 20
+  from?: string
+  to?: string
+  sort?: string
+  viewScope?: number
+  stt?: any
 }
 
 export interface ServicesFilters {

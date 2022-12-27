@@ -1,9 +1,9 @@
 import { Chip, Tooltip, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { TableColumn, TitleActionsHistory } from 'app/models'
 import { TitleRateReports, TitleRating } from 'app/models/rating'
 import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import { TooltipText } from './columnsEvents'
 
 const getColorByStarNum = (num?: number) => {
   switch (num) {
@@ -87,7 +87,7 @@ export const columnsBase: readonly TableColumn<TitleRating>[] = [
   {
     id: 'rating',
     label: 'Số sao',
-    minWidth: 60,
+    minWidth: 80,
     align: 'center',
     status: (value: any) => (
       <Chip label={value} size="small" color={getColorByStarNum(value ?? 0)} />
@@ -106,7 +106,6 @@ export const columnsBase: readonly TableColumn<TitleRating>[] = [
           display: '-webkit-box',
           WebkitLineClamp: '2',
           WebkitBoxOrient: 'vertical',
-          pl: 1,
         }}
       >
         {value}
@@ -198,13 +197,13 @@ export const columnsRatingReported: readonly TableColumn<TitleRating>[] = [
   ...columnsBase,
   {
     id: 'reportedNum',
-    label: 'Số người báo cáo',
-    minWidth: 80,
+    label: 'Số người b/c',
+    minWidth: 100,
     align: 'center',
   },
   {
-    id: 'dateCreated',
-    label: 'Thời gian báo cáo vi phạm',
+    id: 'reportDate',
+    label: 'Thời gian b/c',
     minWidth: 170,
     align: 'center',
     format: (value: string) => ISODateTimeFormatter(value),
@@ -228,7 +227,7 @@ export const columnsRateDetailReports: readonly TableColumn<TitleRateReports>[] 
   [
     { id: 'order', label: 'STT', minWidth: 50, align: 'center' },
     {
-      id: 'customer',
+      id: 'reporter',
       label: 'Tài khoản báo cáo vi phạm',
       minWidth: 200,
       align: 'left',
@@ -253,8 +252,10 @@ export const columnsRateDetailReports: readonly TableColumn<TitleRateReports>[] 
     {
       id: 'reason',
       label: 'Nội dung',
-      minWidth: 170,
-      align: 'center',
+      minWidth: 200,
+      format: (value: any) => (
+        <TooltipText text={value} underline={false} maxLines={2} />
+      ),
     },
     {
       id: 'status',
@@ -271,7 +272,7 @@ export const columnsRateDetailReports: readonly TableColumn<TitleRateReports>[] 
     },
 
     {
-      id: 'dateCreated',
+      id: 'reportDate',
       label: 'Thời gian báo cáo',
       minWidth: 170,
       align: 'right',
@@ -292,8 +293,10 @@ export const columnsRateDetailActionsHistory: readonly TableColumn<TitleActionsH
     {
       id: 'note',
       label: 'Ghi chú',
-      minWidth: 170,
-      align: 'center',
+      minWidth: 200,
+      format: (value: any) => (
+        <TooltipText text={value} underline={false} maxLines={2} />
+      ),
     },
     {
       id: 'actionDate',

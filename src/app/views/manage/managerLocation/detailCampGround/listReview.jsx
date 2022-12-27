@@ -4,6 +4,8 @@ import {
   Icon,
   Fab,
   TextField,
+  Box,
+  LinearProgress,
   Autocomplete,
   FormHelperText,
 } from '@mui/material'
@@ -61,7 +63,7 @@ export default function ListReview(props) {
           }
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
-              if (value[i].size > 10000000) return false
+              if (value[i].size > 50000000) return false
             }
             return true
           }
@@ -161,6 +163,7 @@ export default function ListReview(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 11,
             },
           })
           return await res
@@ -182,7 +185,7 @@ export default function ListReview(props) {
   }
 
   const onSubmit = async data => {
-    console.log(data)
+    setIsLoading(true)
     const listUrl = await handleDataImageUpload()
     let mediasUpdateImage = []
     if (listUrl?.image && listUrl?.image.length > 0) {
@@ -214,13 +217,12 @@ export default function ListReview(props) {
           size: 20,
         }
         fetchListCampGroundReview(param)
+        setIsLoading(false)
         dialogCustomRef.current.handleClose()
       }
     } catch (e) {
       setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   React.useEffect(() => {
@@ -386,7 +388,7 @@ export default function ListReview(props) {
           star: starFilter === 0 ? null : starFilter,
         }}
       />
-      <DialogCustom ref={dialogCustomRef} title="Tạo đánh giá" maxWidth="ml">
+      <DialogCustom ref={dialogCustomRef} title="Tạo đánh giá" maxWidth="md">
         <SimpleCard>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Paragraph> Chọn tài khoản*:</Paragraph>

@@ -34,6 +34,7 @@ export interface ICustomer {
 
 export interface ICustomerDetail {
   id?: number
+  customerId?: number
   email?: string
   mobilePhone?: string
   fullName?: string
@@ -44,9 +45,12 @@ export interface ICustomerDetail {
   following?: number
   followers?: number
   type?: number
+  customerType?: number
   status?: number
   otpCount?: OtpCount[]
   labelText?: string
+  birthday?: string
+  gender?: number
 }
 
 export interface ICustomerTiny {

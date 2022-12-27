@@ -1,37 +1,46 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SearchSharp } from '@mui/icons-material'
-import { Grid, Icon, MenuItem, Stack } from '@mui/material'
+import { Grid, Icon, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery } from '@tanstack/react-query'
-import { fetchCampGrounds } from 'app/apis/feed/feed.service'
+import { fetchListReactFeed } from 'app/apis/feed/feed.service'
 import { SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { ICampGround, ICampGroundResponse } from 'app/models/camp'
-import { columnsCampgrounds } from 'app/utils/columns'
+import { ICustomerDetail } from 'app/models'
+import { ICampGroundResponse } from 'app/models/camp'
+import { columnsReactionsFeed, columnsViewsFeed } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
 
 export interface Props {
-  setSelectedCamps?: (items: readonly ICampGround[]) => void
+  reactionType: string
 }
 
 type ISearchFilters = {
-  status?: number | string
-  name?: string
+  search?: string
   page?: number
   size?: number
   sort?: string
 }
 
-export default function CampgroundList({ setSelectedCamps }: Props) {
-  const navigation = useNavigate()
+const extraCustomer = (customer?: ICustomerDetail) => {
+  if (!customer) return
+  return Object.assign(customer, {
+    customer:
+      (customer?.fullName ? customer?.fullName : '') +
+      (customer?.mobilePhone ? ', ' + customer?.mobilePhone : '') +
+      (customer?.email ? ', ' + customer?.email : ''),
+  })
+}
+
+export default function ReactionList({ reactionType = 'view' }: Props) {
+  const { feedId } = useParams()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(
@@ -41,8 +50,7 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
     queryParams.size ? +queryParams.size : 20,
   )
   const [defaultValues] = useState<ISearchFilters>({
-    name: queryParams.search ?? '',
-    status: queryParams.status ?? 'all',
+    search: queryParams.search ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -52,7 +60,7 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
   )
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string()
+    search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
@@ -64,20 +72,21 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
   })
 
   const {
-    data: campgrounds,
+    data: reactions,
     isFetching,
     isError,
     error,
   } = useQuery<ICampGroundResponse, Error>(
-    ['camp-grounds', filters],
+    ['reactions-feed', filters, reactionType, feedId],
     () =>
-      fetchCampGrounds({
+      fetchListReactFeed(Number(feedId ?? 0), {
         ...filters,
+        reactionType: reactionType,
       }),
     {
       refetchOnWindowFocus: false,
       keepPreviousData: true,
-      enabled: !!filters,
+      enabled: !!filters && !!feedId,
     },
   )
 
@@ -131,8 +140,7 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
 
   const onResetFilters = () => {
     methods.reset({
-      name: '',
-      status: 'all',
+      search: '',
       page: 0,
       size: 20,
     })
@@ -159,22 +167,22 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
               <Grid container spacing={2}>
                 <Grid item sm={6} xs={12}>
                   <FormInputText
-                    label={'Điểm camping'}
+                    label={'Từ khoá tìm kiếm'}
                     type="text"
-                    name="name"
+                    name="search"
                     defaultValue=""
-                    placeholder="Nhập tên điểm camping"
+                    placeholder="Nhập từ khoá tìm kiếm"
                     fullWidth
                   />
                 </Grid>
-                <Grid item sm={2} xs={12}>
+                {/* <Grid item sm={2} xs={12}>
                   <SelectDropDown name="status" label="Trang thái">
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="1">Hoạt động</MenuItem>
                     <MenuItem value="-1">Không hoạt động</MenuItem>
                   </SelectDropDown>
-                </Grid>
-                <Grid item sm={2} xs={12}>
+                </Grid> */}
+                <Grid item sm={3} xs={12}>
                   <MuiButton
                     title="Tìm kiếm"
                     variant="contained"
@@ -184,7 +192,7 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
                     startIcon={<SearchSharp />}
                   />
                 </Grid>
-                <Grid item sm={2} xs={12}>
+                <Grid item sm={3} xs={12}>
                   <MuiButton
                     title="Làm mới"
                     variant="outlined"
@@ -202,31 +210,24 @@ export default function CampgroundList({ setSelectedCamps }: Props) {
 
       <SimpleCard>
         <MuiStyledTable
-          rows={(campgrounds?.content as ICampGround[]) ?? []}
-          columns={columnsCampgrounds as any}
+          rows={
+            (reactions?.content?.map(customer =>
+              extraCustomer(customer as any),
+            ) as any) ?? []
+          }
+          columns={
+            reactionType === 'view' ? columnsViewsFeed : columnsReactionsFeed
+          }
           rowsPerPage={size}
           page={page}
           onClickRow={onClickRow}
           isFetching={isFetching}
           error={isError ? error : null}
-          actions={[
-            {
-              type: 1,
-            },
-            {
-              icon: 'double_arrow',
-              color: 'action',
-              tooltip: 'Xem điểm chi tiết điểm camping',
-              onClick: onRowDetail,
-            },
-          ]}
-          setSelectedItems={setSelectedCamps}
-          multipleSelect={false}
         />
         <MuiStyledPagination
           component="div"
           rowsPerPageOptions={[20, 50, 100]}
-          count={campgrounds?.totalElements ?? 0}
+          count={reactions?.totalElements ?? 0}
           rowsPerPage={size}
           page={page}
           onPageChange={handleChangePage}

@@ -12,13 +12,9 @@ import {
 import UploadImage from 'app/components/common/uploadImage'
 import * as React from 'react'
 import Typography from '@mui/material/Typography'
-import {
-  deletePlace,
-  getDetailPlace,
-  updateDetailPlace,
-} from 'app/apis/place/place.service'
+import { getDetailPlace, updateDetailPlace } from 'app/apis/place/place.service'
 import { useNavigate, useParams } from 'react-router-dom'
-import WYSIWYGEditor from 'app/components/common/WYSIWYGEditor'
+
 import { messages } from 'app/utils/messages'
 import {
   getDistricts,
@@ -53,7 +49,7 @@ export default function InformationPlace(props) {
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
     { label: 'Chạy bộ', id: 2 },
-    { label: 'Teambuiding', id: 3 },
+    { label: 'Teambuilding', id: 3 },
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
@@ -61,7 +57,8 @@ export default function InformationPlace(props) {
   const schema = yup
     .object({
       namePlace: yup.string().required('Vui lòng nhập tên địa danh').trim(),
-      province: yup.object().required(),
+      province: yup.object().required(messages.MSG1),
+      campAreaTypes: yup.array().min(1, messages.MSG1),
       description: yup.string().required(messages.MSG1).trim(),
       hashtag: yup.array().max(50, 'Tối đa 50 hashtag'),
       file: yup
@@ -76,7 +73,7 @@ export default function InformationPlace(props) {
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
               if (
-                value[i].size > 10000000 &&
+                value[i].size > 50000000 &&
                 !value[i].type.startsWith('video')
               )
                 return false
@@ -221,6 +218,7 @@ export default function InformationPlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res
@@ -243,6 +241,7 @@ export default function InformationPlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res
@@ -522,9 +521,13 @@ export default function InformationPlace(props) {
                     <TextField
                       {...params}
                       variant="outlined"
-                      label="Loại hình"
+                      label="Loại hình*"
                       placeholder="Loại hình"
                       fullWidth
+                      error={!!errors.campAreaTypes}
+                      helperText={
+                        errors.campAreaTypes?.message ? 'Giá trị bắt buộc' : ''
+                      }
                       margin="normal"
                     />
                   )}

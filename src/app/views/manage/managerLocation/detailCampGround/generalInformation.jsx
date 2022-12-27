@@ -51,7 +51,7 @@ export default function GeneralInformation({
   const typeCamp = [
     { label: 'Cắm trại', id: 1 },
     { label: 'Chạy bộ', id: 2 },
-    { label: 'Teambuiding', id: 3 },
+    { label: 'Teambuilding', id: 3 },
     { label: 'Lưu trú', id: 4 },
     { label: 'Leo núi', id: 5 },
   ]
@@ -117,7 +117,12 @@ export default function GeneralInformation({
                   field.onChange(data)
                 }}
                 renderInput={params => (
-                  <TextField {...params} label="Địa danh" margin="normal" />
+                  <TextField
+                    {...params}
+                    label="Địa danh"
+                    margin="normal"
+                    defaultValue="The Godfather"
+                  />
                 )}
               />
             )}

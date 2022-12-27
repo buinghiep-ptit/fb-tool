@@ -47,7 +47,7 @@ const getBreadCrumbDetailName = (slug?: string) => {
     case 'tat-ca':
       return 'Tất cả'
     case 'yeu-cau-huy':
-      return 'Yêu cầu huỷ'
+      return 'Yêu cầu huỷ đặt chỗ'
 
     default:
       return 'Tất cả'
@@ -201,14 +201,14 @@ export default function OrderDetail(props: Props) {
                 onClick={methods.handleSubmit(onSubmitHandler)}
                 startIcon={<Icon>done</Icon>}
               />
-              <MuiButton
+              {/* <MuiButton
                 title="Huỷ"
                 variant="contained"
                 color="warning"
                 disabled={editLoading}
                 onClick={() => methods.reset()}
                 startIcon={<Icon>clear</Icon>}
-              />
+              /> */}
             </>
           )}
 

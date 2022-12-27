@@ -124,9 +124,9 @@ export default function CampAreaList({ setSelectedCamps }: Props) {
   }
 
   const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'name') {
-      navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
-    }
+    // if (cell.id === 'name') {
+    //   navigation(`${row.id}/chi-tiet`, { state: { mode: 'update' } })
+    // }
   }
 
   const onResetFilters = () => {

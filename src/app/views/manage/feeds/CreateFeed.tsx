@@ -29,6 +29,7 @@ import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import { MuiAutocompleteWithTags } from 'app/components/common/MuiRHFAutocompleteWithTags'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import { MuiRHFSwitch } from 'app/components/common/MuiRHFSwitch'
 import FormTextArea from 'app/components/common/MuiRHFTextarea'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { TopRightButtonList } from 'app/components/common/TopRightButtonList'
@@ -81,6 +82,8 @@ type SchemaType = {
   images?: any
   videos?: any
   hashtag?: ITags[]
+  viewScope?: number
+  isAllowComment?: boolean
 }
 
 const Container = styled('div')<Props>(({ theme }) => ({
@@ -91,33 +94,6 @@ const Container = styled('div')<Props>(({ theme }) => ({
     [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
   },
 }))
-
-const extractCamps = (camps?: any[]) => {
-  if (!camps || !camps.length) return
-  return camps.map(camp =>
-    Object.assign(camp, {
-      icon: () => (
-        <Chip
-          label={
-            camp.status !== -1
-              ? camp.status === 3
-                ? 'Tỉnh thành'
-                : 'Hoạt động'
-              : 'Không hoạt động'
-          }
-          size="small"
-          color={
-            camp.status !== -1
-              ? camp.status === 3
-                ? 'warning'
-                : 'primary'
-              : 'default'
-          }
-        />
-      ),
-    }),
-  )
-}
 
 const extraCustomer = (customer?: ICustomerDetail) => {
   if (!customer) return
@@ -143,6 +119,8 @@ function CreateFeed(props: any) {
     cusType: '',
     idSrcType: 0,
     hashtag: [],
+    viewScope: 1,
+    isAllowComment: true,
   })
 
   const [dialogData, setDialogData] = useState<{
@@ -292,7 +270,7 @@ function CreateFeed(props: any) {
 
   const { data: campAreas } = useQuery<ICampAreaResponse, Error>(
     ['camp-areas'],
-    () => fetchCampAreas({ size: 200, page: 0 }),
+    () => fetchCampAreas({ size: 1000, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
@@ -301,7 +279,7 @@ function CreateFeed(props: any) {
 
   const { data: campGrounds } = useQuery<ICampAreaResponse, Error>(
     ['camp-grounds'],
-    () => fetchCampGrounds({ size: 200, page: 0 }),
+    () => fetchCampGrounds({ size: 1000, page: 0 }),
     {
       refetchOnWindowFocus: false,
       staleTime: 30 * 60 * 1000,
@@ -373,6 +351,8 @@ function CreateFeed(props: any) {
     defaultValues.idSrcType = feed.idSrcType ?? 0
     defaultValues.content = feed.content
     defaultValues.hashtag = feed.tags
+    defaultValues.viewScope = feed.viewScope
+    defaultValues.isAllowComment = feed.isAllowComment === 1 ? true : false
     defaultValues.webUrl = feed.webUrl ?? ''
 
     props.setInitialFile(
@@ -484,8 +464,8 @@ function CreateFeed(props: any) {
           : [],
       idAudio: values.audio?.id ?? null,
       tags: values.hashtag ?? [],
-      viewScope: 1,
-      isAllowComment: 1,
+      viewScope: Number(values.viewScope),
+      isAllowComment: values.isAllowComment ? 1 : 0,
       status: 1,
     }
 
@@ -765,6 +745,17 @@ function CreateFeed(props: any) {
                   )}
                   <Stack>
                     <MuiAutocompleteWithTags name="hashtag" label="Hashtag" />
+                  </Stack>
+                  <Stack>
+                    <SelectDropDown name="viewScope" label="Ai có thể xem">
+                      <MenuItem value="1">Mọi người</MenuItem>
+                      <MenuItem value="2">Những người theo dõi bạn</MenuItem>
+                      <MenuItem value="3">Chỉ mình tôi</MenuItem>
+                    </SelectDropDown>
+                  </Stack>
+                  <Stack direction={'row'} alignItems="center" gap={1}>
+                    <label>Cho phép bình luận</label>
+                    <MuiRHFSwitch name="isAllowComment" />
                   </Stack>
                   <Stack>
                     <FormTextArea

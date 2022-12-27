@@ -9,13 +9,11 @@ export const columnsFeedLogsActions: readonly TableColumn<TitleActionsHistory>[]
       id: 'email',
       label: 'Người xử lý',
       minWidth: 170,
-      align: 'center',
     },
     {
       id: 'note',
       label: 'Ghi chú',
       minWidth: 170,
-      align: 'center',
     },
     {
       id: 'actionDate',

@@ -87,7 +87,7 @@ export default function CreatePlace(props) {
           if (value.length > 0) {
             for (let i = 0; i < value.length; i++) {
               if (
-                value[i].size > 10000000 &&
+                value[i].size > 50000000 &&
                 !value[i].type.startsWith('video')
               )
                 return false
@@ -179,6 +179,7 @@ export default function CreatePlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res
@@ -202,6 +203,7 @@ export default function CreatePlace(props) {
             headers: {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${token}`,
+              srcType: 1,
             },
           })
           return await res
@@ -515,6 +517,7 @@ export default function CreatePlace(props) {
                             ? 'Vui lòng chọn loại hình'
                             : ''
                         }
+                        defaultValue="Cắm trại"
                         variant="outlined"
                         label="Loại hình*"
                         placeholder="Loại hình"

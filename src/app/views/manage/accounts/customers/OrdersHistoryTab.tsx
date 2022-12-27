@@ -260,7 +260,7 @@ export default function OrdersHistory() {
       }
     } else if (cell.id === 'cusAccount') {
       window.open(
-        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/lich-su-dat-cho`,
+        `/quan-ly-tai-khoan-khach-hang/${row?.customerId}/thong-tin`,
         '_blank',
       )
     } else if (cell.id === 'campGroundName') {
@@ -324,10 +324,10 @@ export default function OrdersHistory() {
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Grid item sm={3} xs={12} mt={-1}>
-                    <MuiRHFDatePicker name="from" label="Ngày bắt đầu" />
+                    <MuiRHFDatePicker name="from" label="Từ ngày" />
                   </Grid>
                   <Grid item sm={3} xs={12} mt={-1}>
-                    <MuiRHFDatePicker name="to" label="Ngày kết thúc" />
+                    <MuiRHFDatePicker name="to" label="Đến ngày" />
                   </Grid>
                 </LocalizationProvider>
               </Grid>

@@ -1,12 +1,10 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
   Avatar,
   Chip,
   Grid,
   Icon,
   IconButton,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   styled,
   Tooltip,
 } from '@mui/material'
@@ -17,6 +15,10 @@ import {
   useQuery,
   UseQueryResult,
 } from '@tanstack/react-query'
+import {
+  customerSystemDefault,
+  fetchCustomers,
+} from 'app/apis/accounts/customer.service'
 import {
   fetchActionsHistory,
   fetchFeedDetail,
@@ -29,9 +31,10 @@ import { MediaViewItem } from 'app/components/common/MediaViewItem'
 import { ModalFullScreen } from 'app/components/common/ModalFullScreen'
 import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
-import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
 import MuiStyledTable from 'app/components/common/MuiStyledTable'
+import { MuiSwitch } from 'app/components/common/MuiSwitch'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
@@ -56,20 +59,16 @@ import {
   columnsFeedLogsActions,
   columnsFeedLogsReports,
 } from 'app/utils/columns'
+import { ISODateTimeFormatter } from 'app/utils/formatters/dateTimeFormatters'
 import { messages } from 'app/utils/messages'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
+import * as Yup from 'yup'
 import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 import { CommentForm } from './detail/CommentForm'
 import { CommentList } from './detail/CommentList'
-import * as Yup from 'yup'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
-import {
-  customerSystemDefault,
-  fetchCustomers,
-} from 'app/apis/accounts/customer.service'
+import ReactionList from './detail/ReactionList'
 
 export interface Props {}
 
@@ -111,9 +110,15 @@ export default function FeedDetail(props: Props) {
     size: sizeActions,
   })
 
-  const [titleDialog, setTitleDialog] = useState('')
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
+
   const [openDialog, setOpenDialog] = useState(false)
-  const [dialogType, setDialogType] = useState(1)
 
   const [customersCmt, setCustomersCmt] = useState<ICustomerDetail[]>([])
 
@@ -165,8 +170,11 @@ export default function FeedDetail(props: Props) {
   const queryResults = useQueries({
     queries: [
       {
-        queryKey: ['feed', feedId],
-        queryFn: () => fetchFeedDetail(Number(feedId ?? 0)),
+        queryKey: ['feed', feedId, customer?.customerId],
+        queryFn: () =>
+          fetchFeedDetail(Number(feedId ?? 0), {
+            customerId: customer?.customerId ?? 0,
+          }),
         refetchOnWindowFocus: false,
         enabled: !!feedId,
       },
@@ -207,10 +215,13 @@ export default function FeedDetail(props: Props) {
   useEffect(() => {
     if (customerCampdi && customersFood && customersFood.content) {
       const customersMerge = [
-        customerCampdi,
+        { ...customerCampdi, customerId: customerCampdi.id },
         ...customersFood.content,
       ] as ICustomerDetail[]
-      methods.setValue('customer', customerCampdi)
+      methods.setValue('customer', {
+        ...customerCampdi,
+        customerId: customerCampdi.id,
+      })
       setCustomersCmt(customersMerge)
     }
   }, [customerCampdi, customersFood])
@@ -224,11 +235,12 @@ export default function FeedDetail(props: Props) {
     isFetching: isFetchingComments,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ['comments', feedId],
+    ['comments', feedId, customer],
     ({ pageParam }) =>
       fetchListCommentFeed(Number(feedId ?? 0), {
         size: 10,
         index: pageParam ? (pageParam - 1) * 10 : 0,
+        customerId: customer?.customerId ?? 0,
       }),
     {
       getNextPageParam: (_lastPage, pages) => {
@@ -240,7 +252,7 @@ export default function FeedDetail(props: Props) {
       },
       refetchOnWindowFocus: false,
       keepPreviousData: true,
-      enabled: !!feedId,
+      enabled: !!feedId && !!customer,
       staleTime: 30 * 60 * 1000,
     },
   )
@@ -332,16 +344,37 @@ export default function FeedDetail(props: Props) {
   const approveFeed = (feedId: number) => {
     approve(feedId)
   }
+
+  const openDialogReactions = (type: string) => {
+    setDialogData(prev => ({
+      ...prev,
+      title:
+        'Danh sách ' +
+        (type === 'view'
+          ? 'lượt xem'
+          : type === 'like'
+          ? 'yêu thích'
+          : 'đã lưu'),
+      type: type,
+      cancelText: 'Đóng',
+    }))
+    setOpenDialog(true)
+  }
+
   const openDialogDelete = () => {
-    setTitleDialog('Xoá bài đăng')
-    setDialogType(-1)
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Xoá bài đăng',
+      message: 'Bạn có chắc chắn muốn xoá bài đăng?',
+      type: 'delete',
+      submitText: 'Xoá',
+      cancelText: 'Huỷ',
+    }))
     setOpenDialog(true)
   }
   const OnDeleteFeed = () => {
     deletedFeed(Number(feedId ?? 0))
   }
-
-  const onSubmitHandler: SubmitHandler<SchemaType> = (values: SchemaType) => {}
 
   const getColorByCusStatus = (status: number) => {
     switch (status) {
@@ -377,27 +410,53 @@ export default function FeedDetail(props: Props) {
     }
   }
 
+  const getTitleLinked = (type?: number | string) => {
+    switch (type) {
+      case 1:
+        return 'Địa danh'
+      case 2:
+        return 'Điểm camp'
+      case 4:
+        return 'Sản phẩm'
+      default:
+        return 'Không liên kết'
+    }
+  }
+
   const interactRender = (feed?: IFeedDetail) => {
     return (
       <>
         <Stack direction={'row'} gap={1.5} alignItems="center">
-          <Tooltip title="Yêu thích" arrow>
-            <Icon sx={{ fontSize: '32px!important' }}>favorite</Icon>
-          </Tooltip>
-          <MuiTypography>{feed?.likeNum}</MuiTypography>
+          <IconButton onClick={() => openDialogReactions('like')}>
+            <Tooltip title="Yêu thích" arrow>
+              <Icon sx={{ fontSize: '32px!important' }}>favorite</Icon>
+            </Tooltip>
+            <MuiTypography ml={1.5}>{feed?.likeNum}</MuiTypography>
+          </IconButton>
         </Stack>
         <Stack direction={'row'} gap={1.5} alignItems="center">
-          <Tooltip title="Lượt xem" arrow>
-            <Icon sx={{ fontSize: '32px!important' }}>remove_red_eye</Icon>
-          </Tooltip>
-          <MuiTypography>{feed?.viewNum}</MuiTypography>
+          <IconButton onClick={() => openDialogReactions('view')}>
+            <Tooltip title="Lượt xem" arrow>
+              <Icon sx={{ fontSize: '32px!important' }}>remove_red_eye</Icon>
+            </Tooltip>
+            <MuiTypography ml={1.5}>{feed?.viewNum}</MuiTypography>
+          </IconButton>
         </Stack>
         <Stack direction={'row'} gap={1.5} alignItems="center">
-          <Tooltip title="Bình luận" arrow>
-            <Icon sx={{ fontSize: '32px!important' }}>chat</Icon>
-          </Tooltip>
-
-          <MuiTypography>{feed?.commentNum}</MuiTypography>
+          <IconButton onClick={() => {}}>
+            <Tooltip title="Bình luận" arrow>
+              <Icon sx={{ fontSize: '32px!important' }}>chat</Icon>
+            </Tooltip>
+            <MuiTypography ml={1.5}>{feed?.commentNum}</MuiTypography>
+          </IconButton>
+        </Stack>
+        <Stack direction={'row'} gap={1.5} alignItems="center">
+          <IconButton onClick={() => openDialogReactions('bookmark')}>
+            <Tooltip title="Lưu" arrow>
+              <Icon sx={{ fontSize: '32px!important' }}>bookmark</Icon>
+            </Tooltip>
+            <MuiTypography ml={1.5}>{feed?.bookmarkNum}</MuiTypography>
+          </IconButton>
         </Stack>
       </>
     )
@@ -444,7 +503,7 @@ export default function FeedDetail(props: Props) {
           feed.data?.status !== -3 && (
             <MuiButton
               title="Chỉnh sửa"
-              variant="outlined"
+              variant="contained"
               color="primary"
               onClick={() => navigate(`chinh-sua-feed`, {})}
               loading={approveLoading}
@@ -490,7 +549,7 @@ export default function FeedDetail(props: Props) {
           <Box>
             <Grid container spacing={2}>
               <Grid item sm={8} xs={12}>
-                <Stack flexDirection={'row'} gap={2} alignItems="center">
+                <Stack flexDirection={'row'} gap={2}>
                   <Avatar
                     alt="avatar"
                     src={
@@ -500,14 +559,58 @@ export default function FeedDetail(props: Props) {
                     }
                     sx={{ width: 56, height: 56 }}
                   />
-                  <Stack flexDirection={'column'}>
+                  <Stack flexDirection={'column'} gap={0.5}>
                     <MuiTypography variant="subtitle2">
                       {feed.data?.customerInfo?.fullName}
                     </MuiTypography>
                     <MuiTypography variant="body2">
-                      {feed.data?.content}
+                      {feed.data?.dateCreated
+                        ? ISODateTimeFormatter(feed.data?.dateCreated)
+                        : null}
                     </MuiTypography>
                   </Stack>
+                </Stack>
+                <Stack mt={3} gap={1.5}>
+                  <Stack flexDirection={'row'} gap={1}>
+                    <MuiTypography variant="subtitle2" fontStyle={'italic'}>
+                      Liên kết với:
+                    </MuiTypography>
+                    <MuiTypography variant="body2">
+                      {getTitleLinked(feed.data?.idSrcType ?? 0)}
+                      {' - '}
+                      {feed.data?.idSrcType == 4
+                        ? feed.data?.webUrl
+                        : feed.data?.idSrcType != 0
+                        ? feed.data?.srcName
+                        : ''}
+                    </MuiTypography>
+                  </Stack>
+                  <Stack flexDirection={'row'} gap={3}>
+                    <Stack flexDirection={'row'} gap={1}>
+                      <MuiTypography variant="subtitle2" fontStyle={'italic'}>
+                        Ai có thể xem:
+                      </MuiTypography>
+                      <MuiTypography variant="body2">
+                        {feed.data?.viewScope === 1
+                          ? 'Công khai'
+                          : feed.data?.viewScope === 2
+                          ? 'Những người theo dõi bạn'
+                          : 'Chỉ mình tôi'}
+                      </MuiTypography>
+                    </Stack>
+                    <Stack flexDirection={'row'} gap={1}>
+                      <MuiTypography variant="subtitle2" fontStyle={'italic'}>
+                        Cho phép bình luận:
+                      </MuiTypography>
+                      <MuiSwitch
+                        checked={feed.data?.isAllowComment === 1 ? true : false}
+                        sx={{ justifyContent: 'center' }}
+                      />
+                    </Stack>
+                  </Stack>
+                  <MuiTypography variant="body2" mt={1.5}>
+                    {feed.data?.content}
+                  </MuiTypography>
                 </Stack>
                 <Stack flexDirection={'row'} gap={1} my={2}>
                   {feed.data?.tags?.map(tag => (
@@ -652,17 +755,47 @@ export default function FeedDetail(props: Props) {
                 </Stack>
               </FormProvider>
               {/* </form> */}
-              <Stack direction={'row'}>
-                <Tooltip arrow title="Thích">
-                  <IconButton onClick={onLikeFeed}>
-                    <Icon>favorite</Icon>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip arrow title="Đánh dấu">
-                  <IconButton onClick={onBookmark}>
-                    <Icon>bookmark</Icon>
-                  </IconButton>
-                </Tooltip>
+              <Stack direction={'row'} gap={1.5}>
+                <Stack direction={'row'} alignItems="center">
+                  <MuiTypography>{feed.data?.likeNum}</MuiTypography>
+
+                  <Tooltip
+                    arrow
+                    title={feed.data?.isLiked ? 'Bỏ thích' : 'Thích'}
+                  >
+                    <IconButton onClick={onLikeFeed}>
+                      <Icon
+                        sx={{
+                          color: feed.data?.isLiked
+                            ? 'hsl(235, 100%, 67%)'
+                            : 'hsl(235, 25%, 67%)',
+                        }}
+                      >
+                        favorite
+                      </Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+
+                <Stack direction={'row'} alignItems="center">
+                  <MuiTypography>{feed.data?.bookmarkNum}</MuiTypography>
+                  <Tooltip
+                    arrow
+                    title={feed.data?.isBookmarked ? 'Bỏ lưu' : 'Lưu'}
+                  >
+                    <IconButton onClick={onBookmark}>
+                      <Icon
+                        sx={{
+                          color: feed.data?.isBookmarked
+                            ? 'hsl(235, 100%, 67%)'
+                            : 'hsl(235, 25%, 67%)',
+                        }}
+                      >
+                        bookmark
+                      </Icon>
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
             </Stack>
 
@@ -698,17 +831,27 @@ export default function FeedDetail(props: Props) {
       </Stack>
 
       <DiagLogConfirm
-        title={titleDialog}
+        title={dialogData.title}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={OnDeleteFeed}
+        onSubmit={dialogData.type !== 'delete' ? undefined : OnDeleteFeed}
         isLoading={deleteLoading}
+        maxWidth={dialogData.type !== 'delete' ? 'lg' : 'sm'}
+        submitText={dialogData.type !== 'delete' ? 'Lưu' : 'Xoá'}
+        cancelText={dialogData.type !== 'delete' ? 'Đóng' : 'Huỷ'}
       >
-        <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1">
-            Bạn có chắc chắn muốn xoá bài?
-          </MuiTypography>
-        </Stack>
+        <>
+          {dialogData.type !== 'delete' && (
+            <ReactionList reactionType={dialogData.type ?? ''} />
+          )}
+          {dialogData.type === 'delete' && (
+            <Stack py={5} justifyContent={'center'} alignItems="center">
+              <MuiTypography variant="subtitle1">
+                {dialogData.message ?? ''}
+              </MuiTypography>
+            </Stack>
+          )}
+        </>
       </DiagLogConfirm>
     </Container>
   )

@@ -5,10 +5,12 @@ import {
   TitleCampAreas,
   TitleCampGrounds,
   TitleFeeds,
+  TitleReactsFeed,
 } from 'app/models'
 import moment from 'moment'
 import { CurrencyFormatter } from '../formatters/currencyFormatter'
-import { labelFeedStatus, LabelFormatter } from '../formatters/labelFormatter'
+import { ISODateTimeFormatter } from '../formatters/dateTimeFormatters'
+import { labelFeedStatus } from '../formatters/labelFormatter'
 
 export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
   {
@@ -217,6 +219,18 @@ export const columnFeeds: readonly TableColumn<TitleFeeds>[] = [
       ),
   },
   {
+    id: 'bookmarkNum',
+    label: 'Đánh dấu',
+    minWidth: 80,
+    align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
+  },
+  {
     id: 'actions',
     label: 'Hành động',
     minWidth: 80,
@@ -349,5 +363,92 @@ export const columnsCampgrounds: readonly TableColumn<TitleCampGrounds>[] = [
       boxShadow: '0px 0px 4px rgba(0,0,0,0.15)',
       clipPath: 'inset(0px 0px 0px -15px)',
     },
+  },
+]
+
+export const columnsReactionsFeed: readonly TableColumn<TitleReactsFeed>[] = [
+  {
+    id: 'order',
+    label: 'STT',
+    width: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
+  {
+    id: 'customer',
+    label: 'Người thực hiện',
+    minWidth: 200,
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          pl: 1,
+        }}
+      >
+        {value}
+      </Typography>
+    ),
+  },
+  {
+    id: 'dateCreated',
+    label: 'Thời gian thực hiện',
+    minWidth: 200,
+    align: 'center',
+    format: (value: string) => (value ? ISODateTimeFormatter(value) : null),
+  },
+]
+
+export const columnsViewsFeed: readonly TableColumn<TitleReactsFeed>[] = [
+  {
+    id: 'order',
+    label: 'STT',
+    width: 50,
+    align: 'center',
+    sticky: {
+      position: 'sticky',
+      left: 0,
+      background: 'white',
+      zIndex: 9,
+    },
+  },
+  {
+    id: 'customer',
+    label: 'Người thực hiện',
+    minWidth: 200,
+    format: (value: number) => (
+      <Typography
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: '1',
+          WebkitBoxOrient: 'vertical',
+          pl: 1,
+        }}
+      >
+        {value}
+      </Typography>
+    ),
+  },
+  {
+    id: 'total',
+    label: 'Số lượt xem',
+    minWidth: 120,
+    align: 'center',
+    format: (value: number) =>
+      value ? (
+        <Typography color={'primary'}>{CurrencyFormatter(value, 2)}</Typography>
+      ) : (
+        <></>
+      ),
   },
 ]

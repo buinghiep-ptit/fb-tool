@@ -180,6 +180,7 @@ export default function MuiPagingTable<T extends Record<string, any>>({
                     tabIndex={-1}
                     key={index} //row.userId ?? row.customerId ?? row.id ??
                     selected={isItemSelected}
+                    // onClick={event => handleClick(event, row)}
                     sx={{
                       '&.MuiTableRow-hover': {
                         '&:hover': {

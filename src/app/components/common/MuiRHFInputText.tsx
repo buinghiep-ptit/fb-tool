@@ -24,6 +24,11 @@ export const CssTextField = styled(TextField)({
       //   border: 'none',
     },
   },
+
+  '& .MuiInputBase-input.Mui-disabled': {
+    WebkitTextFillColor: '#000000',
+    opacity: 0.5,
+  },
 })
 
 export type IFormInputTextProps = {

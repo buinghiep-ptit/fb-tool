@@ -147,7 +147,7 @@ export const getOrderStatusSpec = (
         return {
           key: 2,
           value: 2,
-          title: 'Đã huỷ',
+          title: 'Đã xử lý',
           textColor: '#466FFF',
           bgColor: '#F0F4FF',
         }

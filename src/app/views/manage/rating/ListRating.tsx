@@ -267,7 +267,7 @@ export default function ListRating() {
 
   const [getContentNote, methodsNote] = useNoteDialogForm('note')
 
-  const { mutate: note, isLoading: toggleLoading } = useToggleRateStatus(() =>
+  const { mutate: toggle, isLoading: toggleLoading } = useToggleRateStatus(() =>
     onSuccess(null, 'Cập nhật thành công'),
   )
 
@@ -308,7 +308,7 @@ export default function ListRating() {
   const onSubmitDialogHandler: SubmitHandler<{
     note?: string
   }> = (values: { note?: string }) => {
-    note({
+    toggle({
       rateId: Number(row.id ?? 0),
       note: values.note || undefined,
     })
@@ -323,6 +323,32 @@ export default function ListRating() {
       default:
         break
     }
+  }
+
+  const approveDialog = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Bỏ qua',
+      message: (dialogLoading?: boolean) => getContentNote(dialogLoading),
+      type: 'toggle-status',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
+    setRow(row)
+    setOpenDialog(true)
+  }
+
+  const rejectDialog = (cell: any, row: any) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Vi phạm',
+      message: (dialogLoading?: boolean) => getContentNote(dialogLoading),
+      type: 'toggle-status',
+      submitText: 'Có',
+      cancelText: 'Không',
+    }))
+    setRow(row)
+    setOpenDialog(true)
   }
 
   if (isLoading) return <MuiLoading />
@@ -433,14 +459,20 @@ export default function ListRating() {
                         icon: 'warning_amber',
                         color: 'error',
                         tooltip: 'Vi phạm',
-                        onClick: undefined,
+                        onClick: rejectDialog,
                         disableKey: 'status',
                       },
                       {
                         icon: 'close',
                         color: 'primary',
                         tooltip: 'Bỏ qua',
-                        onClick: undefined,
+                        onClick: approveDialog,
+                      },
+                      {
+                        icon: 'edit',
+                        color: 'action',
+                        tooltip: 'Chi tiết',
+                        onClick: onRowUpdate,
                       },
                     ]
                   : [

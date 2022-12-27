@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { CommentList } from './CommentList'
 import { Avatar, Icon, IconButton, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import { useInfiniteQuery } from '@tanstack/react-query'
@@ -15,9 +13,11 @@ import {
   useToggleLikeComment,
 } from 'app/hooks/queries/useFeedsData'
 import { IComment, ICustomerDetail } from 'app/models'
-import { DateTimeFullConverter } from 'app/utils/formatters/dateTimeFormatters'
-import { CommentForm } from './CommentForm'
+import { timeSince } from 'app/utils/common'
+import { useState } from 'react'
 import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
+import { CommentForm } from './CommentForm'
+import { CommentList } from './CommentList'
 
 type IProps = {
   commentDetail: IComment
@@ -38,6 +38,8 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
     isCommentPinned,
     userCommentName,
     isCurUserLike,
+    customerType,
+    dateUpdated,
   } = commentDetail
   const [areChildrenHidden, setAreChildrenHidden] = useState(true)
   const [isReplying, setIsReplying] = useState(false)
@@ -61,11 +63,12 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
     isFetchingNextPage,
     refetch,
   } = useInfiniteQuery(
-    ['comments-child', commentId, enabled],
+    ['comments-child', commentId, enabled, customer?.customerId],
     ({ pageParam }) =>
       fetchListChildCommentFeed(Number(commentId ?? 0), {
         size: 10,
         index: pageParam ? (pageParam - 1) * 10 : 0,
+        customerId: customer?.customerId ?? 0,
       }),
     {
       getNextPageParam: (_lastPage, pages) => {
@@ -202,9 +205,7 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
             <span className="name">{userCommentName}</span>
           </Stack>
 
-          <span className="date">
-            {DateTimeFullConverter((dateCreated ?? 0) * 1000)}
-          </span>
+          <span className="date">{timeSince((dateCreated ?? 0) * 1000)}</span>
         </div>
         {isEditing ? (
           <CommentForm
@@ -250,21 +251,24 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
 
             {/* {userCommentId === (currentUser as any)?.id && ( */}
             <>
-              <IconButton
-                size="small"
-                onClick={() => setIsEditing(prev => !prev)}
-              >
-                <MuiTypography
-                  sx={{
-                    fontSize: '0.75rem',
-                    color: isEditing
-                      ? 'hsl(235, 100%, 67%)'
-                      : 'hsl(235, 50%, 67%)',
-                  }}
+              {((customerType === 1 && userCommentId == 0) ||
+                customerType === 3) && (
+                <IconButton
+                  size="small"
+                  onClick={() => setIsEditing(prev => !prev)}
                 >
-                  {isEditing ? 'Huỷ chỉnh sửa' : 'Chỉnh sửa'}
-                </MuiTypography>
-              </IconButton>
+                  <MuiTypography
+                    sx={{
+                      fontSize: '0.75rem',
+                      color: isEditing
+                        ? 'hsl(235, 100%, 67%)'
+                        : 'hsl(235, 50%, 67%)',
+                    }}
+                  >
+                    {isEditing ? 'Huỷ chỉnh sửa' : 'Chỉnh sửa'}
+                  </MuiTypography>
+                </IconButton>
+              )}
 
               <IconButton size="small" onClick={openToggleDialog}>
                 <MuiTypography
@@ -345,6 +349,7 @@ export function Comment({ commentDetail, isChildren, customer }: IProps) {
               comments={
                 childComments?.pages.map(group => group).flat() as IComment[]
               }
+              customer={customer}
             />
           </div>
         </div>

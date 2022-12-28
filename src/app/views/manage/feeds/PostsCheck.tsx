@@ -35,6 +35,7 @@ export default function PostsCheck(props: Props) {
   const location = useLocation() as any
   const [open, setOpen] = useState(false)
   const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const [imagesModal, setImagesModal] = useState<Image[]>([])
   const type = location.state?.type ?? 1
 
   const {
@@ -43,6 +44,7 @@ export default function PostsCheck(props: Props) {
     isFetching,
     isError,
     error,
+    refetch,
   }: UseQueryResult<IFeedDetail[], Error> = usePostsCheckData(type)
 
   const onSuccess = (data: any) => {
@@ -55,7 +57,8 @@ export default function PostsCheck(props: Props) {
     approve(feedId)
   }
 
-  const onClickMedia = (imgIndex?: number) => {
+  const onClickMedia = (imgIndex?: number, images?: Image[]) => {
+    setImagesModal(images ?? [])
     setInitialIndexSlider(imgIndex ?? 0)
     setOpen(true)
   }
@@ -146,14 +149,9 @@ export default function PostsCheck(props: Props) {
                     <>
                       <ImageListView
                         medias={post.images as Image[]}
-                        onClickMedia={onClickMedia}
-                      />
-                      <ModalFullScreen
-                        mode="view"
-                        data={post.images as Image[]}
-                        open={open}
-                        onCloseModal={handleClose}
-                        initialIndexSlider={initialIndexSlider}
+                        onClickMedia={posImg =>
+                          onClickMedia(posImg, post?.images as Image[])
+                        }
                       />
                     </>
                   </Box>
@@ -207,7 +205,10 @@ export default function PostsCheck(props: Props) {
           gap: 2,
         }}
       >
-        <CountdownTimer targetDate={dateTimeAfterThreeDays} />
+        <CountdownTimer
+          targetDate={dateTimeAfterThreeDays}
+          callBack={() => refetch()}
+        />
 
         <MuiButton
           title="Quay lại"
@@ -241,6 +242,16 @@ export default function PostsCheck(props: Props) {
           )}
         </Stack>
       </SimpleCard>
+
+      {imagesModal.length && (
+        <ModalFullScreen
+          mode="view"
+          data={imagesModal}
+          open={open}
+          onCloseModal={handleClose}
+          initialIndexSlider={initialIndexSlider}
+        />
+      )}
     </Container>
   )
 }

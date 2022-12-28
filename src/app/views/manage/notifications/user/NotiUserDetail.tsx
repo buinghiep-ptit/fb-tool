@@ -87,7 +87,9 @@ function NotiUserDetail(props: any) {
   >([])
 
   const validationSchema = Yup.object().shape({
-    title: Yup.string().required(messages.MSG1),
+    title: Yup.string()
+      .required(messages.MSG1)
+      .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     srcType: Yup.string().required(messages.MSG1),
     campArea: Yup.object()
       .nullable()

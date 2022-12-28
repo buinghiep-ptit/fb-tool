@@ -19,6 +19,7 @@ export interface IRatingOverall {
   cusMobilePhone?: string
   imgUrl?: string
   dateCreated?: string
+  dateUpdated?: string
   idCustomer?: number
   rating?: number
   cusName?: string

@@ -292,7 +292,6 @@ export default function PushNotificationList(props: Props) {
                     <MenuItem value="all">Tất cả</MenuItem>
                     <MenuItem value="0">Chưa gửi</MenuItem>
                     <MenuItem value="1">Đã gửi</MenuItem>
-                    <MenuItem value="-3">Dừng sử dụng</MenuItem>
                   </SelectDropDown>
                 </Grid>
 

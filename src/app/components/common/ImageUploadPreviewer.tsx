@@ -114,6 +114,18 @@ export function ImageUploadPreviewer({
     maxSize: 50 * 1024 * 1024,
   })
 
+  const convertMessageToVn = (code: string) => {
+    switch (code) {
+      case 'file-too-large':
+        return 'Kích thước file không hợp lệ (<= 50MB)'
+      case 'file-invalid-type':
+        return 'Định dạng file không hợp lệ'
+
+      default:
+        return 'File không hợp lệ'
+    }
+  }
+
   const fileRejectionItems = fileRejections.map(({ file, errors }: any) => {
     return (
       <li key={file.path}>
@@ -121,7 +133,9 @@ export function ImageUploadPreviewer({
         <ul>
           {errors.map((e: any) => (
             <li key={e.code}>
-              <span style={{ color: '#FF6868' }}>{e.message}</span>
+              <span style={{ color: '#FF6868' }}>
+                {convertMessageToVn(e.code)}
+              </span>
             </li>
           ))}
         </ul>

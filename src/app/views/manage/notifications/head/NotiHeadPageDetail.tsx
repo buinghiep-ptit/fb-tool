@@ -347,7 +347,7 @@ function NotiHeadPageDetail(props: any) {
         noti?.status === 1
           ? 'Sau khi tắt, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn tắt?'
           : res?.existActivePopup
-          ? 'Sau khi bật sẽ thay thế cho thông báo lúc mở app hiện tại. Bạn có chắc muốn bật?'
+          ? 'Sau khi bật, thông báo này sẽ thay thế cho thông báo lúc mở app hiện tại. Bạn có chắc muốn bật?'
           : 'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
       type: 'toggle-status',
       submitText: 'Có',

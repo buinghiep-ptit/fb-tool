@@ -5,15 +5,17 @@ import { MuiTypography } from './MuiTypography'
 
 export interface Props {
   targetDate?: number
+  callBack?: () => void
 }
 
-export function CountdownTimer({ targetDate = 0 }: Props) {
+export function CountdownTimer({ targetDate = 0, callBack }: Props) {
   const [days, hours, minutes, seconds] = useCountdown(targetDate)
 
   if (days + hours + minutes + seconds <= 0) {
     toastWarning({
       message: 'Đã hết thời gian 30 phút, các feed chưa xử lý sẽ được gắn cờ',
     })
+    // callBack()
     return <></>
   } else {
     return (

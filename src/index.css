@@ -189,3 +189,7 @@ button {
 .btn[disabled] {
   --color: hsl(var(--hue), 20%, 74%);
 }
+
+.Toastify__toast-body {
+  white-space: pre-line;
+}

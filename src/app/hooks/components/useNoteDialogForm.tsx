@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 
 type SchemaType = {
   note?: string
+  required?: boolean
 }
 
 const useNoteDialogForm = (name = 'note', required = false) => {

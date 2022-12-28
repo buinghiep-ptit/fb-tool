@@ -44,7 +44,7 @@ export const useApproveFeed = (onSuccess?: any, onError?: any) => {
   const queryClient = useQueryClient()
   return useMutation((feedId: number) => approveFeed(feedId), {
     onSettled: () => {
-      queryClient.invalidateQueries(['posts-check'])
+      // queryClient.invalidateQueries(['posts-check'])
       queryClient.invalidateQueries(['feed'])
       queryClient.invalidateQueries(['feeds'])
       queryClient.invalidateQueries(['actions-history'])
@@ -91,7 +91,7 @@ export const useViolateFeed = (onSuccess?: any, onError?: any) => {
       ),
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['posts-check'])
+        // queryClient.invalidateQueries(['posts-check'])
         queryClient.invalidateQueries(['feed'])
         queryClient.invalidateQueries(['feeds'])
         queryClient.invalidateQueries(['actions-history'])

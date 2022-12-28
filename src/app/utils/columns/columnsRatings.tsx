@@ -153,7 +153,7 @@ export const columnsBase: readonly TableColumn<TitleRating>[] = [
 export const columnsRatingAll: readonly TableColumn<TitleRating>[] = [
   ...columnsBase,
   {
-    id: 'dateCreated',
+    id: 'dateUpdated',
     label: 'Thời gian nhận xét',
     minWidth: 170,
     align: 'center',

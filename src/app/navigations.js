@@ -91,7 +91,7 @@ export const navigations = [
         path: '/quan-ly-thong-bao/dau-trang',
       },
     ],
-    auth: [ROLES.ADMIN, ROLES.SALE],
+    auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
   },
   {
     name: 'Quản lý từ khoá yêu thích',

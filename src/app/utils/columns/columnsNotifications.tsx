@@ -131,7 +131,7 @@ export const columnsNotifications: readonly TableColumn<TitleNotifications>[] =
     },
     {
       id: 'lastModifiedBy',
-      label: 'Người gửi',
+      label: 'Người cập nhật',
       minWidth: 200,
       align: 'center',
       format: (value: any) => (

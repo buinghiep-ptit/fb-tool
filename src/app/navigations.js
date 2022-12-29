@@ -105,10 +105,16 @@ export const navigations = [
     icon: 'menu_book',
   },
   {
-    name: 'Quản lý  đánh giá',
+    name: 'Quản lý đánh giá',
     path: '/quan-ly-danh-gia',
     icon: 'stars',
     // auth: [ROLES.ADMIN, ROLES.MKT],
+  },
+  {
+    name: 'Quản lý cấu hình',
+    path: '/quan-ly-cau-hinh',
+    icon: 'settings',
+    auth: [ROLES.ADMIN],
   },
   // {
   //   name: 'Quản lý từ cấm',

@@ -80,7 +80,6 @@ export const columnsNotifications: readonly TableColumn<TitleNotifications>[] =
             display: '-webkit-box',
             WebkitLineClamp: '2',
             WebkitBoxOrient: 'vertical',
-            pl: 1,
           }}
         >
           {value}
@@ -96,7 +95,7 @@ export const columnsNotifications: readonly TableColumn<TitleNotifications>[] =
     },
     {
       id: 'dateUpdated',
-      label: 'Thời gian cập nhật',
+      label: 'Thời gian thêm',
       minWidth: 150,
       align: 'center',
       format: (value: string) => (
@@ -133,7 +132,6 @@ export const columnsNotifications: readonly TableColumn<TitleNotifications>[] =
       id: 'lastModifiedBy',
       label: 'Người cập nhật',
       minWidth: 200,
-      align: 'center',
       format: (value: any) => (
         <Tooltip arrow title={value}>
           <Typography
@@ -259,7 +257,6 @@ export const columnsNotificationsHeadPage: readonly TableColumn<TitleNotificatio
             display: '-webkit-box',
             WebkitLineClamp: '2',
             WebkitBoxOrient: 'vertical',
-            pl: 1,
           }}
         >
           {value}
@@ -275,7 +272,7 @@ export const columnsNotificationsHeadPage: readonly TableColumn<TitleNotificatio
     },
     {
       id: 'dateUpdated',
-      label: 'Thời gian cập nhật',
+      label: 'Thời gian thêm',
       minWidth: 150,
       align: 'center',
       format: (value: string) => (
@@ -290,29 +287,9 @@ export const columnsNotificationsHeadPage: readonly TableColumn<TitleNotificatio
       ),
     },
     {
-      id: 'lastSendDate',
-      label: 'Thời gian gửi',
-      minWidth: 120,
-      align: 'center',
-      format: (value: string) =>
-        value ? (
-          <Stack>
-            <MuiTypography fontWeight={500}>
-              {moment(value).format('DD/MM/YYYY')}
-            </MuiTypography>
-            <MuiTypography variant="body2" fontSize={'0.75rem'}>
-              {moment(value).format('(HH:mm:ss)')}
-            </MuiTypography>
-          </Stack>
-        ) : (
-          <></>
-        ),
-    },
-    {
       id: 'lastModifiedBy',
-      label: 'Người gửi',
+      label: 'Người cập nhật',
       minWidth: 200,
-      align: 'center',
       format: (value: any) => (
         <Tooltip arrow title={value}>
           <Typography

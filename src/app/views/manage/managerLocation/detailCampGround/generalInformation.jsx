@@ -6,6 +6,8 @@ import {
   Typography,
   Button,
   Stack,
+  FormControlLabel,
+  Checkbox,
   Icon,
 } from '@mui/material'
 import { Controller } from 'react-hook-form'
@@ -353,6 +355,19 @@ export default function GeneralInformation({
                     onKeyDown={addHashTag}
                   />
                 )}
+              />
+            )}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <Controller
+            name="isPriority"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                {...field}
+                control={<Checkbox checked={getValues('isPriority')} />}
+                label="Đối tác được ưu tiên(Đối tác sẽ được ưu tiên hiển thị trong phần xu hướng"
               />
             )}
           />

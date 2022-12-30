@@ -131,6 +131,10 @@ export const tableModelReview = {
       name: 'Chi tiết',
       width: 150,
     },
+    {
+      name: '',
+      width: 150,
+    },
   ],
   bodyCell: [
     'index',
@@ -141,6 +145,7 @@ export const tableModelReview = {
     'time',
     'status',
     'linkViewBlank',
+    'action',
   ],
 }
 

@@ -192,6 +192,7 @@ export default function InformationCampGround({ action }) {
       car: false,
       motobike: false,
       boat: false,
+      isPriority: false,
       campAreas: [],
       campTypes: [],
       isSupportBooking: '1',
@@ -325,7 +326,7 @@ export default function InformationCampGround({ action }) {
     } else {
       dataUpdate.idDepositPolicy = null
     }
-
+    dataUpdate.isPriority = data.isPriority === true ? 1 : 0
     dataUpdate.idMerchant = data.idMerchant?.id || null
     dataUpdate.idTopography = data.topographic
     dataUpdate.idProvince = data.province?.id
@@ -372,19 +373,28 @@ export default function InformationCampGround({ action }) {
     dataUpdate.freeParking = true
 
     if (action === 'create') {
-      const res = await createCampGround(dataUpdate)
-      if (res) {
-        toastSuccess({ message: 'Điểm camp đã được tạo' })
-        navigate('/quan-ly-thong-tin-diem-camp')
+      try {
+        const res = await createCampGround(dataUpdate)
+        if (res) {
+          toastSuccess({ message: 'Điểm camp đã được tạo' })
+          navigate('/quan-ly-thong-tin-diem-camp')
+          setIsLoading(false)
+        }
+      } catch (e) {
+        setIsLoading(false)
       }
     } else {
-      const res = await updateCampGround(params.id, dataUpdate)
-      if (res) {
-        toastSuccess({ message: 'Thông tin đã được cập nhật' })
-        navigate('/quan-ly-thong-tin-diem-camp')
+      try {
+        const res = await updateCampGround(params.id, dataUpdate)
+        if (res) {
+          toastSuccess({ message: 'Thông tin đã được cập nhật' })
+          navigate('/quan-ly-thong-tin-diem-camp')
+          setIsLoading(false)
+        }
+      } catch (e) {
+        setIsLoading(false)
       }
     }
-    setIsLoading(false)
   }
 
   const onSubmit = async data => {
@@ -442,6 +452,7 @@ export default function InformationCampGround({ action }) {
             const seasons = data.campGroundSeasons.map(
               item => seasonsById[item],
             )
+            setValue('isPriority', data.isPriority)
             setValue('campGroundSeasons', seasons)
             setValue('address', data.address)
             setValue('description', data.description)

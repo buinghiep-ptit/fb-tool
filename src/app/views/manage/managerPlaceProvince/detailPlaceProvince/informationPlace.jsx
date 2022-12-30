@@ -480,6 +480,7 @@ export default function InformationPlace(props) {
               justifyContent="center"
             >
               <Button
+                disabled
                 variant="text"
                 // onClick={() => {
                 //   dialogCustomRef.current.handleClickOpen()
@@ -603,7 +604,12 @@ export default function InformationPlace(props) {
         {errors?.file && (
           <FormHelperText error={true}>{errors.file?.message}</FormHelperText>
         )}
-        <Button color="primary" type="submit" variant="contained">
+        <Button
+          color="primary"
+          type="submit"
+          variant="contained"
+          disabled={isLoading}
+        >
           Lưu
         </Button>
         <Button

@@ -181,3 +181,11 @@ export const addReview = async (params: any): Promise<any> => {
   const { data } = await http.post<any>(`/api/camp-grounds/ratings`, params)
   return data
 }
+
+export const deleteRating = async (params: any): Promise<any> => {
+  const { data } = await http.delete<any>(
+    `/api/camp-grounds/ratings/delete`,
+    params,
+  )
+  return data
+}

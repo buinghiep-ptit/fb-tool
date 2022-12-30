@@ -217,6 +217,19 @@ const TableCustom = forwardRef(
                                   </IconButton>
                                 )
                               }
+                              if (type === 'deleteRating') {
+                                return (
+                                  <IconButton
+                                    key={indexType}
+                                    onClick={() => {
+                                      dialogConfirm.current.handleClickOpen()
+                                      idDelete.current = data.idInfor
+                                    }}
+                                  >
+                                    <Icon color="error">{type}</Icon>
+                                  </IconButton>
+                                )
+                              }
 
                               if (type === 'unlinked') {
                                 return (

@@ -26,6 +26,7 @@ import {
   getListReview,
   getListCustomCampdi,
   addReview,
+  deleteRating,
 } from 'app/apis/campGround/ground.service'
 import { cloneDeep } from 'lodash'
 import { useParams } from 'react-router-dom'
@@ -54,7 +55,7 @@ export default function ListReview(props) {
   const schema = yup
     .object({
       account: yup.object().required(messages.MSG1),
-      noteReview: yup.string().trim().max(150, 'Không được vượt quá 150 ký tự'),
+      noteReview: yup.string().trim().max(500, 'Không được vượt quá 500 ký tự'),
       file: yup
         .mixed()
         .test('fileSize', 'Dung lượng file quá lớn', value => {
@@ -129,7 +130,7 @@ export default function ListReview(props) {
           convertCampGroundReview.time = moment(
             campGroundReview.dateCreated,
           ).format('DD/MM/YYYY hh:mm:ss')
-
+          convertCampGroundReview.action = ['deleteRating']
           convertCampGroundReview.status =
             campGroundReview.status === 1 ? true : false
 
@@ -209,6 +210,9 @@ export default function ListReview(props) {
     try {
       const res = await addReview(paramDetail)
       if (res) {
+        setValue('account', null)
+        setRateArray(Array(5).fill('primary'))
+        setValue('noteReview', '')
         const param = {
           search: inputFilter,
           star: starFilter == 0 ? null : starFilter,
@@ -222,6 +226,26 @@ export default function ListReview(props) {
       }
     } catch (e) {
       setIsLoading(false)
+    }
+  }
+
+  const onDeleteRating = async idCustomer => {
+    const req = {
+      data: {
+        idCustomer: parseInt(idCustomer),
+        idCampGround: parseInt(params.id),
+      },
+    }
+    const res = await deleteRating(req)
+    if (res) {
+      const param = {
+        search: inputFilter,
+        star: starFilter == 0 ? null : starFilter,
+        status: statusFilter == 0 ? null : statusFilter,
+        page: 0,
+        size: 20,
+      }
+      fetchListCampGroundReview(param)
     }
   }
 
@@ -378,7 +402,7 @@ export default function ListReview(props) {
         dataTable={listCampGroundReview || []}
         tableModel={tableModelReview}
         pagination={true}
-        onDeleteData={deleteCampGroundService}
+        onDeleteData={onDeleteRating}
         updateStatus={changeStatusReview}
         totalData={parseInt(totalListCampGroundReview, 0)}
         fetchDataTable={fetchListCampGroundReview}

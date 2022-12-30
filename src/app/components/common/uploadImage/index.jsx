@@ -30,7 +30,6 @@ const UploadImage = React.forwardRef(
 
     React.useEffect(() => {
       setValue('file', files)
-      console.log(files)
     }, [files])
 
     return (

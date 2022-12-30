@@ -10,14 +10,18 @@ import { MuiButton } from 'app/components/common/MuiButton'
 import MuiLoading from 'app/components/common/MuiLoadingApp'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import useNoteDialogForm from 'app/hooks/components/useNoteDialogForm'
 import {
   useApproveFeed,
   usePostsCheckData,
+  useViolateFeed,
 } from 'app/hooks/queries/useFeedsData'
 import { IFeedDetail, Image } from 'app/models'
 import { messages } from 'app/utils/messages'
-import React, { useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import React, { ReactElement, useEffect, useState } from 'react'
+import { SubmitHandler } from 'react-hook-form'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 export interface Props {}
 
@@ -35,7 +39,20 @@ export default function PostsCheck(props: Props) {
   const location = useLocation() as any
   const [open, setOpen] = useState(false)
   const [initialIndexSlider, setInitialIndexSlider] = useState(0)
+  const [imagesModal, setImagesModal] = useState<Image[]>([])
   const type = location.state?.type ?? 1
+  const [dialogData, setDialogData] = useState<{
+    title?: string
+    message?: string | ReactElement | any
+    type?: string
+    submitText?: string
+    cancelText?: string
+  }>({})
+
+  const [openDialog, setOpenDialog] = useState(false)
+  const [feedId, setFeedId] = useState<number>()
+  const [count, setCount] = useState<number>(0)
+  const [feeds, setFeeds] = useState<IFeedDetail[]>([])
 
   const {
     data: posts,
@@ -43,19 +60,87 @@ export default function PostsCheck(props: Props) {
     isFetching,
     isError,
     error,
+    refetch,
   }: UseQueryResult<IFeedDetail[], Error> = usePostsCheckData(type)
 
-  const onSuccess = (data: any) => {
-    toastSuccess({ message: 'Duyệt bài đăng thành công' })
+  useEffect(() => {
+    if (posts) setFeeds(posts)
+  }, [posts])
+
+  useEffect(() => {
+    if (count >= 10) refetch()
+  }, [count])
+
+  const onSuccess = (data: any, message?: string) => {
+    toastSuccess({ message: message ?? '' })
+    setCount(prev => prev + 1)
+    const newFeeds = feeds.filter(feed => feed.id !== feedId)
+    setFeeds(newFeeds)
+    if (openDialog) setOpenDialog(false)
   }
-  const { mutate: approve, isLoading: approveLoading } =
-    useApproveFeed(onSuccess)
+
+  const [getContentNote, methodsNote] = useNoteDialogForm('note', true)
+
+  const { mutate: violate, isLoading: violateLoading } = useViolateFeed(() =>
+    onSuccess(null, 'Báo cáo vi phạm thành công'),
+  )
+
+  const { mutate: approve, isLoading: approveLoading } = useApproveFeed(() =>
+    onSuccess(null, 'Duyệt bài đăng thành công'),
+  )
+
+  const onSubmitDialogHandler: SubmitHandler<{
+    note?: string
+  }> = (values: { note?: string }) => {
+    violate({ feedId, reason: values.note })
+  }
 
   const approveFeed = (feedId: number) => {
     approve(feedId)
   }
 
-  const onClickMedia = (imgIndex?: number) => {
+  const onSubmitDialog = (type?: string) => {
+    switch (type) {
+      case 'violate':
+        methodsNote.handleSubmit(onSubmitDialogHandler)()
+        break
+      case 'approve':
+        approveFeed(feedId ?? 0)
+        break
+
+      default:
+        break
+    }
+  }
+
+  const openApproveDialog = (feedId: number) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Duyệt',
+      message: 'Xác nhận duyệt bài đăng?',
+      type: 'approve',
+      submitText: 'Xác nhận',
+      cancelText: 'Huỷ',
+    }))
+    setFeedId(feedId)
+    setOpenDialog(true)
+  }
+
+  const openViolateDialog = (feedId: number) => {
+    setDialogData(prev => ({
+      ...prev,
+      title: 'Vi phạm',
+      message: (loading?: boolean) => getContentNote(loading),
+      type: 'violate',
+      submitText: 'Xác nhận',
+      cancelText: 'Huỷ',
+    }))
+    setFeedId(feedId)
+    setOpenDialog(true)
+  }
+
+  const onClickMedia = (imgIndex?: number, images?: Image[]) => {
+    setImagesModal(images ?? [])
     setInitialIndexSlider(imgIndex ?? 0)
     setOpen(true)
   }
@@ -68,7 +153,7 @@ export default function PostsCheck(props: Props) {
 
   const dateTimeAfterThreeDays = NOW_IN_MS + THREE_DAYS_IN_MS
 
-  const renderRowItem = (post: IFeedDetail, index: number) => {
+  const renderRowItem = (feed: IFeedDetail, index: number) => {
     return (
       <>
         <Grid container spacing={2} justifyContent="center">
@@ -77,8 +162,8 @@ export default function PostsCheck(props: Props) {
               <Avatar
                 alt="avatar"
                 src={
-                  post.customerInfo?.avatar
-                    ? post.customerInfo?.avatar
+                  feed.customerInfo?.avatar
+                    ? feed.customerInfo?.avatar
                     : '/assets/images/app/avatar-default.svg'
                 }
                 sx={{ width: 56, height: 56 }}
@@ -91,13 +176,13 @@ export default function PostsCheck(props: Props) {
                 >
                   <Stack flexDirection={'column'}>
                     <MuiTypography variant="subtitle2">
-                      {post.customerInfo?.fullName}
+                      {feed.customerInfo?.fullName}
                     </MuiTypography>
                     <MuiTypography variant="body2">
-                      {post.content}
+                      {feed.content}
                     </MuiTypography>
                     <Stack flexDirection={'row'} gap={1} my={1}>
-                      {post?.tags?.map(tag => (
+                      {feed?.tags?.map(tag => (
                         <Chip
                           key={tag.id}
                           label={`#${tag.value}`}
@@ -118,7 +203,7 @@ export default function PostsCheck(props: Props) {
                       variant="contained"
                       color="primary"
                       sx={{ minWidth: 100 }}
-                      onClick={() => approveFeed(post.id ?? 0)}
+                      onClick={() => openApproveDialog(feed.id ?? 0)}
                       loading={approveLoading}
                     />
                     <MuiButton
@@ -126,18 +211,14 @@ export default function PostsCheck(props: Props) {
                       variant="outlined"
                       color="error"
                       sx={{ minWidth: 100 }}
-                      onClick={() =>
-                        navigate(`${post.id ?? 0}/vi-pham`, {
-                          state: { modal: true },
-                        })
-                      }
+                      onClick={() => openViolateDialog(feed.id ?? 0)}
                     />
                   </Stack>
                 </Stack>
-                {post.type === 1 ? (
+                {feed.type === 1 ? (
                   <Box width={'50%'}>
                     <MediaViewItem
-                      media={post.video as any}
+                      media={feed.video as any}
                       orientation="vertical"
                     />
                   </Box>
@@ -145,15 +226,10 @@ export default function PostsCheck(props: Props) {
                   <Box width={'75%'} mt={-2}>
                     <>
                       <ImageListView
-                        medias={post.images as Image[]}
-                        onClickMedia={onClickMedia}
-                      />
-                      <ModalFullScreen
-                        mode="view"
-                        data={post.images as Image[]}
-                        open={open}
-                        onCloseModal={handleClose}
-                        initialIndexSlider={initialIndexSlider}
+                        medias={feed.images as Image[]}
+                        onClickMedia={posImg =>
+                          onClickMedia(posImg, feed?.images as Image[])
+                        }
                       />
                     </>
                   </Box>
@@ -161,7 +237,7 @@ export default function PostsCheck(props: Props) {
               </Stack>
             </Stack>
 
-            {posts && index < posts?.length - 1 && (
+            {feeds && index < feeds?.length - 1 && (
               <Divider
                 orientation="horizontal"
                 sx={{ backgroundColor: '#D9D9D9', mt: 3 }}
@@ -207,7 +283,10 @@ export default function PostsCheck(props: Props) {
           gap: 2,
         }}
       >
-        <CountdownTimer targetDate={dateTimeAfterThreeDays} />
+        <CountdownTimer
+          targetDate={dateTimeAfterThreeDays}
+          callBack={() => refetch()}
+        />
 
         <MuiButton
           title="Quay lại"
@@ -219,10 +298,10 @@ export default function PostsCheck(props: Props) {
       </Stack>
       <SimpleCard title={type === 1 ? 'Xét duyệt' : 'Vi phạm'}>
         <Stack gap={4} justifyContent="center" alignItems={'center'}>
-          {posts.length ? (
-            posts.map((post, index) => (
-              <React.Fragment key={post.id}>
-                {renderRowItem(post, index)}
+          {feeds.length ? (
+            feeds.map((feed, index) => (
+              <React.Fragment key={feed.id}>
+                {renderRowItem(feed, index)}
               </React.Fragment>
             ))
           ) : (
@@ -241,6 +320,38 @@ export default function PostsCheck(props: Props) {
           )}
         </Stack>
       </SimpleCard>
+
+      {imagesModal.length && (
+        <ModalFullScreen
+          mode="view"
+          data={imagesModal}
+          open={open}
+          onCloseModal={handleClose}
+          initialIndexSlider={initialIndexSlider}
+        />
+      )}
+
+      <DiagLogConfirm
+        title={dialogData.title}
+        open={openDialog}
+        setOpen={setOpenDialog}
+        onSubmit={() => onSubmitDialog(dialogData.type)}
+        submitText={dialogData.submitText}
+        cancelText={dialogData.cancelText}
+        isLoading={violateLoading}
+      >
+        <>
+          <Stack>
+            {dialogData.type === 'violate' &&
+              dialogData?.message(violateLoading)}
+          </Stack>
+          <Stack py={5}>
+            <MuiTypography variant="subtitle1" textAlign={'center'}>
+              {dialogData.type === 'approve' && dialogData?.message}
+            </MuiTypography>
+          </Stack>
+        </>
+      </DiagLogConfirm>
     </Container>
   )
 }

@@ -69,6 +69,8 @@ const PushNotificationHeadPageList = Loadable(
 const NotiHeadPageDetail = Loadable(
   lazy(() => import('./notifications/head/NotiHeadPageDetail')),
 )
+const ConfigList = Loadable(lazy(() => import('./appconfig/ConfigList')))
+const ConfigDetail = Loadable(lazy(() => import('./appconfig/ConfigDetail')))
 
 const ManagerServices = Loadable(
   lazy(() => import('./managerServices/ServiceSetting')),
@@ -497,6 +499,26 @@ const ManagementRoutes = [
     path: '/quan-ly-thong-bao/dau-trang/:notiId/chi-tiet',
     element: <NotiHeadPageDetail />,
     auth: [ROLES.ADMIN, ROLES.SALE, ROLES.MKT],
+  },
+  {
+    path: '/quan-ly-cau-hinh',
+    element: (
+      <>
+        <ConfigList />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: ':configId/chi-tiet',
+        element: <ConfigDetail title="Chi tiết" />,
+      },
+      {
+        path: 'them-moi',
+        element: <ConfigDetail title="Thêm mới" />,
+      },
+    ],
+    auth: [ROLES.ADMIN],
   },
   { path: '/quan-ly-tu-cam', element: <ManagerForbiddenWord /> },
   {

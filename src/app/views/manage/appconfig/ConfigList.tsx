@@ -3,7 +3,7 @@ import { ChangeCircleSharp, SearchSharp } from '@mui/icons-material'
 import { Grid, Icon, MenuItem, Stack, styled } from '@mui/material'
 import { Box } from '@mui/system'
 import { useQuery } from '@tanstack/react-query'
-import { fetchNotificationsUser } from 'app/apis/notifications/users/notificationsUser.service'
+import { fetchConfigs } from 'app/apis/config/config.service'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -13,19 +13,20 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import {
-  useDeleteNotificationUser,
-  useSendNotificationUser,
-} from 'app/hooks/queries/useNotificationsData'
+  useChangeIsDefaultAudio,
+  useChangeStatusAudio,
+  useDeleteAudio,
+} from 'app/hooks/queries/useAudiosData'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { IFeed } from 'app/models'
-import { INotification, INotificationResponse } from 'app/models/notification'
-import { columnsNotifications } from 'app/utils/columns/columnsNotifications'
+import { IConfigOverall } from 'app/models/config'
+import { columnsAudios } from 'app/utils/columns/columnsAudios'
+import { columnsConfigs } from 'app/utils/columns/columnsConfig'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
-import { DiagLogConfirm } from '../../orders/details/ButtonsLink/DialogConfirm'
+import { DiagLogConfirm } from '../orders/details/ButtonsLink/DialogConfirm'
 
 const Container = styled('div')<Props>(({ theme }) => ({
   margin: '30px',
@@ -36,26 +37,18 @@ const Container = styled('div')<Props>(({ theme }) => ({
   },
 }))
 
-const extractFeeds = (feeds?: IFeed[]) => {
-  if (!feeds || !feeds.length) return []
-  return feeds.map(feed =>
-    Object.assign(feed, {
-      customerType:
-        feed.customerType === 2 ? 'KOL' : feed.customerId ? 'Thường' : 'Campdi',
-    }),
-  )
-}
-type ISearchFilters = {
+export interface IAudiosFilters {
   search?: string
-  status?: string
-  page?: number
-  size?: number
+  status?: 0 | 1 | 'all' | string | undefined //  0:Chờ hậu kiểm 1:Đã duyệt -1:Vi phạm  -2:Bị báo cáo -3:Đã xóa
+  isDefault?: 0 | 1 | 'all' | string | undefined //
+  page?: number | 0
+  size?: number | 20
   sort?: string
 }
 
 export interface Props {}
 
-export default function PushNotificationList(props: Props) {
+export default function ConfigList(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -68,14 +61,15 @@ export default function PushNotificationList(props: Props) {
   )
   const [isReset, setIsReset] = useState<boolean>(false)
 
-  const [defaultValues] = useState<ISearchFilters>({
-    status: queryParams.status ?? 'all',
+  const [defaultValues] = useState<IAudiosFilters>({
     search: queryParams.search ?? '',
+    status: queryParams.status ?? 'all',
+    isDefault: queryParams.isDefault ?? 'all',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
 
-  const [filters, setFilters] = useState<ISearchFilters>(
+  const [filters, setFilters] = useState<IAudiosFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
 
@@ -83,12 +77,11 @@ export default function PushNotificationList(props: Props) {
     title?: string
     message?: string
     type?: string
-    isLinked?: number
     submitText?: string
     cancelText?: string
   }>({})
   const [openDialog, setOpenDialog] = useState(false)
-  const [row, setRow] = useState<any>({})
+  const [audioId, setAudioId] = useState(0)
 
   const validationSchema = Yup.object().shape({
     search: Yup.string()
@@ -96,16 +89,16 @@ export default function PushNotificationList(props: Props) {
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
 
-  const methods = useForm<ISearchFilters>({
+  const methods = useForm<IAudiosFilters>({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
 
   const { data, isLoading, isFetching, isError, error } = useQuery<
-    INotificationResponse,
+    IConfigOverall[],
     Error
-  >(['notifications-user', filters], () => fetchNotificationsUser(filters), {
+  >(['configs', filters], () => fetchConfigs(filters), {
     refetchOnWindowFocus: false,
     keepPreviousData: true,
     enabled: !!filters,
@@ -144,8 +137,8 @@ export default function PushNotificationList(props: Props) {
     } as any)
   }
 
-  const onSubmitHandler: SubmitHandler<ISearchFilters> = (
-    values: ISearchFilters,
+  const onSubmitHandler: SubmitHandler<IAudiosFilters> = (
+    values: IAudiosFilters,
   ) => {
     setPage(0)
     setSize(20)
@@ -169,6 +162,7 @@ export default function PushNotificationList(props: Props) {
     setIsReset(true)
     methods.reset({
       status: 'all',
+      isDefault: 'all',
       search: '',
       page: 0,
       size: 20,
@@ -189,62 +183,34 @@ export default function PushNotificationList(props: Props) {
   }
 
   const onRowUpdateSuccess = (data: any, message?: string) => {
-    toastSuccess({ message: message ?? '' })
+    toastSuccess({
+      message: message ?? '',
+    })
     setOpenDialog(false)
   }
 
-  const { mutate: sendNoti, isLoading: sendLoading } = useSendNotificationUser(
-    () => onRowUpdateSuccess(null, 'Gửi thành công'),
+  const { mutate: changeStatus, isLoading: updateLoading } =
+    useChangeStatusAudio(() => onRowUpdateSuccess(null, 'Cập nhật thành công'))
+
+  const { mutate: changeIsDefault, isLoading: defaultLoading } =
+    useChangeIsDefaultAudio(() =>
+      onRowUpdateSuccess(null, 'Cập nhật thành công'),
+    )
+
+  const { mutate: deleteAudio, isLoading: deleteLoading } = useDeleteAudio(() =>
+    onRowUpdateSuccess(null, 'Xoá nhạc nền thành công'),
   )
-  const { mutate: deleteNoti, isLoading: deleteLoading } =
-    useDeleteNotificationUser(() => onRowUpdateSuccess(null, 'Xoá thành công'))
 
-  const onRowUpdate = (cell: any, row: any) => {
-    navigation(`${row.id}/chi-tiet`, {})
-  }
-
-  const onRowApprove = (cell: any, row: any) => {
-    setDialogData(prev => ({
-      ...prev,
-      title: 'Gửi thông báo',
-      type: 'send',
-      message:
-        'Sau khi bật, thông báo sẽ được hiển thị ngay khi KH mở ứng dụng. Bạn có chắc muốn bật?',
-      submitText: 'Có',
-      cancelText: 'Không',
-    }))
-    setOpenDialog(true)
-    setRow(row)
-  }
-  const onRowDelete = (cell: any, row: any) => {
-    setDialogData(prev => ({
-      ...prev,
-      title: 'Xoá thông báo',
-      message:
-        'Sau khi xóa, thông báo sẽ không còn được hiển thị cho khách hàng. Bạn có chắc muốn xóa?',
-      type: 'delete',
-      submitText: 'Có',
-      cancelText: 'Không',
-    }))
-    setOpenDialog(true)
-    setRow(row)
-  }
-
-  const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'title') {
-      navigation(`${row.id}/chi-tiet`, {})
-    }
-  }
-
-  const onSubmitDialog = () => {
+  const submitDialog = () => {
     switch (dialogData.type) {
-      case 'send':
-        sendNoti(row.id)
-
+      case 'toggle-status':
+        changeStatus(audioId)
         break
-
+      case 'toggle-isDefault':
+        changeIsDefault(audioId)
+        break
       case 'delete':
-        deleteNoti(row.id)
+        deleteAudio(audioId)
         break
 
       default:
@@ -252,10 +218,22 @@ export default function PushNotificationList(props: Props) {
     }
   }
 
+  const onRowUpdate = (cell: any, row: any) => {
+    navigation(`${row.id_CONFIG}/chi-tiet`, {
+      state: { modal: true, data: row },
+    })
+  }
+
+  const onClickRow = (cell: any, row: any) => {
+    if (['edit', 'account'].includes(cell.id)) {
+      navigation(`${row.configId}`, {})
+    }
+  }
+
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Gửi thông báo người dùng' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Quản lý cấu hình' }]} />
       </Box>
       <Stack
         flexDirection={'row'}
@@ -263,35 +241,48 @@ export default function PushNotificationList(props: Props) {
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm thông báo"
+          title="Thêm cấu hình"
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`them-moi`, {})}
+          onClick={() =>
+            navigation('them-moi', {
+              state: { modal: true },
+            })
+          }
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
       <Stack gap={3}>
-        <SimpleCard>
+        {/* <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item sm={4} xs={12}>
                   <FormInputText
-                    label={'Tiêu đề'}
+                    label={'Tến bài hát/Người thể hiện/Tác giả'}
                     type="text"
                     name="search"
                     size="small"
-                    placeholder="Nhập tiêu đề"
+                    placeholder="Nhập từ khoá"
                     fullWidth
                     defaultValue=""
                   />
                 </Grid>
+
                 <Grid item sm={4} xs={12}>
                   <SelectDropDown name="status" label="Trạng thái">
                     <MenuItem value="all">Tất cả</MenuItem>
-                    <MenuItem value="0">Chưa gửi</MenuItem>
-                    <MenuItem value="1">Đã gửi</MenuItem>
+                    <MenuItem value="1">Hoạt động</MenuItem>
+                    <MenuItem value="0">Không hoạt động</MenuItem>
+                  </SelectDropDown>
+                </Grid>
+
+                <Grid item sm={4} xs={12}>
+                  <SelectDropDown name="isDefault" label="Thể loại">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="1">Nhạc hay</MenuItem>
+                    <MenuItem value="0">Nhạc thường</MenuItem>
                   </SelectDropDown>
                 </Grid>
 
@@ -320,12 +311,12 @@ export default function PushNotificationList(props: Props) {
               </Grid>
             </FormProvider>
           </form>
-        </SimpleCard>
+        </SimpleCard> */}
 
         <SimpleCard>
           <MuiStyledTable
-            rows={data ? (data?.content as INotification[]) : []}
-            columns={columnsNotifications}
+            rows={data ? (data as IConfigOverall[]) : []}
+            columns={columnsConfigs}
             rowsPerPage={size}
             page={page}
             onClickRow={onClickRow}
@@ -333,52 +324,40 @@ export default function PushNotificationList(props: Props) {
             error={isError ? error : null}
             actions={[
               {
-                icon: 'send',
-                color: 'primary',
-                tooltip: 'Gửi',
-                onClick: onRowApprove,
-              },
-              {
                 icon: 'edit',
                 color: 'action',
                 tooltip: 'Chi tiết',
                 onClick: onRowUpdate,
               },
-              {
-                icon: 'delete',
-                color: 'error',
-                tooltip: 'Xoá',
-                onClick: onRowDelete,
-              },
             ]}
           />
-          <MuiStyledPagination
+          {/* <MuiStyledPagination
             component="div"
             rowsPerPageOptions={[20, 50, 100]}
-            count={data ? (data?.totalElements as number) : 0}
+            count={data ? (data?.length as number) : 0}
             rowsPerPage={size}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          /> */}
         </SimpleCard>
       </Stack>
 
-      <DiagLogConfirm
-        title={dialogData.title ?? ''}
+      {/* <DiagLogConfirm
+        title={dialogData.title}
         open={openDialog}
         setOpen={setOpenDialog}
-        onSubmit={onSubmitDialog}
+        onSubmit={submitDialog}
         submitText={dialogData.submitText}
         cancelText={dialogData.cancelText}
-        isLoading={sendLoading || deleteLoading}
+        isLoading={updateLoading || deleteLoading || defaultLoading}
       >
         <Stack py={5} justifyContent={'center'} alignItems="center">
-          <MuiTypography variant="subtitle1" textAlign={'center'}>
+          <MuiTypography variant="subtitle1">
             {dialogData.message}
           </MuiTypography>
         </Stack>
-      </DiagLogConfirm>
+      </DiagLogConfirm> */}
     </Container>
   )
 }

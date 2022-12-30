@@ -40,7 +40,7 @@ const UploadProgress = props => {
         px={1.5}
         bgcolor="green"
       >
-        <MuiTypography color={'Highlight'} variant="subtitle1">
+        <MuiTypography color={'#ffffff'} variant="subtitle1">
           File tải lên
         </MuiTypography>
         <IconButton onClick={() => props.clearUploadingFile()}>

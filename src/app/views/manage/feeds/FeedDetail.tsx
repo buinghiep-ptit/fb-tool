@@ -378,6 +378,8 @@ export default function FeedDetail(props: Props) {
 
   const getColorByCusStatus = (status: number) => {
     switch (status) {
+      case -3:
+        return '#FF3D57'
       case -2:
         return '#AAAAAA'
       case -1:
@@ -396,9 +398,10 @@ export default function FeedDetail(props: Props) {
     switch (status) {
       case 1:
         return 'Hợp lệ'
-      case -3:
+      case -2:
         return 'Xoá'
-
+      case -3:
+        return 'Bị báo cáo'
       case -1:
         return 'Vi phạm'
 

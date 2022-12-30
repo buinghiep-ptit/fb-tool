@@ -76,8 +76,8 @@ const optionsStatus = [
   { name: 'Chờ hậu kiểm', value: 0 },
   { name: 'Hợp lệ', value: 1 },
   { name: 'Vi phạm', value: -1 },
-  { name: 'Bị báo cáo', value: -2 },
-  { name: 'Xoá', value: -3 },
+  { name: 'Bị báo cáo', value: -3 },
+  { name: 'Xoá', value: -2 },
 ]
 
 const convertOptionToValues = (options: { name: string; value: number }[]) => {
@@ -89,8 +89,8 @@ const convertValuesToOptions = (values: string[]) => {
     if (Number(v) == 0) return { name: 'Chờ hậu kiểm', value: 0 }
     else if (Number(v) == 1) return { name: 'Hợp lệ', value: 1 }
     else if (Number(v) == -1) return { name: 'Vi phạm', value: -1 }
-    else if (Number(v) == -2) return { name: 'Bị báo cáo', value: -2 }
-    else return { name: 'Xoá', value: -3 }
+    else if (Number(v) == -3) return { name: 'Bị báo cáo', value: -3 }
+    else return { name: 'Xoá', value: -2 }
   })
 }
 
@@ -129,7 +129,7 @@ export default function ManagerFeed(props: Props) {
           { name: 'Chờ hậu kiểm', value: 0 },
           { name: 'Hợp lệ', value: 1 },
           { name: 'Vi phạm', value: -1 },
-          { name: 'Bị báo cáo', value: -2 },
+          { name: 'Bị báo cáo', value: -3 },
         ],
   })
 
@@ -435,8 +435,8 @@ export default function ManagerFeed(props: Props) {
                     <MenuItem value="1">Hợp lệ</MenuItem>
                     <MenuItem value="0">Chờ hậu kiểm</MenuItem>
                     <MenuItem value="-1">Vi phạm</MenuItem>
-                    <MenuItem value="-2">Bị báo cáo</MenuItem>
-                    <MenuItem value="-3">Xoá</MenuItem>
+                    <MenuItem value="-3">Bị báo cáo</MenuItem>
+                    <MenuItem value="-2">Xoá</MenuItem>
                   </SelectDropDown>
                 </Grid> */}
                 <Grid item sm={6} xs={12}>

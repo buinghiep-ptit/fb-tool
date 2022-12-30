@@ -41,9 +41,9 @@ export const LabelFormatter = (value?: number, key?: string) => {
         formatter = 'Hợp lệ'
       } else if (value === -1) {
         formatter = 'Vi phạm'
-      } else if (value === -2) {
-        formatter = 'Bị báo cáo'
       } else if (value === -3) {
+        formatter = 'Bị báo cáo'
+      } else if (value === -2) {
         formatter = 'Xóa'
       }
 
@@ -84,13 +84,13 @@ export const labelFeedStatus = (value?: number) => {
       textColor: '#FF4141',
       bgColor: '#FFF5F5',
     }
-  } else if (value === -2) {
+  } else if (value === -3) {
     return {
       title: 'Bị báo cáo',
       textColor: '#FB7800',
       bgColor: '#FCF5ED',
     }
-  } else if (value === -3) {
+  } else if (value === -2) {
     return {
       title: 'Xóa',
       textColor: '#FFFFFF',

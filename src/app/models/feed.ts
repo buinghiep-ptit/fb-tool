@@ -1,5 +1,4 @@
 import { IPagingResponse } from './'
-import { ICampArea, ICampGround } from './camp'
 
 export interface IFeedResponse extends IPagingResponse {
   content?: IFeed[]
@@ -152,6 +151,4 @@ export interface IComment {
 export type TitleFeeds = keyof IFeed | 'order' | 'action'
 export type TitleReportsDecline = keyof IReportDecline | 'order' | 'action'
 export type TitleActionsHistory = keyof IActionHistory | 'order' | 'action'
-export type TitleCampAreas = keyof ICampArea | 'order' | 'action'
-export type TitleCampGrounds = keyof ICampGround | 'order' | 'action'
 export type TitleReactsFeed = keyof IReactFeed | 'order' | 'action'

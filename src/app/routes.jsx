@@ -1,11 +1,9 @@
 import AuthGuard from 'app/auth/AuthGuard'
-import chartsRoute from 'app/views/charts/ChartsRoute'
 import dashboardRoutes from 'app/views/dashboard/DashboardRoutes'
-import managementRoutes from 'app/views/manage/ManagementRoutes'
-import materialRoutes from 'app/views/material-kit/MaterialRoutes'
+import gameRoutes from 'app/views/games/gameRoutes'
 import NotFound from 'app/views/sessions/NotFound'
 import sessionRoutes from 'app/views/sessions/SessionRoutes'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import MatxLayout from './components/MatxLayout/MatxLayout'
 
 const routes = [
@@ -15,12 +13,7 @@ const routes = [
         <MatxLayout />
       </AuthGuard>
     ),
-    children: [
-      ...dashboardRoutes,
-      ...managementRoutes,
-      ...chartsRoute,
-      ...materialRoutes,
-    ],
+    children: [...dashboardRoutes, ...gameRoutes],
   },
   ...sessionRoutes,
   { path: '/', element: <Navigate to="dashboard" /> },

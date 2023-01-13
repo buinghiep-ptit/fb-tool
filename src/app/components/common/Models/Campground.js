@@ -14,13 +14,14 @@ export function Campground({ ...props }) {
   const vec = new THREE.Vector3()
 
   useEffect(() => {
-    scene.scale.set(0.2, 0.2, 0.2)
+    scene.scale.set(0.3, 0.3, 0.3)
     scene.position.set(0, 0, 0)
     scene.rotation.set(0, -Math.PI / 3, 0)
   }, [])
 
   useEffect(() => {
-    actions['Take 001'] && actions['Take 001'].play()
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    actions['Animation'] && actions['Animation'].play()
   }, [mixer, actions])
 
   useFrame((state, delta) => {
@@ -30,7 +31,7 @@ export function Campground({ ...props }) {
 
     state.camera.fov = THREE.MathUtils.lerp(state.camera.fov, 47, 0.05)
     state.camera.position.lerp(vec, 0.2)
-    state.camera.lookAt(0, 0.75, 0)
+    state.camera.lookAt(0, 0.45, 0)
     state.camera.updateProjectionMatrix()
   })
 

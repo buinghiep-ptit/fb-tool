@@ -20,7 +20,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
   '& .MuiLinearProgress-barColorPrimary': {
     borderRadius: 4,
-    backgroundColor: '#2f9b42',
+    backgroundColor: '#ED1E24',
   },
   '& .MuiLinearProgress-dashed': {
     background: 'transparent',

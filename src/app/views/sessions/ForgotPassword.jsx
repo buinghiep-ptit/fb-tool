@@ -64,7 +64,7 @@ const CssTextField = styled(TextField)({
   },
 })
 const ForgotPasswordRoot = styled(JustifyBox)(() => ({
-  background: '#2F9B42', //'#1A2038',
+  background: '#ED1E24', //'#1A2038',
   minHeight: '100vh !important',
   '& .card': {
     maxWidth: 500,

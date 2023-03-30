@@ -6,6 +6,7 @@ import { Paragraph, Span } from './Typography'
 
 const AppFooter = styled(Toolbar)(() => ({
   display: 'flex',
+  backgroundColor: '#BD0F14',
   alignItems: 'center',
   minHeight: topBarHeight,
   '@media (max-width: 499px)': {
@@ -40,11 +41,6 @@ const Footer = () => {
       <AppBar color="primary" position="static" sx={{ zIndex: 96 }}>
         <AppFooter>
           <FooterContent>
-            {/* <a href="">
-              <Button variant="contained" color="secondary">
-                campdi
-              </Button>
-            </a> */}
             <Span sx={{ m: 'auto' }}></Span>
             <Paragraph sx={{ m: 0 }}>
               Design and Developed by <a href="">DSC</a>

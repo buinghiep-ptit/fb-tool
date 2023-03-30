@@ -62,7 +62,7 @@ const Layout1Sidenav = () => {
     }
   }
   // const primaryRGB = convertHexToRGB(theme.palette.primary.main)
-  const primaryRGB = convertHexToRGB('#218332')
+  const primaryRGB = convertHexToRGB('#ED1E24')
 
   const updateSidebarMode = sidebarSettings => {
     updateSettings({

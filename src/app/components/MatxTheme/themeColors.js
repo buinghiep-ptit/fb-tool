@@ -50,7 +50,7 @@ export const themeColors = {
         contrastText: textLight.primary,
       },
       secondary: {
-        main: '#2F9B42',
+        main: '#ED1E24',
         contrastText: '#ffffff',
       },
       background: {
@@ -64,7 +64,7 @@ export const themeColors = {
     palette: {
       type: 'dark',
       primary: {
-        main: '#218332',
+        main: '#ED1E24',
         contrastText: '#ffffff',
       },
       secondary: {
@@ -175,7 +175,7 @@ export const themeColors = {
     palette: {
       type: 'light',
       primary: {
-        main: '#2F9B42',
+        main: '#ED1E24',
         contrastText: '#ffffff',
       },
       secondary: {
@@ -194,7 +194,7 @@ export const themeColors = {
     palette: {
       type: 'dark',
       primary: {
-        main: '#2F9B42',
+        main: '#ED1E24',
         contrastText: '#ffffff',
       },
       secondary: {

@@ -75,7 +75,7 @@ export const labelFeedStatus = (value?: number) => {
   } else if (value === 1) {
     return {
       title: 'Hợp lệ',
-      textColor: '#2F9B42',
+      textColor: '#ED1E24',
       bgColor: '#EDFDEF',
     }
   } else if (value === -1) {
@@ -110,7 +110,7 @@ export const labelNotificationStatus = (value?: number) => {
   } else if (value === 1) {
     return {
       title: 'Đã gửi',
-      textColor: '#2F9B42',
+      textColor: '#ED1E24',
       bgColor: '#EDFDEF',
     }
   } else if (value === -3) {

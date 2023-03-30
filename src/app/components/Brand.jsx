@@ -26,10 +26,10 @@ const Brand = ({ children }) => {
   return (
     <BrandRoot>
       <Box display="flex" alignItems="center">
-        <img src="/assets/images/logo-campdi.svg" alt="" />
+        <img src="/assets/images/logo.svg" alt="" />
         {/* <MatxLogo /> */}
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          campdi
+          Hà Nội FC
         </StyledSpan>
       </Box>
 

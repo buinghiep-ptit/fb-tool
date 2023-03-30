@@ -31,7 +31,7 @@ export const DropWrapper = styled(Box)<{ aspectRatio?: string }>(
     cursor: 'pointer',
     border: '2px dashed rgba(22, 24 , 35, 0.2)',
     '&:hover': {
-      border: '2px dashed #2F9B42',
+      border: '2px dashed #ED1E24',
     },
   }),
 )
@@ -252,7 +252,7 @@ export function VideoUploadPreviewer({
                       objectFit: 'cover',
                       borderRadius: 8,
                       border: `2px solid ${
-                        thumbnailActive === index ? '#2F9B42' : '#ffffff'
+                        thumbnailActive === index ? '#ED1E24' : '#ffffff'
                       }`,
                     }}
                   />

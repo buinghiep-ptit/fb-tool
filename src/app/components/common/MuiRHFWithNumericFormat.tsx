@@ -74,7 +74,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
             ...inputProps,
             sx: {
               cursor: iconEnd ? 'pointer' : 'default',
-              caretColor: '#218332',
+              caretColor: '#ED1E24',
             },
             startAdornment: iconStart ? (
               <InputAdornment position="start">{iconStart}</InputAdornment>
@@ -105,7 +105,7 @@ const MuiRHFNumericFormatInput: FC<Props> = ({
     //       //   ...inputProps,
     //       //   sx: {
     //       //     cursor: iconEnd ? 'pointer' : 'default',
-    //       //     caretColor: '#218332',
+    //       //     caretColor: '#ED1E24',
     //       //   },
     //       //   startAdornment: iconStart ? (
     //       //     <InputAdornment position="start">{iconStart}</InputAdornment>

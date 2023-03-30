@@ -37,7 +37,7 @@ const StyledSpan = styled(Span)(({ mode }) => ({
 }))
 
 const JWTRoot = styled(JustifyBox)(() => ({
-  background: '#2F9B42', //'#1A2038',
+  background: '#BD0F14', //'#1A2038',
   minHeight: '100% !important',
   '& .card': {
     maxWidth: 800,
@@ -123,12 +123,13 @@ const JwtLogin = () => {
           <Grid item sm={6} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
               <MuiTypography variant="h6">Hệ thống quản trị</MuiTypography>
-              <StyledSpan className="sidenavHoverShow pb-3">campdi</StyledSpan>
-              <img
+              <MuiTypography variant="h6">CLB Công An Hà Nội</MuiTypography>
+
+              {/* <img
                 src="/assets/images/login/bg-login.png"
                 width="100%"
                 alt=""
-              />
+              /> */}
             </JustifyBox>
           </Grid>
 

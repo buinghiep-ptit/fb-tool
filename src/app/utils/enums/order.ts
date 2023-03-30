@@ -52,7 +52,7 @@ export const getOrderStatusSpec = (
           key: 3,
           value: 3,
           title: 'Đặt thành công',
-          textColor: '#2F9B42',
+          textColor: '#ED1E24',
           bgColor: '#EDFDEF',
         }
       case OrderStatusEnum.COMPLETED:
@@ -112,7 +112,7 @@ export const getOrderStatusSpec = (
           key: 3,
           value: 3,
           title: 'Đặt thành công',
-          textColor: '#2F9B42',
+          textColor: '#ED1E24',
           bgColor: '#EDFDEF',
         }
 

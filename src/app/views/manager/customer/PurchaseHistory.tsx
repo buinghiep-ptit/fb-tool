@@ -1,6 +1,5 @@
-import { Box } from '@mui/system'
 import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
+import { SimpleCard, StyledTable } from 'app/components'
 import { Link } from 'react-router-dom'
 import {
   Grid,
@@ -21,13 +20,11 @@ import {
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import { headTableAccount } from './const'
+import { headTablePurchaseHistory } from './const'
 import { useState } from 'react'
 export interface Props {}
 
-export default function CustomerManager(props: Props) {
+export default function PurchaseHistory(props: Props) {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
@@ -43,10 +40,7 @@ export default function CustomerManager(props: Props) {
   }
 
   return (
-    <Container>
-      <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý khách hàng' }]} />
-      </Box>
+    <>
       <SimpleCard>
         <Grid container spacing={2}>
           <Grid item xs={3}>
@@ -59,43 +53,11 @@ export default function CustomerManager(props: Props) {
           </Grid>
           <Grid item xs={3}>
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">
-                Loại tài khoản
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                label="Loại tài khoản"
-              >
-                <MenuItem value={0}>Tất cả</MenuItem>
-                <MenuItem value={1}>Thường</MenuItem>
-                <MenuItem value={2}>Fan</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={3}>
-            <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Trạng thái"
-              >
-                <MenuItem value={0}>Tất cả</MenuItem>
-                <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={2}>Khóa</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={3}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">
-                Hình thức đăng ký
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                label="Hình thức đăng ký"
               >
                 <MenuItem value={0}>Tất cả</MenuItem>
                 <MenuItem value={1}>Thường</MenuItem>
@@ -105,8 +67,6 @@ export default function CustomerManager(props: Props) {
           </Grid>
           <Grid item xs={3}>
             <TextField
-              style={{ marginRight: '15px' }}
-              margin="normal"
               id="time"
               label="Từ ngày"
               type="time"
@@ -121,8 +81,6 @@ export default function CustomerManager(props: Props) {
           </Grid>
           <Grid item xs={3}>
             <TextField
-              style={{ marginRight: '15px' }}
-              margin="normal"
               id="time"
               label="Đến ngày"
               type="time"
@@ -135,35 +93,13 @@ export default function CustomerManager(props: Props) {
               fullWidth
             />
           </Grid>
-          <Grid
-            item
-            xs={6}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              justifyItems: 'baseline',
-            }}
-          >
+          <Grid item xs={12}>
             <Button
               variant="contained"
               startIcon={<SearchIcon />}
-              style={{ width: '100%', margin: '16px 12px 8px 0px' }}
+              style={{ width: '150px', height: '50px' }}
             >
               Tìm kiếm
-            </Button>
-            <Button
-              startIcon={<AutorenewIcon />}
-              variant="contained"
-              style={{ width: '100%', margin: '16px 12px 8px 12px' }}
-            >
-              Làm mới
-            </Button>
-            <Button
-              startIcon={<SimCardDownloadIcon />}
-              variant="contained"
-              style={{ width: '100%', margin: '16px 0px 8px 12px' }}
-            >
-              Xuất Excel
             </Button>
           </Grid>
         </Grid>
@@ -173,7 +109,7 @@ export default function CustomerManager(props: Props) {
         <StyledTable>
           <TableHead>
             <TableRow>
-              {headTableAccount.map(header => (
+              {headTablePurchaseHistory.map(header => (
                 <TableCell align="center" style={{ minWidth: header.width }}>
                   {header.name}
                 </TableCell>
@@ -196,13 +132,6 @@ export default function CustomerManager(props: Props) {
               <TableCell align="center">
                 <Chip label="Hoạt động" color="success" />
               </TableCell>
-              <TableCell align="center">
-                <Tooltip title="Sửa" placement="top">
-                  <IconButton color="primary">
-                    <BorderColorIcon />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
             </TableRow>
           </TableBody>
         </StyledTable>
@@ -220,6 +149,6 @@ export default function CustomerManager(props: Props) {
           backIconButtonProps={{ 'aria-label': 'Previous Page' }}
         />
       </SimpleCard>
-    </Container>
+    </>
   )
 }

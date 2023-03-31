@@ -2,7 +2,11 @@ import { ROLES } from './utils/enums/roles'
 
 export const navigations = [
   { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
-  { name: 'Quản lý khách hàng', path: '/customers', icon: 'person' },
+  {
+    name: 'Quản lý khách hàng',
+    path: '/customers',
+    icon: 'person',
+  },
   { name: 'Quản lý cầu thủ', path: '/players', icon: 'accessibility' },
   { name: 'Quản lý tin tức', path: '/news', icon: 'newspaper' },
   { name: 'Quản lý đội bóng', path: '/teams', icon: 'groups' },

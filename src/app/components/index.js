@@ -25,3 +25,5 @@ export { default as MatxVerticalNav } from './MatxVerticalNav/MatxVerticalNav'
 export { default as MatxVerticalNavExpansionPanel } from './MatxVerticalNav/MatxVerticalNavExpansionPanel'
 // export { default as RectangleAvatar } from './RectangleAvatar';
 export { default as SimpleCard } from './SimpleCard'
+export { default as Container } from './Container'
+export { default as StyledTable } from './StyledTable'

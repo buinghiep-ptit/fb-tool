@@ -11,11 +11,16 @@ const ScheduleManager = Loadable(
 const ShopManager = Loadable(lazy(() => import('./shop/ShopManager')))
 const TeamManager = Loadable(lazy(() => import('./team/TeamManager')))
 const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
+const EditCustomer = Loadable(lazy(() => import('./customer/EditCustomer')))
 
 const managerRoutes = [
   {
     path: '/customers',
     element: <CustomerManager />,
+  },
+  {
+    path: '/customers/:idCustomer',
+    element: <EditCustomer />,
   },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },

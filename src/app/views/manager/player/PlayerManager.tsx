@@ -10,7 +10,16 @@ import {
   InputLabel,
   Stack,
   Icon,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Chip,
+  Tooltip,
+  IconButton,
+  TablePagination,
 } from '@mui/material'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
 import { useState } from 'react'
 import { MuiButton } from 'app/components/common/MuiButton'
@@ -20,6 +29,11 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SearchSharp } from '@mui/icons-material'
+import { headTablePlayer } from 'app/utils/columns'
+import { Link } from 'react-router-dom'
+import StarIcon from '@mui/icons-material/Star'
+import Star from '@mui/icons-material/Star'
+import RankIcon from 'app/components/common/RankIcon'
 export interface Props {}
 
 export default function PlayerManager(props: Props) {
@@ -181,7 +195,58 @@ export default function PlayerManager(props: Props) {
             </FormProvider>
           </form>
         </SimpleCard>
-        <SimpleCard title="Danh sách cầu thủ"></SimpleCard>
+        <SimpleCard title="Danh sách cầu thủ">
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {headTablePlayer.map(header => (
+                  <TableCell align="center" style={{ minWidth: header.width }}>
+                    {header.name}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow hover>
+                <TableCell align="center">1</TableCell>
+                <TableCell align="center">
+                  <RankIcon rank={1} sx={{ fontSize: 30 }} />
+                </TableCell>
+                <TableCell align="center">
+                  <Link to="/">Đoàn Văn Hậu</Link>
+                </TableCell>
+                <TableCell align="center">Hậu vệ</TableCell>
+                <TableCell align="center">Đội hình 1,U20</TableCell>
+                <TableCell align="center">22/03/2023</TableCell>
+                <TableCell align="center">186</TableCell>
+                <TableCell align="center">22/03/2023</TableCell>
+                <TableCell align="center">
+                  <Chip label="Hoạt động" color="success" />
+                </TableCell>
+                <TableCell align="center">
+                  <Tooltip title="Sửa" placement="top">
+                    <IconButton color="primary">
+                      <BorderColorIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </StyledTable>
+          <TablePagination
+            sx={{ px: 2 }}
+            page={page}
+            component="div"
+            rowsPerPage={rowsPerPage}
+            count={40}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+          />
+        </SimpleCard>
       </Stack>
     </Container>
   )

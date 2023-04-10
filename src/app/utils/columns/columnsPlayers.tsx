@@ -4,6 +4,10 @@ export const headTablePlayer = [
     width: '60px',
   },
   {
+    name: '',
+    width: '5px',
+  },
+  {
     name: 'Tên cầu thủ',
     width: '200px',
   },
@@ -20,7 +24,7 @@ export const headTablePlayer = [
     width: '120px',
   },
   {
-    name: 'Chiều cao',
+    name: 'Chiều cao (cm)',
     width: '200px',
   },
   {
@@ -32,7 +36,7 @@ export const headTablePlayer = [
     width: '100px',
   },
   {
-    name: '',
+    name: 'Hành động',
     width: '100px',
   },
 ]

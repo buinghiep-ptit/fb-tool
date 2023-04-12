@@ -29,28 +29,123 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SearchSharp } from '@mui/icons-material'
-import { headTablePlayer } from 'app/utils/columns'
-import { Link } from 'react-router-dom'
+import { columnsPlayers } from 'app/utils/columns'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import StarIcon from '@mui/icons-material/Star'
 import Star from '@mui/icons-material/Star'
 import RankIcon from 'app/components/common/RankIcon'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { PlayerResponse, PlayersFilters, TitlePlayer } from 'app/models'
+import { getListPlayer } from 'app/apis/players/players.service'
+import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import * as Yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
+import MuiStyledTable from 'app/components/common/MuiStyledTable'
 export interface Props {}
 
 export default function PlayerManager(props: Props) {
-  const [page, setPage] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
-  const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
+  const navigate = useNavigateParams()
+  const navigation = useNavigate()
+  const [searchParams] = useSearchParams()
+  const queryParams = Object.fromEntries([...searchParams])
+  const [page, setPage] = useState<number>(0)
+  const [size, setSize] = useState<number>(1)
+  const onClickRow = (cell: any, row: any) => {
+    if (cell.id === 'name') {
+      navigation(`${row.id}/`)
+    }
+  }
+
+  const handleChangePage = (service: unknown, newPage: number) => {
     setPage(newPage)
+    setFilters(prevFilters => {
+      return {
+        ...prevFilters,
+        page: newPage,
+      }
+    })
+    navigate('', {
+      ...filters,
+      page: newPage,
+    } as any)
   }
-  const methods = useForm()
-  const handleChangeRowsPerPage = (event: {
-    target: { value: string | number }
-  }) => {
-    setRowsPerPage(+event.target.value)
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSize(+event.target.value)
     setPage(0)
-    const newSize = +event.target.value
+    setFilters(prevFilters => {
+      return {
+        ...prevFilters,
+        page: 0,
+        size: parseInt(event.target.value, 10),
+      }
+    })
+    navigate('', {
+      ...filters,
+      size: parseInt(event.target.value, 10),
+    } as any)
   }
+
   const onSubmitHandler = () => console.log('Hello')
+  const [defaultValues] = useState<PlayersFilters>({
+    status: queryParams.status ?? '1',
+    search: queryParams.search ?? '',
+    position: queryParams.position ?? '',
+    dateStart: queryParams.dateStart ?? '',
+    dateEnd: queryParams.dateEnd ?? '',
+    sort: queryParams.sort ?? '',
+    page: queryParams.page ? +queryParams.page : 0,
+    size: queryParams.size ? +queryParams.size : 1,
+  })
+  const [filters, setFilters] = useState<PlayersFilters>(
+    extractMergeFiltersObject(defaultValues, {}),
+  )
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  }: UseQueryResult<PlayerResponse, Error> = useQuery<PlayerResponse, Error>(
+    ['players', filters],
+    () => getListPlayer(filters),
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      enabled: !!filters,
+    },
+  )
+  const validationSchema = Yup.object().shape({
+    search: Yup.string()
+      .min(0, 'hashtag must be at least 0 characters')
+      .max(256, 'hashtag must be at almost 256 characters'),
+  })
+
+  const methods = useForm<PlayersFilters>({
+    defaultValues,
+    mode: 'onChange',
+    resolver: yupResolver(validationSchema),
+  })
+
+  React.useEffect(() => {
+    if (searchParams) {
+      if (!!Object.keys(queryParams).length) {
+        setPage(parseInt(queryParams.page) || 0)
+        setSize(parseInt(queryParams.size) || 1)
+
+        setFilters(prevFilters => {
+          return {
+            ...prevFilters,
+            ...queryParams,
+          }
+        })
+      }
+    }
+  }, [searchParams])
+
   return (
     <Container>
       <Box className="breadcrumb">
@@ -196,55 +291,36 @@ export default function PlayerManager(props: Props) {
           </form>
         </SimpleCard>
         <SimpleCard title="Danh sách cầu thủ">
-          <StyledTable>
-            <TableHead>
-              <TableRow>
-                {headTablePlayer.map(header => (
-                  <TableCell align="center" style={{ minWidth: header.width }}>
-                    {header.name}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow hover>
-                <TableCell align="center">1</TableCell>
-                <TableCell align="center">
-                  <RankIcon rank={1} sx={{ fontSize: 30 }} />
-                </TableCell>
-                <TableCell align="center">
-                  <Link to="/">Đoàn Văn Hậu</Link>
-                </TableCell>
-                <TableCell align="center">Hậu vệ</TableCell>
-                <TableCell align="center">Đội hình 1,U20</TableCell>
-                <TableCell align="center">22/03/2023</TableCell>
-                <TableCell align="center">186</TableCell>
-                <TableCell align="center">22/03/2023</TableCell>
-                <TableCell align="center">
-                  <Chip label="Hoạt động" color="success" />
-                </TableCell>
-                <TableCell align="center">
-                  <Tooltip title="Sửa" placement="top">
-                    <IconButton color="primary">
-                      <BorderColorIcon />
-                    </IconButton>
-                  </Tooltip>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </StyledTable>
-          <TablePagination
-            sx={{ px: 2 }}
+          <MuiStyledTable
+            rows={data?.content as TitlePlayer[]}
+            columns={columnsPlayers}
+            onClickRow={onClickRow}
+            isFetching={isFetching}
+            rowsPerPage={size}
             page={page}
+            // actions={[
+            //   {
+            //     icon: 'edit',
+            //     color: 'warning',
+            //     tooltip: 'Chi tiết',
+            //     onClick: onRowUpdate,
+            //   },
+            //   {
+            //     icon: 'delete',
+            //     color: 'error',
+            //     tooltip: 'Xoá',
+            //     onClick: onRowDelete,
+            //   },
+            // ]}
+          />
+          <MuiStyledPagination
             component="div"
-            rowsPerPage={rowsPerPage}
-            count={40}
-            onPageChange={handleChangePage}
             rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
+            count={data ? (data?.totalElements as number) : 0}
+            rowsPerPage={size}
+            page={page}
+            onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
           />
         </SimpleCard>
       </Stack>

@@ -35,7 +35,7 @@ import StarIcon from '@mui/icons-material/Star'
 import Star from '@mui/icons-material/Star'
 import RankIcon from 'app/components/common/RankIcon'
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { PlayerResponse, PlayersFilters, TitlePlayer } from 'app/models'
+import { PlayersFilters, TitlePlayer } from 'app/models'
 import { getListPlayer } from 'app/apis/players/players.service'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
@@ -46,78 +46,55 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 export interface Props {}
 
 export default function PlayerManager(props: Props) {
+  let count = 1
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(1)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
   const onClickRow = (cell: any, row: any) => {
     if (cell.id === 'name') {
       navigation(`${row.id}/`)
     }
   }
-
-  const handleChangePage = (service: unknown, newPage: number) => {
+  const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    setFilters(prevFilters => {
-      return {
-        ...prevFilters,
-        page: newPage,
-      }
-    })
-    navigate('', {
-      ...filters,
-      page: newPage,
-    } as any)
   }
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setSize(+event.target.value)
+
+  const handleChangeRowsPerPage = (event: {
+    target: { value: string | number }
+  }) => {
+    setRowsPerPage(+event.target.value)
     setPage(0)
-    setFilters(prevFilters => {
-      return {
-        ...prevFilters,
-        page: 0,
-        size: parseInt(event.target.value, 10),
-      }
-    })
-    navigate('', {
-      ...filters,
-      size: parseInt(event.target.value, 10),
-    } as any)
+    const newSize = +event.target.value
   }
 
   const onSubmitHandler = () => console.log('Hello')
   const [defaultValues] = useState<PlayersFilters>({
-    status: queryParams.status ?? '1',
+    status: queryParams.status ?? 'all',
     search: queryParams.search ?? '',
     position: queryParams.position ?? '',
     dateStart: queryParams.dateStart ?? '',
     dateEnd: queryParams.dateEnd ?? '',
     sort: queryParams.sort ?? '',
-    page: queryParams.page ? +queryParams.page : 0,
-    size: queryParams.size ? +queryParams.size : 1,
+    // page: queryParams.page ? +queryParams.page : 0,
+    // size: queryParams.size ? +queryParams.size : 1,
   })
   const [filters, setFilters] = useState<PlayersFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
-  const {
-    data,
-    isLoading,
-    isFetching,
-    isError,
-    error,
-  }: UseQueryResult<PlayerResponse, Error> = useQuery<PlayerResponse, Error>(
-    ['players', filters],
-    () => getListPlayer(filters),
-    {
-      refetchOnWindowFocus: false,
-      keepPreviousData: true,
-      enabled: !!filters,
-    },
-  )
+  const { data, isLoading, isFetching, isError, error } = useQuery<
+    TitlePlayer[],
+    Error
+  >(['players', filters], () => getListPlayer(filters), {
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
+    enabled: !!filters,
+  })
+  console.log(data)
+
   const validationSchema = Yup.object().shape({
     search: Yup.string()
       .min(0, 'hashtag must be at least 0 characters')
@@ -291,36 +268,61 @@ export default function PlayerManager(props: Props) {
           </form>
         </SimpleCard>
         <SimpleCard title="Danh sách cầu thủ">
-          <MuiStyledTable
-            rows={data?.content as TitlePlayer[]}
-            columns={columnsPlayers}
-            onClickRow={onClickRow}
-            isFetching={isFetching}
-            rowsPerPage={size}
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {columnsPlayers.map(header => (
+                  <TableCell align="center" style={{ minWidth: header.width }}>
+                    {header.name}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data?.map(item => (
+                <TableRow key={item.id}>
+                  <TableCell align="center">{count++}</TableCell>
+                  <TableCell align="center">
+                    {item.priority !== null && (
+                      <RankIcon
+                        rank={item.priority ?? 0}
+                        sx={{ fontSize: 30 }}
+                      ></RankIcon>
+                    )}
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Link to="/">{item.name}</Link>
+                  </TableCell>
+                  <TableCell align="center">{item.position}</TableCell>
+                  <TableCell align="center">{item.idTeam}</TableCell>
+                  <TableCell align="center">{item.dateOfBirth}</TableCell>
+                  <TableCell align="center">{item.height}</TableCell>
+                  <TableCell align="center">{item.dateJoined}</TableCell>
+                  <TableCell align="center">{item.status}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="Sửa" placement="top">
+                      <IconButton color="primary">
+                        <BorderColorIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </StyledTable>
+          <TablePagination
+            sx={{ px: 2 }}
             page={page}
-            // actions={[
-            //   {
-            //     icon: 'edit',
-            //     color: 'warning',
-            //     tooltip: 'Chi tiết',
-            //     onClick: onRowUpdate,
-            //   },
-            //   {
-            //     icon: 'delete',
-            //     color: 'error',
-            //     tooltip: 'Xoá',
-            //     onClick: onRowDelete,
-            //   },
-            // ]}
-          />
-          <MuiStyledPagination
             component="div"
-            rowsPerPageOptions={[20, 50, 100]}
-            count={data ? (data?.totalElements as number) : 0}
-            rowsPerPage={size}
-            page={page}
+            rowsPerPage={rowsPerPage}
+            count={40}
             onPageChange={handleChangePage}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
           />
         </SimpleCard>
       </Stack>

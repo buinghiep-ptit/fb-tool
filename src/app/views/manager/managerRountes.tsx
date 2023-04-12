@@ -14,6 +14,9 @@ const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
 const EditCustomer = Loadable(lazy(() => import('./customer/EditCustomer')))
 const AccountManager = Loadable(lazy(() => import('./accounts/AccountManager')))
 const OrderManager = Loadable(lazy(() => import('./orders/OrderManager')))
+const SortManager = Loadable(lazy(() => import('./shop/Sort')))
+const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
+
 const managerRoutes = [
   {
     path: '/customers',
@@ -29,7 +32,12 @@ const managerRoutes = [
   { path: '/teams', element: <TeamManager /> },
   { path: '/schedules', element: <ScheduleManager /> },
   { path: '/videos', element: <VideoManager /> },
-  { path: '/shop', element: <ShopManager /> },
+  { path: '/shop/sort', element: <SortManager /> },
+  { path: '/shop/category/:id', element: <DetailCategory /> },
+  {
+    path: '/shop',
+    element: <ShopManager />,
+  },
   { path: '/orders', element: <OrderManager /> },
 ]
 export default managerRoutes

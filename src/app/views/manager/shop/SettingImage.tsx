@@ -1,7 +1,7 @@
 import { Box } from '@mui/system'
 import * as React from 'react'
 import { Breadcrumb, Container } from 'app/components'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   Accordion,
   AccordionSummary,
@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Divider,
 } from '@mui/material'
 import CachedIcon from '@mui/icons-material/Cached'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -18,7 +19,6 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart'
 import { useEffect, useState } from 'react'
 import { getProductCategories } from 'app/apis/shop/shop.service'
-import DialogSettingImage from './DialogSettingImage'
 export interface Props {}
 
 interface item {
@@ -39,18 +39,13 @@ const style = {
 
 export default function ShopManager(props: Props) {
   const [productCategories, setProductCategories] = useState<category[]>()
-  const navigate = useNavigate()
-  const dialogSettingImageRef = React.useRef<any>(null)
-
   const fetchProductCategories = async () => {
     const res = await getProductCategories()
     setProductCategories(res)
   }
-
   useEffect(() => {
     fetchProductCategories()
   }, [])
-
   return (
     <Container>
       <Box className="breadcrumb">
@@ -66,21 +61,13 @@ export default function ShopManager(props: Props) {
         </Button>
       </div>
       <div style={{ marginBottom: '15px' }}>
-        <Button
-          variant="contained"
-          startIcon={<SettingsIcon />}
-          onClick={() => {
-            console.log('data')
-            dialogSettingImageRef?.current.handleClickOpen()
-          }}
-        >
+        <Button variant="contained" startIcon={<SettingsIcon />}>
           Cài đặt hình ảnh
         </Button>
         <Button
           variant="contained"
           startIcon={<StackedBarChartIcon />}
           style={{ marginLeft: '15px', background: 'black' }}
-          onClick={() => navigate('/shop/sort')}
         >
           Sắp xếp
         </Button>
@@ -89,7 +76,7 @@ export default function ShopManager(props: Props) {
       <div>
         {(productCategories || []).map((category: category) => {
           return (
-            <Accordion key={category.name}>
+            <Accordion>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -99,20 +86,31 @@ export default function ShopManager(props: Props) {
               </AccordionSummary>
               <AccordionDetails>
                 <List sx={style} component="nav" aria-label="mailbox folders">
-                  {category.children.map((item: item) => (
-                    <Link to={'#'} key={item.name}>
-                      <ListItem button>
-                        <ListItemText primary={item.name} />
-                      </ListItem>
-                    </Link>
-                  ))}
+                  <ListItem button>
+                    <ListItemText primary="Inbox" />
+                  </ListItem>
+                  <Divider />
+                  <ListItem button divider>
+                    <ListItemText primary="Drafts" />
+                  </ListItem>
+                  <ListItem button>
+                    <ListItemText primary="Trash" />
+                  </ListItem>
+                  <Divider light />
+                  <ListItem button>
+                    <ListItemText primary="Spam" />
+                  </ListItem>
                 </List>
+                {category.children.map((item: item) => (
+                  <Typography>
+                    <Link to={'#'}>{item.name}</Link>
+                  </Typography>
+                ))}
               </AccordionDetails>
             </Accordion>
           )
         })}
       </div>
-      <DialogSettingImage ref={dialogSettingImageRef}></DialogSettingImage>
     </Container>
   )
 }

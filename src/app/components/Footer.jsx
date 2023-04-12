@@ -6,7 +6,7 @@ import { Paragraph, Span } from './Typography'
 
 const AppFooter = styled(Toolbar)(() => ({
   display: 'flex',
-  backgroundColor: '#BD0F14',
+  backgroundColor: '#121111',
   alignItems: 'center',
   minHeight: topBarHeight,
   '@media (max-width: 499px)': {

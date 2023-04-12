@@ -1,0 +1,21 @@
+.list-container {
+  margin-top: 50px;
+}
+
+.list-container .item {
+  height: 80px;
+  font-family: sans-serif;
+  background-color: #eeeeee;
+  border-radius: 0.25rem;
+  opacity: 1;
+  margin-bottom: 5px;
+}
+
+.dragged .item {
+  opacity: 0.1;
+}
+
+.floating .item {
+  background-color: #ffffff;
+  box-shadow: 0 0.2rem 2rem #666666;
+}

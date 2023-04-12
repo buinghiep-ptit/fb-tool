@@ -17,6 +17,8 @@ export const navigations = [
   { name: 'Quản lý lịch thi đấu', path: '/schedules', icon: 'schedule' },
   { name: 'Quản lý CAHN TV', path: '/videos', icon: 'movie' },
   { name: 'Quản lý cửa hàng', path: '/shop', icon: 'storefront' },
+  { name: 'Quản lý tài khoản vận hành', path: '/accounts', icon: 'contacts' },
+  { name: 'Quản lý đơn hàng', path: '/orders', icon: 'notes' },
   // {
   //   name: 'Quản lý giải đấu',
   //   icon: 'sports_soccer',

@@ -16,8 +16,6 @@ import {
   TableBody,
   TablePagination,
   Chip,
-  IconButton,
-  Tooltip,
   FormLabel,
   Radio,
   FormControlLabel,
@@ -25,16 +23,14 @@ import {
   Paper,
   ButtonGroup,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import { headTableAccount, headTableAccountLog } from './const'
-import { useState } from 'react'
+import LockDialog from './dialog/LockDialog'
+import { headTableAccountLog } from './const'
+import { useState, useRef } from 'react'
 import LockPersonIcon from '@mui/icons-material/LockPerson'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
 
 export interface Props {}
+
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   boxShadow: 'none',
@@ -43,6 +39,8 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Information(props: Props) {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
+  const lockDialogRef = React.useRef<any>(null)
+
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
   }
@@ -167,7 +165,9 @@ export default function Information(props: Props) {
             </Item>
             <Item>
               <ButtonGroup variant="text" aria-label="text button group">
-                <Button startIcon={<LockPersonIcon />}>Khóa</Button>
+                <Button startIcon={<LockPersonIcon />} onClick={() => {}}>
+                  Khóa
+                </Button>
                 <Button color="success">Loại tài khoản: Fan</Button>
               </ButtonGroup>
             </Item>
@@ -179,6 +179,7 @@ export default function Information(props: Props) {
           </Grid>
         </Grid>
       </SimpleCard>
+      <LockDialog ref={lockDialogRef} />
       <div style={{ height: '30px' }} />
       <SimpleCard title="Log hành động">
         <StyledTable>

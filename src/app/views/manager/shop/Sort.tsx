@@ -1,30 +1,9 @@
-import { Box, styled } from '@mui/system'
+import { Box } from '@mui/system'
 import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link } from 'react-router-dom'
-import {
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
-  Chip,
-  IconButton,
-  Tooltip,
-  Grid,
-  Typography,
-  Paper,
-  Button,
-  LinearProgress,
-} from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import AddBoxIcon from '@mui/icons-material/AddBox'
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp'
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown'
-import { headTableCategory } from './const'
+import { Breadcrumb, SimpleCard, Container } from 'app/components'
+
+import { Chip, Grid, Button, LinearProgress } from '@mui/material'
+
 import { useState } from 'react'
 import {
   getCategoriesSort,
@@ -32,7 +11,6 @@ import {
 } from 'app/apis/shop/shop.service'
 import RLDD from 'react-list-drag-and-drop/lib/RLDD'
 import './shop.css'
-import { set } from 'lodash'
 
 interface category {
   name: string
@@ -62,7 +40,12 @@ export default function Sort(props: Props) {
 
   const updateProductCategories = async () => {
     setIsloading(true)
-    const res = await updateCategoriesSort(categories)
+    const res = await updateCategoriesSort({
+      sortCategories: categories?.map((item, index) => {
+        item.priority = index + 1
+        return item
+      }),
+    })
     if (res) {
       setIsloading(false)
       fetchProductCategories()
@@ -124,7 +107,7 @@ export default function Sort(props: Props) {
           <Button
             variant="contained"
             style={{ width: '200px', margin: '15px 0', height: '52px' }}
-            onClick={updateCategoriesSort}
+            onClick={updateProductCategories}
             disabled={isLoading}
           >
             cập nhật thay đổi

@@ -17,8 +17,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart'
 import { useEffect, useState } from 'react'
-import { getProductCategories } from 'app/apis/shop/shop.service'
+import { getProductCategories, syncStatus } from 'app/apis/shop/shop.service'
 import DialogSettingImage from './DialogSettingImage'
+
 export interface Props {}
 
 interface item {
@@ -47,8 +48,20 @@ export default function ShopManager(props: Props) {
     setProductCategories(res)
   }
 
+  const syncCategory = async () => {
+    const res = await syncCategory()
+
+    watchRequest()
+  }
+
   useEffect(() => {
     fetchProductCategories()
+    const watchRequest = setInterval(() => {
+      const resStatus = await syncStatus({ isProduct: 1 })
+      if (resStatus) {
+        clearInterval(watchRequest)
+      }
+    }, 20000)
   }, [])
 
   return (
@@ -95,12 +108,14 @@ export default function ShopManager(props: Props) {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography variant="h5">{category?.name}</Typography>
+                <Link to={`/shop/category/${category.id}`} key={category.name}>
+                  <Typography variant="h5">{category?.name}</Typography>
+                </Link>
               </AccordionSummary>
               <AccordionDetails>
                 <List sx={style} component="nav" aria-label="mailbox folders">
                   {category.children.map((item: item) => (
-                    <Link to={'#'} key={item.name}>
+                    <Link to={`/shop/category/${item.id}`} key={item.name}>
                       <ListItem button>
                         <ListItemText primary={item.name} />
                       </ListItem>

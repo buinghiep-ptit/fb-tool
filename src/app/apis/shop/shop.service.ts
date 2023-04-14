@@ -34,7 +34,15 @@ export const syncCategory = async (): Promise<any> => {
   return data
 }
 
+export const uploadImageCategories = async (
+  id: any,
+  params: any,
+): Promise<any> => {
+  const { data } = await http.put<any>(`/api/product-categories/${id}`, params)
+  return data
+}
+
 export const syncStatus = async (params: any): Promise<any> => {
-  const { data } = await http.post<any>(`/api/synchronize-status`, { params })
+  const { data } = await http.get<any>(`/api/synchronize-status`, { params })
   return data
 }

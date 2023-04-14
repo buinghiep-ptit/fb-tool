@@ -9,10 +9,19 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import BackupIcon from '@mui/icons-material/Backup'
 import { compressImageFile } from 'app/helpers/compressFile'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { uploadImageCategories } from 'app/apis/shop/shop.service'
+import { useParams } from 'react-router-dom'
 
-const DialogSettingImage = React.forwardRef((props, ref) => {
+interface Props {
+  isLoading: boolean
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const DialogSettingImage = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const [file, setFile] = React.useState<any>(null)
+  const params = useParams()
+
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
       setOpen(true)
@@ -35,7 +44,7 @@ const DialogSettingImage = React.forwardRef((props, ref) => {
       const token = window.localStorage.getItem('accessToken')
       const config: AxiosRequestConfig = {
         method: 'post',
-        url: `${process.env.REACT_APP_API_URL}/api/file/upload`,
+        url: `${process.env.REACT_APP_API_URL}/api/file/upload?directory=cahnfc`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -44,15 +53,23 @@ const DialogSettingImage = React.forwardRef((props, ref) => {
         },
       }
       const res: AxiosResponse = await axios(config)
-      return res
+      return res.data
     } catch (e) {
       console.log(e)
     }
   }
 
   const uploadImage = async () => {
+    props.setIsLoading(true)
     const url = await handleUploadImage()
     if (url) {
+      const res = uploadImageCategories(params.id, {
+        id: params.id,
+        imgUrl: url?.path,
+      })
+      if (await res) {
+        props.setIsLoading(false)
+      }
     }
   }
 
@@ -133,7 +150,12 @@ const DialogSettingImage = React.forwardRef((props, ref) => {
           >
             Thay đổi
           </Button>
-          <Button onClick={uploadImage} autoFocus variant="contained">
+          <Button
+            onClick={uploadImage}
+            autoFocus
+            variant="contained"
+            disabled={props.isLoading}
+          >
             Cập nhật
           </Button>
         </DialogActions>

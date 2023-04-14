@@ -11,14 +11,20 @@ import {
   List,
   ListItem,
   ListItemText,
+  LinearProgress,
 } from '@mui/material'
 import CachedIcon from '@mui/icons-material/Cached'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart'
 import { useEffect, useState } from 'react'
-import { getProductCategories } from 'app/apis/shop/shop.service'
+import {
+  getProductCategories,
+  syncCategory,
+  syncStatus,
+} from 'app/apis/shop/shop.service'
 import DialogSettingImage from './DialogSettingImage'
+
 export interface Props {}
 
 interface item {
@@ -41,11 +47,51 @@ export default function ShopManager(props: Props) {
   const [productCategories, setProductCategories] = useState<category[]>()
   const navigate = useNavigate()
   const dialogSettingImageRef = React.useRef<any>(null)
+  const [intervalCheck, setIntervalCheck] = useState(0)
+  const [isLoading, setIsloading] = useState(false)
 
   const fetchProductCategories = async () => {
     const res = await getProductCategories()
     setProductCategories(res)
   }
+
+  // eslint-disable-next-line prefer-const
+  // const handleInterval = setInterval(() => {
+  //   console.log('x')
+  // }, 2000)
+
+  // const tmp = handleInterval()
+
+  const handleSyncCategory = async () => {
+    const res = await syncCategory()
+    if (res) {
+      // eslint-disable-next-line prefer-const
+      let status = 0
+      while (status === 0) {
+        console.log('a')
+        await new Promise<void>(resolve =>
+          setTimeout(async () => {
+            const statusRes = await watchStatusSync()
+            console.log(statusRes)
+            if (statusRes === 0) {
+              status = 1
+            }
+            resolve()
+          }, 20000),
+        )
+      }
+    }
+  }
+
+  const watchStatusSync = async () => {
+    const res = await syncStatus({ isProduct: 0 })
+    return res.status
+  }
+
+  // useEffect(() => {
+  //   if (intervalCheck === 0) return
+  //   watchStatusSync()
+  // }, [intervalCheck])
 
   useEffect(() => {
     fetchProductCategories()
@@ -53,6 +99,19 @@ export default function ShopManager(props: Props) {
 
   return (
     <Container>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <Box className="breadcrumb">
         <Breadcrumb routeSegments={[{ name: 'Quản lý cửa hàng' }]} />
       </Box>
@@ -61,6 +120,7 @@ export default function ShopManager(props: Props) {
           variant="contained"
           startIcon={<CachedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
+          onClick={() => handleSyncCategory()}
         >
           Đồng bộ dữ liệu
         </Button>
@@ -70,7 +130,6 @@ export default function ShopManager(props: Props) {
           variant="contained"
           startIcon={<SettingsIcon />}
           onClick={() => {
-            console.log('data')
             dialogSettingImageRef?.current.handleClickOpen()
           }}
         >
@@ -95,12 +154,14 @@ export default function ShopManager(props: Props) {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography variant="h5">{category?.name}</Typography>
+                <Link to={`/shop/category/${category.id}`} key={category.name}>
+                  <Typography variant="h5">{category?.name}</Typography>
+                </Link>
               </AccordionSummary>
               <AccordionDetails>
                 <List sx={style} component="nav" aria-label="mailbox folders">
                   {category.children.map((item: item) => (
-                    <Link to={'#'} key={item.name}>
+                    <Link to={`/shop/category/${item.id}`} key={item.name}>
                       <ListItem button>
                         <ListItemText primary={item.name} />
                       </ListItem>
@@ -112,7 +173,11 @@ export default function ShopManager(props: Props) {
           )
         })}
       </div>
-      <DialogSettingImage ref={dialogSettingImageRef}></DialogSettingImage>
+      <DialogSettingImage
+        ref={dialogSettingImageRef}
+        isLoading={isLoading}
+        setIsLoading={setIsloading}
+      ></DialogSettingImage>
     </Container>
   )
 }

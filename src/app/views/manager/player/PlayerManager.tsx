@@ -52,7 +52,6 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { getListTeam } from 'app/apis/teams/teams.service'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import moment from 'moment'
-import * as XLSX from 'xlsx'
 
 export interface Props {}
 const optionPosition = [

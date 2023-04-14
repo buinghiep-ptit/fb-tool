@@ -17,6 +17,7 @@ const OrderManager = Loadable(lazy(() => import('./orders/OrderManager')))
 const SortManager = Loadable(lazy(() => import('./shop/Sort')))
 const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
 const Product = Loadable(lazy(() => import('./shop/Product')))
+const PlayerDetail = Loadable(lazy(() => import('./player/PlayerDetail')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -35,7 +36,7 @@ const managerRoutes = [
   { path: '/shop/sort', element: <SortManager /> },
   { path: '/shop/category/:id', element: <DetailCategory /> },
   { path: '/shop/product/:id', element: <Product /> },
-  // { path: '/shop/ca/:id', element: <Product /> },
+  { path: '/players/:id', element: <PlayerDetail /> },
   {
     path: '/shop',
     element: <ShopManager />,

@@ -28,6 +28,7 @@
     "draftjs-to-html": "^0.9.1",
     "echarts": "^5.2.2",
     "env-cmd": "^10.1.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.2.9",
     "history": "4.10.1",
     "html-to-draftjs": "^1.5.0",
@@ -68,6 +69,7 @@
     "three": "0.139.2",
     "typescript": "^4.7.4",
     "webpack": "^5.74.0",
+    "xlsx": "^0.18.5",
     "yup": "^0.32.11"
   },
   "scripts": {
@@ -115,6 +117,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/react-slick": "^0.23.10",
     "@types/slick-carousel": "^1.6.37",
+    "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "autoprefixer": "^10.4.8",

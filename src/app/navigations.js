@@ -7,7 +7,11 @@ export const navigations = [
     path: '/customers',
     icon: 'person',
   },
-  { name: 'Quản lý cầu thủ', path: '/players', icon: 'accessibility' },
+  {
+    name: 'Quản lý cầu thủ',
+    path: '/players',
+    icon: 'accessibility',
+  },
   { name: 'Quản lý tin tức', path: '/news', icon: 'newspaper' },
   { name: 'Quản lý đội bóng', path: '/teams', icon: 'groups' },
   { name: 'Quản lý lịch thi đấu', path: '/schedules', icon: 'schedule' },

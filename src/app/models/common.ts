@@ -92,10 +92,14 @@ export interface IFeedsFilters {
   stt?: any
 }
 
-export interface ServicesFilters {
+export interface PlayersFilters {
   search?: string
-  status?: 1 | -1 | 'all' | string | undefined //   1:Hiệu lực -1:Không hiệu lực
-  rentalType?: 1 | 2 | 3 | 'all' | string | undefined // 1: gói dịch vụ 2: lưu trú 3: Khác
+  position?: string
+  status?: 1 | -1 | 'all' | string | undefined //   1:Hoạt động -1:Không hoạt động
   page?: number | 0
   size?: number | 20
+  sort?: string
+  team?: string
+  dateStart?: string
+  dateEnd?: string
 }

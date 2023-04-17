@@ -5,6 +5,7 @@ import { lazy } from 'react'
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
+const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
 const ScheduleManager = Loadable(
   lazy(() => import('./schedule/ScheduleManager')),
 )
@@ -39,5 +40,6 @@ const managerRoutes = [
     element: <ShopManager />,
   },
   { path: '/orders', element: <OrderManager /> },
+  { path: '/banner', element: <BannerManager /> },
 ]
 export default managerRoutes

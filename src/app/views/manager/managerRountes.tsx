@@ -6,6 +6,7 @@ const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
 const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
+const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
 const ScheduleManager = Loadable(
   lazy(() => import('./schedule/ScheduleManager')),
 )
@@ -41,5 +42,13 @@ const managerRoutes = [
   },
   { path: '/orders', element: <OrderManager /> },
   { path: '/banner', element: <BannerManager /> },
+  {
+    path: '/banner/chi-tiet-banner',
+    element: <AddBanner />,
+  },
+  {
+    path: '/banner/:bannerID/*',
+    element: <AddBanner />,
+  },
 ]
 export default managerRoutes

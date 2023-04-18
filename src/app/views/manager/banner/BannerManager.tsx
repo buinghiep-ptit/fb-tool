@@ -88,7 +88,7 @@ export default function BannerManager(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`/`, {})}
+          onClick={() => navigation(`chi-tiet-banner`, {})}
           startIcon={<Icon>control_point</Icon>}
           sx={{ width: '50%' }}
         />

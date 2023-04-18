@@ -103,3 +103,11 @@ export interface PlayersFilters {
   dateStart?: string
   dateEnd?: string
 }
+export interface OrdersFilters {
+  search?: string
+  status?: 2 | 1 | 0 | string | undefined
+  page?: number | 0
+  size?: number | 20
+  dateStart?: string
+  dateEnd?: string
+}

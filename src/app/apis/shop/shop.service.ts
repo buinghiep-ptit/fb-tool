@@ -42,6 +42,11 @@ export const uploadImageCategories = async (
   return data
 }
 
+export const getImageCategories = async (id: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/product-categories/${id}`)
+  return data
+}
+
 export const syncStatus = async (params: any): Promise<any> => {
   const { data } = await http.get<any>(`/api/synchronize-status`, { params })
   return data

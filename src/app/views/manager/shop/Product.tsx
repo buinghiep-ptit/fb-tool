@@ -15,7 +15,6 @@ import 'swiper/css/thumbs'
 import { Mousewheel, Navigation, Thumbs } from 'swiper'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-import { Girl } from '@mui/icons-material'
 import { useParams } from 'react-router-dom'
 
 export interface Props {}

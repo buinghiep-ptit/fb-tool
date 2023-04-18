@@ -9,7 +9,10 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import BackupIcon from '@mui/icons-material/Backup'
 import { compressImageFile } from 'app/helpers/compressFile'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import { uploadImageCategories } from 'app/apis/shop/shop.service'
+import {
+  getImageCategories,
+  uploadImageCategories,
+} from 'app/apis/shop/shop.service'
 import { useParams } from 'react-router-dom'
 
 interface Props {
@@ -20,6 +23,7 @@ interface Props {
 const DialogSettingImage = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const [file, setFile] = React.useState<any>(null)
+  const [previewImage, setPreviewImage] = React.useState<string>('')
   const params = useParams()
 
   React.useImperativeHandle(ref, () => ({
@@ -63,15 +67,25 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     const url = await handleUploadImage()
     if (url) {
-      const res = uploadImageCategories(params.id, {
-        id: params.id,
+      const res = uploadImageCategories(params.id || 0, {
+        id: params.id || 0,
         imgUrl: url?.path,
       })
       if (await res) {
         props.setIsLoading(false)
+        handleClose()
       }
     }
   }
+
+  const getDetailImage = async () => {
+    const res = await getImageCategories(params.id || 0)
+    setPreviewImage(res.imgUrl)
+  }
+
+  React.useEffect(() => {
+    getDetailImage()
+  }, [])
 
   return (
     <div>
@@ -96,7 +110,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
             id="uploadImage"
             style={{ display: 'none' }}
             onChange={(event: any) => {
-              console.log(event.target.files)
+              setPreviewImage(window.URL.createObjectURL(event.target.files[0]))
               setFile(event.target.files[0])
             }}
           />
@@ -115,7 +129,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
               paddingTop: '100px',
             }}
           >
-            {!file && (
+            {!file && previewImage === '' && (
               <div>
                 <div>Chọn ảnh để tải lên</div>
                 <div>Hoặc kéo và thả tập tin</div>
@@ -126,20 +140,21 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
               </div>
             )}
 
-            {file?.type.startsWith('image/') && (
-              <img
-                src={window.URL.createObjectURL(file)}
-                width="480px"
-                height="270px"
-              ></img>
+            {previewImage.length !== 0 && (
+              <img src={previewImage} width="480px" height="270px"></img>
             )}
           </div>
         </DialogContent>
         <DialogActions sx={{ textAlign: 'center' }}>
-          <Button onClick={handleClose} variant="outlined">
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            disabled={props.isLoading}
+          >
             Đóng
           </Button>
           <Button
+            disabled={props.isLoading}
             variant="contained"
             onClick={() => {
               const inputUploadImage = document.getElementById(
@@ -156,7 +171,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
             variant="contained"
             disabled={props.isLoading}
           >
-            Cập nhật
+            {props.isLoading ? 'Đang tải ảnh lên...' : 'Cập nhật'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -115,12 +115,12 @@ export default function PlayerManager(props: Props) {
 
   const [defaultValues] = useState<PlayersFilters>({
     status: queryParams.status ?? 'all',
-    search: queryParams.search ?? '',
+    name: queryParams.search ?? '',
     position: queryParams.position ?? '',
     dateStart: queryParams.dateStart ?? '',
     dateEnd: queryParams.dateEnd ?? '',
     team: queryParams.team ?? '',
-    sort: 'string',
+    sort: queryParams.sort ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -146,7 +146,7 @@ export default function PlayerManager(props: Props) {
 
   const validationSchema = Yup.object().shape(
     {
-      search: Yup.string()
+      name: Yup.string()
         .min(0, 'email must be at least 0 characters')
         .max(255, 'Nội dung không được vượt quá 255 ký tự'),
     },
@@ -229,7 +229,7 @@ export default function PlayerManager(props: Props) {
   }
   const onResetFilters = () => {
     methods.reset({
-      search: '',
+      name: '',
       position: '',
       status: '',
       dateStart: '',

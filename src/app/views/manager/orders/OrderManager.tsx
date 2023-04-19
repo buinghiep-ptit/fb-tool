@@ -123,7 +123,7 @@ export default function OrderManager(props: Props) {
   }
   const [defaultValues] = useState<OrdersFilters>({
     status: queryParams.status ?? '',
-    search: queryParams.search ?? '',
+    name: queryParams.name ?? '',
     dateStart: queryParams.dateStart ?? '',
     dateEnd: queryParams.dateEnd ?? '',
     page: queryParams.page ? +queryParams.page : 0,
@@ -149,7 +149,7 @@ export default function OrderManager(props: Props) {
   )
   console.log(orders?.content)
   const validationSchema = Yup.object().shape({
-    search: Yup.string()
+    name: Yup.string()
       .min(0, 'email must be at least 0 characters')
       .max(255, 'Nội dung không được vượt quá 255 ký tự'),
   })
@@ -281,7 +281,13 @@ export default function OrderManager(props: Props) {
                       <Chip
                         sx={{ width: '100px' }}
                         label={getStatusText(item.status)}
-                        color="success"
+                        color={
+                          item.status === 2
+                            ? 'success'
+                            : item.status === 1
+                            ? 'warning'
+                            : 'error'
+                        }
                       />
                     ) : (
                       'Unknown'
@@ -290,7 +296,7 @@ export default function OrderManager(props: Props) {
                   <TableCell align="center">{item.note}</TableCell>
                   <TableCell align="center">
                     <Link
-                      to="/"
+                      to="chi-tiet-don-hang"
                       style={{
                         color: 'green',
                         textDecorationLine: 'underline',

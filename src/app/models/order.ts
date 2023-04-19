@@ -15,3 +15,42 @@ export interface Order {
 export interface OrderResponse extends IPagingResponse {
   content?: Order[]
 }
+
+export interface OrderDetail {
+  id?: number
+  customerId?: number
+  customerEmail?: string
+  customerPhone?: string
+  orderCode?: string
+  quantity?: number
+  createdDate?: string
+  status?: number
+  amount?: number
+  orderDetails?: OrdersDetail[]
+  delivery?: Delivery[]
+}
+
+export interface OrdersDetail {
+  productId?: number
+  customerId?: number
+  quantity?: number
+  amount?: number
+  code?: string
+  name?: string
+  fullName?: string
+  productType?: number
+  status?: number
+  imgUrl?: string
+}
+
+export interface Delivery {
+  fullName?: string
+  phone?: string
+  email?: string
+  districtId?: number
+  districtName?: string
+  wardId?: number
+  wardName?: string
+  address?: string
+  note?: string
+}

@@ -93,7 +93,7 @@ export interface IFeedsFilters {
 }
 
 export interface PlayersFilters {
-  search?: string
+  name?: string
   position?: string
   status?: 1 | -1 | 'all' | string | undefined //   1:Hoạt động -1:Không hoạt động
   page?: number | 0
@@ -104,7 +104,7 @@ export interface PlayersFilters {
   dateEnd?: string
 }
 export interface OrdersFilters {
-  search?: string
+  name?: string
   status?: 2 | 1 | 0 | string | undefined
   page?: number | 0
   size?: number | 20

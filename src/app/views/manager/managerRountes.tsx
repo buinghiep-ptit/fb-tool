@@ -16,6 +16,7 @@ const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
 const EditCustomer = Loadable(lazy(() => import('./customer/EditCustomer')))
 const AccountManager = Loadable(lazy(() => import('./accounts/AccountManager')))
 const OrderManager = Loadable(lazy(() => import('./orders/OrderManager')))
+const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
 const SortManager = Loadable(lazy(() => import('./shop/Sort')))
 const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
 
@@ -41,6 +42,14 @@ const managerRoutes = [
     element: <ShopManager />,
   },
   { path: '/orders', element: <OrderManager /> },
+  {
+    path: '/orders/chi-tiet-don-hang',
+    element: <OrderDetail />,
+  },
+  {
+    path: '/orders/:orderID/*',
+    element: <OrderDetail />,
+  },
   { path: '/banner', element: <BannerManager /> },
   {
     path: '/banner/chi-tiet-banner',

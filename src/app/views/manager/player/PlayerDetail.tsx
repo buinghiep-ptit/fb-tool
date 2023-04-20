@@ -115,7 +115,7 @@ export default function PlayerDetail(props: Props) {
       expirationDate: yup.string().nullable(),
       gatheringDay: yup.string(),
       team: yup.string().required('Giá trị bát buộc'),
-      position: yup.string(),
+      position: yup.string().required('Giá trị bắt buộc'),
       dominantFoot: yup.string(),
       clothersNumber: yup.number().typeError('Nhâp số').nullable(),
       height: yup.number().typeError('Nhâp số'),
@@ -208,8 +208,8 @@ export default function PlayerDetail(props: Props) {
       redCardNo: data.redCard,
       oldClub: data.oldClub,
       biography: data.editor_content,
-      isDisplayHome: data.viewPosition,
-      priority: data.prioritize,
+      isDisplayHome: data.prioritize ? 1 : 0,
+      priority: data.viewPosition,
       status: data.status,
       mainPosition: data.position,
       position: null,
@@ -631,7 +631,10 @@ export default function PlayerDetail(props: Props) {
                     name="team"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl fullWidth>
+                      <FormControl
+                        fullWidth
+                        error={!!methods.formState.errors?.team?.message}
+                      >
                         <InputLabel id="demo-simple-select-label">
                           Đội thi đấu*
                         </InputLabel>
@@ -661,7 +664,10 @@ export default function PlayerDetail(props: Props) {
                     name="position"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl fullWidth>
+                      <FormControl
+                        fullWidth
+                        error={!!methods.formState.errors?.position}
+                      >
                         <InputLabel id="demo-simple-select-label">
                           Vị trí thi đấu chính
                         </InputLabel>

@@ -113,9 +113,9 @@ export default function PlayerDetail(props: Props) {
       dateRange: yup.string().nullable(),
       expirationDate: yup.string().nullable(),
       gatheringDay: yup.string(),
-      team: yup.string().required('Giá trị bát buộc'),
-      position: yup.string(),
-      dominantFoot: yup.string(),
+      team: yup.string().required('Giá trị bát buộc').nullable(),
+      position: yup.string().nullable().required('Giá trị bắt buộc'),
+      dominantFoot: yup.string().nullable(),
       clothersNumber: yup.number().typeError('Nhâp số').nullable(),
       height: yup.number().typeError('Nhâp số'),
       weight: yup.number().typeError('Nhập số'),
@@ -128,7 +128,7 @@ export default function PlayerDetail(props: Props) {
       goal: yup.number().typeError('Nhâp số').nullable(),
       yellowCard: yup.number().typeError('Nhâp số').nullable(),
       redCard: yup.number().typeError('Nhâp số').nullable(),
-      oldClub: yup.string().required('Giá trị bắt buộc'),
+      oldClub: yup.string(),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),
     })
@@ -156,7 +156,7 @@ export default function PlayerDetail(props: Props) {
       weight: null,
       sizeShoes: null,
       sizeSpikeShoes: null,
-      sizeClothers: null,
+      sizeClothers: '',
       viewPosition: null,
       countMatch: null,
       cleanMatch: null,
@@ -179,7 +179,6 @@ export default function PlayerDetail(props: Props) {
       imageUrl = previewImage
     }
     const payload: any = {
-      id: params.id,
       name: data.namePlayer,
       fullName: data.namePlayer,
       mobilePhone: data.phone,
@@ -207,8 +206,8 @@ export default function PlayerDetail(props: Props) {
       redCardNo: data.redCard,
       oldClub: data.oldClub,
       biography: data.editor_content,
-      isDisplayHome: data.viewPosition,
-      priority: data.prioritize,
+      isDisplayHome: data.prioritize ? 1 : 0,
+      priority: data.viewPosition,
       status: data.status,
       mainPosition: data.position,
       position: null,
@@ -217,7 +216,7 @@ export default function PlayerDetail(props: Props) {
     const res = await createPlayer(payload)
     if (res) {
       toastSuccess({
-        message: 'Cập nhật thành công',
+        message: 'Tạo thành công',
       })
       navigate('/players')
     }
@@ -623,7 +622,10 @@ export default function PlayerDetail(props: Props) {
                     name="team"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl fullWidth>
+                      <FormControl
+                        fullWidth
+                        error={!!methods.formState.errors?.team?.message}
+                      >
                         <InputLabel id="demo-simple-select-label">
                           Đội thi đấu*
                         </InputLabel>
@@ -653,7 +655,10 @@ export default function PlayerDetail(props: Props) {
                     name="position"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl fullWidth>
+                      <FormControl
+                        fullWidth
+                        error={!!methods.formState.errors?.position}
+                      >
                         <InputLabel id="demo-simple-select-label">
                           Vị trí thi đấu chính
                         </InputLabel>
@@ -683,7 +688,10 @@ export default function PlayerDetail(props: Props) {
                     name="dominantFoot"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl style={{ width: '200px' }}>
+                      <FormControl
+                        style={{ width: '200px' }}
+                        error={!!methods.formState.errors?.dominantFoot}
+                      >
                         <InputLabel id="demo-simple-select-label">
                           Chân thuận
                         </InputLabel>

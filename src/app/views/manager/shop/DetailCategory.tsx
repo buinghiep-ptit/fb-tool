@@ -192,7 +192,9 @@ export default function DetailCategory(props: Props) {
             {(products || []).map((product: any, index: any) => {
               return (
                 <TableRow hover key={product.name}>
-                  <TableCell align="center">{index + 1}</TableCell>
+                  <TableCell align="center">
+                    {rowsPerPage * page + index + 1}
+                  </TableCell>
                   <TableCell align="center">
                     <Link to="/customers/1">{product.name}</Link>
                   </TableCell>

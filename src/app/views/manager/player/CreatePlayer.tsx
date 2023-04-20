@@ -146,7 +146,7 @@ export default function PlayerDetail(props: Props) {
       passPortDateRange: '',
       passPort: '',
       expirationDate: '',
-      gatheringDay: moment(Date.now()).format('YYYY-MM-DD'),
+      gatheringDay: moment(Date.now()).format('YYYY-MM-DD') || null,
       team: '',
       position: '',
       dominantFoot: '',
@@ -188,14 +188,29 @@ export default function PlayerDetail(props: Props) {
       fullName: data.namePlayer,
       mobilePhone: data.phone === '' ? null : data.phone,
       citizenIdCard: data.citizenIdentification,
-      dateCitizenId: moment(data.dateRange).format('YYYY-MM-DD'),
+      dateCitizenId:
+        moment(data.dateRange).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(data.dateRange).format('YYYY-MM-DD'),
       passport: data.passPort,
-      datePassport: moment(data.passPortDateRange).format('YYYY-MM-DD'),
-      dateExpirePassport: moment(data.expirationDate).format('YYYY-MM-DD'),
+      datePassport:
+        moment(data.passPortDateRange).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(data.passPortDateRange).format('YYYY-MM-DD'),
+      dateExpirePassport:
+        moment(data.expirationDate).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(data.expirationDate).format('YYYY-MM-DD'),
       placeOfOrigin: data.homeTown,
       idTeam: data.team,
-      dateOfBirth: moment(data.dateOfBirth).format('YYYY-MM-DD'),
-      dateJoined: moment(data.gatheringDay).format('YYYY-MM-DD'),
+      dateOfBirth:
+        moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(data.dateOfBirth).format('YYYY-MM-DD'),
+      dateJoined:
+        moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(data.gatheringDay).format('YYYY-MM-DD'),
       maritalStatus: data.married,
       shirtSize: data.sizeClothers,
       shoseSize: data.sizeShoes,
@@ -216,6 +231,7 @@ export default function PlayerDetail(props: Props) {
       status: data.status,
       mainPosition: data.position,
       position: null,
+      goalFor: data.goal,
     }
 
     const res = await createPlayer(payload)
@@ -776,6 +792,7 @@ export default function PlayerDetail(props: Props) {
                               checked={methods.getValues('prioritize')}
                               {...field}
                               onChange={e => {
+                                setDisableViewPosition(!e.target.checked)
                                 methods.setValue('prioritize', e.target.checked)
                               }}
                             />
@@ -795,7 +812,7 @@ export default function PlayerDetail(props: Props) {
                           <Select
                             autoWidth
                             {...field}
-                            disabled={methods.getValues('prioritize')}
+                            disabled={disabledViewPosition}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             label="Vị trí hiển thị"

@@ -58,11 +58,8 @@ export interface Props {}
 const optionPosition = [
   { name: 'Thủ môn', value: 0 },
   { name: 'Hậu vệ', value: 1 },
-  { name: 'Hậu vệ biên', value: -1 },
-  { name: 'Tiền vệ', value: -2 },
-  { name: 'Tiền vệ biên', value: -3 },
-  { name: 'Trung vệ', value: -4 },
-  { name: 'Tiền đạo', value: -5 },
+  { name: 'Tiền vệ', value: 2 },
+  { name: 'Tiền đạo', value: 3 },
 ]
 
 export default function PlayerManager(props: Props) {
@@ -75,11 +72,7 @@ export default function PlayerManager(props: Props) {
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
   const [rowsPerPage, setRowsPerPage] = useState(20)
-  const onClickRow = (cell: any, row: any) => {
-    if (cell.id === 'name') {
-      navigation(`${row.id}/`)
-    }
-  }
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
@@ -117,8 +110,8 @@ export default function PlayerManager(props: Props) {
     status: queryParams.status ?? 'all',
     name: queryParams.search ?? '',
     position: queryParams.position ?? '',
-    dateStart: queryParams.dateStart ?? '',
-    dateEnd: queryParams.dateEnd ?? '',
+    from: queryParams.from ?? '',
+    to: queryParams.to ?? '',
     team: queryParams.team ?? '',
     sort: queryParams.sort ?? '',
     page: queryParams.page ? +queryParams.page : 0,
@@ -180,14 +173,14 @@ export default function PlayerManager(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-  const from = methods.watch('dateStart')
-  const to = methods.watch('dateEnd')
+  const from = methods.watch('from')
+  const to = methods.watch('to')
 
   React.useEffect(() => {
     if (!from || !to) return
     if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
-      methods.clearErrors('dateStart')
-      methods.clearErrors('dateEnd')
+      methods.clearErrors('from')
+      methods.clearErrors('to')
     }
   }, [from, to])
 
@@ -231,9 +224,9 @@ export default function PlayerManager(props: Props) {
     methods.reset({
       name: '',
       position: '',
-      status: '',
-      dateStart: '',
-      dateEnd: '',
+      status: 'all',
+      from: '',
+      to: '',
       team: '',
       page: 0,
       size: 20,
@@ -302,7 +295,6 @@ export default function PlayerManager(props: Props) {
                     defaultValue=""
                     placeholder="Nhập tên cầu thủ"
                     fullWidth
-                    required
                   />
                 </Grid>
                 <Grid item xs={3}>
@@ -317,6 +309,7 @@ export default function PlayerManager(props: Props) {
                         {...params}
                         label="Vị trí"
                         placeholder="Vị trí"
+                        name="position"
                       />
                     )}
                     sx={{ width: '100%' }}
@@ -331,6 +324,7 @@ export default function PlayerManager(props: Props) {
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                       label="Trạng thái"
+                      name="status"
                     >
                       <MenuItem value={0}>Tất cả</MenuItem>
                       <MenuItem value={1}>Hoạt động</MenuItem>
@@ -341,7 +335,7 @@ export default function PlayerManager(props: Props) {
                 <Grid item xs={3}>
                   <MuiRHFAutoComplete
                     label="Đội thi đấu"
-                    name="idTeam"
+                    name="team"
                     options={teams?.content ?? {}}
                     optionProperty="name"
                     getOptionLabel={option => option.name ?? ''}

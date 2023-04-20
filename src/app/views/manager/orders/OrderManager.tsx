@@ -124,8 +124,8 @@ export default function OrderManager(props: Props) {
   const [defaultValues] = useState<OrdersFilters>({
     status: queryParams.status ?? '',
     name: queryParams.name ?? '',
-    dateStart: queryParams.dateStart ?? '',
-    dateEnd: queryParams.dateEnd ?? '',
+    from: queryParams.from ?? '',
+    to: queryParams.to ?? '',
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -158,13 +158,13 @@ export default function OrderManager(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-  const from = methods.watch('dateStart')
-  const to = methods.watch('dateEnd')
+  const from = methods.watch('from')
+  const to = methods.watch('to')
   React.useEffect(() => {
     if (!from || !to) return
     if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
-      methods.clearErrors('dateStart')
-      methods.clearErrors('dateEnd')
+      methods.clearErrors('from')
+      methods.clearErrors('to')
     }
   }, [from, to])
 
@@ -296,7 +296,8 @@ export default function OrderManager(props: Props) {
                   <TableCell align="center">{item.note}</TableCell>
                   <TableCell align="center">
                     <Link
-                      to="chi-tiet-don-hang"
+                      to={`${item.id}`}
+                      // to="chi-tiet-don-hang"
                       style={{
                         color: 'green',
                         textDecorationLine: 'underline',

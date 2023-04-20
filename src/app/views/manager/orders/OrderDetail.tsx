@@ -1,58 +1,62 @@
 import { Box } from '@mui/system'
 import * as React from 'react'
 import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
   Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Stack,
-  TableHead,
   TableRow,
   TableCell,
   TableBody,
-  TablePagination,
   Chip,
   IconButton,
   Tooltip,
   Autocomplete,
   Icon,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import AddBoxIcon from '@mui/icons-material/AddBox'
 import { useState } from 'react'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import FormInputText from 'app/components/common/MuiRHFInputText'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { SearchSharp } from '@mui/icons-material'
-import { columnsOrders } from 'app/utils/columns'
-import { OrderResponse, OrdersFilters } from 'app/models'
+import {
+  IOrderDetail,
+  OrderResponse,
+  OrdersFilters,
+  TeamResponse,
+} from 'app/models'
 import { UseQueryResult, useQuery } from '@tanstack/react-query'
-import { getListOrder } from 'app/apis/order/order.service'
+import { getOrderDetail } from 'app/apis/order/order.service'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
-import moment from 'moment'
+import { getListTeam } from 'app/apis/teams/teams.service'
 export interface Props {}
+// type TypeElement = {
+//   status?: number | string
+// }
 
 export default function OrderDetail(props: Props) {
-  const navigate = useNavigateParams()
+  const params = useParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
-  const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(0)
-  const [size, setSize] = useState<number>(20)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [order, setOrder] = useState<IOrderDetail | undefined>()
+
+  const fetchOrder = async () => {
+    const res = await getOrderDetail(params.orderID)
+    setOrder(res)
+  }
+
+  React.useEffect(() => {
+    fetchOrder()
+  }, [])
+
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 0:
+        return 'Hủy'
+      case 1:
+        return 'Chờ xử lý'
+      case 2:
+        return 'Hoàn thành'
+    }
+  }
 
   return (
     <Container>
@@ -64,11 +68,21 @@ export default function OrderDetail(props: Props) {
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
-        <Chip
-          sx={{ width: '100px', fontSize: '14px', height: '52px' }}
-          label="Chờ Xử Lý"
-          color="warning"
-        />
+        {order?.status !== undefined ? (
+          <Chip
+            sx={{ width: '100px', fontSize: '14px', height: '52px' }}
+            label={getStatusText(order.status)}
+            color={
+              order.status === 2
+                ? 'success'
+                : order.status === 1
+                ? 'warning'
+                : 'error'
+            }
+          />
+        ) : (
+          'Unknown'
+        )}
         <MuiButton
           title="Quay lại"
           variant="outlined"
@@ -89,7 +103,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Người đặt
                 </TableCell>
-                <TableCell align="left">Người đặt</TableCell>
+                <TableCell align="left">{order?.customerPhone}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -98,7 +112,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Thời gian đặt
                 </TableCell>
-                <TableCell align="left">Người đặt</TableCell>
+                <TableCell align="left">{order?.createdDate}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -107,7 +121,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Mã đơn hàng
                 </TableCell>
-                <TableCell align="left">Người đặt</TableCell>
+                <TableCell align="left">{order?.orderCode}</TableCell>
               </TableRow>
             </TableBody>
           </StyledTable>
@@ -122,7 +136,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Họ và tên
                 </TableCell>
-                <TableCell align="left">Nguyễn đức thành</TableCell>
+                <TableCell align="left">{order?.delivery?.fullName}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -131,7 +145,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Số điện thoại
                 </TableCell>
-                <TableCell align="left">09876543312</TableCell>
+                <TableCell align="left">{order?.delivery?.phone}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -140,7 +154,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Email
                 </TableCell>
-                <TableCell align="left">Thanhnd77@fpt.com.vn</TableCell>
+                <TableCell align="left">{order?.delivery?.email}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -149,9 +163,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Địa chỉ
                 </TableCell>
-                <TableCell align="left">
-                  Só 10 Pham Van Bach, Cau Giäy, Ha Noi
-                </TableCell>
+                <TableCell align="left">{order?.delivery?.address}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -160,7 +172,9 @@ export default function OrderDetail(props: Props) {
                 >
                   Khu vực
                 </TableCell>
-                <TableCell align="left">hà nội</TableCell>
+                <TableCell align="left">
+                  {order?.delivery?.districtName}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -169,7 +183,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Phường/ Xã
                 </TableCell>
-                <TableCell align="left">Mai dịch</TableCell>
+                <TableCell align="left">{order?.delivery?.wardName}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -178,7 +192,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Ghi chú
                 </TableCell>
-                <TableCell align="left"></TableCell>
+                <TableCell align="left">{order?.delivery?.note}</TableCell>
               </TableRow>
             </TableBody>
           </StyledTable>
@@ -186,42 +200,76 @@ export default function OrderDetail(props: Props) {
       </Stack>
       <Stack sx={{ marginTop: '20px' }}>
         <SimpleCard title="Danh sách sản phẩm">
-          <Grid container spacing={1}>
-            <Grid item xs={2}>
-              <img
-                src="https://i.pinimg.com/564x/6b/fe/2a/6bfe2ab44b7243aaef796648a3dba260.jpg"
-                style={{
-                  width: '200px',
-                  height: '200px',
-                  objectFit: 'cover',
-                  borderRadius: 4,
-                }}
-                alt="bg"
-              />
+          {order?.orderDetails?.map(item => (
+            <Grid container spacing={1} key={item.productId}>
+              {item.imgUrl?.map((url, index) => (
+                <Grid item xs={2}>
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Product ${index + 1}`}
+                    style={{
+                      width: '200px',
+                      height: '200px',
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                    }}
+                  />
+                </Grid>
+              ))}
+              {!item.imgUrl?.length && (
+                <Grid item xs={2}>
+                  <img
+                    src="https://i.pinimg.com/564x/e2/d7/53/e2d753f4b2fc3301f6217f80142eb0f6.jpg"
+                    alt="Default Product Image"
+                    style={{
+                      width: '200px',
+                      height: '200px',
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                    }}
+                  />
+                </Grid>
+              )}
+              {/* <img
+                  src={
+                    item.imgUrl?.length
+                      ? item.imgUrl
+                      : 'https://i.pinimg.com/564x/e2/d7/53/e2d753f4b2fc3301f6217f80142eb0f6.jpg'
+                  }
+                  style={{
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: 4,
+                  }}
+                  alt="bg"
+                /> */}
+
+              <Grid container item xs={3}>
+                <Grid item xs={12}>
+                  <h2>{item.name}</h2>
+                  <h3>{item.fullName}</h3>
+                </Grid>
+                <Grid item xs={6}>
+                  <h3>Số lượng: {item.quantity}</h3>
+                </Grid>
+                <Grid item xs={6}>
+                  <h3 style={{ color: 'red' }}>{item.amount}</h3>
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid container item xs={3}>
-              <Grid item xs={12}>
-                <h2>Tên sản phẩm(name)</h2>
-                <h3>Full name</h3>
-              </Grid>
-              <Grid item xs={6}>
-                <h3>Số lượng: 1</h3>
-              </Grid>
-              <Grid item xs={6}>
-                <h3 style={{ color: 'red' }}>Tiền</h3>
-              </Grid>
-            </Grid>
-          </Grid>
+          ))}
         </SimpleCard>
       </Stack>
       <Stack sx={{ marginTop: '20px' }}>
         <SimpleCard title="Thông tin đơn hàng">
           <Grid container>
             <Grid item xs={3}>
-              <h3>Tổng tiền số sản phẩm:</h3>
+              <h3>Tổng tiền {order?.quantity} sản phẩm:</h3>
             </Grid>
             <Grid item xs={3}>
-              <h3 style={{ color: 'red' }}>Tiền</h3>
+              <h3 style={{ color: 'red' }}>{order?.amount}</h3>
             </Grid>
           </Grid>
         </SimpleCard>

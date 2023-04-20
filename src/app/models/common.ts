@@ -100,14 +100,14 @@ export interface PlayersFilters {
   size?: number | 20
   sort?: string
   team?: string
-  dateStart?: string
-  dateEnd?: string
+  from?: string
+  to?: string
 }
 export interface OrdersFilters {
   name?: string
   status?: 2 | 1 | 0 | string | undefined
   page?: number | 0
   size?: number | 20
-  dateStart?: string
-  dateEnd?: string
+  from?: string
+  to?: string
 }

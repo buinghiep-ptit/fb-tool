@@ -43,11 +43,15 @@ const managerRoutes = [
   },
   { path: '/orders', element: <OrderManager /> },
   {
+    path: '/orders/chi-tiet-don-hang/:orderID',
+    element: <OrderDetail />,
+  },
+  {
     path: '/orders/chi-tiet-don-hang',
     element: <OrderDetail />,
   },
   {
-    path: '/orders/:orderID/*',
+    path: '/orders/:orderID',
     element: <OrderDetail />,
   },
   { path: '/banner', element: <BannerManager /> },

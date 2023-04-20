@@ -16,7 +16,7 @@ export interface OrderResponse extends IPagingResponse {
   content?: Order[]
 }
 
-export interface OrderDetail {
+export interface IOrderDetail {
   id?: number
   customerId?: number
   customerEmail?: string
@@ -27,7 +27,7 @@ export interface OrderDetail {
   status?: number
   amount?: number
   orderDetails?: OrdersDetail[]
-  delivery?: Delivery[]
+  delivery?: Delivery
 }
 
 export interface OrdersDetail {
@@ -39,8 +39,7 @@ export interface OrdersDetail {
   name?: string
   fullName?: string
   productType?: number
-  status?: number
-  imgUrl?: string
+  imgUrl?: string[] | undefined
 }
 
 export interface Delivery {

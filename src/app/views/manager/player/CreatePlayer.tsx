@@ -529,8 +529,8 @@ export default function PlayerDetail(props: Props) {
 
                         <img
                           src={previewImage}
-                          width="80%"
-                          height="60%"
+                          width="30%"
+                          height="40%"
                           style={{ objectFit: 'contain' }}
                         ></img>
                       </>

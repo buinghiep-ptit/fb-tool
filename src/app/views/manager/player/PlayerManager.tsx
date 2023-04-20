@@ -284,7 +284,7 @@ export default function PlayerManager(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`/`, {})}
+          onClick={() => navigation(`/players/create`, {})}
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
@@ -425,7 +425,7 @@ export default function PlayerManager(props: Props) {
                   </TableCell>
 
                   <TableCell align="center">
-                    <Link to="/">{item.name}</Link>
+                    <Link to={`/players/${item.id}`}>{item.name}</Link>
                   </TableCell>
                   <TableCell align="center">{item.position}</TableCell>
                   <TableCell align="center">{item.idTeam}</TableCell>

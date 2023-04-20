@@ -30,10 +30,9 @@ import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Controller, useForm, FormProvider } from 'react-hook-form'
 import {
-  getPlayer,
+  createPlayer,
   getPositions,
   getTeams,
-  updatePlayer,
 } from 'app/apis/players/players.service'
 import { useNavigate, useParams } from 'react-router-dom'
 import handleUploadImage from 'app/helpers/handleUploadImage'
@@ -55,41 +54,41 @@ export default function PlayerDetail(props: Props) {
   //     setExpanded(isExpanded ? panel : false)
   //   }
 
-  const initDefaultValues = (player: any) => {
-    const defaultValues: any = {}
-    defaultValues.namePlayer = player.fullName
-    defaultValues.homeTown = player.placeOfOrigin
-    defaultValues.phone = player.mobilePhone
-    defaultValues.dateOfBirth = player.dateOfBirth
-    defaultValues.married = player.maritalStatus
-    defaultValues.citizenIdentification = player.citizenIdCard
-    defaultValues.dateRange = player.dateCitizenId
-    defaultValues.passPortDateRange = player.datePassport
-    defaultValues.passPort = player.passport
-    defaultValues.expirationDate = player.dateExpirePassport
-    defaultValues.gatheringDay = player.dateJoined
-    defaultValues.team = player.idTeam
-    defaultValues.position = player.mainPosition
-    defaultValues.dominantFoot = player.dominantFoot
-    defaultValues.clothersNumber = player.jerseyNo
-    defaultValues.height = player.height
-    defaultValues.weight = player.weight
-    defaultValues.sizeShoes = player.shoseSize
-    defaultValues.sizeSpikeShoes = player.nailShoseSize
-    defaultValues.sizeClothers = player.shirtSize
-    defaultValues.viewPosition = player.isDisplayHome
-    defaultValues.countMatch = player.matchPlayedNo
-    defaultValues.cleanMatch = player.cleanSheetNo
-    defaultValues.goal = player.goalFor
-    defaultValues.yellowCard = player.yellowCardNo
-    defaultValues.redCard = player.redCardNo
-    defaultValues.editor_content = player.biography
-    defaultValues.oldClub = player.oldClub
-    defaultValues.prioritize = player.priority
-    defaultValues.status = player.status
-    setPreviewImage(player.imageUrl)
-    methods.reset({ ...defaultValues })
-  }
+  // const initDefaultValues = (player: any) => {
+  //   const defaultValues: any = {}
+  //   defaultValues.namePlayer = player.fullName
+  //   defaultValues.homeTown = player.placeOfOrigin
+  //   defaultValues.phone = player.mobilePhone
+  //   defaultValues.dateOfBirth = player.dateOfBirth
+  //   defaultValues.married = player.maritalStatus
+  //   defaultValues.citizenIdentification = player.citizenIdCard
+  //   defaultValues.dateRange = player.dateCitizenId
+  //   defaultValues.passPortDateRange = player.datePassport
+  //   defaultValues.passPort = player.passport
+  //   defaultValues.expirationDate = player.dateExpirePassport
+  //   defaultValues.gatheringDay = player.dateJoined
+  //   defaultValues.team = player.idTeam
+  //   defaultValues.position = player.mainPosition
+  //   defaultValues.dominantFoot = player.dominantFoot
+  //   defaultValues.clothersNumber = player.jerseyNo
+  //   defaultValues.height = player.height
+  //   defaultValues.weight = player.weight
+  //   defaultValues.sizeShoes = player.shoseSize
+  //   defaultValues.sizeSpikeShoes = player.nailShoseSize
+  //   defaultValues.sizeClothers = player.shirtSize
+  //   defaultValues.viewPosition = player.isDisplayHome
+  //   defaultValues.countMatch = player.matchPlayedNo
+  //   defaultValues.cleanMatch = player.cleanSheetNo
+  //   defaultValues.goal = player.goalFor
+  //   defaultValues.yellowCard = player.yellowCardNo
+  //   defaultValues.redCard = player.redCardNo
+  //   defaultValues.editor_content = player.biography
+  //   defaultValues.oldClub = player.oldClub
+  //   defaultValues.prioritize = player.priority
+  //   defaultValues.status = player.status
+  //   setPreviewImage(player.imageUrl)
+  //   methods.reset({ ...defaultValues })
+  // }
 
   const schema = yup
     .object({
@@ -149,24 +148,24 @@ export default function PlayerDetail(props: Props) {
       passPort: '',
       expirationDate: '',
       gatheringDay: '',
-      team: '',
-      position: '',
-      dominantFoot: '',
-      clothersNumber: 0,
-      height: '',
-      weight: '',
-      sizeShoes: 0,
-      sizeSpikeShoes: 0,
-      sizeClothers: '',
-      viewPosition: '',
-      countMatch: '',
-      cleanMatch: '',
-      goal: '',
-      yellowCard: '',
-      redCard: '',
+      team: null,
+      position: null,
+      dominantFoot: null,
+      clothersNumber: null,
+      height: null,
+      weight: null,
+      sizeShoes: null,
+      sizeSpikeShoes: null,
+      sizeClothers: null,
+      viewPosition: null,
+      countMatch: null,
+      cleanMatch: null,
+      goal: null,
+      yellowCard: null,
+      redCard: null,
       editor_content: '',
       oldClub: '',
-      prioritize: '',
+      prioritize: true,
       status: 1,
     },
   })
@@ -215,7 +214,7 @@ export default function PlayerDetail(props: Props) {
       position: null,
     }
 
-    const res = await updatePlayer(payload)
+    const res = await createPlayer(payload)
     if (res) {
       toastSuccess({
         message: 'Cập nhật thành công',
@@ -235,16 +234,9 @@ export default function PlayerDetail(props: Props) {
     setTeams(res)
   }
 
-  const fetchPlayer = async () => {
-    const res = await getPlayer(params.id)
-    setPlayer(res)
-    initDefaultValues(res)
-  }
-
   React.useEffect(() => {
     fetchPositions()
     fetchTeams()
-    fetchPlayer()
   }, [])
 
   return (

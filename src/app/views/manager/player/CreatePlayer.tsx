@@ -1,4 +1,4 @@
-import { Box } from '@mui/system'
+import { Box, getValue } from '@mui/system'
 import * as React from 'react'
 import { Breadcrumb, SimpleCard, Container } from 'app/components'
 
@@ -19,7 +19,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@mui/material'
-
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useState } from 'react'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import BackupIcon from '@mui/icons-material/Backup'
@@ -36,7 +36,11 @@ import {
 } from 'app/apis/players/players.service'
 import { useNavigate, useParams } from 'react-router-dom'
 import handleUploadImage from 'app/helpers/handleUploadImage'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
+import { Value } from 'sass'
+import moment from 'moment'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers'
 export interface Props {}
 
 export default function PlayerDetail(props: Props) {
@@ -44,51 +48,14 @@ export default function PlayerDetail(props: Props) {
   const [positions, setPositions] = useState<any[]>([])
   const [isLoading, setIsloading] = useState(false)
   const [file, setFile] = useState<any>()
-  const [previewImage, setPreviewImage] = useState<string>()
+  const [previewImage, setPreviewImage] = useState<string>('')
   const [player, setPlayer] = useState<any>()
-  const [expanded, setExpanded] = React.useState<string | false>(false)
+  const [idTeam, setIdTeam] = React.useState<any>(false)
+  const [disabledViewPosition, setDisableViewPosition] =
+    React.useState<any>(false)
+  const [idPosition, setIdPosition] = React.useState<any>(false)
   const params = useParams()
   const navigate = useNavigate()
-  // const handleChange =
-  //   (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-  //     setExpanded(isExpanded ? panel : false)
-  //   }
-
-  // const initDefaultValues = (player: any) => {
-  //   const defaultValues: any = {}
-  //   defaultValues.namePlayer = player.fullName
-  //   defaultValues.homeTown = player.placeOfOrigin
-  //   defaultValues.phone = player.mobilePhone
-  //   defaultValues.dateOfBirth = player.dateOfBirth
-  //   defaultValues.married = player.maritalStatus
-  //   defaultValues.citizenIdentification = player.citizenIdCard
-  //   defaultValues.dateRange = player.dateCitizenId
-  //   defaultValues.passPortDateRange = player.datePassport
-  //   defaultValues.passPort = player.passport
-  //   defaultValues.expirationDate = player.dateExpirePassport
-  //   defaultValues.gatheringDay = player.dateJoined
-  //   defaultValues.team = player.idTeam
-  //   defaultValues.position = player.mainPosition
-  //   defaultValues.dominantFoot = player.dominantFoot
-  //   defaultValues.clothersNumber = player.jerseyNo
-  //   defaultValues.height = player.height
-  //   defaultValues.weight = player.weight
-  //   defaultValues.sizeShoes = player.shoseSize
-  //   defaultValues.sizeSpikeShoes = player.nailShoseSize
-  //   defaultValues.sizeClothers = player.shirtSize
-  //   defaultValues.viewPosition = player.isDisplayHome
-  //   defaultValues.countMatch = player.matchPlayedNo
-  //   defaultValues.cleanMatch = player.cleanSheetNo
-  //   defaultValues.goal = player.goalFor
-  //   defaultValues.yellowCard = player.yellowCardNo
-  //   defaultValues.redCard = player.redCardNo
-  //   defaultValues.editor_content = player.biography
-  //   defaultValues.oldClub = player.oldClub
-  //   defaultValues.prioritize = player.priority
-  //   defaultValues.status = player.status
-  //   setPreviewImage(player.imageUrl)
-  //   methods.reset({ ...defaultValues })
-  // }
 
   const schema = yup
     .object({
@@ -108,7 +75,7 @@ export default function PlayerDetail(props: Props) {
         .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       dateOfBirth: yup.string().required('Gía trị bắt buộc'),
       passPortDateRange: yup.string().nullable(),
-      married: yup.number().typeError('Nhâp số'),
+      married: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhâp số'),
       citizenIdentification: yup.string(),
       dateRange: yup.string().nullable(),
       expirationDate: yup.string().nullable(),
@@ -116,18 +83,50 @@ export default function PlayerDetail(props: Props) {
       team: yup.string().required('Giá trị bát buộc').nullable(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       dominantFoot: yup.string().nullable(),
-      clothersNumber: yup.number().typeError('Nhâp số').nullable(),
-      height: yup.number().typeError('Nhâp số'),
-      weight: yup.number().typeError('Nhập số'),
-      sizeShoes: yup.number().typeError('Nhâp số').nullable(),
-      sizeSpikeShoes: yup.number().typeError('Nhâp số').nullable(),
-      sizeClothers: yup.string(),
-      viewPosition: yup.number().typeError('Nhâp số').nullable(),
-      countMatch: yup.number().typeError('Nhâp số').nullable(),
-      cleanMatch: yup.number().typeError('Nhâp số').nullable(),
-      goal: yup.number().typeError('Nhâp số').nullable(),
-      yellowCard: yup.number().typeError('Nhâp số').nullable(),
-      redCard: yup.number().typeError('Nhâp số').nullable(),
+      clothersNumber: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhâp số'),
+      weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
+      sizeShoes: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      sizeSpikeShoes: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      sizeClothers: yup.string().nullable(),
+      viewPosition: yup.string().typeError('Nhâp số').nullable(),
+      countMatch: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      cleanMatch: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      goal: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      yellowCard: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
+      redCard: yup
+        .number()
+        .min(0, 'Nhập số lớn hơn 0')
+        .typeError('Nhâp số')
+        .nullable(),
       oldClub: yup.string(),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),
@@ -147,22 +146,22 @@ export default function PlayerDetail(props: Props) {
       passPortDateRange: '',
       passPort: '',
       expirationDate: '',
-      gatheringDay: '',
-      team: null,
-      position: null,
-      dominantFoot: null,
+      gatheringDay: moment(Date.now()).format('YYYY-MM-DD'),
+      team: '',
+      position: '',
+      dominantFoot: '',
       clothersNumber: null,
-      height: null,
-      weight: null,
-      sizeShoes: null,
-      sizeSpikeShoes: null,
-      sizeClothers: '',
-      viewPosition: null,
-      countMatch: null,
-      cleanMatch: null,
-      goal: null,
-      yellowCard: null,
-      redCard: null,
+      height: 0,
+      weight: 0,
+      sizeShoes: 0,
+      sizeSpikeShoes: 0,
+      sizeClothers: null,
+      viewPosition: '',
+      countMatch: 0,
+      cleanMatch: 0,
+      goal: 0,
+      yellowCard: 0,
+      redCard: 0,
       editor_content: '',
       oldClub: '',
       prioritize: true,
@@ -171,6 +170,7 @@ export default function PlayerDetail(props: Props) {
   })
 
   const onSubmit = async (data: any) => {
+    console.log(data)
     setIsloading(true)
     let imageUrl: any = ''
     if (file) {
@@ -178,19 +178,24 @@ export default function PlayerDetail(props: Props) {
     } else {
       imageUrl = previewImage
     }
+    if (previewImage.length === 0) {
+      toastWarning({ message: 'Thêm ảnh' })
+      setIsloading(false)
+      return
+    }
     const payload: any = {
       name: data.namePlayer,
       fullName: data.namePlayer,
-      mobilePhone: data.phone,
+      mobilePhone: data.phone === '' ? null : data.phone,
       citizenIdCard: data.citizenIdentification,
-      dateCitizenId: data.dateRange,
+      dateCitizenId: moment(data.dateRange).format('YYYY-MM-DD'),
       passport: data.passPort,
-      datePassport: data.passPortDateRange,
-      dateExpirePassport: data.expirationDate,
+      datePassport: moment(data.passPortDateRange).format('YYYY-MM-DD'),
+      dateExpirePassport: moment(data.expirationDate).format('YYYY-MM-DD'),
       placeOfOrigin: data.homeTown,
       idTeam: data.team,
-      dateOfBirth: data.dateOfBirth,
-      dateJoined: data.gatheringDay,
+      dateOfBirth: moment(data.dateOfBirth).format('YYYY-MM-DD'),
+      dateJoined: moment(data.gatheringDay).format('YYYY-MM-DD'),
       maritalStatus: data.married,
       shirtSize: data.sizeClothers,
       shoseSize: data.sizeShoes,
@@ -207,7 +212,7 @@ export default function PlayerDetail(props: Props) {
       oldClub: data.oldClub,
       biography: data.editor_content,
       isDisplayHome: data.prioritize ? 1 : 0,
-      priority: data.viewPosition,
+      priority: data.prioritize ? data.viewPosition : null,
       status: data.status,
       mainPosition: data.position,
       position: null,
@@ -272,7 +277,7 @@ export default function PlayerDetail(props: Props) {
               aria-controls="panel1bh-content"
               id="panel1bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>
+              <Typography variant="h4" gutterBottom>
                 Thông tin chung
               </Typography>
             </AccordionSummary>
@@ -330,39 +335,26 @@ export default function PlayerDetail(props: Props) {
                             label="Số điện thoại"
                             variant="outlined"
                             fullWidth
+                            margin="dense"
                           />
                         )}
                       />
                     </Grid>
                     <Grid item xs={4}>
-                      <Controller
-                        name="dateOfBirth"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={!!methods.formState.errors?.dateOfBirth}
-                            helperText={
-                              methods.formState.errors?.dateOfBirth?.message
-                            }
-                            {...field}
-                            style={{ marginRight: '15px' }}
-                            id="date"
-                            label="Ngày sinh*"
-                            type="date"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            fullWidth
-                          />
-                        )}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <MuiRHFDatePicker
+                          name="dateOfBirth"
+                          label="Ngày sinh*"
+                          inputFormat={'DD/MM/YYYY'}
+                        />
+                      </LocalizationProvider>
                     </Grid>
                     <Grid item xs={4}>
                       <Controller
                         name="married"
                         control={methods.control}
                         render={({ field }) => (
-                          <FormControl fullWidth>
+                          <FormControl fullWidth margin="dense">
                             <InputLabel id="demo-simple-select-label">
                               Tình trạng hôn nhân
                             </InputLabel>
@@ -400,35 +392,20 @@ export default function PlayerDetail(props: Props) {
                             {...field}
                             label="Số CCCD"
                             variant="outlined"
-                            margin="normal"
+                            margin="dense"
                             fullWidth
                           />
                         )}
                       />
                     </Grid>
                     <Grid item xs={4}>
-                      <Controller
-                        name="dateRange"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={!!methods.formState.errors?.dateRange}
-                            helperText={
-                              methods.formState.errors?.dateRange?.message
-                            }
-                            {...field}
-                            style={{ marginRight: '15px' }}
-                            margin="normal"
-                            id="date"
-                            label="Ngày cấp"
-                            type="date"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            fullWidth
-                          />
-                        )}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <MuiRHFDatePicker
+                          name="dateRange"
+                          label="Ngày cấp"
+                          inputFormat={'DD/MM/YYYY'}
+                        />
+                      </LocalizationProvider>
                     </Grid>
                   </Grid>
                   <Grid container spacing={2}>
@@ -445,62 +422,29 @@ export default function PlayerDetail(props: Props) {
                             {...field}
                             label="Số hộ chiếu"
                             variant="outlined"
-                            margin="normal"
+                            margin="dense"
                             fullWidth
                           />
                         )}
                       />
                     </Grid>
                     <Grid item xs={4}>
-                      <Controller
-                        name="passPortDateRange"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={
-                              !!methods.formState.errors?.passPortDateRange
-                            }
-                            helperText={
-                              methods.formState.errors?.passPortDateRange
-                                ?.message
-                            }
-                            {...field}
-                            style={{ marginRight: '15px' }}
-                            margin="normal"
-                            id="date"
-                            label="Ngày cấp"
-                            type="date"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            fullWidth
-                          />
-                        )}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <MuiRHFDatePicker
+                          name="passPortDateRange"
+                          label="Ngày cấp"
+                          inputFormat={'DD/MM/YYYY'}
+                        />
+                      </LocalizationProvider>
                     </Grid>
                     <Grid item xs={4}>
-                      <Controller
-                        name="expirationDate"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={!!methods.formState.errors?.expirationDate}
-                            helperText={
-                              methods.formState.errors?.expirationDate?.message
-                            }
-                            {...field}
-                            style={{ marginRight: '15px' }}
-                            margin="normal"
-                            id="date"
-                            label="Ngày hết hạn"
-                            type="date"
-                            InputLabelProps={{
-                              shrink: true,
-                            }}
-                            fullWidth
-                          />
-                        )}
-                      />
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <MuiRHFDatePicker
+                          name="expirationDate"
+                          label="Ngày hết hạn"
+                          inputFormat={'DD/MM/YYYY'}
+                        />
+                      </LocalizationProvider>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -510,10 +454,16 @@ export default function PlayerDetail(props: Props) {
                     type="file"
                     id="uploadImage"
                     style={{ display: 'none' }}
-                    onChange={(event: any) => {
-                      setFile(event.target.files[0])
+                    onChange={(e: any) => {
+                      if (e.target.files[0].size > 52428800) {
+                        toastSuccess({
+                          message: 'Quá dung lượng cho phép',
+                        })
+                        return
+                      }
+                      setFile(e.target.files[0])
                       setPreviewImage(
-                        window.URL.createObjectURL(event.target.files[0]),
+                        window.URL.createObjectURL(e.target.files[0]),
                       )
                     }}
                   />
@@ -525,8 +475,8 @@ export default function PlayerDetail(props: Props) {
                       inputUploadImage?.click()
                     }}
                     style={{
-                      width: 500,
-                      height: 400,
+                      width: '80%',
+                      height: '90%',
                       border: '2px dashed black',
                       textAlign: 'center',
                     }}
@@ -563,20 +513,12 @@ export default function PlayerDetail(props: Props) {
 
                         <img
                           src={previewImage}
-                          width="480px"
-                          height="270px"
+                          width="80%"
+                          height="60%"
                           style={{ objectFit: 'contain' }}
                         ></img>
                       </>
                     )}
-
-                    {/* {file?.type.startsWith('image/') && (
-                      <img
-                        src={window.URL.createObjectURL(file)}
-                        width="480px"
-                        height="270px"
-                      ></img>
-                    )} */}
                   </div>
                 </Grid>
               </Grid>
@@ -588,34 +530,20 @@ export default function PlayerDetail(props: Props) {
               aria-controls="panel2bh-content"
               id="panel2bh-header"
             >
-              <Typography sx={{ width: '33%', flexShrink: 0 }}>
+              <Typography variant="h4" gutterBottom>
                 Thông số cầu thủ
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid container spacing={2}>
                 <Grid item xs={3}>
-                  <Controller
-                    name="gatheringDay"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.gatheringDay}
-                        helperText={
-                          methods.formState.errors?.gatheringDay?.message
-                        }
-                        {...field}
-                        style={{ marginRight: '15px' }}
-                        id="date"
-                        label="Ngày tập trung"
-                        type="date"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        fullWidth
-                      />
-                    )}
-                  />
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <MuiRHFDatePicker
+                      name="gatheringDay"
+                      label="Ngày tập trung"
+                      inputFormat={'DD/MM/YYYY'}
+                    />
+                  </LocalizationProvider>
                 </Grid>
                 <Grid item xs={3}>
                   <Controller
@@ -624,19 +552,25 @@ export default function PlayerDetail(props: Props) {
                     render={({ field }) => (
                       <FormControl
                         fullWidth
+                        margin="dense"
                         error={!!methods.formState.errors?.team?.message}
                       >
                         <InputLabel id="demo-simple-select-label">
                           Đội thi đấu*
                         </InputLabel>
                         <Select
-                          {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội thi đấu*"
+                          {...field}
+                          value={idTeam}
+                          onChange={e => {
+                            setIdTeam(e.target.value)
+                            methods.setValue('team', e.target.value.toString())
+                          }}
                         >
                           {teams.map((team, index) => (
-                            <MenuItem value={team.id}>
+                            <MenuItem value={team.id} key={index}>
                               {team.shortName}
                             </MenuItem>
                           ))}
@@ -656,20 +590,29 @@ export default function PlayerDetail(props: Props) {
                     control={methods.control}
                     render={({ field }) => (
                       <FormControl
+                        margin="dense"
                         fullWidth
                         error={!!methods.formState.errors?.position}
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Vị trí thi đấu chính
+                          Vị trí thi đấu*
                         </InputLabel>
                         <Select
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Vị trí thi đấu chính"
+                          value={idPosition}
+                          onChange={e => {
+                            setIdPosition(e.target.value.toString())
+                            methods.setValue(
+                              'position',
+                              e.target.value.toString(),
+                            )
+                          }}
                         >
                           {(positions || []).map(position => (
-                            <MenuItem value={position.id}>
+                            <MenuItem value={position.id} key={position.id}>
                               {position.description}
                             </MenuItem>
                           ))}
@@ -683,13 +626,14 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Controller
                     name="dominantFoot"
                     control={methods.control}
                     render={({ field }) => (
                       <FormControl
-                        style={{ width: '200px' }}
+                        style={{ width: '100%' }}
+                        margin="dense"
                         error={!!methods.formState.errors?.dominantFoot}
                       >
                         <InputLabel id="demo-simple-select-label">
@@ -702,8 +646,8 @@ export default function PlayerDetail(props: Props) {
                           id="demo-simple-select"
                           label="Chân thuận"
                         >
-                          <MenuItem value={0}>Cả hai chân</MenuItem>
-                          <MenuItem value={0}>Trái</MenuItem>
+                          <MenuItem value={3}>Cả hai chân</MenuItem>
+                          <MenuItem value={2}>Trái</MenuItem>
                           <MenuItem value={1}>Phải</MenuItem>
                         </Select>
                         {!!methods.formState.errors?.dominantFoot?.message && (
@@ -714,6 +658,8 @@ export default function PlayerDetail(props: Props) {
                       </FormControl>
                     )}
                   />
+                </Grid>
+                <Grid item xs={1}>
                   <Controller
                     name="clothersNumber"
                     control={methods.control}
@@ -724,21 +670,20 @@ export default function PlayerDetail(props: Props) {
                         helperText={
                           methods.formState.errors?.clothersNumber?.message
                         }
-                        style={{ marginLeft: '15px', width: '100px' }}
-                        id=""
+                        id="clothersNumber"
                         label="Số áo"
                         type="number"
+                        margin="dense"
                       />
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Controller
                     name="height"
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
-                        style={{ width: '150px' }}
                         {...field}
                         error={!!methods.formState.errors?.height}
                         helperText={methods.formState.errors?.height?.message}
@@ -748,13 +693,14 @@ export default function PlayerDetail(props: Props) {
                       />
                     )}
                   />
+                </Grid>
+                <Grid item xs={2}>
                   <Controller
                     name="weight"
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        style={{ width: '150px', marginLeft: '15px' }}
                         error={!!methods.formState.errors?.weight}
                         helperText={methods.formState.errors?.weight?.message}
                         id="time"
@@ -764,7 +710,7 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={1}>
                   <Controller
                     name="sizeShoes"
                     control={methods.control}
@@ -775,13 +721,14 @@ export default function PlayerDetail(props: Props) {
                         helperText={
                           methods.formState.errors?.sizeShoes?.message
                         }
-                        style={{ width: '150px', marginRight: '15px' }}
                         id="time"
                         label="Size giầy"
                         type="number"
                       />
                     )}
                   />
+                </Grid>
+                <Grid item xs={1}>
                   <Controller
                     name="sizeSpikeShoes"
                     control={methods.control}
@@ -792,7 +739,6 @@ export default function PlayerDetail(props: Props) {
                         helperText={
                           methods.formState.errors?.sizeSpikeShoes?.message
                         }
-                        style={{ width: '150px' }}
                         id="time"
                         label="Giầy đinh"
                         type="number"
@@ -800,7 +746,7 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={2}>
                   <Controller
                     name="sizeClothers"
                     control={methods.control}
@@ -818,7 +764,68 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                {idTeam.toString() === '1' && (
+                  <Grid item xs={4}>
+                    <Controller
+                      name="prioritize"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={methods.getValues('prioritize')}
+                              {...field}
+                              onChange={e => {
+                                methods.setValue('prioritize', e.target.checked)
+                              }}
+                            />
+                          }
+                          label="Ưu tiên"
+                        />
+                      )}
+                    />
+                    <Controller
+                      name="viewPosition"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <FormControl style={{ width: '200px' }}>
+                          <InputLabel id="demo-simple-select-label">
+                            Vị trí hiển thị
+                          </InputLabel>
+                          <Select
+                            autoWidth
+                            {...field}
+                            disabled={methods.getValues('prioritize')}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Vị trí hiển thị"
+                          >
+                            {Array(11)
+                              .fill('')
+                              .map((item, index) => (
+                                <MenuItem value={index + 1} key={index}>
+                                  {index + 1}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          {!!methods.formState.errors?.viewPosition
+                            ?.message && (
+                            <FormHelperText>
+                              {methods.formState.errors?.viewPosition.message}
+                            </FormHelperText>
+                          )}
+                        </FormControl>
+                      )}
+                    />
+                    <div>
+                      Lưu ý: Sau khi chọn, vị trí hiển thị của cầu thủ trên
+                      trang chủ sẽ được hiển thị đúng vị trí trong danh sách, và
+                      thay thế vào vị trí đã chọn
+                    </div>
+                  </Grid>
+                )}
+
+                <Grid item xs={2}>
                   <Controller
                     name="countMatch"
                     control={methods.control}
@@ -829,14 +836,15 @@ export default function PlayerDetail(props: Props) {
                         helperText={
                           methods.formState.errors?.countMatch?.message
                         }
-                        style={{ width: '150px' }}
                         id="time"
                         label="Số trận đã đá"
                         type="number"
                       />
                     )}
                   />
-                  {player?.mainPosition === 1 && (
+                </Grid>
+                {idPosition.toString() === '1' && (
+                  <Grid item xs={2}>
                     <Controller
                       name="cleanMatch"
                       control={methods.control}
@@ -855,9 +863,9 @@ export default function PlayerDetail(props: Props) {
                         />
                       )}
                     />
-                  )}
-                </Grid>
-                <Grid item xs={3}>
+                  </Grid>
+                )}
+                <Grid item xs={2}>
                   <Controller
                     name="goal"
                     control={methods.control}
@@ -866,13 +874,14 @@ export default function PlayerDetail(props: Props) {
                         {...field}
                         error={!!methods.formState.errors?.goal}
                         helperText={methods.formState.errors?.goal?.message}
-                        style={{ width: '150px' }}
                         id="time"
                         label="Số bàn thắng"
                         type="number"
                       />
                     )}
                   />
+                </Grid>
+                <Grid item xs={2}>
                   <Controller
                     name="yellowCard"
                     control={methods.control}
@@ -883,9 +892,8 @@ export default function PlayerDetail(props: Props) {
                         helperText={
                           methods.formState.errors?.yellowCard?.message
                         }
-                        style={{ marginLeft: '25px', width: '150px' }}
                         id="time"
-                        label="Số thể vàng"
+                        label="Số thẻ vàng"
                         type="number"
                       />
                     )}
@@ -900,7 +908,6 @@ export default function PlayerDetail(props: Props) {
                         {...field}
                         error={!!methods.formState.errors?.redCard}
                         helperText={methods.formState.errors?.redCard?.message}
-                        style={{ marginLeft: '25px', width: '150px' }}
                         id="time"
                         label="Số thẻ đỏ"
                         type="number"
@@ -908,58 +915,7 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
-                  <Controller
-                    name="prioritize"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={true}
-                            {...field}
-                            onChange={e => {}}
-                          />
-                        }
-                        label="Ưu tiên"
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="viewPosition"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <FormControl style={{ width: '200px' }}>
-                        <InputLabel id="demo-simple-select-label">
-                          Vị trí hiển thị
-                        </InputLabel>
-                        <Select
-                          autoWidth
-                          {...field}
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          label="Vị trí hiển thị"
-                        >
-                          {Array(11)
-                            .fill('')
-                            .map((item, index) => (
-                              <MenuItem value={index + 1}>{index + 1}</MenuItem>
-                            ))}
-                        </Select>
-                        {!!methods.formState.errors?.viewPosition?.message && (
-                          <FormHelperText>
-                            {methods.formState.errors?.viewPosition.message}
-                          </FormHelperText>
-                        )}
-                      </FormControl>
-                    )}
-                  />
-                  <div>
-                    Lưu ý: Sau khi chọn, vị trí hiển thị của cầu thủ trên trang
-                    chủ sẽ được hiển thị đúng vị trí trong danh sách, và thay
-                    thế vào vị trí đã chọn
-                  </div>
-                </Grid>
+
                 <Grid item xs={12}>
                   <Controller
                     name="oldClub"
@@ -977,7 +933,7 @@ export default function PlayerDetail(props: Props) {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography>Tiểu xử*:</Typography>
+                  <Typography>Tiểu sử*:</Typography>
                   <RHFWYSIWYGEditor name="editor_content"></RHFWYSIWYGEditor>
                 </Grid>
                 <Grid item xs={12}>
@@ -996,7 +952,7 @@ export default function PlayerDetail(props: Props) {
                           id="demo-simple-select"
                           label="Trạng thái"
                         >
-                          <MenuItem value={0}>Không hoạt động</MenuItem>
+                          <MenuItem value={-2}>Khoá</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>
                         </Select>
                         {!!methods.formState.errors?.status?.message && (
@@ -1014,16 +970,15 @@ export default function PlayerDetail(props: Props) {
                     type="submit"
                     variant="contained"
                     disabled={isLoading}
-                    size="large"
+                    style={{ padding: '12px 20px' }}
                   >
                     Lưu
                   </Button>
                   <Button
-                    style={{ marginLeft: '15px' }}
+                    style={{ marginLeft: '15px', padding: '12px 20px' }}
                     color="primary"
                     variant="contained"
                     disabled={isLoading}
-                    size="large"
                     onClick={() => {
                       navigate('/players')
                     }}

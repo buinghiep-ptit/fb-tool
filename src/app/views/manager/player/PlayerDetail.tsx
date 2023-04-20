@@ -1002,7 +1002,7 @@ export default function PlayerDetail(props: Props) {
                           id="demo-simple-select"
                           label="Trạng thái"
                         >
-                          <MenuItem value={0}>Không hoạt động</MenuItem>
+                          <MenuItem value={-2}>Khóa</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>
                         </Select>
                         {!!methods.formState.errors?.status?.message && (

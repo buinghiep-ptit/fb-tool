@@ -138,7 +138,7 @@ export default function BannerManager(props: Props) {
               {banner.dateCreated}
             </Grid>
             <Grid item xs={2} style={{ padding: 0, lineHeight: '80px' }}>
-              <Tooltip title="Sắp xếp" placement="top">
+              <Tooltip title="Kéo để sắp xếp" placement="top">
                 <IconButton color="info" sx={{ width: '33%' }}>
                   <DragHandle />
                 </IconButton>

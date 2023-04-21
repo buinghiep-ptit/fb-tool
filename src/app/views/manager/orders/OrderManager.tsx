@@ -297,7 +297,6 @@ export default function OrderManager(props: Props) {
                   <TableCell align="center">
                     <Link
                       to={`${item.id}`}
-                      // to="chi-tiet-don-hang"
                       style={{
                         color: 'green',
                         textDecorationLine: 'underline',

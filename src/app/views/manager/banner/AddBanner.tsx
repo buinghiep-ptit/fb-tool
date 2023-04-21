@@ -12,6 +12,8 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import RLDD, { RLDDItem } from 'react-list-drag-and-drop/lib/RLDD'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Delete, DragHandle } from '@mui/icons-material'
+import { FormProvider, useForm } from 'react-hook-form'
+import FormInputText from 'app/components/common/MuiRHFInputText'
 
 export interface Props {}
 export interface BannerFilters {
@@ -38,7 +40,8 @@ export default function AddBanner(props: Props) {
   const [filters, setFilters] = useState<BannerFilters>(
     extractMergeFiltersObject(defaultValues, {}),
   )
-
+  const onSubmitHandler = () => {}
+  const methods = useForm()
   return (
     <Container>
       <Box className="breadcrumb">
@@ -48,22 +51,23 @@ export default function AddBanner(props: Props) {
           ]}
         />
       </Box>
-
-      <SimpleCard title="Danh sách banner">
-        <Grid container style={{ textAlign: 'center', paddingTop: '20px' }}>
-          <Grid item xs={2}>
-            Vị trí hiển thị (trên Home)
-          </Grid>
-          <Grid item xs={4}>
-            Tiêu đề
-          </Grid>
-          <Grid item xs={4}>
-            Thời gian thêm
-          </Grid>
-          <Grid item xs={2}>
-            Hành động
-          </Grid>
-        </Grid>
+      <SimpleCard>
+        <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
+          <FormProvider {...methods}>
+            <Grid container spacing={6}>
+              <Grid item sm={6} xs={12}>
+                <FormInputText
+                  type="text"
+                  name="name"
+                  label={'Tiêu đề'}
+                  defaultValue=""
+                  placeholder=""
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+          </FormProvider>
+        </form>
       </SimpleCard>
     </Container>
   )

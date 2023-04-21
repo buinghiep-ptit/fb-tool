@@ -247,11 +247,9 @@ export default function PlayerManager(props: Props) {
   const getStatusText = (status: number) => {
     switch (status) {
       case 0:
-        return 'Tất cả'
+        return 'Không hoạt động'
       case 1:
         return 'Hoạt động'
-      case -1:
-        return 'Không hoạt động'
     }
   }
   const onExportEcel = (fileName: any) => {
@@ -325,9 +323,8 @@ export default function PlayerManager(props: Props) {
                       label="Trạng thái"
                       name="status"
                     >
-                      <MenuItem value={0}>Tất cả</MenuItem>
+                      <MenuItem value={0}>Không hoạt động</MenuItem>
                       <MenuItem value={1}>Hoạt động</MenuItem>
-                      <MenuItem value={-1}>Không hoạt động</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -419,7 +416,15 @@ export default function PlayerManager(props: Props) {
                   </TableCell>
 
                   <TableCell align="center">
-                    <Link to={`/players/${item.id}`}>{item.name}</Link>
+                    <Link
+                      to={`/players/${item.id}`}
+                      style={{
+                        color: 'green',
+                        textDecorationLine: 'underline',
+                      }}
+                    >
+                      {item.name}
+                    </Link>
                   </TableCell>
                   <TableCell align="center">{item.position}</TableCell>
                   <TableCell align="center">{item.idTeam}</TableCell>
@@ -430,7 +435,7 @@ export default function PlayerManager(props: Props) {
                     {item.status !== undefined ? (
                       <Chip
                         label={getStatusText(item.status)}
-                        color="success"
+                        color={item.status === 1 ? 'success' : 'error'}
                       />
                     ) : (
                       'Unknown'
@@ -438,7 +443,12 @@ export default function PlayerManager(props: Props) {
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="Sửa" placement="top">
-                      <IconButton color="primary">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          navigation(`/players/${item.id}`)
+                        }}
+                      >
                         <BorderColorIcon />
                       </IconButton>
                     </Tooltip>

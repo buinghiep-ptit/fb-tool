@@ -52,7 +52,6 @@ import MuiStyledTable from 'app/components/common/MuiStyledTable'
 import { getListTeam } from 'app/apis/teams/teams.service'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
 import moment from 'moment'
-import * as XLSX from 'xlsx'
 
 export interface Props {}
 const optionPosition = [
@@ -278,7 +277,7 @@ export default function PlayerManager(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`/`, {})}
+          onClick={() => navigation(`/players/create`, {})}
           startIcon={<Icon>control_point</Icon>}
         />
       </Stack>
@@ -420,7 +419,7 @@ export default function PlayerManager(props: Props) {
                   </TableCell>
 
                   <TableCell align="center">
-                    <Link to="/">{item.name}</Link>
+                    <Link to={`/players/${item.id}`}>{item.name}</Link>
                   </TableCell>
                   <TableCell align="center">{item.position}</TableCell>
                   <TableCell align="center">{item.idTeam}</TableCell>

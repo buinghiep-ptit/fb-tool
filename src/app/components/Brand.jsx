@@ -29,7 +29,7 @@ const Brand = ({ children }) => {
         <img src="/assets/images/logo.svg" alt="" />
         {/* <MatxLogo /> */}
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          Hà Nội FC
+          CAHN
         </StyledSpan>
       </Box>
 

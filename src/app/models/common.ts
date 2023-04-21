@@ -93,13 +93,21 @@ export interface IFeedsFilters {
 }
 
 export interface PlayersFilters {
-  search?: string
+  name?: string
   position?: string
   status?: 1 | -1 | 'all' | string | undefined //   1:Hoạt động -1:Không hoạt động
   page?: number | 0
   size?: number | 20
   sort?: string
   team?: string
-  dateStart?: string
-  dateEnd?: string
+  from?: string
+  to?: string
+}
+export interface OrdersFilters {
+  name?: string
+  status?: 2 | 1 | 0 | string | undefined
+  page?: number | 0
+  size?: number | 20
+  from?: string
+  to?: string
 }

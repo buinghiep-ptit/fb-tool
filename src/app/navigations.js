@@ -19,6 +19,7 @@ export const navigations = [
   { name: 'Quản lý cửa hàng', path: '/shop', icon: 'storefront' },
   { name: 'Quản lý tài khoản vận hành', path: '/accounts', icon: 'contacts' },
   { name: 'Quản lý đơn hàng', path: '/orders', icon: 'notes' },
+  { name: 'Quản lý banner', path: '/banner', icon: 'flag-pennant' },
   // {
   //   name: 'Quản lý giải đấu',
   //   icon: 'sports_soccer',

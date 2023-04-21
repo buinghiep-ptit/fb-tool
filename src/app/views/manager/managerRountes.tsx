@@ -5,6 +5,8 @@ import { lazy } from 'react'
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
+const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
+const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
 const ScheduleManager = Loadable(
   lazy(() => import('./schedule/ScheduleManager')),
 )
@@ -14,6 +16,7 @@ const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
 const EditCustomer = Loadable(lazy(() => import('./customer/EditCustomer')))
 const AccountManager = Loadable(lazy(() => import('./accounts/AccountManager')))
 const OrderManager = Loadable(lazy(() => import('./orders/OrderManager')))
+const OrderDetail = Loadable(lazy(() => import('./orders/OrderDetail')))
 const SortManager = Loadable(lazy(() => import('./shop/Sort')))
 const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
 const Product = Loadable(lazy(() => import('./shop/Product')))
@@ -44,5 +47,26 @@ const managerRoutes = [
     element: <ShopManager />,
   },
   { path: '/orders', element: <OrderManager /> },
+  {
+    path: '/orders/chi-tiet-don-hang/:orderID',
+    element: <OrderDetail />,
+  },
+  {
+    path: '/orders/chi-tiet-don-hang',
+    element: <OrderDetail />,
+  },
+  {
+    path: '/orders/:orderID',
+    element: <OrderDetail />,
+  },
+  { path: '/banner', element: <BannerManager /> },
+  {
+    path: '/banner/chi-tiet-banner',
+    element: <AddBanner />,
+  },
+  {
+    path: '/banner/:bannerID/*',
+    element: <AddBanner />,
+  },
 ]
 export default managerRoutes

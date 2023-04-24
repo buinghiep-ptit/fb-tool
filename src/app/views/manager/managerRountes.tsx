@@ -22,6 +22,7 @@ const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
 const Product = Loadable(lazy(() => import('./shop/Product')))
 const PlayerDetail = Loadable(lazy(() => import('./player/PlayerDetail')))
 const CreatePlayer = Loadable(lazy(() => import('./player/CreatePlayer')))
+const LeaguesManager = Loadable(lazy(() => import('./leagues/Leagues')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -31,6 +32,7 @@ const managerRoutes = [
     path: '/customers/:idCustomer',
     element: <EditCustomer />,
   },
+  { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },
   { path: '/accounts', element: <AccountManager /> },

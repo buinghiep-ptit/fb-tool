@@ -2,7 +2,7 @@ import { Box } from '@mui/system'
 import * as React from 'react'
 import { Breadcrumb, SimpleCard, Container } from 'app/components'
 
-import { Chip, Grid, Button, LinearProgress } from '@mui/material'
+import { Chip, Grid, Button, LinearProgress, Typography } from '@mui/material'
 
 import { useState } from 'react'
 import {
@@ -110,18 +110,18 @@ export default function Sort(props: Props) {
             onClick={updateProductCategories}
             disabled={isLoading}
           >
-            cập nhật thay đổi
+            Cập nhật thay đổi
           </Button>
         </div>
-        <Grid container style={{ textAlign: 'center' }}>
+        <Grid container style={{ textAlign: 'center', marginTop: '20px' }}>
           <Grid item xs={2}>
-            Vị trí hiển thị
+            <Typography variant="h6"> Vị trí hiển thị</Typography>
           </Grid>
           <Grid item xs={5}>
-            Tên danh mục
+            <Typography variant="h6"> Tên danh mục</Typography>
           </Grid>
           <Grid item xs={5}>
-            Trạng thái
+            <Typography variant="h6"> Trạng thái</Typography>
           </Grid>
         </Grid>
         {categories && (

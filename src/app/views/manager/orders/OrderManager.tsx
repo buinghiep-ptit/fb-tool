@@ -197,7 +197,6 @@ export default function OrderManager(props: Props) {
                     defaultValue=""
                     placeholder="Nhập SĐT, email, mã đơn hàng"
                     fullWidth
-                    required
                   />
                 </Grid>
                 <Grid item xs={3}>

@@ -77,7 +77,7 @@ const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
         .mixed()
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
-          return value?.name?.split('.').pop() === 'png'
+          return ['png', 'jpg', 'jpeg'].includes(value?.name?.split('.').pop())
         }),
     })
     .required()

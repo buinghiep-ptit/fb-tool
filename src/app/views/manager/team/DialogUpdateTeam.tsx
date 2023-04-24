@@ -89,7 +89,9 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
           if (value && value.name)
-            return value?.name?.split('.').pop() === 'png'
+            return ['png', 'jpg', 'jpeg'].includes(
+              value?.name?.split('.').pop(),
+            )
           else return true
         }),
     })

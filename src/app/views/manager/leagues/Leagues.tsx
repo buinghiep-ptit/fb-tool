@@ -1,6 +1,7 @@
+import { Edit } from '@mui/icons-material'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import CachedIcon from '@mui/icons-material/Cached'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import DeleteIcon from '@mui/icons-material/Delete'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Button,
@@ -27,6 +28,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { headTableLeagues, typeLeagues } from './const'
+
 export interface Props {}
 
 export default function LeaguesManager(props: Props) {
@@ -36,6 +38,8 @@ export default function LeaguesManager(props: Props) {
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>()
   const [statusFilter, setStatusFilter] = useState<any>()
+  // const [nameFilter, setNameFilter] = useState<any>()
+  // const [statusFilter, setStatusFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const param = useParams()
@@ -56,7 +60,7 @@ export default function LeaguesManager(props: Props) {
   const fetchLeagues = async (params: any) => {
     const res = await getLeagues(params)
     setLeagues(res.content)
-    setCountTable(res.content.length)
+    setCountTable(res.totalElements)
   }
 
   const handleSearch = async () => {
@@ -224,7 +228,7 @@ export default function LeaguesManager(props: Props) {
                   </TableCell>
                   <TableCell align="center">
                     {product.status === 1 && (
-                      <Chip label="Hoạt động" color="success" />
+                      <Chip label="Đang diễn ra" color="success" />
                     )}
                     {product.status === 0 && (
                       <Chip label="Chưa diễn ra" color="warning" />
@@ -238,14 +242,24 @@ export default function LeaguesManager(props: Props) {
                     {product.status === 4 && <Chip label="Đóng" />}
                   </TableCell>
                   <TableCell align="center">
-                    <Tooltip title="Chi tiết" placement="top">
+                    <Tooltip title="Sửa" placement="top">
                       <IconButton
                         color="primary"
                         onClick={() =>
                           navigate(`/shop/product/${product.masterProductId}`)
                         }
                       >
-                        <RemoveRedEyeIcon />
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xóa" placement="top">
+                      <IconButton
+                        color="primary"
+                        onClick={() =>
+                          navigate(`/shop/product/${product.masterProductId}`)
+                        }
+                      >
+                        <DeleteIcon />
                       </IconButton>
                     </Tooltip>
                   </TableCell>

@@ -1,4 +1,7 @@
+import CachedIcon from '@mui/icons-material/Cached'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import SearchIcon from '@mui/icons-material/Search'
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
   Button,
   Chip,
@@ -19,15 +22,15 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import {
+  getProducts,
+  syncCategory,
+  syncStatus,
+} from 'app/apis/shop/shop.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import * as React from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-
-import CachedIcon from '@mui/icons-material/Cached'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import SettingsIcon from '@mui/icons-material/Settings'
-import { getProducts } from 'app/apis/shop/shop.service'
 import { useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 import { headTableDetailCategory } from './const'
 export interface Props {}
@@ -38,14 +41,15 @@ export default function DetailCategory(props: Props) {
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [products, setProducts] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>()
-  const [statusFilter, setStatusFilter] = useState<any>()
+  const [statusFilter, setStatusFilter] = useState<any>(2)
   const dialogSettingImageRef = React.useRef<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const param = useParams()
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    fetchListProduct({ page: page, size: rowsPerPage })
+
+    fetchListProduct()
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -53,28 +57,58 @@ export default function DetailCategory(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-    fetchListProduct({ page: 0, size: rowsPerPage })
+    fetchListProduct()
   }
 
-  const fetchListProduct = async (params: any) => {
-    const res = await getProducts(params, param.id)
+  const fetchListProduct = async () => {
+    const res = await getProducts(
+      {
+        search: nameFilter,
+        status: statusFilter === 2 ? null : statusFilter,
+        page: page,
+        size: rowsPerPage,
+      },
+      param.id,
+    )
     setProducts(res.content)
     setCountTable(res.totalElements)
   }
 
   const handleSearch = async () => {
     setIsLoading(true)
-    await fetchListProduct({
-      search: nameFilter,
-      status: statusFilter,
-      page: 0,
-      size: 20,
-    })
+    await fetchListProduct()
     setIsLoading(false)
   }
 
+  const handleSyncCategory = async () => {
+    setIsLoading(true)
+    const res = await syncCategory()
+    if (res) {
+      // eslint-disable-next-line prefer-const
+      let status = 0
+      while (status === 0) {
+        await new Promise<void>(resolve =>
+          setTimeout(async () => {
+            const statusRes = await watchStatusSync()
+            console.log(statusRes)
+            if (statusRes === 0) {
+              status = 1
+              setIsLoading(false)
+            }
+            resolve()
+          }, 20000),
+        )
+      }
+    }
+  }
+
+  const watchStatusSync = async () => {
+    const res = await syncStatus({ isProduct: 0 })
+    return res.status
+  }
+
   React.useEffect(() => {
-    fetchListProduct({ page: 0, size: 20 })
+    fetchListProduct()
   }, [])
 
   return (
@@ -115,8 +149,10 @@ export default function DetailCategory(props: Props) {
           variant="contained"
           startIcon={<CachedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
+          disabled={isLoading}
+          onClick={handleSyncCategory}
         >
-          Đồng bộ dữ liệu
+          {isLoading ? '...Đang đồng bộ' : 'Đồng bộ dữ liệu'}
         </Button>
       </div>
       <SimpleCard>
@@ -200,10 +236,14 @@ export default function DetailCategory(props: Props) {
                   </TableCell>
                   <TableCell align="center">{product.amount}</TableCell>
                   <TableCell align="center">
-                    {product.status === 1 ? (
+                    {product.status === 0 && (
+                      <Chip label="Không hoạt động" color="success" />
+                    )}
+                    {product.status === 1 && (
                       <Chip label="Hoạt động" color="success" />
-                    ) : (
-                      <Chip label="không hoạt động" color="primary" />
+                    )}
+                    {product.status === -1 && (
+                      <Chip label="Đã xóa từ kiotviet" />
                     )}
                   </TableCell>
                   <TableCell align="center">

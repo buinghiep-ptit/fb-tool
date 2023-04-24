@@ -6,3 +6,8 @@ export const getLeagues = async (params: any): Promise<any> => {
   })
   return data
 }
+
+export const deleteLeagues = async (id: any): Promise<any> => {
+  const { data } = await http.delete<any>(`/api/leagues/${id}`)
+  return data
+}

@@ -38,15 +38,15 @@ export default function LeaguesManager(props: Props) {
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>()
   const [statusFilter, setStatusFilter] = useState<any>()
-  // const [nameFilter, setNameFilter] = useState<any>()
-  // const [statusFilter, setStatusFilter] = useState<any>()
+  const [nameShortFilter, setNameShortFilter] = useState<any>()
+  const [typeFilter, setTypeFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const param = useParams()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    fetchLeagues({ page: page, size: rowsPerPage })
+    fetchLeagues()
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -54,28 +54,40 @@ export default function LeaguesManager(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-    fetchLeagues({ page: 0, size: rowsPerPage })
+    fetchLeagues()
   }
 
-  const fetchLeagues = async (params: any) => {
-    const res = await getLeagues(params)
+  const fetchLeagues = async () => {
+    const res = await getLeagues({
+      name: nameFilter,
+      shortName: nameShortFilter,
+      status: statusFilter === 2 ? null : statusFilter,
+      type: typeFilter === 99 ? null : typeFilter,
+      size: rowsPerPage,
+      page: page,
+    })
     setLeagues(res.content)
     setCountTable(res.totalElements)
   }
 
   const handleSearch = async () => {
     setIsLoading(true)
-    await fetchLeagues({
-      search: nameFilter,
-      status: statusFilter,
-      page: 0,
-      size: 20,
-    })
+    await fetchLeagues()
+    setIsLoading(false)
+  }
+
+  const handleClearFilter = async () => {
+    setIsLoading(true)
+    setNameFilter(null)
+    setNameShortFilter(null)
+    setStatusFilter(2)
+    setTypeFilter(99)
+    await fetchLeagues()
     setIsLoading(false)
   }
 
   React.useEffect(() => {
-    fetchLeagues({ page: 0, size: 20 })
+    fetchLeagues()
   }, [])
 
   return (
@@ -101,6 +113,7 @@ export default function LeaguesManager(props: Props) {
           variant="contained"
           startIcon={<AddBoxOutlinedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
+          onClick={() => navigate('/leagues/create')}
         >
           Thêm mới giải đấu
         </Button>
@@ -130,7 +143,7 @@ export default function LeaguesManager(props: Props) {
               variant="outlined"
               fullWidth
               onChange={e => {
-                setNameFilter(e.target.value)
+                setNameShortFilter(e.target.value)
               }}
               onKeyDown={async e => {
                 if (e.keyCode === 13) {
@@ -147,13 +160,16 @@ export default function LeaguesManager(props: Props) {
                 id="demo-simple-select"
                 label="Trạng thái"
                 onChange={e => {
-                  setStatusFilter(e.target.value)
+                  setTypeFilter(e.target.value)
                 }}
               >
-                <MenuItem value={2}>Tất cả</MenuItem>
-                <MenuItem value={0}>Chưa diễn ra</MenuItem>
-                <MenuItem value={1}>Đang diễn ra</MenuItem>
-                <MenuItem value={-1}>Kết thúc</MenuItem>
+                <MenuItem value={99}>Tất cả</MenuItem>
+                <MenuItem value={1}>Bóng đá nam</MenuItem>
+                <MenuItem value={2}>Bóng đá nữ</MenuItem>
+                <MenuItem value={3}>Futsal</MenuItem>
+                <MenuItem value={4}>Bóng đá bãi biển</MenuItem>
+                <MenuItem value={5}>Phong trào cộng đồng</MenuItem>
+                <MenuItem value={6}>Khác</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -191,7 +207,7 @@ export default function LeaguesManager(props: Props) {
               variant="contained"
               startIcon={<CachedIcon />}
               style={{ width: '100%', padding: '15px' }}
-              onClick={handleSearch}
+              onClick={handleClearFilter}
               disabled={isLoading}
             >
               Làm mới

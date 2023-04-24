@@ -24,7 +24,7 @@ import {
 import { Box } from '@mui/system'
 import {
   getProducts,
-  syncCategory,
+  syncProduct,
   syncStatus,
 } from 'app/apis/shop/shop.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
@@ -82,7 +82,7 @@ export default function DetailCategory(props: Props) {
 
   const handleSyncCategory = async () => {
     setIsLoading(true)
-    const res = await syncCategory()
+    const res = await syncProduct()
     if (res) {
       // eslint-disable-next-line prefer-const
       let status = 0

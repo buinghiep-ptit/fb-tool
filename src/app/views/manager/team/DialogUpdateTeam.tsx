@@ -31,7 +31,7 @@ import * as yup from 'yup'
 interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  refresh: () => Promise<void>
+  refresh: () => void
   teamId: number
 }
 
@@ -93,6 +93,9 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
               value?.name?.split('.').pop(),
             )
           else return true
+        })
+        .test('fileSize', 'Dung lượng file <= 10MB', value => {
+          return Math.floor(value?.size / 1000000) <= 10
         }),
     })
     .required()
@@ -234,7 +237,7 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
             </FormLabel>
             <input
               type="file"
-              accept="image/png"
+              accept="image/png,image/jpg,image/jpeg"
               id="uploadImage"
               style={{ display: 'none' }}
               onChange={(event: any) => {

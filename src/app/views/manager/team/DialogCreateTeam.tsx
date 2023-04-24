@@ -31,7 +31,7 @@ import * as yup from 'yup'
 export interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  refresh: () => Promise<void>
+  refresh: () => void
 }
 
 const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
@@ -78,6 +78,9 @@ const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
           return ['png', 'jpg', 'jpeg'].includes(value?.name?.split('.').pop())
+        })
+        .test('fileSize', 'Dung lượng file <= 10MB', value => {
+          return Math.floor(value?.size / 1000000) <= 10
         }),
     })
     .required()
@@ -206,7 +209,7 @@ const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
             </FormLabel>
             <input
               type="file"
-              accept="image/png"
+              accept="image/png,image/jpg,image/jpeg"
               id="uploadImage"
               style={{ display: 'none' }}
               onChange={(event: any) => {

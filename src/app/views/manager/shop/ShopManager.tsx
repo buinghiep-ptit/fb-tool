@@ -1,28 +1,28 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, Container } from 'app/components'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  Accordion,
-  AccordionSummary,
-  Typography,
-  AccordionDetails,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  LinearProgress,
-} from '@mui/material'
 import CachedIcon from '@mui/icons-material/Cached'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart'
-import { useEffect, useState } from 'react'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material'
+import { Box } from '@mui/system'
 import {
   getProductCategories,
   syncCategory,
   syncStatus,
 } from 'app/apis/shop/shop.service'
+import { Breadcrumb, Container } from 'app/components'
+import * as React from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 
 export interface Props {}
@@ -109,7 +109,7 @@ export default function ShopManager(props: Props) {
           variant="contained"
           startIcon={<CachedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
-          onClick={() => handleSyncCategory()}
+          onClick={handleSyncCategory}
           disabled={isLoading}
         >
           {isLoading ? '...Đang đồng bộ' : 'Đồng bộ dữ liệu'}

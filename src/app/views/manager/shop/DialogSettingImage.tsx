@@ -1,18 +1,18 @@
-import * as React from 'react'
+import BackupIcon from '@mui/icons-material/Backup'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import { IconButton } from '@mui/material'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { IconButton } from '@mui/material'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import BackupIcon from '@mui/icons-material/Backup'
-import { compressImageFile } from 'app/helpers/compressFile'
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import {
   getImageCategories,
   uploadImageCategories,
 } from 'app/apis/shop/shop.service'
+import { compressImageFile } from 'app/helpers/compressFile'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import * as React from 'react'
 import { useParams } from 'react-router-dom'
 
 interface Props {
@@ -140,7 +140,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
               </div>
             )}
 
-            {previewImage.length !== 0 && (
+            {previewImage?.length !== 0 && (
               <img src={previewImage} width="480px" height="270px"></img>
             )}
           </div>

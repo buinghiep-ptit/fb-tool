@@ -1,36 +1,36 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import SearchIcon from '@mui/icons-material/Search'
 import {
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Button,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
   Chip,
+  FormControl,
+  Grid,
   IconButton,
+  InputLabel,
   LinearProgress,
+  MenuItem,
+  Select,
   Switch,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
   Tooltip,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
+import { Box } from '@mui/system'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import * as React from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import CachedIcon from '@mui/icons-material/Cached'
-import { useState } from 'react'
-import { headTableDetailCategory } from './const'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import SettingsIcon from '@mui/icons-material/Settings'
 import { getProducts } from 'app/apis/shop/shop.service'
-export interface Props {}
+import { useState } from 'react'
 import DialogSettingImage from './DialogSettingImage'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import { headTableDetailCategory } from './const'
+export interface Props {}
 
 export default function DetailCategory(props: Props) {
   const [page, setPage] = useState(0)
@@ -59,7 +59,7 @@ export default function DetailCategory(props: Props) {
   const fetchListProduct = async (params: any) => {
     const res = await getProducts(params, param.id)
     setProducts(res.content)
-    setCountTable(res.content.length)
+    setCountTable(res.totalElements)
   }
 
   const handleSearch = async () => {

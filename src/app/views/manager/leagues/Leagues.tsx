@@ -1,6 +1,10 @@
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
+import CachedIcon from '@mui/icons-material/Cached'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Button,
+  Chip,
   FormControl,
   Grid,
   IconButton,
@@ -8,7 +12,6 @@ import {
   LinearProgress,
   MenuItem,
   Select,
-  Switch,
   TableBody,
   TableCell,
   TableHead,
@@ -18,15 +21,11 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
+import { getLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import * as React from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
-import CachedIcon from '@mui/icons-material/Cached'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import { getLeagues } from 'app/apis/leagues/leagues.service'
 import { useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { headTableLeagues, typeLeagues } from './const'
 export interface Props {}
 
@@ -37,10 +36,10 @@ export default function LeaguesManager(props: Props) {
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>()
   const [statusFilter, setStatusFilter] = useState<any>()
-  const dialogSettingImageRef = React.useRef<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const param = useParams()
+
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
     fetchLeagues({ page: page, size: rowsPerPage })
@@ -219,24 +218,25 @@ export default function LeaguesManager(props: Props) {
                     <Link to="/customers/1">{product.name}</Link>
                   </TableCell>
                   <TableCell align="center">{product.logo}</TableCell>
-                  <TableCell align="center">
-                    {product.shortName}
-                    {/* {product.status === 1 ? (
-                      <Chip label="Hoạt động" color="success" />
-                    ) : (
-                      <Chip label="không hoạt động" color="primary" />
-                    )} */}
-                  </TableCell>
+                  <TableCell align="center">{product.shortName}</TableCell>
                   <TableCell align="center">
                     {typeLeagues[product.type - 1]}
                   </TableCell>
                   <TableCell align="center">
-                    <Switch
-                      color="success"
-                      checked={product.priority === 0 ? false : true}
-                    />
+                    {product.status === 1 && (
+                      <Chip label="Hoạt động" color="success" />
+                    )}
+                    {product.status === 0 && (
+                      <Chip label="Chưa diễn ra" color="warning" />
+                    )}
+                    {product.status === 2 && (
+                      <Chip label="Kết thúc" color="primary" />
+                    )}
+                    {product.status === 3 && (
+                      <Chip label="Tạm dừng" color="secondary" />
+                    )}
+                    {product.status === 4 && <Chip label="Đóng" />}
                   </TableCell>
-                  <TableCell align="center">{product.dateUpdate}</TableCell>
                   <TableCell align="center">
                     <Tooltip title="Chi tiết" placement="top">
                       <IconButton

@@ -34,6 +34,11 @@ export const syncCategory = async (): Promise<any> => {
   return data
 }
 
+export const syncProduct = async (): Promise<any> => {
+  const { data } = await http.post<any>(`/api/sync-product`)
+  return data
+}
+
 export const uploadImageCategories = async (
   id: any,
   params: any,

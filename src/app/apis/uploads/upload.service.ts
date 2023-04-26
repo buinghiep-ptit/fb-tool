@@ -10,7 +10,7 @@ export const uploadFile = async (
   if (mediaFormat === 1) {
     path = '/api/video/upload'
   } else if (mediaFormat === 2) {
-    path = '/api/image/upload'
+    path = '/api/file/upload?directory=cahnfc'
   } else {
     path = '/api/file/upload'
   }
@@ -42,7 +42,7 @@ export const uploadApi = async (
   if (file.type.includes('video')) {
     path = '/api/video/upload'
   } else if (file.type.includes('image')) {
-    path = '/api/image/upload'
+    path = '/api/image/upload?directory=cahnfc'
   } else if (file.type.includes('audio')) {
     path = '/api/audio/upload'
   } else {
@@ -76,12 +76,16 @@ export const uploadImage = async (file?: any): Promise<any> => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const { data }: any = await http.post('/api/image/upload', formData, {
-    baseURL: process.env.REACT_APP_API_UPLOAD_URL,
-    headers: {
-      'Content-Type': 'multipart/form-data',
+  const { data }: any = await http.post(
+    '/api/file/upload?directory=cahnfc',
+    formData,
+    {
+      baseURL: process.env.REACT_APP_API_UPLOAD_URL,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     },
-  })
+  )
   return data
 }
 

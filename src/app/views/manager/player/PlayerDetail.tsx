@@ -1,48 +1,50 @@
-import { Box, getValue } from '@mui/system'
+import { Box } from '@mui/system'
+import { Breadcrumb, Container } from 'app/components'
 import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container } from 'app/components'
 
+import { yupResolver } from '@hookform/resolvers/yup'
+import BackupIcon from '@mui/icons-material/Backup'
+import DeleteIcon from '@mui/icons-material/Delete'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
-  Grid,
-  Button,
-  LinearProgress,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  Typography,
-  TextField,
+  AccordionSummary,
+  Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
+  Grid,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
-  FormHelperText,
-  Checkbox,
-  FormControlLabel,
+  TextField,
+  Typography,
 } from '@mui/material'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { useState } from 'react'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import BackupIcon from '@mui/icons-material/Backup'
-import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
 import IconButton from '@mui/material/IconButton'
-import DeleteIcon from '@mui/icons-material/Delete'
-import { Controller, useForm, FormProvider } from 'react-hook-form'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import {
-  createPlayer,
   getPlayer,
   getPositions,
   getTeams,
   updatePlayer,
 } from 'app/apis/players/players.service'
-import { useNavigate, useParams } from 'react-router-dom'
-import handleUploadImage from 'app/helpers/handleUploadImage'
-import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
-import { Value } from 'sass'
-import moment from 'moment'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers'
+import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import handleUploadImage from 'app/helpers/handleUploadImage'
+import {
+  toastError,
+  toastSuccess,
+  toastWarning,
+} from 'app/helpers/toastNofication'
+import moment from 'moment'
+import { useState } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
+import * as yup from 'yup'
 export interface Props {}
 
 export default function PlayerDetail(props: Props) {
@@ -63,10 +65,10 @@ export default function PlayerDetail(props: Props) {
     const defaultValues: any = {}
     defaultValues.namePlayer = player.fullName
     defaultValues.homeTown = player.placeOfOrigin
-    defaultValues.phone = player.mobilePhone
+    defaultValues.phone = player.mobilePhone || ''
     defaultValues.dateOfBirth = player.dateOfBirth
     defaultValues.married = player.maritalStatus
-    defaultValues.citizenIdentification = player.citizenIdCard
+    defaultValues.citizenIdentification = player.citizenIdCard || ''
     defaultValues.dateRange = player.dateCitizenId
     defaultValues.passPortDateRange = player.datePassport
     defaultValues.passPort = player.passport
@@ -114,11 +116,14 @@ export default function PlayerDetail(props: Props) {
         .matches(/^[0-9]*$/, 'Chỉ nhập số')
         .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       dateOfBirth: yup.string().required('Gía trị bắt buộc'),
-      passPortDateRange: yup.string().nullable(),
-      married: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhâp số'),
+      passPortDateRange: yup.date().nullable(),
+      married: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       citizenIdentification: yup.string(),
       dateRange: yup.string().nullable(),
-      expirationDate: yup.string().nullable(),
+      expirationDate: yup
+        .date()
+        .min(yup.ref('passPortDateRange'), 'Ngày hết hạn phải sau ngày cấp')
+        .nullable(),
       gatheringDay: yup.string(),
       team: yup.string().required('Giá trị bát buộc').nullable(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
@@ -126,48 +131,53 @@ export default function PlayerDetail(props: Props) {
       clothersNumber: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
-      height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhâp số'),
+      height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       sizeShoes: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       sizeSpikeShoes: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       sizeClothers: yup.string().nullable(),
-      viewPosition: yup.string().typeError('Nhâp số').nullable(),
+      viewPosition: !disabledViewPosition
+        ? yup.string().nullable().required('Giá trị bắt buộc')
+        : yup.string(),
       countMatch: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       cleanMatch: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       goal: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       yellowCard: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
       redCard: yup
         .number()
         .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhâp số')
+        .typeError('Nhập số')
         .nullable(),
-      oldClub: yup.string(),
+      oldClub: yup
+        .string()
+        .trim()
+        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),
     })
@@ -181,9 +191,9 @@ export default function PlayerDetail(props: Props) {
       phone: '',
       dateOfBirth: '',
       married: 0,
-      citizenIdentification: '',
+      citizenIdentification: null,
       dateRange: '',
-      passPortDateRange: '',
+      passPortDateRange: null,
       passPort: '',
       expirationDate: '',
       gatheringDay: moment(Date.now()).format('YYYY-MM-DD') || null,
@@ -210,79 +220,89 @@ export default function PlayerDetail(props: Props) {
   })
 
   const onSubmit = async (data: any) => {
-    console.log(data)
+    // console.log(moment(data.expirationDate).format('YYYY-MM-DD'))
+
+    // return
     setIsloading(true)
     let imageUrl: any = ''
-    if (file) {
-      imageUrl = await handleUploadImage(file)
-    } else {
-      imageUrl = previewImage
-    }
-    if (previewImage.length === 0) {
-      toastWarning({ message: 'Thêm ảnh' })
-      setIsloading(false)
-      return
-    }
-    const payload: any = {
-      name: data.namePlayer,
-      fullName: data.namePlayer,
-      mobilePhone: data.phone === '' ? null : data.phone,
-      citizenIdCard: data.citizenIdentification,
-      dateCitizenId:
-        moment(data.dateRange).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(data.dateRange).format('YYYY-MM-DD'),
-      passport: data.passPort,
-      datePassport:
-        moment(data.passPortDateRange).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(data.passPortDateRange).format('YYYY-MM-DD'),
-      dateExpirePassport:
-        moment(data.expirationDate).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(data.expirationDate).format('YYYY-MM-DD'),
-      placeOfOrigin: data.homeTown,
-      idTeam: data.team,
-      dateOfBirth:
-        moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(data.dateOfBirth).format('YYYY-MM-DD'),
-      dateJoined:
-        moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(data.gatheringDay).format('YYYY-MM-DD'),
-      maritalStatus: data.married,
-      shirtSize: data.sizeClothers,
-      shoseSize: data.sizeShoes,
-      nailShoseSize: data.sizeSpikeShoes,
-      height: data.height,
-      weight: data.weight,
-      imageUrl: imageUrl,
-      jerseyNo: data.clothersNumber,
-      dominantFoot: data.dominantFoot,
-      cleanSheetNo: data.cleanMatch,
-      matchPlayedNo: data.countMatch,
-      yellowCardNo: data.yellowCard,
-      redCardNo: data.redCard,
-      oldClub: data.oldClub,
-      biography: data.editor_content,
-      isDisplayHome: data.prioritize ? 1 : 0,
-      priority: data.prioritize ? data.viewPosition : null,
-      status: data.status,
-      mainPosition: data.position,
-      position: null,
-      goalFor: data.goal,
-      id: params.id,
-    }
-    const res = await updatePlayer(payload)
-    if (res) {
-      toastSuccess({
-        message: 'Cập nhật thành công',
+    try {
+      if (file) {
+        imageUrl = await handleUploadImage(file)
+      } else {
+        imageUrl = previewImage
+      }
+      if (previewImage.length === 0) {
+        toastWarning({ message: 'Thêm ảnh' })
+        setIsloading(false)
+        return
+      }
+      const payload: any = {
+        name: data.namePlayer,
+        fullName: data.namePlayer,
+        mobilePhone: data.phone === '' ? null : data.phone,
+        citizenIdCard: data.citizenIdentification,
+        dateCitizenId:
+          moment(data.dateRange).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.dateRange).format('YYYY-MM-DD'),
+        passport: data.passPort,
+        datePassport:
+          moment(data.passPortDateRange).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.passPortDateRange).format('YYYY-MM-DD'),
+        dateExpirePassport:
+          moment(data.expirationDate).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.expirationDate).format('YYYY-MM-DD'),
+        placeOfOrigin: data.homeTown,
+        idTeam: data.team,
+        dateOfBirth:
+          moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.dateOfBirth).format('YYYY-MM-DD'),
+        dateJoined:
+          moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.gatheringDay).format('YYYY-MM-DD'),
+        maritalStatus: data.married,
+        shirtSize: data.sizeClothers,
+        shoseSize: data.sizeShoes,
+        nailShoseSize: data.sizeSpikeShoes,
+        height: data.height,
+        weight: data.weight,
+        imageUrl: imageUrl,
+        jerseyNo: data.clothersNumber,
+        dominantFoot: data.dominantFoot,
+        cleanSheetNo: data.cleanMatch,
+        matchPlayedNo: data.countMatch,
+        yellowCardNo: data.yellowCard,
+        redCardNo: data.redCard,
+        oldClub: data.oldClub,
+        biography: data.editor_content,
+        isDisplayHome: data.prioritize ? 1 : 0,
+        priority: data.prioritize ? data.viewPosition : null,
+        status: data.status,
+        mainPosition: data.position,
+        position: null,
+        goalFor: data.goal,
+        id: params.id,
+      }
+      const res = await updatePlayer(payload)
+      if (res) {
+        toastSuccess({
+          message: 'Cập nhật thành công',
+        })
+        setIsloading(false)
+        navigate('/players')
+      }
+    } catch (e) {
+      toastError({
+        message: 'Cập nhật thất bại',
       })
-      navigate('/players')
+      setIsloading(false)
     }
-    setIsloading(false)
   }
+
   const fetchPositions = async () => {
     const res = await getPositions({ size: 100, page: 0 })
     setPositions(res)
@@ -840,6 +860,9 @@ export default function PlayerDetail(props: Props) {
                               onChange={e => {
                                 setDisableViewPosition(!e.target.checked)
                                 methods.setValue('prioritize', e.target.checked)
+                                if (!e.target.checked) {
+                                  methods.setValue('viewPosition', '')
+                                }
                               }}
                             />
                           }
@@ -921,7 +944,7 @@ export default function PlayerDetail(props: Props) {
                           type="number"
                           id="outlined-basic"
                           style={{ marginLeft: '15px', width: '150px' }}
-                          label="Số trận giữ sạch lướt"
+                          label="Số trận giữ sạch lưới"
                           variant="outlined"
                         />
                       )}
@@ -1015,7 +1038,7 @@ export default function PlayerDetail(props: Props) {
                           id="demo-simple-select"
                           label="Trạng thái"
                         >
-                          <MenuItem value={-2}>Khoá</MenuItem>
+                          <MenuItem value={-2}>Không hoạt động</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>
                         </Select>
                         {!!methods.formState.errors?.status?.message && (

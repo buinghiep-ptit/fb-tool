@@ -22,11 +22,12 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { getLeagues } from 'app/apis/leagues/leagues.service'
+import { deleteLeagues, getLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { headTableLeagues, typeLeagues } from './const'
 
 export interface Props {}
@@ -42,7 +43,6 @@ export default function LeaguesManager(props: Props) {
   const [typeFilter, setTypeFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-  const param = useParams()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
@@ -84,6 +84,16 @@ export default function LeaguesManager(props: Props) {
     setTypeFilter(99)
     await fetchLeagues()
     setIsLoading(false)
+  }
+
+  const handleDeleteLeagues = async (id: any) => {
+    const res = await deleteLeagues(id)
+    if (res) {
+      toastSuccess({
+        message: 'Xóa thành công',
+      })
+      fetchLeagues()
+    }
   }
 
   React.useEffect(() => {
@@ -217,73 +227,80 @@ export default function LeaguesManager(props: Props) {
       </SimpleCard>
       <div style={{ height: '30px' }} />
       <SimpleCard title="Danh sách khách hàng">
-        <StyledTable>
-          <TableHead>
-            <TableRow>
-              {headTableLeagues.map(header => (
-                <TableCell align="center" style={{ minWidth: header.width }}>
-                  {header.name}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(leagues || []).map((product: any, index: any) => {
-              return (
-                <TableRow hover key={product.name}>
-                  <TableCell align="center">
-                    {rowsPerPage * page + index + 1}
+        <Box width="100%" overflow="auto">
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {headTableLeagues.map(header => (
+                  <TableCell align="center" style={{ minWidth: header.width }}>
+                    {header.name}
                   </TableCell>
-                  <TableCell align="center">
-                    <Link to="/customers/1">{product.name}</Link>
-                  </TableCell>
-                  <TableCell align="center">{product.logo}</TableCell>
-                  <TableCell align="center">{product.shortName}</TableCell>
-                  <TableCell align="center">
-                    {typeLeagues[product.type - 1]}
-                  </TableCell>
-                  <TableCell align="center">
-                    {product.status === 1 && (
-                      <Chip label="Đang diễn ra" color="success" />
-                    )}
-                    {product.status === 0 && (
-                      <Chip label="Chưa diễn ra" color="warning" />
-                    )}
-                    {product.status === 2 && (
-                      <Chip label="Kết thúc" color="primary" />
-                    )}
-                    {product.status === 3 && (
-                      <Chip label="Tạm dừng" color="secondary" />
-                    )}
-                    {product.status === 4 && <Chip label="Đóng" />}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Sửa" placement="top">
-                      <IconButton
-                        color="primary"
-                        onClick={() =>
-                          navigate(`/shop/product/${product.masterProductId}`)
-                        }
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Xóa" placement="top">
-                      <IconButton
-                        color="primary"
-                        onClick={() =>
-                          navigate(`/shop/product/${product.masterProductId}`)
-                        }
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </StyledTable>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(leagues || []).map((league: any, index: any) => {
+                return (
+                  <TableRow hover key={league.name}>
+                    <TableCell align="center">
+                      {rowsPerPage * page + index + 1}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Link to="/customers/1">{league.name}</Link>
+                    </TableCell>
+                    <TableCell align="center">
+                      <img
+                        style={{
+                          objectFit: 'cover',
+                          width: '100px',
+                          height: '100px',
+                        }}
+                        src={league.logo}
+                      ></img>
+                    </TableCell>
+                    <TableCell align="center">{league.shortName}</TableCell>
+                    <TableCell align="center">
+                      {typeLeagues[league.type - 1]}
+                    </TableCell>
+                    <TableCell align="center">
+                      {league.status === 1 && (
+                        <Chip label="Đang diễn ra" color="success" />
+                      )}
+                      {league.status === 0 && (
+                        <Chip label="Chưa diễn ra" color="warning" />
+                      )}
+                      {league.status === 2 && (
+                        <Chip label="Kết thúc" color="primary" />
+                      )}
+                      {league.status === 3 && (
+                        <Chip label="Tạm dừng" color="secondary" />
+                      )}
+                      {league.status === 4 && <Chip label="Đóng" />}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Sửa" placement="top">
+                        <IconButton
+                          color="primary"
+                          onClick={() => navigate(`/leagues/${league.id}`)}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Xóa" placement="top">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleDeleteLeagues(league.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </StyledTable>
+        </Box>
         <TablePagination
           sx={{ px: 2 }}
           page={page}

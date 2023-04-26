@@ -16,7 +16,7 @@ import * as React from 'react'
 export interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-  refresh: () => Promise<void>
+  refresh: () => void
   team: any
 }
 

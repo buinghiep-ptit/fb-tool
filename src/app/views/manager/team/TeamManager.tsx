@@ -1,5 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Button,
@@ -48,9 +49,10 @@ export default function TeamManager(props: Props) {
   const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [doRerender, setDoRerender] = useState(false)
 
   const [teams, setTeams] = useState<any>()
-  const [nameFilter, setNameFilter] = useState<any>()
+  const [nameFilter, setNameFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState(99)
   const [typeFilter, setTypeFilter] = useState(false)
 
@@ -71,8 +73,23 @@ export default function TeamManager(props: Props) {
     setIsLoading(false)
   }
 
+  const search = () => {
+    setPage(0)
+    setDoRerender(!doRerender)
+  }
+
+  const resetFilter = () => {
+    setNameFilter('')
+    setStatusFilter(99)
+    setTypeFilter(false)
+    setRowsPerPage(20)
+    setPage(0)
+    setDoRerender(!doRerender)
+  }
+
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
+    setDoRerender(!doRerender)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -80,11 +97,12 @@ export default function TeamManager(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
+    setDoRerender(!doRerender)
   }
 
   React.useEffect(() => {
     fetchListTeam()
-  }, [page])
+  }, [page, doRerender])
 
   return (
     <Container>
@@ -128,23 +146,24 @@ export default function TeamManager(props: Props) {
       <Stack gap={3}>
         <SimpleCard>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <TextField
                 id="outlined-basic"
                 label="Tên đội bóng"
                 variant="outlined"
                 fullWidth
+                value={nameFilter}
                 onChange={e => {
                   setNameFilter(e.target.value)
                 }}
                 onKeyDown={async e => {
                   if (e.key === 'Enter') {
-                    fetchListTeam()
+                    search()
                   }
                 }}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={5}>
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
@@ -164,9 +183,9 @@ export default function TeamManager(props: Props) {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={2} textAlign="center">
               <FormControlLabel
-                label="Thuộc CAHN FC"
+                label="Thuộc CAHN"
                 control={
                   <Checkbox
                     checked={typeFilter}
@@ -177,9 +196,10 @@ export default function TeamManager(props: Props) {
                 }
               />
             </Grid>
+            <Grid item xs={4}></Grid>
             <Grid
               item
-              xs={6}
+              xs={2}
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -190,10 +210,29 @@ export default function TeamManager(props: Props) {
                 variant="contained"
                 startIcon={<SearchIcon />}
                 style={{ width: '100%' }}
-                onClick={fetchListTeam}
+                onClick={search}
                 disabled={isLoading}
               >
                 Tìm kiếm
+              </Button>
+            </Grid>
+            <Grid
+              item
+              xs={2}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                justifyItems: 'baseline',
+              }}
+            >
+              <Button
+                variant="contained"
+                startIcon={<RefreshIcon />}
+                style={{ width: '100%' }}
+                onClick={resetFilter}
+                disabled={isLoading}
+              >
+                Làm mới
               </Button>
             </Grid>
           </Grid>
@@ -223,7 +262,7 @@ export default function TeamManager(props: Props) {
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell align="left">
                         <Button
                           color="info"
                           onClick={() => {
@@ -243,7 +282,7 @@ export default function TeamManager(props: Props) {
                           src={team.logo}
                         />
                       </TableCell>
-                      <TableCell align="center">{team.homeField}</TableCell>
+                      <TableCell align="left">{team.homeField}</TableCell>
                       <TableCell align="center">
                         <Switch
                           color="success"
@@ -304,7 +343,7 @@ export default function TeamManager(props: Props) {
         ref={dialogCreateTeamRef}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchListTeam}
+        refresh={search}
       />
 
       <DialogUpdateTeam
@@ -312,7 +351,7 @@ export default function TeamManager(props: Props) {
         teamId={focusedTeam?.id}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchListTeam}
+        refresh={search}
       />
 
       <DialogUpdateTeamStatus
@@ -320,7 +359,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchListTeam}
+        refresh={search}
       />
 
       <DialogDeleteTeam
@@ -328,7 +367,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchListTeam}
+        refresh={search}
       />
     </Container>
   )

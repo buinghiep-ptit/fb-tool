@@ -16,7 +16,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
       '& td': {
         paddingLeft: 10,
         paddingRight: 10,
-        textTransform: 'capitalize',
+        textTransform: 'none',
       },
     },
   },

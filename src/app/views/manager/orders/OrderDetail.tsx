@@ -107,6 +107,8 @@ export default function OrderDetail(props: Props) {
                   {order?.delivery?.fullName}
                   {'-'}
                   {order?.customerPhone}
+                  {'-'}
+                  {order?.customerEmail}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -116,7 +118,11 @@ export default function OrderDetail(props: Props) {
                 >
                   Thời gian đặt
                 </TableCell>
-                <TableCell align="left">{order?.createdDate}</TableCell>
+                <TableCell align="left">
+                  {order?.createdDate
+                    ? new Date(order.createdDate).toLocaleString()
+                    : ''}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell
@@ -206,42 +212,29 @@ export default function OrderDetail(props: Props) {
         <SimpleCard title="Danh sách sản phẩm">
           {order?.orderDetails?.map(item => (
             <Grid container spacing={3} key={item.productId}>
-              {item.imgUrl?.map((url, index) => (
-                <Grid item xs={1.5}>
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Product ${index + 1}`}
-                    style={{
-                      width: '200px',
-                      height: '200px',
-                      objectFit: 'cover',
-                      borderRadius: 4,
-                    }}
-                  />
-                </Grid>
-              ))}
-              {!item.imgUrl?.length && (
-                <Grid item xs={1.5}>
-                  <img
-                    src="https://i.pinimg.com/564x/e2/d7/53/e2d753f4b2fc3301f6217f80142eb0f6.jpg"
-                    alt="Default Product Image"
-                    style={{
-                      width: '200px',
-                      height: '200px',
-                      objectFit: 'cover',
-                      borderRadius: 4,
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={2}>
+                <img
+                  src={
+                    item.imgUrl && item.imgUrl.length
+                      ? item.imgUrl[0]
+                      : 'https://i.pinimg.com/564x/e2/d7/53/e2d753f4b2fc3301f6217f80142eb0f6.jpg'
+                  }
+                  style={{
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: 4,
+                  }}
+                  alt="bg"
+                />
+              </Grid>
               <Grid container item xs={3}>
                 <Grid item xs={12}>
                   <p style={{ fontWeight: '600', fontSize: '15px' }}>
                     {item.name}
                   </p>
                   <p style={{ fontWeight: '500', fontSize: '14px' }}>
-                    {item.fullName}
+                    Sản phẩm: {item.fullName}
                   </p>
                 </Grid>
                 <Grid item xs={6}>
@@ -257,7 +250,7 @@ export default function OrderDetail(props: Props) {
                       fontSize: '15px',
                     }}
                   >
-                    {item.amount}
+                    {item.amount} VNĐ
                   </p>
                 </Grid>
               </Grid>
@@ -272,7 +265,7 @@ export default function OrderDetail(props: Props) {
               <h3>Tổng tiền {order?.quantity} sản phẩm:</h3>
             </Grid>
             <Grid item xs={3}>
-              <h3 style={{ color: 'red' }}>{order?.amount}</h3>
+              <h3 style={{ color: 'red' }}>{order?.amount} VNĐ</h3>
             </Grid>
           </Grid>
         </SimpleCard>

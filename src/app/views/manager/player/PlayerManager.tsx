@@ -70,7 +70,6 @@ export default function PlayerManager(props: Props) {
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -461,8 +460,8 @@ export default function PlayerManager(props: Props) {
             sx={{ px: 2 }}
             page={page}
             component="div"
-            rowsPerPage={rowsPerPage}
-            count={40}
+            rowsPerPage={size}
+            count={data ? (data?.length as number) : 0}
             onPageChange={handleChangePage}
             rowsPerPageOptions={[20, 50, 100]}
             labelRowsPerPage={'Dòng / Trang'}

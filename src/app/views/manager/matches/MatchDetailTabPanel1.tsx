@@ -285,7 +285,7 @@ export default function MatchDetailTabPanel1(props: any) {
                           methods.formState.errors?.team1Goal?.message
                         }
                         {...field}
-                        label={`${match.team1Name ?? 'Đội 1'}${
+                        label={`${match?.team1Name ?? 'Đội 1'}${
                           [1, 2].includes(methods.getValues('status'))
                             ? '*'
                             : ''
@@ -296,6 +296,7 @@ export default function MatchDetailTabPanel1(props: any) {
                       />
                     )}
                   />
+                  {/* // TODO pending api */}
                   <MinimizeIcon sx={{ mt: '20px' }} />
                   <Controller
                     name="team2Goal"
@@ -307,7 +308,7 @@ export default function MatchDetailTabPanel1(props: any) {
                           methods.formState.errors?.team2Goal?.message
                         }
                         {...field}
-                        label={`${match.team2Name ?? 'Đội 2'}${
+                        label={`${match?.team2Name ?? 'Đội 2'}${
                           [1, 2].includes(methods.getValues('status'))
                             ? '*'
                             : ''

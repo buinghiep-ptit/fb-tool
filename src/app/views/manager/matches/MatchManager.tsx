@@ -57,27 +57,42 @@ export default function MatchManager(props: Props) {
   const [toFilter, setToFilter] = useState<any>('')
   const [cahnFilter, setCahnFilter] = useState(false)
 
+  //autocomplete
+  const [open, setOpen] = React.useState(false) // if dropdown open?
+  const loading = open && leagues?.length === 0 // is it still loading
+  // ====
+  // TODO https://stackoverflow.com/questions/61970103/reactjs-update-options-by-hitting-api-on-every-input-change-in-autocomplete-co
   const fetchListLeagues = async () => {
+    let active = true
+
+    if (!loading) {
+      return undefined
+    }
+
     setIsLoading(true)
     await getLeagues({
+      name: leagueFilter,
       page: 0,
-      size: 1000,
+      size: 100,
     })
       .then(res => {
-        setLeagues(res.content)
-        setLeagueOption(
-          res.content.map((item: any) => {
-            return {
-              id: item.id,
-              label: item.name,
-            }
-          }),
-        )
+        // setLeagues(res.content)
+        if (active)
+          setLeagueOption(
+            res.content.map((item: any) => {
+              return {
+                id: item.id,
+                label: item.name,
+              }
+            }),
+          )
       })
       .catch(() => {})
       .finally(() => {
         setIsLoading(false)
       })
+
+    active = false
   }
 
   const fetchListMatches = async () => {
@@ -180,9 +195,18 @@ export default function MatchManager(props: Props) {
     setDoRerender(!doRerender)
   }
 
+  const onACInputChange = (event: any, value: any, reason: any) => {
+    if (value) setLeagueFilter(value)
+    else setLeagueFilter('')
+  }
+
   React.useEffect(() => {
     fetchListLeagues()
-  }, [])
+  }, [loading])
+
+  // React.useEffect(() => {
+  //   fetchListLeagues()
+  // }, [])
 
   React.useEffect(() => {
     fetchListMatches()
@@ -234,14 +258,20 @@ export default function MatchManager(props: Props) {
             </Grid>
             <Grid item xs={4}>
               <Autocomplete
+                open={open}
+                onOpen={() => {
+                  setOpen(true)
+                }}
+                onClose={() => {
+                  setOpen(false)
+                }}
+                loading={loading}
                 value={leagueFilter}
                 onChange={(event: any, newValue: string | null) => {
                   setLeagueFilter(newValue)
                 }}
-                inputValue={leagueFilterInput}
-                onInputChange={(event, newInputValue) => {
-                  setLeagueFilterInput(newInputValue)
-                }}
+                // inputValue={leagueFilterInput}
+                // onInputChange={onACInputChange}
                 id="leagueFilter"
                 options={leagueOptions ?? []}
                 renderInput={params => (

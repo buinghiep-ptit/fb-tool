@@ -26,3 +26,8 @@ export const editLeagues = async (params: any, id: any): Promise<any> => {
   const { data } = await http.put<any>(`/api/leagues/${id}`, params)
   return data
 }
+
+export const getSchedule = async (id: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/leagues/${id}/schedule`)
+  return data
+}

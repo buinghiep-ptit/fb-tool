@@ -96,6 +96,7 @@ export default function PlayerDetail(props: Props) {
     setPreviewImage(player.imageUrl)
     methods.reset({ ...defaultValues })
     setIdTeam(player.idTeam)
+    setDisableViewPosition(player.isDisplayHome === 0 ? true : false)
     setIdPosition(player.mainPosition)
   }
 
@@ -118,11 +119,7 @@ export default function PlayerDetail(props: Props) {
       team: yup.string().required('Giá trị bát buộc').nullable(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       dominantFoot: yup.string().nullable(),
-      clothersNumber: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
-        .nullable(),
+      clothersNumber: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       sizeShoes: yup
@@ -134,7 +131,7 @@ export default function PlayerDetail(props: Props) {
       sizeClothers: yup.string().nullable(),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
-        : yup.string(),
+        : yup.string().nullable(),
       countMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       cleanMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       goal: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
@@ -718,7 +715,10 @@ export default function PlayerDetail(props: Props) {
                       name="viewPosition"
                       control={methods.control}
                       render={({ field }) => (
-                        <FormControl style={{ width: '200px' }}>
+                        <FormControl
+                          style={{ width: '200px' }}
+                          error={!!methods.formState.errors?.viewPosition}
+                        >
                           <InputLabel id="demo-simple-select-label">
                             Vị trí hiển thị
                           </InputLabel>

@@ -10,6 +10,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import InformationLeagues from './InformationLeagues'
+import ScheduleCup from './ScheduleCup'
 export interface Props {}
 
 export default function EditLeagues(props: Props) {
@@ -101,7 +102,12 @@ export default function EditLeagues(props: Props) {
           <TabPanel value="1">
             <InformationLeagues />
           </TabPanel>
-          <TabPanel value="2">Lịch thi đấu</TabPanel>
+          <TabPanel value="2">
+            <ScheduleCup
+              setIsLoading={setIsLoading}
+              isLoading={isLoading}
+            ></ScheduleCup>
+          </TabPanel>
           <TabPanel value="3">Bảng xếp hạng</TabPanel>
         </TabContext>
       </Box>

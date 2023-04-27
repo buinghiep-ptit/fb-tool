@@ -77,11 +77,7 @@ export default function PlayerDetail(props: Props) {
       team: yup.string().required('Giá trị bát buộc').nullable(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       dominantFoot: yup.string().nullable(),
-      clothersNumber: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
-        .nullable(),
+      clothersNumber: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       sizeShoes: yup
@@ -93,7 +89,7 @@ export default function PlayerDetail(props: Props) {
       sizeClothers: yup.string().nullable(),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
-        : yup.string(),
+        : yup.string().nullable(),
       countMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       cleanMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
       goal: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),

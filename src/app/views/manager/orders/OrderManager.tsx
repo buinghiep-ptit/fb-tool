@@ -52,7 +52,6 @@ export default function OrderManager(props: Props) {
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
@@ -188,7 +187,7 @@ export default function OrderManager(props: Props) {
         <SimpleCard>
           <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
             <FormProvider {...methods}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} alignItems={'center'}>
                 <Grid item xs={3}>
                   <FormInputText
                     type="text"
@@ -197,10 +196,9 @@ export default function OrderManager(props: Props) {
                     defaultValue=""
                     placeholder="Nhập SĐT, email, mã đơn hàng"
                     fullWidth
-                    required
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={1.5}>
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
                       Trạng thái
@@ -216,37 +214,35 @@ export default function OrderManager(props: Props) {
                     </Select>
                   </FormControl>
                 </Grid>
-              </Grid>
-              <Box mt={1}>
-                <Grid container spacing={2}>
+                <Grid item xs={6} container spacing={2}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Grid item xs={3}>
+                    <Grid item xs={6}>
                       <MuiRHFDatePicker name="from" label="Từ ngày" />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={6}>
                       <MuiRHFDatePicker name="to" label="Đến ngày" />
                     </Grid>
                   </LocalizationProvider>
-                  <Grid
-                    item
-                    xs={3}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <MuiButton
-                      title="Tìm kiếm "
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      sx={{ width: '100%' }}
-                      startIcon={<SearchSharp />}
-                    />
-                  </Grid>
                 </Grid>
-              </Box>
+                <Grid
+                  item
+                  xs={1.5}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <MuiButton
+                    title="Tìm kiếm "
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    sx={{ width: '100%' }}
+                    startIcon={<SearchSharp />}
+                  />
+                </Grid>
+              </Grid>
             </FormProvider>
           </form>
         </SimpleCard>
@@ -275,7 +271,11 @@ export default function OrderManager(props: Props) {
                   </TableCell>
                   <TableCell align="center">{item.quantity}</TableCell>
                   <TableCell align="center">{item.amount}</TableCell>
-                  <TableCell align="center">{item.createdDate}</TableCell>
+                  <TableCell align="center">
+                    {item.createdDate
+                      ? new Date(item.createdDate).toLocaleString()
+                      : ''}
+                  </TableCell>
                   <TableCell align="center">
                     {item.status !== undefined ? (
                       <Chip
@@ -297,7 +297,6 @@ export default function OrderManager(props: Props) {
                   <TableCell align="center">
                     <Link
                       to={`${item.id}`}
-                      // to="chi-tiet-don-hang"
                       style={{
                         color: 'green',
                         textDecorationLine: 'underline',
@@ -314,8 +313,8 @@ export default function OrderManager(props: Props) {
             sx={{ px: 2 }}
             page={page}
             component="div"
-            rowsPerPage={rowsPerPage}
-            count={40}
+            rowsPerPage={size}
+            count={orders ? (orders?.totalElements as number) : 0}
             onPageChange={handleChangePage}
             rowsPerPageOptions={[20, 50, 100]}
             labelRowsPerPage={'Dòng / Trang'}

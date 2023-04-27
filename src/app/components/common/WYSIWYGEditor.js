@@ -38,7 +38,7 @@ const WYSIWYGEditor = React.forwardRef(
 
     const onEditorDefaultStateChange = useCallback(
       editorState => {
-        console.log(editorState)
+        // console.log(editorState)
         setDefaultValueState(editorState)
         const currentContentAsHTML = draftToHtml(
           convertToRaw(editorState.getCurrentContent()),

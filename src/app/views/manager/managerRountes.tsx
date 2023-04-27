@@ -1,5 +1,4 @@
 import Loadable from 'app/components/Loadable'
-import { ROLES } from 'app/utils/enums/roles'
 import { lazy } from 'react'
 
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
@@ -23,6 +22,8 @@ const Product = Loadable(lazy(() => import('./shop/Product')))
 const PlayerDetail = Loadable(lazy(() => import('./player/PlayerDetail')))
 const CreatePlayer = Loadable(lazy(() => import('./player/CreatePlayer')))
 const LeaguesManager = Loadable(lazy(() => import('./leagues/Leagues')))
+const MatchManager = Loadable(lazy(() => import('./matches/MatchManager')))
+const MatchDetail = Loadable(lazy(() => import('./matches/MatchDetail')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -70,5 +71,7 @@ const managerRoutes = [
     path: '/banner/:bannerID/*',
     element: <AddBanner />,
   },
+  { path: '/matches', element: <MatchManager /> },
+  { path: '/matches/:id', element: <MatchDetail /> },
 ]
 export default managerRoutes

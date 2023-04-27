@@ -66,11 +66,15 @@ export default function TeamManager(props: Props) {
       type: typeFilter ? 1 : null,
       page: page,
       size: rowsPerPage,
-    }).then(res => {
-      setTeams(res.content)
-      setCountTable(res.totalElements)
     })
-    setIsLoading(false)
+      .then(res => {
+        setTeams(res.content)
+        setCountTable(res.totalElements)
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const search = () => {
@@ -124,7 +128,6 @@ export default function TeamManager(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý thông tin các đội bóng', path: '/teams' },
-            { name: 'Danh sách các đội bóng' },
           ]}
         />
       </Box>
@@ -184,17 +187,24 @@ export default function TeamManager(props: Props) {
               </FormControl>
             </Grid>
             <Grid item xs={2} textAlign="center">
-              <FormControlLabel
-                label="Thuộc CAHN"
-                control={
-                  <Checkbox
-                    checked={typeFilter}
-                    onChange={e => {
-                      setTypeFilter(e.target.checked)
-                    }}
-                  />
-                }
-              />
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="100%"
+              >
+                <FormControlLabel
+                  label="Thuộc CAHN"
+                  control={
+                    <Checkbox
+                      checked={typeFilter}
+                      onChange={e => {
+                        setTypeFilter(e.target.checked)
+                      }}
+                    />
+                  }
+                />
+              </Box>
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid
@@ -239,7 +249,7 @@ export default function TeamManager(props: Props) {
         </SimpleCard>
 
         <div style={{ height: '30px' }} />
-        <SimpleCard title="Danh sách đội">
+        <SimpleCard title="Danh sách các đội bóng">
           <Box width="100%" overflow="auto">
             <StyledTable>
               <TableHead>

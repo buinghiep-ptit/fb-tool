@@ -1,28 +1,28 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, Container } from 'app/components'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  Accordion,
-  AccordionSummary,
-  Typography,
-  AccordionDetails,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  LinearProgress,
-} from '@mui/material'
 import CachedIcon from '@mui/icons-material/Cached'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import SettingsIcon from '@mui/icons-material/Settings'
 import StackedBarChartIcon from '@mui/icons-material/StackedBarChart'
-import { useEffect, useState } from 'react'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  LinearProgress,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material'
+import { Box } from '@mui/system'
 import {
   getProductCategories,
   syncCategory,
   syncStatus,
 } from 'app/apis/shop/shop.service'
+import { Breadcrumb, Container } from 'app/components'
+import * as React from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 
 export interface Props {}
@@ -47,7 +47,6 @@ export default function ShopManager(props: Props) {
   const [productCategories, setProductCategories] = useState<category[]>()
   const navigate = useNavigate()
   const dialogSettingImageRef = React.useRef<any>(null)
-  const [intervalCheck, setIntervalCheck] = useState(0)
   const [isLoading, setIsloading] = useState(false)
 
   const fetchProductCategories = async () => {
@@ -55,14 +54,8 @@ export default function ShopManager(props: Props) {
     setProductCategories(res)
   }
 
-  // eslint-disable-next-line prefer-const
-  // const handleInterval = setInterval(() => {
-  //   console.log('x')
-  // }, 2000)
-
-  // const tmp = handleInterval()
-
   const handleSyncCategory = async () => {
+    setIsloading(true)
     const res = await syncCategory()
     if (res) {
       // eslint-disable-next-line prefer-const
@@ -75,6 +68,7 @@ export default function ShopManager(props: Props) {
             console.log(statusRes)
             if (statusRes === 0) {
               status = 1
+              setIsloading(false)
             }
             resolve()
           }, 20000),
@@ -87,11 +81,6 @@ export default function ShopManager(props: Props) {
     const res = await syncStatus({ isProduct: 0 })
     return res.status
   }
-
-  // useEffect(() => {
-  //   if (intervalCheck === 0) return
-  //   watchStatusSync()
-  // }, [intervalCheck])
 
   useEffect(() => {
     fetchProductCategories()
@@ -120,9 +109,10 @@ export default function ShopManager(props: Props) {
           variant="contained"
           startIcon={<CachedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
-          onClick={() => handleSyncCategory()}
+          onClick={handleSyncCategory}
+          disabled={isLoading}
         >
-          Đồng bộ dữ liệu
+          {isLoading ? '...Đang đồng bộ' : 'Đồng bộ dữ liệu'}
         </Button>
       </div>
       <div style={{ marginBottom: '15px' }}>
@@ -155,7 +145,7 @@ export default function ShopManager(props: Props) {
                 id="panel1a-header"
               >
                 <Link to={`/shop/category/${category.id}`} key={category.name}>
-                  <Typography variant="h5">{category?.name}</Typography>
+                  <Typography variant="h6">{category?.name}</Typography>
                 </Link>
               </AccordionSummary>
               <AccordionDetails>

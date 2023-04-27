@@ -179,7 +179,7 @@ export const themeColors = {
         contrastText: '#ffffff',
       },
       secondary: {
-        main: '#FFAF38',
+        main: '#4caf50',
         contrastText: textLight.primary,
       },
       error: errorColor,

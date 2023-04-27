@@ -1,5 +1,4 @@
 import Loadable from 'app/components/Loadable'
-import { ROLES } from 'app/utils/enums/roles'
 import { lazy } from 'react'
 
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
@@ -22,6 +21,9 @@ const DetailCategory = Loadable(lazy(() => import('./shop/DetailCategory')))
 const Product = Loadable(lazy(() => import('./shop/Product')))
 const PlayerDetail = Loadable(lazy(() => import('./player/PlayerDetail')))
 const CreatePlayer = Loadable(lazy(() => import('./player/CreatePlayer')))
+const LeaguesManager = Loadable(lazy(() => import('./leagues/Leagues')))
+const CreateLeagues = Loadable(lazy(() => import('./leagues/CreateLeagues')))
+const EditLeagues = Loadable(lazy(() => import('./leagues/EditLeagues')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -31,6 +33,7 @@ const managerRoutes = [
     path: '/customers/:idCustomer',
     element: <EditCustomer />,
   },
+  { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },
   { path: '/accounts', element: <AccountManager /> },
@@ -42,6 +45,8 @@ const managerRoutes = [
   { path: '/shop/product/:id', element: <Product /> },
   { path: '/players/:id', element: <PlayerDetail /> },
   { path: '/players/create', element: <CreatePlayer /> },
+  { path: '/leagues/create', element: <CreateLeagues /> },
+  { path: '/leagues/:id', element: <EditLeagues /> },
   {
     path: '/shop',
     element: <ShopManager />,

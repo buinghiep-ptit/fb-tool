@@ -72,7 +72,8 @@ const WYSIWYGEditor = React.forwardRef(
         e => {},
         abortController.current,
       ).then(file => {
-        return { data: { link: file.url } }
+        console.log(file)
+        return { data: { link: file.path } }
       })
     }
 

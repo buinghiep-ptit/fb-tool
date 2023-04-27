@@ -31,7 +31,7 @@ export const columnsOrders = [
   },
   {
     id: 'status',
-    name: 'Trang thái đơn hàng',
+    name: 'Trạng thái đơn hàng',
     width: '100px',
   },
   {

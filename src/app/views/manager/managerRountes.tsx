@@ -52,10 +52,7 @@ const managerRoutes = [
     element: <ShopManager />,
   },
   { path: '/orders', element: <OrderManager /> },
-  {
-    path: '/orders/chi-tiet-don-hang/:orderID',
-    element: <OrderDetail />,
-  },
+
   {
     path: '/orders/chi-tiet-don-hang',
     element: <OrderDetail />,

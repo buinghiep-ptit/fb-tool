@@ -1,13 +1,13 @@
-import React, { Component } from 'react'
 import axios from 'axios'
 import {
-  EditorState,
-  convertToRaw,
   ContentState,
+  EditorState,
   convertFromHTML,
+  convertToRaw,
 } from 'draft-js'
-import { Editor } from 'react-draft-wysiwyg'
 import draftToHtml from 'draftjs-to-html'
+import { Component } from 'react'
+import { Editor } from 'react-draft-wysiwyg'
 // import htmlToDraft from 'html-to-draftjs'
 import '../../../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import './text-editor.css'
@@ -41,7 +41,7 @@ class EditorConvertToHTML extends Component {
       const token = window.localStorage.getItem('accessToken')
       const res = await axios({
         method: 'post',
-        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/image/upload`,
+        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/file/upload?directory=cahnfc`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',

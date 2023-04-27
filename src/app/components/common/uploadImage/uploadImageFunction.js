@@ -9,7 +9,7 @@ export const uploadFile = async files => {
       const token = window.localStorage.getItem('accessToken')
       const res = axios({
         method: 'post',
-        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/image/upload`,
+        url: `${process.env.REACT_APP_API_UPLOAD_URL}/api/file/upload?directory=cahnfc`,
         data: formData,
         headers: {
           'Content-Type': 'multipart/form-data',

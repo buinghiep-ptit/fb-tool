@@ -16,9 +16,11 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import MultipleNewsSelect from 'app/components/DynamicAutocomplete/MultipleNewsSelect'
+import MultipleVideosSelect from 'app/components/DynamicAutocomplete/MultipleVideosSelect'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import PropTypes from 'prop-types'
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
@@ -43,6 +45,9 @@ export default function MatchDetailTabPanel1(props: any) {
 
   const dialogRelatedNewsRef = useRef<any>(null)
   const dialogRelatedVideosRef = useRef<any>(null)
+
+  const [relatedNews, setRelatedNews] = useState([])
+  const [relatedVideos, setRelatedVideos] = useState([])
 
   const schema = yup.object({
     status: yup.number().required('Giá trị bắt buộc'),
@@ -252,6 +257,11 @@ export default function MatchDetailTabPanel1(props: any) {
                 <RHFWYSIWYGEditor name="preMatchSummary"></RHFWYSIWYGEditor>
               </FormControl>
 
+              <MultipleVideosSelect
+                label="Video liên quan"
+                selectedArr={relatedVideos}
+                setSelectedArr={setRelatedVideos}
+              />
               <Button
                 sx={{ mt: 2 }}
                 variant="contained"
@@ -263,6 +273,11 @@ export default function MatchDetailTabPanel1(props: any) {
                 Chọn video liên quan
               </Button>
               <br />
+              <MultipleNewsSelect
+                label="Tin tức liên quan"
+                selectedArr={relatedNews}
+                setSelectedArr={setRelatedNews}
+              />
               <Button
                 sx={{ mt: 2 }}
                 variant="contained"

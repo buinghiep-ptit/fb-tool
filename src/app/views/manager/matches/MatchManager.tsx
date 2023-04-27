@@ -2,7 +2,6 @@ import EditIcon from '@mui/icons-material/Edit'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import SearchIcon from '@mui/icons-material/Search'
 import {
-  Autocomplete,
   Button,
   Checkbox,
   Chip,
@@ -27,12 +26,12 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { getLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import LeagueSelect from '../../../components/DynamicAutocomplete/LeagueSelect'
 import { headTableMatches } from './const'
 
 export interface Props {}
@@ -47,56 +46,15 @@ export default function MatchManager(props: Props) {
   const [isLoading, setIsLoading] = useState(false)
 
   const [matches, setMatches] = useState<any>()
-  const [leagues, setLeagues] = useState<any>()
-  const [leagueOptions, setLeagueOption] = useState<any>()
   const [teamFilter, setTeamFilter] = useState('')
-  const [leagueFilter, setLeagueFilter] = useState<any>()
-  const [leagueFilterInput, setLeagueFilterInput] = useState('')
+  const [leagueFilter, setLeagueFilter] = useState<any>(null)
   const [statusFilter, setStatusFilter] = useState(99)
   const [fromFilter, setFromFilter] = useState<any>('')
   const [toFilter, setToFilter] = useState<any>('')
   const [cahnFilter, setCahnFilter] = useState(false)
 
-  //autocomplete
-  const [open, setOpen] = React.useState(false) // if dropdown open?
-  const loading = open && leagues?.length === 0 // is it still loading
-  // ====
-  // TODO https://stackoverflow.com/questions/61970103/reactjs-update-options-by-hitting-api-on-every-input-change-in-autocomplete-co
-  const fetchListLeagues = async () => {
-    let active = true
-
-    if (!loading) {
-      return undefined
-    }
-
-    setIsLoading(true)
-    await getLeagues({
-      name: leagueFilter,
-      page: 0,
-      size: 100,
-    })
-      .then(res => {
-        // setLeagues(res.content)
-        if (active)
-          setLeagueOption(
-            res.content.map((item: any) => {
-              return {
-                id: item.id,
-                label: item.name,
-              }
-            }),
-          )
-      })
-      .catch(() => {})
-      .finally(() => {
-        setIsLoading(false)
-      })
-
-    active = false
-  }
-
   const fetchListMatches = async () => {
-    setIsLoading(true)
+    // TODO mocking data
     setMatches([
       {
         id: 1,
@@ -144,14 +102,14 @@ export default function MatchManager(props: Props) {
         status: 4,
       },
     ])
-    setCountTable(5)
+    // setIsLoading(true)
     // await getMatches({
     //   teamName: teamFilter,
     //   idLeague: leagueFilter,
     //   status: statusFilter === 99 ? null : statusFilter,
     //   dateStart: dayjs(fromFilter).format('YYYY-MM-DD'),
     //   dateEnd: dayjs(toFilter).format('YYYY-MM-DD'),
-    //   isCahn: cahnFilter ? 1 : null, // todo pending api
+    //   isCahn: cahnFilter ? 1 : null, // TODO pending api
     //   page: page,
     //   size: rowsPerPage,
     // })
@@ -161,7 +119,7 @@ export default function MatchManager(props: Props) {
     //   })
     //   .catch(() => {})
     //   .finally(() => {
-    setIsLoading(false)
+    //     setIsLoading(false)
     //   })
   }
 
@@ -194,19 +152,6 @@ export default function MatchManager(props: Props) {
     setPage(0)
     setDoRerender(!doRerender)
   }
-
-  const onACInputChange = (event: any, value: any, reason: any) => {
-    if (value) setLeagueFilter(value)
-    else setLeagueFilter('')
-  }
-
-  React.useEffect(() => {
-    fetchListLeagues()
-  }, [loading])
-
-  // React.useEffect(() => {
-  //   fetchListLeagues()
-  // }, [])
 
   React.useEffect(() => {
     fetchListMatches()
@@ -257,26 +202,10 @@ export default function MatchManager(props: Props) {
               />
             </Grid>
             <Grid item xs={4}>
-              <Autocomplete
-                open={open}
-                onOpen={() => {
-                  setOpen(true)
-                }}
-                onClose={() => {
-                  setOpen(false)
-                }}
-                loading={loading}
-                value={leagueFilter}
-                onChange={(event: any, newValue: string | null) => {
-                  setLeagueFilter(newValue)
-                }}
-                // inputValue={leagueFilterInput}
-                // onInputChange={onACInputChange}
-                id="leagueFilter"
-                options={leagueOptions ?? []}
-                renderInput={params => (
-                  <TextField {...params} label="Giải đấu" />
-                )}
+              <LeagueSelect
+                label="Giải đấu"
+                leagueFilter={leagueFilter}
+                setLeagueFilter={setLeagueFilter}
               />
             </Grid>
             <Grid item xs={4}>
@@ -303,7 +232,7 @@ export default function MatchManager(props: Props) {
               </FormControl>
             </Grid>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Grid item xs={5}>
+              <Grid item xs={4}>
                 <DatePicker
                   label="Từ ngày"
                   value={fromFilter}
@@ -324,7 +253,7 @@ export default function MatchManager(props: Props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={4}>
                 <DatePicker
                   label="Đến ngày"
                   value={toFilter}
@@ -346,7 +275,7 @@ export default function MatchManager(props: Props) {
                 />
               </Grid>
             </LocalizationProvider>
-            <Grid item xs={2} textAlign="center">
+            <Grid item xs={3} textAlign="center">
               <Box
                 display="flex"
                 justifyContent="center"

@@ -21,11 +21,13 @@ import React, { useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { MATCH_PROCESS_TYPES } from '../../../constants/matchProcessTypes'
+import DialogDeleteProcess from './MatchProcessDelete'
 
 export default function MatchProcess(props: any) {
-  const { match, matchProcess } = props
-  const [isLoading, setIsLoading] = useState(false)
+  const { match, matchProcess, isLoading, setIsLoading, refresh } = props
   const [editable, setEditable] = useState(false)
+
+  const dialogDeleteProcessRef = React.useRef<any>(null)
 
   const schema = yup.object({
     type: yup.number(),
@@ -151,6 +153,14 @@ export default function MatchProcess(props: any) {
           <LinearProgress />
         </Box>
       )}
+
+      <DialogDeleteProcess
+        ref={dialogDeleteProcessRef}
+        matchProcess={matchProcess}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        refresh={refresh}
+      />
 
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormProvider {...methods}>
@@ -394,7 +404,7 @@ export default function MatchProcess(props: any) {
                   color="error"
                   disabled={isLoading}
                   onClick={() => {
-                    console.info('xoa')
+                    dialogDeleteProcessRef?.current.handleClickOpen()
                   }}
                 >
                   Xóa

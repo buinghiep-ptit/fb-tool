@@ -17,7 +17,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Box } from '@mui/system'
 import { findMatchProcessType } from 'app/constants/matchProcessTypes'
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { exampleList } from './const'
 
@@ -59,9 +59,9 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
     setExList(items)
   }
 
-  useEffect(() => {
-    console.log(exList.map(i => i.id))
-  }, [exList])
+  // useEffect(() => {
+  //   console.log(exList.map(i => i.id))
+  // }, [exList])
 
   return (
     <div>

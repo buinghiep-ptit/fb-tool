@@ -1,12 +1,13 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import { IconButton } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import * as React from 'react'
+import { useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import * as yup from 'yup'
-
 interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -41,18 +42,28 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
 
   const schema = yup
     .object({
-      idTeamA: yup
-        .string()
-        .required('Giá trị bắt buộc')
-        .trim()
-        .max(255, 'Tối đa 255 ký tự'),
-      homeTown: yup
-        .string()
-        .required('Giá trị bắt buộc')
-        .trim()
-        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
+      idTeamA: yup.string().required('Giá trị bắt buộc'),
+      idTeamB: yup.string().required('Giá trị bắt buộc'),
+      dateStart: yup.string(),
+      status: yup.string(),
+      stadium: yup.string(),
+      goalForTeamA: yup.string(),
+      goalForTeamB: yup.string(),
     })
     .required()
+
+  const methods = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      idTeamA: '',
+      idTeamB: '',
+      dateStart: '',
+      status: '',
+      stadium: '',
+      goalForTeamA: '',
+      goalForTeamB: '',
+    },
+  })
 
   return (
     <div>

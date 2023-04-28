@@ -139,7 +139,7 @@ export default function MatchProcess(props: any) {
   }
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ width: '100%' }}>
       {props.isLoading && (
         <Box
           sx={{

@@ -56,6 +56,7 @@ export default function MultipleVideosSelect(props: any) {
         setSelectedArr(newValue)
       }}
       id="selectedArr"
+      noOptionsText="Không có video nào"
       options={options ?? []}
       renderInput={params => (
         <TextField

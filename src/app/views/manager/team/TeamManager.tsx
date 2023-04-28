@@ -23,6 +23,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { red } from '@mui/material/colors'
 import { Box } from '@mui/system'
@@ -250,7 +251,12 @@ export default function TeamManager(props: Props) {
 
         <div style={{ height: '30px' }} />
         <SimpleCard title="Danh sách các đội bóng">
-          <Box width="100%" overflow="auto">
+          {teams?.length === 0 && (
+            <Typography color="gray" textAlign="center">
+              Không có dữ liệu
+            </Typography>
+          )}
+          <Box width="100%" overflow="auto" hidden={teams?.length === 0}>
             <StyledTable>
               <TableHead>
                 <TableRow>
@@ -332,20 +338,20 @@ export default function TeamManager(props: Props) {
                 })}
               </TableBody>
             </StyledTable>
+            <TablePagination
+              sx={{ px: 2 }}
+              page={page}
+              component="div"
+              rowsPerPage={rowsPerPage}
+              count={countTable}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[20, 50, 100]}
+              labelRowsPerPage={'Dòng / Trang'}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+            />
           </Box>
-          <TablePagination
-            sx={{ px: 2 }}
-            page={page}
-            component="div"
-            rowsPerPage={rowsPerPage}
-            count={countTable}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-          />
         </SimpleCard>
       </Stack>
 

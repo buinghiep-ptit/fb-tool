@@ -6,9 +6,6 @@ const NewsManager = Loadable(lazy(() => import('./news/News')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
 const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
 const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
-const ScheduleManager = Loadable(
-  lazy(() => import('./schedule/ScheduleManager')),
-)
 const ShopManager = Loadable(lazy(() => import('./shop/ShopManager')))
 const TeamManager = Loadable(lazy(() => import('./team/TeamManager')))
 const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
@@ -41,7 +38,6 @@ const managerRoutes = [
   { path: '/news', element: <NewsManager /> },
   { path: '/accounts', element: <AccountManager /> },
   { path: '/teams', element: <TeamManager /> },
-  { path: '/schedules', element: <ScheduleManager /> },
   { path: '/videos', element: <VideoManager /> },
   { path: '/shop/sort', element: <SortManager /> },
   { path: '/shop/category/:id', element: <DetailCategory /> },

@@ -1,6 +1,6 @@
 import ControlPointIcon from '@mui/icons-material/ControlPoint'
 import SortIcon from '@mui/icons-material/Sort'
-import { Button } from '@mui/material'
+import { Button, List, ListItem } from '@mui/material'
 import { Box } from '@mui/system'
 import PropTypes from 'prop-types'
 import { useRef } from 'react'
@@ -77,11 +77,18 @@ export default function MatchDetailTabPanel2(props: any) {
             match={match}
             refresh={() => {}}
           />
-          {/* // TODO api // TODO list process */}
-
-          <MatchProcess />
-          <MatchProcess />
-          <MatchProcess />
+          {/* // TODO api */}
+          <List>
+            <ListItem>
+              <MatchProcess />
+            </ListItem>
+            <ListItem>
+              <MatchProcess />
+            </ListItem>
+            <ListItem>
+              <MatchProcess />
+            </ListItem>
+          </List>
         </Box>
       )}
     </div>

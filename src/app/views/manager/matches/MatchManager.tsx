@@ -21,6 +21,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -107,8 +108,8 @@ export default function MatchManager(props: Props) {
     //   teamName: teamFilter,
     //   idLeague: leagueFilter,
     //   status: statusFilter === 99 ? null : statusFilter,
-    //   dateStart: dayjs(fromFilter).format('YYYY-MM-DD'),
-    //   dateEnd: dayjs(toFilter).format('YYYY-MM-DD'),
+    // dateStart: fromFilter ? dayjs(fromFilter).toISOString() : '',
+    // dateEnd: toFilter ? dayjs(toFilter).toISOString() : '',
     //   isCahn: cahnFilter ? 1 : null, // TODO pending api
     //   page: page,
     //   size: rowsPerPage,
@@ -275,10 +276,10 @@ export default function MatchManager(props: Props) {
                 />
               </Grid>
             </LocalizationProvider>
-            <Grid item xs={3} textAlign="center">
+            <Grid item xs={4} textAlign="left">
               <Box
                 display="flex"
-                justifyContent="center"
+                justifyContent="start"
                 alignItems="center"
                 minHeight="100%"
               >
@@ -339,7 +340,12 @@ export default function MatchManager(props: Props) {
 
         <div style={{ height: '30px' }} />
         <SimpleCard title="Danh sách thông tin trận đấu">
-          <Box width="100%" overflow="auto">
+          {matches?.length === 0 && (
+            <Typography color="gray" textAlign="center">
+              Không có dữ liệu
+            </Typography>
+          )}
+          <Box width="100%" overflow="auto" hidden={matches?.length === 0}>
             <StyledTable>
               <TableHead>
                 <TableRow>
@@ -436,20 +442,20 @@ export default function MatchManager(props: Props) {
                 })}
               </TableBody>
             </StyledTable>
+            <TablePagination
+              sx={{ px: 2 }}
+              page={page}
+              component="div"
+              rowsPerPage={rowsPerPage}
+              count={countTable}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[20, 50, 100]}
+              labelRowsPerPage={'Dòng / Trang'}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+            />
           </Box>
-          <TablePagination
-            sx={{ px: 2 }}
-            page={page}
-            component="div"
-            rowsPerPage={rowsPerPage}
-            count={countTable}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-          />
         </SimpleCard>
       </Stack>
     </Container>

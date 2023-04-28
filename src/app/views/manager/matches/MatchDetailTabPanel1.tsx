@@ -16,16 +16,18 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { SimpleCard } from 'app/components'
+import DialogSelectNews from 'app/components/DialogSelect/DialogSelectNews'
+import DialogSelectVideo from 'app/components/DialogSelect/DialogSelectVideo'
 import MultipleNewsSelect from 'app/components/DynamicAutocomplete/MultipleNewsSelect'
 import MultipleVideosSelect from 'app/components/DynamicAutocomplete/MultipleVideosSelect'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import { MATCH_STATUSES } from 'app/constants/matchStatuses'
 import PropTypes from 'prop-types'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
-import DialogRelatedNews from './DialogRelatedNews'
-import DialogRelatedVideos from './DialogRelatedVideos'
 import './style.css'
 
 MatchDetailTabPanel1.propTypes = {
@@ -49,13 +51,22 @@ export default function MatchDetailTabPanel1(props: any) {
   const [relatedNews, setRelatedNews] = useState([])
   const [relatedVideos, setRelatedVideos] = useState([])
 
+  useEffect(() => {
+    console.log(relatedVideos)
+  }, [relatedVideos])
+
   const schema = yup.object({
     status: yup.number().required('Giá trị bắt buộc'),
     dateStart: yup
       .date()
       .when('status', (status, schema) => {
-        // bắt buộc nếu k hoãn
-        if (status !== 3) return schema.required('Giá trị bắt buộc')
+        // bắt buộc nếu k hoãn, hủy
+        if (
+          ![MATCH_STATUSES.PENDING.id, MATCH_STATUSES.CANCEL.id].includes(
+            status,
+          )
+        )
+          return schema.required('Giá trị bắt buộc')
         else return schema
       })
       .nullable()
@@ -72,7 +83,10 @@ export default function MatchDetailTabPanel1(props: any) {
       .integer('Số nguyên')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
-        if ([1, 2].includes(status)) return schema.required('Giá trị bắt buộc')
+        if (
+          [MATCH_STATUSES.STARTING.id, MATCH_STATUSES.ENDED.id].includes(status)
+        )
+          return schema.required('Giá trị bắt buộc')
         else return schema
       })
       .nullable()
@@ -83,7 +97,10 @@ export default function MatchDetailTabPanel1(props: any) {
       .integer('Số nguyên')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
-        if ([1, 2].includes(status)) return schema.required('Giá trị bắt buộc')
+        if (
+          [MATCH_STATUSES.STARTING.id, MATCH_STATUSES.ENDED.id].includes(status)
+        )
+          return schema.required('Giá trị bắt buộc')
         else return schema
       })
       .nullable()
@@ -114,7 +131,7 @@ export default function MatchDetailTabPanel1(props: any) {
   }
 
   React.useEffect(() => {
-    // TODO pending api
+    // TODO pending api, init related lists
     if (match) initDefaultValues(match)
   }, [])
 
@@ -142,241 +159,257 @@ export default function MatchDetailTabPanel1(props: any) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          {props.isLoading && (
-            <Box
-              sx={{
-                width: '100%',
-                position: 'fixed',
-                top: '0',
-                left: '0',
-                zIndex: '1000',
-              }}
-            >
-              <LinearProgress />
-            </Box>
-          )}
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            <FormProvider {...methods}>
-              <TextField
-                label="Giải đấu"
-                variant="standard"
-                margin="normal"
-                value={match.leagueName}
-                fullWidth
-                disabled
-              />
-
-              <TextField
-                label="Đội bóng tham gia"
-                variant="standard"
-                margin="normal"
-                fullWidth
-                disabled
-                value={match.teamName}
-              />
-
-              <Controller
-                name="status"
-                control={methods.control}
-                render={({ field }) => (
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel id="demo-simple-select-label">
-                      Trạng thái*
-                    </InputLabel>
-                    <Select
-                      variant="outlined"
-                      sx={{ width: '50%' }}
-                      {...field}
-                      onClose={() => methods.trigger()}
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Trạng thái*"
-                    >
-                      <MenuItem value={0}>Chưa diễn ra</MenuItem>
-                      <MenuItem value={1}>Đang diễn ra</MenuItem>
-                      <MenuItem value={2}>Kết thúc</MenuItem>
-                      <MenuItem value={3}>Hoãn</MenuItem>
-                      <MenuItem value={4}>Hủy</MenuItem>
-                    </Select>
-                    {!!methods.formState.errors?.status?.message && (
-                      <FormHelperText>
-                        {methods.formState.errors?.status.message}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                )}
-              />
-              <Controller
-                name="dateStart"
-                control={methods.control}
-                render={({ field }) => (
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                      {...field}
-                      label={`Thời gian diễn ra${
-                        methods.getValues('status') === 3 ? '' : '*'
-                      }:`}
-                      ampm={false}
-                      renderInput={(params: any) => (
-                        <FormControl fullWidth margin="normal">
-                          <TextField
-                            {...params}
-                            error={!!methods.formState.errors?.dateStart}
-                            helperText={
-                              methods.formState.errors?.dateStart?.message
-                            }
-                            InputLabelProps={{ shrink: true }}
-                            sx={{ width: '50%' }}
-                            variant="outlined"
-                            autoComplete="bday"
-                          />
-                        </FormControl>
-                      )}
-                    />
-                  </LocalizationProvider>
-                )}
-              />
-              <Controller
-                name="stadium"
-                control={methods.control}
-                render={({ field }) => (
-                  <FormControl fullWidth margin="normal">
-                    <TextField
-                      error={!!methods.formState.errors?.stadium}
-                      helperText={methods.formState.errors?.stadium?.message}
-                      {...field}
-                      label="Sân vận động*"
-                      variant="outlined"
-                      sx={{ width: '50%' }}
-                    />
-                  </FormControl>
-                )}
-              />
-              <FormControl fullWidth margin="normal">
-                <Typography color="grey">Tổng thuật trước trận đấu:</Typography>
-                <RHFWYSIWYGEditor name="preMatchSummary"></RHFWYSIWYGEditor>
-              </FormControl>
-
-              <MultipleVideosSelect
-                label="Video liên quan"
-                selectedArr={relatedVideos}
-                setSelectedArr={setRelatedVideos}
-              />
-              <Button
-                sx={{ mt: 2 }}
-                variant="contained"
-                color="info"
-                onClick={() =>
-                  dialogRelatedVideosRef?.current.handleClickOpen()
-                }
-              >
-                Chọn video liên quan
-              </Button>
-              <br />
-              <MultipleNewsSelect
-                label="Tin tức liên quan"
-                selectedArr={relatedNews}
-                setSelectedArr={setRelatedNews}
-              />
-              <Button
-                sx={{ mt: 2 }}
-                variant="contained"
-                color="info"
-                onClick={() => dialogRelatedNewsRef?.current.handleClickOpen()}
-              >
-                Chọn tin tức liên quan
-              </Button>
-
-              <FormControl fullWidth margin="normal">
-                <Typography color="grey">Kết quả:</Typography>
-                <Stack direction="row" alignItems="start" gap={2}>
-                  <Controller
-                    name="team1Goal"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.team1Goal}
-                        helperText={
-                          methods.formState.errors?.team1Goal?.message
-                        }
-                        {...field}
-                        label={`${match?.team1Name ?? 'Đội 1'}${
-                          [1, 2].includes(methods.getValues('status'))
-                            ? '*'
-                            : ''
-                        }`}
-                        type="number"
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    )}
-                  />
-                  {/* // TODO pending api */}
-                  <MinimizeIcon sx={{ mt: '20px' }} />
-                  <Controller
-                    name="team2Goal"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.team2Goal}
-                        helperText={
-                          methods.formState.errors?.team2Goal?.message
-                        }
-                        {...field}
-                        label={`${match?.team2Name ?? 'Đội 2'}${
-                          [1, 2].includes(methods.getValues('status'))
-                            ? '*'
-                            : ''
-                        }`}
-                        type="number"
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    )}
-                  />
-                </Stack>
-              </FormControl>
-
+          <SimpleCard>
+            {props.isLoading && (
               <Box
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'row-reverse',
-                  m: 1,
+                  width: '100%',
+                  position: 'fixed',
+                  top: '0',
+                  left: '0',
+                  zIndex: '1000',
                 }}
               >
-                <Button
-                  color="primary"
-                  type="submit"
-                  variant="contained"
-                  disabled={isLoading}
-                  sx={{ mx: 1 }}
-                >
-                  Lưu
-                </Button>
-                <Button
-                  variant="contained"
-                  disabled={isLoading}
-                  onClick={() => {
-                    navigate(-1)
-                  }}
-                  sx={{ mx: 1 }}
-                >
-                  Quay lại
-                </Button>
+                <LinearProgress />
               </Box>
-            </FormProvider>
-          </form>
+            )}
+            <form onSubmit={methods.handleSubmit(onSubmit)}>
+              <FormProvider {...methods}>
+                <TextField
+                  label="Giải đấu"
+                  variant="standard"
+                  margin="normal"
+                  value={match.leagueName}
+                  fullWidth
+                  disabled
+                />
 
-          <DialogRelatedNews
-            ref={dialogRelatedNewsRef}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-          />
-          <DialogRelatedVideos
-            ref={dialogRelatedVideosRef}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-          />
+                <TextField
+                  label="Đội bóng tham gia"
+                  variant="standard"
+                  margin="normal"
+                  fullWidth
+                  disabled
+                  value={match.teamName}
+                />
+
+                <Controller
+                  name="status"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel id="demo-simple-select-label">
+                        Trạng thái*
+                      </InputLabel>
+                      <Select
+                        variant="outlined"
+                        sx={{ width: '50%' }}
+                        {...field}
+                        onClose={() =>
+                          methods.trigger().then(() => methods.clearErrors())
+                        }
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Trạng thái*"
+                      >
+                        {Object.values(MATCH_STATUSES).map((type, index) => {
+                          return (
+                            <MenuItem key={index} value={type.id}>
+                              {type.label}
+                            </MenuItem>
+                          )
+                        })}
+                      </Select>
+                      {!!methods.formState.errors?.status?.message && (
+                        <FormHelperText>
+                          {methods.formState.errors?.status.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                />
+                <Controller
+                  name="dateStart"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DateTimePicker
+                        {...field}
+                        label={`Thời gian diễn ra${
+                          methods.getValues('status') === 3 ? '' : '*'
+                        }:`}
+                        ampm={false}
+                        renderInput={(params: any) => (
+                          <FormControl fullWidth margin="normal">
+                            <TextField
+                              {...params}
+                              error={!!methods.formState.errors?.dateStart}
+                              helperText={
+                                methods.formState.errors?.dateStart?.message
+                              }
+                              InputLabelProps={{ shrink: true }}
+                              sx={{ width: '50%' }}
+                              variant="outlined"
+                              autoComplete="bday"
+                            />
+                          </FormControl>
+                        )}
+                      />
+                    </LocalizationProvider>
+                  )}
+                />
+                <Controller
+                  name="stadium"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <FormControl fullWidth margin="normal">
+                      <TextField
+                        error={!!methods.formState.errors?.stadium}
+                        helperText={methods.formState.errors?.stadium?.message}
+                        {...field}
+                        label="Sân vận động*"
+                        variant="outlined"
+                        sx={{ width: '50%' }}
+                      />
+                    </FormControl>
+                  )}
+                />
+                <FormControl fullWidth margin="normal">
+                  <Typography color="grey">
+                    Tổng thuật trước trận đấu:
+                  </Typography>
+                  <RHFWYSIWYGEditor name="preMatchSummary"></RHFWYSIWYGEditor>
+                </FormControl>
+
+                <MultipleVideosSelect
+                  label="Video liên quan"
+                  selectedArr={relatedVideos}
+                  setSelectedArr={setRelatedVideos}
+                />
+                <Button
+                  sx={{ mt: 2 }}
+                  variant="contained"
+                  color="info"
+                  onClick={() =>
+                    dialogRelatedVideosRef?.current.handleClickOpen()
+                  }
+                >
+                  Chọn video liên quan
+                </Button>
+                <br />
+                <MultipleNewsSelect
+                  label="Tin tức liên quan"
+                  selectedArr={relatedNews}
+                  setSelectedArr={setRelatedNews}
+                />
+                <Button
+                  sx={{ mt: 2 }}
+                  variant="contained"
+                  color="info"
+                  onClick={() =>
+                    dialogRelatedNewsRef?.current.handleClickOpen()
+                  }
+                >
+                  Chọn tin tức liên quan
+                </Button>
+
+                <FormControl fullWidth margin="normal">
+                  <Typography color="grey">Kết quả:</Typography>
+                  <Stack direction="row" alignItems="start" gap={2}>
+                    <Controller
+                      name="team1Goal"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.team1Goal}
+                          helperText={
+                            methods.formState.errors?.team1Goal?.message
+                          }
+                          {...field}
+                          label={`${match?.team1Name ?? 'Đội 1'}${
+                            [1, 2].includes(methods.getValues('status'))
+                              ? '*'
+                              : ''
+                          }`}
+                          type="number"
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      )}
+                    />
+                    {/* // TODO pending api */}
+                    <MinimizeIcon sx={{ mt: '20px' }} />
+                    <Controller
+                      name="team2Goal"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.team2Goal}
+                          helperText={
+                            methods.formState.errors?.team2Goal?.message
+                          }
+                          {...field}
+                          label={`${match?.team2Name ?? 'Đội 2'}${
+                            [1, 2].includes(methods.getValues('status'))
+                              ? '*'
+                              : ''
+                          }`}
+                          type="number"
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      )}
+                    />
+                  </Stack>
+                </FormControl>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    m: 1,
+                  }}
+                >
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ mx: 1 }}
+                  >
+                    Lưu
+                  </Button>
+                  <Button
+                    variant="contained"
+                    disabled={isLoading}
+                    onClick={() => {
+                      navigate(-1)
+                    }}
+                    sx={{ mx: 1 }}
+                  >
+                    Quay lại
+                  </Button>
+                </Box>
+              </FormProvider>
+            </form>
+
+            <DialogSelectNews
+              ref={dialogRelatedNewsRef}
+              label="Chọn tin tức liên quan"
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              selectedList={relatedNews}
+              setSelectedList={setRelatedNews}
+            />
+            <DialogSelectVideo
+              label="Chọn video liên quan"
+              ref={dialogRelatedVideosRef}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              selectedList={relatedVideos}
+              setSelectedList={setRelatedVideos}
+            />
+          </SimpleCard>
         </Box>
       )}
     </div>

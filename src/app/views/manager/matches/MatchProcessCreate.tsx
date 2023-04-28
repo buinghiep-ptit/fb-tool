@@ -143,7 +143,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
   }
 
   return (
-    <Collapse in={show} easing={{ enter: '1', exit: '0.5' }}>
+    <Collapse in={show} timeout={{ appear: 500, enter: 500, exit: 0 }}>
       <Box sx={{ mb: 2 }}>
         {props.isLoading && (
           <Box

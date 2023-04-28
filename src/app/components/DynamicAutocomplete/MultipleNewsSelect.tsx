@@ -56,6 +56,7 @@ export default function MultipleNewsSelect(props: any) {
         setSelectedArr(newValue)
       }}
       id="selectedArr"
+      noOptionsText="Không có tin tức nào"
       options={options ?? []}
       renderInput={params => (
         <TextField

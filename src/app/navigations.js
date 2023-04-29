@@ -1,5 +1,3 @@
-import { ROLES } from './utils/enums/roles'
-
 export const navigations = [
   { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
   {
@@ -14,8 +12,8 @@ export const navigations = [
   },
   { name: 'Quản lý tin tức', path: '/news', icon: 'newspaper' },
   { name: 'Quản lý đội bóng', path: '/teams', icon: 'groups' },
-  { name: 'Quản lý lịch thi đấu', path: '/schedules', icon: 'schedule' },
   { name: 'Quản lý giải đấu', path: '/leagues', icon: 'schedule' },
+  { name: 'Quản lý thông tin trận đấu', path: '/matches', icon: 'scoreboard' },
   { name: 'Quản lý CAHN TV', path: '/videos', icon: 'movie' },
   { name: 'Quản lý cửa hàng', path: '/shop', icon: 'storefront' },
   { name: 'Quản lý tài khoản vận hành', path: '/accounts', icon: 'contacts' },

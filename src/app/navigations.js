@@ -6,6 +6,11 @@ export const navigations = [
     icon: 'person',
   },
   {
+    name: 'Quản lý hội viên',
+    path: '/members',
+    icon: 'loyalty',
+  },
+  {
     name: 'Quản lý cầu thủ',
     path: '/players',
     icon: 'accessibility',

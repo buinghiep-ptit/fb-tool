@@ -84,8 +84,14 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
       search: searchFilter,
       status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
-      dateStart: fromFilter ? dayjs(fromFilter).toISOString() : '',
-      dateEnd: toFilter ? dayjs(toFilter).toISOString() : '',
+      dateStart:
+        fromFilter && dayjs(fromFilter).isValid()
+          ? dayjs(fromFilter).toISOString()
+          : '',
+      dateEnd:
+        toFilter && dayjs(toFilter).isValid()
+          ? dayjs(toFilter).toISOString()
+          : '',
       page: page,
       size: rowsPerPage,
     }).then(res => {

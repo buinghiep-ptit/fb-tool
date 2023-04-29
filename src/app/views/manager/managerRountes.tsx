@@ -23,6 +23,9 @@ const MatchManager = Loadable(lazy(() => import('./matches/MatchManager')))
 const MatchDetail = Loadable(lazy(() => import('./matches/MatchDetail')))
 const CreateLeagues = Loadable(lazy(() => import('./leagues/CreateLeagues')))
 const EditLeagues = Loadable(lazy(() => import('./leagues/EditLeagues')))
+const MemberManager = Loadable(lazy(() => import('./members/MemberManager')))
+const MemberDetail = Loadable(lazy(() => import('./members/MemberDetail')))
+const MemberSetting = Loadable(lazy(() => import('./members/MemberSetting')))
 
 const managerRoutes = [
   {
@@ -71,5 +74,8 @@ const managerRoutes = [
   },
   { path: '/matches', element: <MatchManager /> },
   { path: '/matches/:id', element: <MatchDetail /> },
+  { path: '/members', element: <MemberManager /> },
+  { path: '/members/:id', element: <MemberDetail /> },
+  { path: '/members/setting', element: <MemberSetting /> },
 ]
 export default managerRoutes

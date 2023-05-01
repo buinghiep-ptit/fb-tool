@@ -67,8 +67,8 @@ export const headTableScheduleCup = [
 export const typeLeagues = [
   'Bóng đá nam',
   'Bóng đá nữ',
-  'futsal',
+  'Futsal',
   'Bóng đá bãi biển',
-  'Bóng đá địa phương',
+  'Phong trào - Cộng đồng',
   'Khác',
 ]

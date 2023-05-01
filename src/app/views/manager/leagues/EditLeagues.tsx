@@ -100,7 +100,10 @@ export default function EditLeagues(props: Props) {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <InformationLeagues />
+            <InformationLeagues
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+            />
           </TabPanel>
           <TabPanel value="2">
             <ScheduleCup

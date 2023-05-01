@@ -1,12 +1,23 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { IconButton } from '@mui/material'
+import {
+  FormControl,
+  FormHelperText,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { useParams } from 'react-router-dom'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 interface Props {
   isLoading: boolean
@@ -15,17 +26,6 @@ interface Props {
 
 const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-  const [focusedTeam, setFocusedTeam] = React.useState<any>()
-  const params = useParams()
-  const [page, setPage] = React.useState(0)
-  const [countTable, setCountTable] = React.useState(0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(20)
-  const [doRerender, setDoRerender] = React.useState(false)
-
-  const [teams, setTeams] = React.useState<any>()
-  const [nameFilter, setNameFilter] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState(99)
-  const [typeFilter, setTypeFilter] = React.useState(false)
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -64,7 +64,9 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       goalForTeamB: '',
     },
   })
-
+  const onSubmit = async (data: any) => {
+    console.log(data)
+  }
   return (
     <div>
       <Dialog open={open} maxWidth="xl">
@@ -82,7 +84,106 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
             </IconButton>
           </div>
         </DialogTitle>
-        <DialogContent></DialogContent>
+        <DialogContent>
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <FormProvider {...methods}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Controller
+                    name="idTeamA"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <FormControl
+                        style={{ width: '100%' }}
+                        margin="dense"
+                        error={!!methods.formState.errors?.idTeamA}
+                      >
+                        <InputLabel id="demo-simple-select-label">
+                          Chân thuận
+                        </InputLabel>
+                        <Select
+                          autoWidth
+                          {...field}
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Chân thuận"
+                        >
+                          <MenuItem value={3}>Cả hai chân</MenuItem>
+                          <MenuItem value={2}>Trái</MenuItem>
+                          <MenuItem value={1}>Phải</MenuItem>
+                        </Select>
+                        {!!methods.formState.errors?.idTeamA?.message && (
+                          <FormHelperText>
+                            {methods.formState.errors?.idTeamA.message}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                    name="idTeamA"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <FormControl
+                        style={{ width: '100%' }}
+                        margin="dense"
+                        error={!!methods.formState.errors?.idTeamA}
+                      >
+                        <InputLabel id="demo-simple-select-label">
+                          Chân thuận
+                        </InputLabel>
+                        <Select
+                          autoWidth
+                          {...field}
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Chân thuận"
+                        >
+                          <MenuItem value={3}>Cả hai chân</MenuItem>
+                          <MenuItem value={2}>Trái</MenuItem>
+                          <MenuItem value={1}>Phải</MenuItem>
+                        </Select>
+                        {!!methods.formState.errors?.idTeamA?.message && (
+                          <FormHelperText>
+                            {methods.formState.errors?.idTeamA.message}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <MuiRHFDatePicker
+                      name="startDate"
+                      label="Ngày sinh*"
+                      inputFormat={'DD/MM/YYYY'}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                    name="stadium"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        error={!!methods.formState.errors?.stadium}
+                        helperText={methods.formState.errors?.stadium?.message}
+                        {...field}
+                        label="Quê quán*"
+                        variant="outlined"
+                        margin="normal"
+                        fullWidth
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </FormProvider>
+          </form>
+        </DialogContent>
       </Dialog>
     </div>
   )

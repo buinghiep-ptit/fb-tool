@@ -99,7 +99,10 @@ export default function LeaguesManager(props: Props) {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <InformationLeagues />
+            <InformationLeagues
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+            />
           </TabPanel>
           <TabPanel value="2">Lịch thi đấu</TabPanel>
           <TabPanel value="3">Bảng xếp hạng</TabPanel>

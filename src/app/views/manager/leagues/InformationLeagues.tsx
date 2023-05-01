@@ -25,11 +25,14 @@ import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
 import DialogPickTeam from './DialogPickTeam'
-export interface Props {}
+export interface Props {
+  isLoading: any
+  setIsLoading: any
+}
 export default function InfomationLeagues(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
-  const [isLoading, setIsLoading] = useState(false)
+
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState([])
   const [logo, setLogo] = useState('')
@@ -78,6 +81,7 @@ export default function InfomationLeagues(props: Props) {
 
   const onSubmit = async (data: any) => {
     console.log(data)
+    props.setIsLoading(true)
     data.isDisplayRank = data.isDisplayRank ? 1 : 0
     data.isDisplaySchedule = data.isDisplaySchedule ? 1 : 0
     let urlLogo: any = ''
@@ -96,6 +100,7 @@ export default function InfomationLeagues(props: Props) {
         )
         if (res) {
           toastSuccess({ message: 'Lưu thành công' })
+          props.setIsLoading(false)
           navigate('/leagues')
         }
       } else {
@@ -105,11 +110,13 @@ export default function InfomationLeagues(props: Props) {
           teamList: teamPicked,
         })
         if (res) {
+          props.setIsLoading(false)
           toastSuccess({ message: 'Tạo thành công' })
           navigate('/leagues')
         }
       }
     } catch (e) {
+      props.setIsLoading(false)
       toastError({ message: ' Tạo thất bại' })
     }
   }
@@ -200,7 +207,7 @@ export default function InfomationLeagues(props: Props) {
                         <MenuItem value={2}>Bóng đá nữ</MenuItem>
                         <MenuItem value={3}>Futsal</MenuItem>
                         <MenuItem value={4}>Bóng đá bãi biển</MenuItem>
-                        <MenuItem value={5}>Phong trào cộng đồng</MenuItem>
+                        <MenuItem value={5}>Phong trào - Cộng đồng</MenuItem>
                         <MenuItem value={6}>Khác</MenuItem>
                       </Select>
                       {!!methods.formState.errors?.type && (
@@ -229,7 +236,7 @@ export default function InfomationLeagues(props: Props) {
                         id="demo-simple-select"
                         label="Thể Loại*"
                       >
-                        <MenuItem value={1}>Leagues</MenuItem>
+                        <MenuItem value={1}>League</MenuItem>
                         <MenuItem value={2}>Cup</MenuItem>
                         <MenuItem value={3}>Khác</MenuItem>
                       </Select>
@@ -360,11 +367,11 @@ export default function InfomationLeagues(props: Props) {
               <Grid item xs={12}>
                 <MuiCheckBox
                   name="isDisplayRank"
-                  label="Hiển thị BXH trên tràng chủ*"
+                  label="Hiển thị BXH trên tràng chủ"
                 />
                 <MuiCheckBox
                   name="isDisplaySchedule"
-                  label="Hiển thị lịch đấu trên website*"
+                  label="Hiển thị lịch đấu trên website"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -372,7 +379,7 @@ export default function InfomationLeagues(props: Props) {
                   color="primary"
                   type="submit"
                   variant="contained"
-                  disabled={isLoading}
+                  disabled={props.isLoading}
                   style={{ padding: '12px 20px' }}
                 >
                   Lưu
@@ -381,7 +388,7 @@ export default function InfomationLeagues(props: Props) {
                   style={{ marginLeft: '15px', padding: '12px 20px' }}
                   color="primary"
                   variant="contained"
-                  disabled={isLoading}
+                  disabled={props.isLoading}
                   onClick={() => {
                     navigate('/leagues')
                   }}
@@ -394,8 +401,8 @@ export default function InfomationLeagues(props: Props) {
         </form>
       </SimpleCard>
       <DialogPickTeam
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
+        isLoading={props.isLoading}
+        setIsLoading={props.setIsLoading}
         ref={DialogPickTeamRef}
         setTeamPicked={setTeamPicked}
         setValue={methods.setValue}

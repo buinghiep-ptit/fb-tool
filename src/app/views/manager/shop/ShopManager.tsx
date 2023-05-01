@@ -22,7 +22,7 @@ import {
 import { Breadcrumb, Container } from 'app/components'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 
 export interface Props {}
@@ -68,6 +68,7 @@ export default function ShopManager(props: Props) {
             console.log(statusRes)
             if (statusRes === 0) {
               status = 1
+              fetchProductCategories()
               setIsloading(false)
             }
             resolve()
@@ -144,21 +145,35 @@ export default function ShopManager(props: Props) {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Link to={`/shop/category/${category.id}`} key={category.name}>
-                  <Typography variant="h6">{category?.name}</Typography>
-                </Link>
+                <Typography
+                  variant="h6"
+                  onClick={() =>
+                    navigate(`/shop/category/${category.id}`, {
+                      state: { name: category.name },
+                    })
+                  }
+                >
+                  {category?.name}
+                </Typography>
               </AccordionSummary>
-              <AccordionDetails>
-                <List sx={style} component="nav" aria-label="mailbox folders">
-                  {category.children.map((item: item) => (
-                    <Link to={`/shop/category/${item.id}`} key={item.name}>
-                      <ListItem button>
+              {category.children.length !== 0 && (
+                <AccordionDetails>
+                  <List sx={style} component="nav" aria-label="mailbox folders">
+                    {category.children.map((item: item) => (
+                      <ListItem
+                        button
+                        onClick={() =>
+                          navigate(`/shop/category/${category.id}`, {
+                            state: { name: item.name },
+                          })
+                        }
+                      >
                         <ListItemText primary={item.name} />
                       </ListItem>
-                    </Link>
-                  ))}
-                </List>
-              </AccordionDetails>
+                    ))}
+                  </List>
+                </AccordionDetails>
+              )}
             </Accordion>
           )
         })}

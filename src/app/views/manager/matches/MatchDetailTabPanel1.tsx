@@ -52,7 +52,7 @@ export default function MatchDetailTabPanel1(props: any) {
   const [relatedVideos, setRelatedVideos] = useState([])
 
   useEffect(() => {
-    console.log(relatedVideos)
+    console.log(relatedVideos) // TODO consume api
   }, [relatedVideos])
 
   const schema = yup.object({

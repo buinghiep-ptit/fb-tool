@@ -192,7 +192,7 @@ export default function MatchManager(props: Props) {
         />
       </Box>
 
-      <Stack gap={3}>
+      <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
             <Grid item xs={4}>

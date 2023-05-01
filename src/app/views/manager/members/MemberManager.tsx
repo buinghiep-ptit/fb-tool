@@ -140,7 +140,7 @@ export default function MatchManager(props: Props) {
         />
       </Stack>
 
-      <Stack gap={3}>
+      <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
             <Grid item xs={4}>
@@ -199,7 +199,6 @@ export default function MatchManager(props: Props) {
                       InputLabelProps={{ shrink: true }}
                       size="medium"
                       variant="outlined"
-                      margin="dense"
                       fullWidth
                       color="primary"
                       autoComplete="bday"
@@ -220,7 +219,6 @@ export default function MatchManager(props: Props) {
                       InputLabelProps={{ shrink: true }}
                       size="medium"
                       variant="outlined"
-                      margin="dense"
                       fullWidth
                       color="primary"
                       autoComplete="bday"

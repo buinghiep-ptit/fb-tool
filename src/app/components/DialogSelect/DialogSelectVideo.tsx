@@ -270,7 +270,6 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"
@@ -291,7 +290,6 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"

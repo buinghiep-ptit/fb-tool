@@ -221,7 +221,8 @@ export default function MemberDetail(props: Props) {
                   <TableCell variant="head">Cân nặng</TableCell>
                   <TableCell variant="body">{member?.weight + ' kg'}</TableCell>
                 </TableRow>
-                {member?.status === MEMBER_STATUSES.APPROVED.id && (
+                {member?.latestRegistration?.status ===
+                  MEMBER_STATUSES.APPROVED.id && (
                   <TableRow>
                     <TableCell variant="head">Số mùa đăng ký</TableCell>
                     <TableCell variant="body">
@@ -233,7 +234,8 @@ export default function MemberDetail(props: Props) {
                     </TableCell>
                   </TableRow>
                 )}
-                {member?.status === MEMBER_STATUSES.APPROVED.id && (
+                {member?.latestRegistration?.status ===
+                  MEMBER_STATUSES.APPROVED.id && (
                   <TableRow>
                     <TableCell variant="head">
                       Mức phí hội viên (tổng tiền)

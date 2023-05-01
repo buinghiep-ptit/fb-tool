@@ -159,6 +159,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
         label: item.title
       }),
     )
+    // TODO update?
   }
 
   const handlePick = (id: number) => {
@@ -270,7 +271,6 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"
@@ -291,7 +291,6 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"

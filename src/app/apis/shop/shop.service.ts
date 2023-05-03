@@ -56,3 +56,13 @@ export const syncStatus = async (params: any): Promise<any> => {
   const { data } = await http.get<any>(`/api/synchronize-status`, { params })
   return data
 }
+
+export const displayProduct = async (id: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/products/${id}/toggle-display`)
+  return data
+}
+
+export const priorityProduct = async (id: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/products/${id}/toggle-priority`)
+  return data
+}

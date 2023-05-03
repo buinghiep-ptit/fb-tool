@@ -31,10 +31,6 @@ export const headTableLeagues = [
 
 export const headTableScheduleCup = [
   {
-    name: 'STT',
-    width: '60px',
-  },
-  {
     name: 'Đội bóng 1',
     width: '250px',
   },
@@ -64,11 +60,54 @@ export const headTableScheduleCup = [
   },
 ]
 
+export const headTableRank = [
+  {
+    name: 'Thứ hạng',
+    width: '150px',
+  },
+  {
+    name: 'CLB',
+    width: '250px',
+  },
+  {
+    name: 'Trận',
+    width: '200px',
+  },
+  {
+    name: 'Thắng',
+    width: '200px',
+  },
+  {
+    name: 'Hòa',
+    width: '200px',
+  },
+  {
+    name: 'Thua',
+    width: '200px',
+  },
+  {
+    name: 'Bàn thắng',
+    width: '200px',
+  },
+  {
+    name: 'Bàn thua',
+    width: '200px',
+  },
+  {
+    name: 'hiệu số',
+    width: '200px',
+  },
+  {
+    name: 'Điểm',
+    width: '200px',
+  },
+]
+
 export const typeLeagues = [
   'Bóng đá nam',
   'Bóng đá nữ',
-  'futsal',
+  'Futsal',
   'Bóng đá bãi biển',
-  'Bóng đá địa phương',
+  'Phong trào - Cộng đồng',
   'Khác',
 ]

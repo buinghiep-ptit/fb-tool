@@ -3,6 +3,7 @@ import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import CachedIcon from '@mui/icons-material/Cached'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SearchIcon from '@mui/icons-material/Search'
+import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
 import {
   Button,
   Chip,
@@ -22,23 +23,29 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { deleteLeagues, getLeagues } from 'app/apis/leagues/leagues.service'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { deleteLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { headTableLeagues, typeLeagues } from './const'
+import { headTableCoachs } from './const'
+import { getCoachs } from 'app/apis/coachs/coachs.service'
 
 export interface Props {}
 
-export default function LeaguesManager(props: Props) {
+export default function CoachManager(props: Props) {
   const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
-  const [leagues, setLeagues] = useState<any>()
+  const [coaches, setCoaches] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
   const [statusFilter, setStatusFilter] = useState<any>()
+  const [from, setFrom] = useState<any>(null)
+  const [to, setTo] = useState<any>(null)
   const [nameShortFilter, setNameShortFilter] = useState<any>('')
   const [typeFilter, setTypeFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
@@ -58,9 +65,9 @@ export default function LeaguesManager(props: Props) {
     setDoRerender(!doRerender)
   }
 
-  const fetchLeagues = async () => {
+  const fetchCoaches = async () => {
     setIsLoading(true)
-    const res = await getLeagues({
+    const res = await getCoachs({
       name: nameFilter.trim(),
       shortName: nameShortFilter.trim(),
       status: statusFilter === 2 ? null : statusFilter,
@@ -68,7 +75,7 @@ export default function LeaguesManager(props: Props) {
       size: rowsPerPage,
       page: page,
     })
-    setLeagues(res.content)
+    setCoaches(res.content)
     setCountTable(res.totalElements)
     setIsLoading(false)
   }
@@ -97,7 +104,7 @@ export default function LeaguesManager(props: Props) {
   }
 
   React.useEffect(() => {
-    fetchLeagues()
+    fetchCoaches()
   }, [page, doRerender])
 
   return (
@@ -124,7 +131,7 @@ export default function LeaguesManager(props: Props) {
         }}
       >
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Quản lý giải đấu' }]} />
+          <Breadcrumb routeSegments={[{ name: 'Quản lý ban huấn luyện' }]} />
         </Box>
         <Button
           variant="contained"
@@ -140,7 +147,7 @@ export default function LeaguesManager(props: Props) {
           <Grid item xs={3}>
             <TextField
               id="name1"
-              label="Tên giải đấu"
+              label="Tên ban huấn luyện"
               variant="outlined"
               fullWidth
               onChange={e => {
@@ -154,30 +161,14 @@ export default function LeaguesManager(props: Props) {
               }}
             />
           </Grid>
-          <Grid item xs={3}>
-            <TextField
-              id="name2"
-              label="Tên viết tắt"
-              variant="outlined"
-              fullWidth
-              value={nameShortFilter}
-              onChange={e => {
-                setNameShortFilter(e.target.value)
-              }}
-              onKeyDown={async e => {
-                if (e.keyCode === 13) {
-                  handleSearch()
-                }
-              }}
-            />
-          </Grid>
+
           <Grid item xs={3}>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Loại giải</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                label="Trạng thái"
+                label="Vị trí"
                 value={typeFilter}
                 onChange={e => {
                   setTypeFilter(e.target.value)
@@ -194,6 +185,46 @@ export default function LeaguesManager(props: Props) {
             </FormControl>
           </Grid>
           <Grid item xs={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={from}
+                label="Từ ngày"
+                onChange={newValue => setFrom(newValue)}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{ shrink: true }}
+                    size="medium"
+                    variant="outlined"
+                    fullWidth
+                    color="primary"
+                    autoComplete="bday"
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={to}
+                label="Đến ngày"
+                onChange={newValue => setTo(newValue)}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{ shrink: true }}
+                    size="medium"
+                    variant="outlined"
+                    fullWidth
+                    color="primary"
+                    autoComplete="bday"
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={3}>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
               <Select
@@ -205,19 +236,17 @@ export default function LeaguesManager(props: Props) {
                   setStatusFilter(e.target.value)
                 }}
               >
-                <MenuItem value={2}>Tất cả</MenuItem>
-                <MenuItem value={0}>Chưa diễn ra</MenuItem>
-                <MenuItem value={1}>Đang diễn ra</MenuItem>
-                <MenuItem value={-1}>Kết thúc</MenuItem>
+                <MenuItem value={1}>Hoạt động</MenuItem>
+                <MenuItem value={0}>Không hoạt động</MenuItem>
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Grid item xs={9} style={{ textAlign: 'end' }}>
             <Button
               variant="contained"
               startIcon={<SearchIcon />}
               onClick={handleSearch}
-              style={{ marginRight: '15px' }}
+              style={{ marginRight: '15px', height: '50px' }}
               disabled={isLoading}
             >
               Tìm kiếm
@@ -227,8 +256,17 @@ export default function LeaguesManager(props: Props) {
               startIcon={<CachedIcon />}
               onClick={handleClearFilter}
               disabled={isLoading}
+              style={{ marginRight: '15px', height: '50px' }}
             >
               Làm mới
+            </Button>
+            <Button
+              startIcon={<SimCardDownloadIcon />}
+              variant="contained"
+              disabled={isLoading}
+              style={{ marginRight: '15px', height: '50px' }}
+            >
+              Xuất Excel
             </Button>
           </Grid>
         </Grid>
@@ -239,7 +277,7 @@ export default function LeaguesManager(props: Props) {
           <StyledTable>
             <TableHead>
               <TableRow>
-                {headTableLeagues.map(header => (
+                {headTableCoachs.map(header => (
                   <TableCell align="center" style={{ minWidth: header.width }}>
                     {header.name}
                   </TableCell>
@@ -247,7 +285,7 @@ export default function LeaguesManager(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(leagues || []).map((league: any, index: any) => {
+              {(coaches || []).map((league: any, index: any) => {
                 return (
                   <TableRow hover key={league.name}>
                     <TableCell align="center">
@@ -271,9 +309,10 @@ export default function LeaguesManager(props: Props) {
                     <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                       {league.shortName}
                     </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {typeLeagues[league.type - 1]}
-                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ wordBreak: 'keep-all' }}
+                    ></TableCell>
                     <TableCell align="center">
                       {league.status === 1 && (
                         <Chip label="Đang diễn ra" color="success" />

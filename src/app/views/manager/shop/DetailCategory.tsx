@@ -20,17 +20,21 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import {
+  displayProduct,
   getProducts,
+  priorityProduct,
   syncProduct,
   syncStatus,
 } from 'app/apis/shop/shop.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 import { headTableDetailCategory } from './const'
 export interface Props {}
@@ -40,16 +44,18 @@ export default function DetailCategory(props: Props) {
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [products, setProducts] = useState<any>()
-  const [nameFilter, setNameFilter] = useState<any>()
+  const [nameFilter, setNameFilter] = useState<any>('')
   const [statusFilter, setStatusFilter] = useState<any>(2)
   const dialogSettingImageRef = React.useRef<any>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
   const param = useParams()
+  const { state, pathname } = useLocation()
+
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-
-    fetchListProduct()
+    setDoRerender(!doRerender)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -57,13 +63,14 @@ export default function DetailCategory(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-    fetchListProduct()
+    setDoRerender(!doRerender)
   }
 
   const fetchListProduct = async () => {
+    setIsLoading(true)
     const res = await getProducts(
       {
-        search: nameFilter,
+        search: nameFilter.trim(),
         status: statusFilter === 2 ? null : statusFilter,
         page: page,
         size: rowsPerPage,
@@ -72,12 +79,12 @@ export default function DetailCategory(props: Props) {
     )
     setProducts(res.content)
     setCountTable(res.totalElements)
+    setIsLoading(false)
   }
 
   const handleSearch = async () => {
-    setIsLoading(true)
-    await fetchListProduct()
-    setIsLoading(false)
+    setPage(0)
+    setDoRerender(!doRerender)
   }
 
   const handleSyncCategory = async () => {
@@ -93,6 +100,7 @@ export default function DetailCategory(props: Props) {
             console.log(statusRes)
             if (statusRes === 0) {
               status = 1
+              fetchListProduct()
               setIsLoading(false)
             }
             resolve()
@@ -102,6 +110,16 @@ export default function DetailCategory(props: Props) {
     }
   }
 
+  const toggleDisplay = async (id: any) => {
+    const res = await displayProduct(id)
+    if (res) fetchListProduct()
+  }
+
+  const togglePrority = async (id: any) => {
+    const res = await priorityProduct(id)
+    if (res) fetchListProduct()
+  }
+
   const watchStatusSync = async () => {
     const res = await syncStatus({ isProduct: 0 })
     return res.status
@@ -109,7 +127,7 @@ export default function DetailCategory(props: Props) {
 
   React.useEffect(() => {
     fetchListProduct()
-  }, [])
+  }, [page, doRerender])
 
   return (
     <Container>
@@ -130,7 +148,7 @@ export default function DetailCategory(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý cửa hàng', path: '/shop' },
-            { name: 'Danh mục' },
+            { name: state.name },
           ]}
         />
       </Box>
@@ -166,6 +184,7 @@ export default function DetailCategory(props: Props) {
               onChange={e => {
                 setNameFilter(e.target.value)
               }}
+              value={nameFilter}
               onKeyDown={async e => {
                 if (e.keyCode === 13) {
                   handleSearch()
@@ -180,6 +199,7 @@ export default function DetailCategory(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Trạng thái"
+                value={statusFilter}
                 onChange={e => {
                   setStatusFilter(e.target.value)
                 }}
@@ -214,81 +234,104 @@ export default function DetailCategory(props: Props) {
       </SimpleCard>
       <div style={{ height: '30px' }} />
       <SimpleCard title="Danh sách khách hàng">
-        <StyledTable>
-          <TableHead>
-            <TableRow>
-              {headTableDetailCategory.map(header => (
-                <TableCell align="center" style={{ minWidth: header.width }}>
-                  {header.name}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {(products || []).map((product: any, index: any) => {
-              return (
-                <TableRow hover key={product.name}>
-                  <TableCell align="center">
-                    {rowsPerPage * page + index + 1}
+        <Box width="100%" overflow="auto">
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {headTableDetailCategory.map(header => (
+                  <TableCell align="center" style={{ minWidth: header.width }}>
+                    {header.name}
                   </TableCell>
-                  <TableCell align="center">
-                    <Link to="/customers/1">{product.name}</Link>
-                  </TableCell>
-                  <TableCell align="center">{product.amount}</TableCell>
-                  <TableCell align="center">
-                    {product.status === 0 && (
-                      <Chip label="Không hoạt động" color="success" />
-                    )}
-                    {product.status === 1 && (
-                      <Chip label="Hoạt động" color="success" />
-                    )}
-                    {product.status === -1 && (
-                      <Chip label="Đã xóa từ kiotviet" />
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Switch
-                      color="success"
-                      checked={product.isDisplay === 0 ? false : true}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <Switch
-                      color="success"
-                      checked={product.priority === 0 ? false : true}
-                    />
-                  </TableCell>
-                  <TableCell align="center">{product.dateUpdate}</TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Chi tiết" placement="top">
-                      <IconButton
-                        color="primary"
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(products || []).map((product: any, index: any) => {
+                return (
+                  <TableRow hover key={product.name}>
+                    <TableCell align="center">
+                      {rowsPerPage * page + index + 1}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography
                         onClick={() =>
-                          navigate(`/shop/product/${product.masterProductId}`)
+                          navigate(`/shop/product/${product.masterProductId}`, {
+                            state: {
+                              name: product.name,
+                              category: state.name,
+                              path: pathname,
+                            },
+                          })
                         }
                       >
-                        <RemoveRedEyeIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </StyledTable>
-        <TablePagination
-          sx={{ px: 2 }}
-          page={page}
-          component="div"
-          rowsPerPage={rowsPerPage}
-          count={countTable}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[20, 50, 100]}
-          labelRowsPerPage={'Dòng / Trang'}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-          backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-        />
+                        {product.name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">{product.amount}</TableCell>
+                    <TableCell align="center">
+                      {product.status === 0 && (
+                        <Chip label="Không hoạt động" color="success" />
+                      )}
+                      {product.status === 1 && (
+                        <Chip label="Hoạt động" color="success" />
+                      )}
+                      {product.status === -1 && (
+                        <Chip label="Đã xóa từ kiotviet" />
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Switch
+                        color="success"
+                        checked={product.isDisplay === 0 ? false : true}
+                        onChange={e => {
+                          toggleDisplay(product.id)
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Switch
+                        color="success"
+                        checked={product.priority === 0 ? false : true}
+                        onChange={e => {
+                          togglePrority(product.id)
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      {moment(product.dateUpdated).format('YYYY-MM-DD hh:mm')}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Chi tiết" placement="top">
+                        <IconButton
+                          color="primary"
+                          onClick={() =>
+                            navigate(`/shop/product/${product.masterProductId}`)
+                          }
+                        >
+                          <RemoveRedEyeIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </StyledTable>
+
+          <TablePagination
+            sx={{ px: 2 }}
+            page={page}
+            component="div"
+            rowsPerPage={rowsPerPage}
+            count={countTable}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+          />
+        </Box>
       </SimpleCard>
       <DialogSettingImage
         ref={dialogSettingImageRef}

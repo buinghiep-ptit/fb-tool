@@ -4,23 +4,27 @@ export const headTableCoachs = [
     width: '60px',
   },
   {
-    name: 'Tên giải đấu',
+    name: 'Tên BHL',
     width: '250px',
   },
   {
-    name: 'Logo',
+    name: 'Vị trí',
     width: '150px',
   },
   {
-    name: 'Tên viết tắt',
+    name: 'Quê quán',
     width: '150px',
   },
   {
-    name: 'Loại giải',
+    name: 'Ngày sinh',
     width: '150px',
   },
   {
-    name: 'Trạng thái',
+    name: 'Ngày tham gia CAHN',
+    width: '150px',
+  },
+  {
+    name: 'Trạng thái',
     width: '150px',
   },
   {

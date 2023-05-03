@@ -26,6 +26,7 @@ import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { getCoachs } from 'app/apis/coachs/coachs.service'
 import { deleteLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { toastSuccess } from 'app/helpers/toastNofication'
@@ -33,7 +34,6 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { headTableCoachs } from './const'
-import { getCoachs } from 'app/apis/coachs/coachs.service'
 
 export interface Props {}
 
@@ -285,54 +285,37 @@ export default function CoachManager(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(coaches || []).map((league: any, index: any) => {
+              {(coaches || []).map((coach: any, index: any) => {
                 return (
-                  <TableRow hover key={league.name}>
+                  <TableRow hover key={coach.name}>
                     <TableCell align="center">
                       {rowsPerPage * page + index + 1}
                     </TableCell>
                     <TableCell align="left">
                       <Link to="#" style={{ wordBreak: 'keep-all' }}>
-                        {league.name}
+                        {coach.name}
                       </Link>
                     </TableCell>
-                    <TableCell align="center">
-                      <img
-                        style={{
-                          objectFit: 'contain',
-                          width: '100px',
-                          height: '100px',
-                        }}
-                        src={league.logo}
-                      ></img>
+                    <TableCell align="center">{coach.position}</TableCell>
+                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                      {coach.placeOfOrigin}
                     </TableCell>
                     <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {league.shortName}
+                      {coach.birthday}
                     </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ wordBreak: 'keep-all' }}
-                    ></TableCell>
                     <TableCell align="center">
-                      {league.status === 1 && (
-                        <Chip label="Đang diễn ra" color="success" />
+                      {coach.status === 1 && (
+                        <Chip label="Hoạt động" color="success" />
                       )}
-                      {league.status === 0 && (
-                        <Chip label="Chưa diễn ra" color="warning" />
+                      {coach.status === 0 && (
+                        <Chip label="Không hoạt động" color="warning" />
                       )}
-                      {league.status === 2 && (
-                        <Chip label="Kết thúc" color="primary" />
-                      )}
-                      {league.status === 3 && (
-                        <Chip label="Tạm dừng" color="secondary" />
-                      )}
-                      {league.status === 4 && <Chip label="Đóng" />}
                     </TableCell>
                     <TableCell align="center">
                       <Tooltip title="Sửa" placement="top">
                         <IconButton
                           color="primary"
-                          onClick={() => navigate(`/leagues/${league.id}`)}
+                          // onClick={() => navigate(`/leagues/${league.id}`)}
                         >
                           <Edit />
                         </IconButton>
@@ -340,7 +323,7 @@ export default function CoachManager(props: Props) {
                       <Tooltip title="Xóa" placement="top">
                         <IconButton
                           color="primary"
-                          onClick={() => handleDeleteLeagues(league.id)}
+                          // onClick={() => handleDeleteLeagues(league.id)}
                         >
                           <DeleteIcon />
                         </IconButton>

@@ -1,75 +1,71 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   Grid,
-  Icon,
-  IconButton,
   InputLabel,
   LinearProgress,
   MenuItem,
   Select,
   Stack,
-  Switch,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material'
-import { red } from '@mui/material/colors'
 import { Box } from '@mui/system'
-import { getTeams } from 'app/apis/teams/teams.service'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { getMemberRegistrations } from 'app/apis/members/members.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
+import { MEMBER_STATUSES, findMemberStatus } from 'app/constants/memberStatus'
+import dayjs from 'dayjs'
 import * as React from 'react'
-import { useState } from 'react'
-import DialogCreateTeam from './DialogCreateTeam'
-import DialogDeleteTeam from './DialogDeleteTeam'
-import DialogUpdateTeam from './DialogUpdateTeam'
-import DialogUpdateTeamStatus from './DialogUpdateTeamStatus'
-import { headTableTeams } from './const'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { headTableMembers } from './const'
 
 export interface Props {}
 
-export default function TeamManager(props: Props) {
-  const dialogCreateTeamRef = React.useRef<any>(null)
-  const dialogUpdateTeamRef = React.useRef<any>(null)
-  const dialogUpdateTeamStatusRef = React.useRef<any>(null)
-  const dialogDeleteTeamRef = React.useRef<any>(null)
-  const [focusedTeam, setFocusedTeam] = useState<any>()
+export default function MatchManager(props: Props) {
+  const navigate = useNavigate()
 
   const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [doRerender, setDoRerender] = useState(false)
-
-  const [teams, setTeams] = useState<any>()
-  const [nameFilter, setNameFilter] = useState('')
-  const [statusFilter, setStatusFilter] = useState(99)
-  const [typeFilter, setTypeFilter] = useState(false)
-
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchListTeam = async () => {
+  const [registrations, setRegistrations] = useState<any>()
+  const [searchFilter, setSearchFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState(99)
+  const [fromFilter, setFromFilter] = useState<any>('')
+  const [toFilter, setToFilter] = useState<any>('')
+
+  const fetchListRegistrations = async () => {
     setIsLoading(true)
-    await getTeams({
-      q: nameFilter,
+    await getMemberRegistrations({
+      search: searchFilter,
       status: statusFilter === 99 ? null : statusFilter,
-      type: typeFilter ? 1 : null,
+      from:
+        fromFilter && dayjs(fromFilter).isValid()
+          ? dayjs(fromFilter).toISOString()
+          : '',
+      to:
+        toFilter && dayjs(toFilter).isValid()
+          ? dayjs(toFilter).toISOString()
+          : '',
       page: page,
       size: rowsPerPage,
     })
       .then(res => {
-        setTeams(res.content)
+        setRegistrations(res.content)
         setCountTable(res.totalElements)
       })
       .catch(() => {})
@@ -84,11 +80,10 @@ export default function TeamManager(props: Props) {
   }
 
   const resetFilter = () => {
-    setNameFilter('')
+    setSearchFilter('')
     setStatusFilter(99)
-    setTypeFilter(false)
-    setRowsPerPage(20)
-    setPage(0)
+    setFromFilter('')
+    setToFilter('')
     setDoRerender(!doRerender)
   }
 
@@ -105,8 +100,8 @@ export default function TeamManager(props: Props) {
     setDoRerender(!doRerender)
   }
 
-  React.useEffect(() => {
-    fetchListTeam()
+  useEffect(() => {
+    fetchListRegistrations()
   }, [page, doRerender])
 
   return (
@@ -127,38 +122,36 @@ export default function TeamManager(props: Props) {
 
       <Box className="breadcrumb">
         <Breadcrumb
-          routeSegments={[
-            { name: 'Quản lý thông tin các đội bóng', path: '/teams' },
-          ]}
+          routeSegments={[{ name: 'Quản lý hội viên', path: '/members' }]}
         />
       </Box>
+
       <Stack
         flexDirection={'row'}
         gap={2}
         sx={{ position: 'fixed', right: '48px', top: '80px', zIndex: 9 }}
       >
         <MuiButton
-          title="Thêm mới đội bóng"
+          title="Cài đặt giới thiệu hội viên"
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => dialogCreateTeamRef?.current.handleClickOpen()}
-          startIcon={<Icon>control_point</Icon>}
+          onClick={() => navigate('/members/setting')}
         />
       </Stack>
 
       <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
-            <Grid item xs={5}>
+            <Grid item xs={4}>
               <TextField
                 id="outlined-basic"
-                label="Tên đội bóng"
+                label="Sđt, họ và tên"
                 variant="outlined"
                 fullWidth
-                value={nameFilter}
+                value={searchFilter}
                 onChange={e => {
-                  setNameFilter(e.target.value)
+                  setSearchFilter(e.target.value)
                 }}
                 onKeyDown={async e => {
                   if (e.key === 'Enter') {
@@ -167,7 +160,7 @@ export default function TeamManager(props: Props) {
                 }}
               />
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={2}>
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
@@ -182,31 +175,58 @@ export default function TeamManager(props: Props) {
                   }}
                 >
                   <MenuItem value={99}>Tất cả</MenuItem>
-                  <MenuItem value={-1}>Không hoạt động</MenuItem>
-                  <MenuItem value={1}>Hoạt động</MenuItem>
+                  {Object.values(MEMBER_STATUSES).map((type, index) => {
+                    return (
+                      <MenuItem key={index} value={type.id}>
+                        {type.label}
+                      </MenuItem>
+                    )
+                  })}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={2} textAlign="center">
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                minHeight="100%"
-              >
-                <FormControlLabel
-                  label="Thuộc CAHN"
-                  control={
-                    <Checkbox
-                      checked={typeFilter}
-                      onChange={e => {
-                        setTypeFilter(e.target.checked)
-                      }}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Grid item xs={3}>
+                <DatePicker
+                  label="Từ ngày"
+                  value={fromFilter}
+                  onChange={newValue => setFromFilter(newValue)}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      error={false}
+                      required={false}
+                      InputLabelProps={{ shrink: true }}
+                      size="medium"
+                      variant="outlined"
+                      fullWidth
+                      color="primary"
+                      autoComplete="bday"
                     />
-                  }
+                  )}
                 />
-              </Box>
-            </Grid>
+              </Grid>
+              <Grid item xs={3}>
+                <DatePicker
+                  label="Đến ngày"
+                  value={toFilter}
+                  onChange={newValue => setToFilter(newValue)}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      error={false}
+                      required={false}
+                      InputLabelProps={{ shrink: true }}
+                      size="medium"
+                      variant="outlined"
+                      fullWidth
+                      color="primary"
+                      autoComplete="bday"
+                    />
+                  )}
+                />
+              </Grid>
+            </LocalizationProvider>
             <Grid item xs={4}></Grid>
             <Grid
               item
@@ -250,17 +270,21 @@ export default function TeamManager(props: Props) {
         </SimpleCard>
 
         <div style={{ height: '30px' }} />
-        <SimpleCard title="Danh sách các đội bóng">
-          {teams?.length === 0 && (
+        <SimpleCard>
+          {registrations?.length === 0 && (
             <Typography color="gray" textAlign="center">
               Không có dữ liệu
             </Typography>
           )}
-          <Box width="100%" overflow="auto" hidden={teams?.length === 0}>
+          <Box
+            width="100%"
+            overflow="auto"
+            hidden={registrations?.length === 0}
+          >
             <StyledTable>
               <TableHead>
                 <TableRow>
-                  {headTableTeams.map(header => (
+                  {headTableMembers.map(header => (
                     <TableCell
                       align="center"
                       style={{ minWidth: header.width }}
@@ -272,9 +296,9 @@ export default function TeamManager(props: Props) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(teams || []).map((team: any, index: any) => {
+                {(registrations || []).map((registration: any, index: any) => {
                   return (
-                    <TableRow hover key={team.name}>
+                    <TableRow hover key={index}>
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
@@ -282,56 +306,34 @@ export default function TeamManager(props: Props) {
                         <Button
                           color="info"
                           onClick={() => {
-                            setFocusedTeam(team)
-                            dialogUpdateTeamRef?.current.handleClickOpen()
+                            navigate('/customers/' + registration.customerId)
                           }}
                         >
-                          {team.name}
+                          {registration.customerName}
                         </Button>
                       </TableCell>
-                      <TableCell align="center">{team.shortName}</TableCell>
-                      <TableCell align="center">
-                        <Box
-                          component="img"
-                          sx={{ height: 50, width: 50 }}
-                          alt="Logo"
-                          src={team.logo}
-                        />
+                      <TableCell align="left">
+                        {registration.registerInfo}
                       </TableCell>
-                      <TableCell align="left">{team.homeField}</TableCell>
-                      <TableCell align="center">
-                        <Switch
-                          color="success"
-                          checked={team.status === 1 ? true : false}
-                          onChange={() => {
-                            setFocusedTeam(team)
-                            dialogUpdateTeamStatusRef?.current.handleClickOpen()
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title="Chỉnh sửa" placement="top">
-                          <IconButton
-                            onClick={() => {
-                              setFocusedTeam(team)
-                              dialogUpdateTeamRef?.current.handleClickOpen()
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        {team.isMain !== 1 && (
-                          <Tooltip title="Xóa" placement="top">
-                            <IconButton
-                              onClick={() => {
-                                setFocusedTeam(team)
-                                dialogDeleteTeamRef?.current.handleClickOpen()
-                              }}
-                            >
-                              <DeleteIcon sx={{ color: red[500] }} />
-                            </IconButton>
-                          </Tooltip>
+                      <TableCell align="left">
+                        {dayjs(registration.registerDate).format(
+                          'DD/MM/YYYY HH:mm',
                         )}
+                      </TableCell>
+                      <TableCell align="center">
+                        {findMemberStatus(registration.status)?.label}
+                      </TableCell>
+                      <TableCell align="center">
+                        {registration.type === 1 ? 'Đăng ký' : 'Gia hạn'}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          onClick={() => {
+                            navigate('/members/' + registration.membershipId)
+                          }}
+                        >
+                          Chi tiết
+                        </Button>
                       </TableCell>
                     </TableRow>
                   )
@@ -354,37 +356,6 @@ export default function TeamManager(props: Props) {
           </Box>
         </SimpleCard>
       </Stack>
-
-      <DialogCreateTeam
-        ref={dialogCreateTeamRef}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        refresh={search}
-      />
-
-      <DialogUpdateTeam
-        ref={dialogUpdateTeamRef}
-        teamId={focusedTeam?.id}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        refresh={search}
-      />
-
-      <DialogUpdateTeamStatus
-        ref={dialogUpdateTeamStatusRef}
-        team={focusedTeam}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        refresh={search}
-      />
-
-      <DialogDeleteTeam
-        ref={dialogDeleteTeamRef}
-        team={focusedTeam}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        refresh={search}
-      />
     </Container>
   )
 }

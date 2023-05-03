@@ -11,14 +11,16 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { deleteLeagues, getSchedule } from 'app/apis/leagues/leagues.service'
-import { SimpleCard, StyledTable } from 'app/components'
+import { deleteMatch, getSchedule } from 'app/apis/leagues/leagues.service'
+import { ConfirmationDialog, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import DialogCreateMatch from './DialogCreatMatch'
+import DialogEditMatch from './DialogEditMatch'
 import { headTableScheduleCup } from './const'
 export interface Props {
   setIsLoading: any
@@ -26,24 +28,30 @@ export interface Props {
 }
 
 export default function ScheduleCup(props: Props) {
-  const [page, setPage] = useState(0)
-  const [countTable, setCountTable] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
   const [schedule, setSchedule] = useState<any>()
   const navigate = useNavigate()
   const params = useParams()
   const dialogCreateMatchRef = React.useRef<any>(null)
+  const dialogEditMatchRef = React.useRef<any>(null)
+  const [idPicked, setIdPicked] = useState(null)
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
+
   const fetchScheduleCup = async () => {
     const res = await getSchedule(params.id)
-    setSchedule(res.content)
+    setSchedule(res.matches)
   }
 
-  const handleDeleteLeagues = async (id: any) => {
-    const res = await deleteLeagues(id)
+  const closeConfirmDialog = () => {
+    setOpenConfirmDialog(false)
+  }
+
+  const handleDeleteMatch = async () => {
+    const res = await deleteMatch(idPicked)
     if (res) {
       toastSuccess({
         message: 'Xóa thành công',
       })
+      setOpenConfirmDialog(false)
       fetchScheduleCup()
     }
   }
@@ -56,7 +64,7 @@ export default function ScheduleCup(props: Props) {
     <SimpleCard>
       <div style={{ textAlign: 'end', marginBottom: '20px' }}>
         <MuiButton
-          title="Thêm mới cầu thủ"
+          title="Thêm mới lịch đấu"
           variant="contained"
           color="primary"
           type="submit"
@@ -81,25 +89,13 @@ export default function ScheduleCup(props: Props) {
           <TableBody>
             {(schedule || []).map((item: any, index: any) => {
               return (
-                <TableRow hover key={item.name}>
+                <TableRow hover key={item.name + index}>
+                  <TableCell align="center">{item.teamA.name}</TableCell>
+                  <TableCell align="center">{item.teamB.name}</TableCell>
                   <TableCell align="center">
-                    {rowsPerPage * page + index + 1}
+                    {moment(item.dateStart).format('YYYY-MM-DD hh:mm')}
                   </TableCell>
-                  <TableCell align="center">
-                    <Link to="/customers/1">{item.name}</Link>
-                  </TableCell>
-                  <TableCell align="center">
-                    <img
-                      style={{
-                        objectFit: 'cover',
-                        width: '100px',
-                        height: '100px',
-                      }}
-                      src={item.logo}
-                    ></img>
-                  </TableCell>
-                  <TableCell align="center">{item.shortName}</TableCell>
-                  <TableCell align="center"></TableCell>
+                  <TableCell align="center">{item.stadium}</TableCell>
                   <TableCell align="center">
                     {item.status === 1 && (
                       <Chip label="Đang diễn ra" color="success" />
@@ -116,13 +112,29 @@ export default function ScheduleCup(props: Props) {
                     {item.status === 4 && <Chip label="Đóng" />}
                   </TableCell>
                   <TableCell align="center">
+                    {!item.goalForTeamA || !item.goalForTeamB
+                      ? 'Chờ cập nhật'
+                      : `${item.goalForTeamA} - ${item.goalForTeamB}`}
+                  </TableCell>
+                  <TableCell align="center">
                     <Tooltip title="Sửa" placement="top">
-                      <IconButton color="primary">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          dialogEditMatchRef.current.handleClickOpen(item)
+                        }}
+                      >
                         <Edit />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Xóa" placement="top">
-                      <IconButton color="primary">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          setIdPicked(item.id)
+                          setOpenConfirmDialog(true)
+                        }}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </Tooltip>
@@ -137,6 +149,20 @@ export default function ScheduleCup(props: Props) {
         ref={dialogCreateMatchRef}
         setIsLoading={props.setIsLoading}
         isLoading={props.isLoading}
+        fetchScheduleCup={fetchScheduleCup}
+      />
+      <DialogEditMatch
+        ref={dialogEditMatchRef}
+        setIsLoading={props.setIsLoading}
+        isLoading={props.isLoading}
+        fetchScheduleCup={fetchScheduleCup}
+      />
+      <ConfirmationDialog
+        open={openConfirmDialog}
+        onConfirmDialogClose={closeConfirmDialog}
+        text="Chắc chán muốn xóa giải đấu"
+        onYesClick={handleDeleteMatch}
+        title="Xác nhận"
       />
     </SimpleCard>
   )

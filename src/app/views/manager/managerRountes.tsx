@@ -24,6 +24,7 @@ const CreatePlayer = Loadable(lazy(() => import('./player/CreatePlayer')))
 const LeaguesManager = Loadable(lazy(() => import('./leagues/Leagues')))
 const CreateLeagues = Loadable(lazy(() => import('./leagues/CreateLeagues')))
 const EditLeagues = Loadable(lazy(() => import('./leagues/EditLeagues')))
+const CoachManager = Loadable(lazy(() => import('./coach/CoachManager')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -33,6 +34,7 @@ const managerRoutes = [
     path: '/customers/:idCustomer',
     element: <EditCustomer />,
   },
+  { path: '/coachs', element: <CoachManager /> },
   { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },

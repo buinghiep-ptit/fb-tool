@@ -4,67 +4,20 @@ import TabPanel from '@mui/lab/TabPanel'
 import { LinearProgress } from '@mui/material'
 import Tab from '@mui/material/Tab'
 import { Box } from '@mui/system'
-import { getLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container } from 'app/components'
 import * as React from 'react'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import InformationLeagues from './InformationLeagues'
 export interface Props {}
 
 export default function LeaguesManager(props: Props) {
-  const [page, setPage] = useState(0)
-  const [countTable, setCountTable] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
-  const [leagues, setLeagues] = useState<any>()
-  const [nameFilter, setNameFilter] = useState<any>()
-  const [statusFilter, setStatusFilter] = useState<any>()
-  const [nameShortFilter, setNameShortFilter] = useState<any>()
-  const [typeFilter, setTypeFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
-  const param = useParams()
+
   const [value, setValue] = React.useState('1')
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
   }
-
-  const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
-    setPage(newPage)
-    fetchLeagues()
-  }
-
-  const handleChangeRowsPerPage = (event: {
-    target: { value: string | number }
-  }) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-    fetchLeagues()
-  }
-
-  const fetchLeagues = async () => {
-    const res = await getLeagues({
-      name: nameFilter,
-      shortName: nameShortFilter,
-      status: statusFilter === 2 ? null : statusFilter,
-      type: typeFilter === 99 ? null : typeFilter,
-      size: rowsPerPage,
-      page: page,
-    })
-    setLeagues(res.content)
-    setCountTable(res.totalElements)
-  }
-
-  const handleSearch = async () => {
-    setIsLoading(true)
-    await fetchLeagues()
-    setIsLoading(false)
-  }
-
-  React.useEffect(() => {
-    fetchLeagues()
-  }, [])
 
   return (
     <Container>
@@ -104,8 +57,6 @@ export default function LeaguesManager(props: Props) {
               setIsLoading={setIsLoading}
             />
           </TabPanel>
-          <TabPanel value="2">Lịch thi đấu</TabPanel>
-          <TabPanel value="3">Bảng xếp hạng</TabPanel>
         </TabContext>
       </Box>
     </Container>

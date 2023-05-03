@@ -20,8 +20,10 @@ import { Container, SimpleCard } from 'app/components'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
+import { saveLeagueCurrent } from 'app/redux/actions/leagueActions'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
 import DialogPickTeam from './DialogPickTeam'
@@ -32,7 +34,7 @@ export interface Props {
 export default function InfomationLeagues(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
-
+  const dispatch = useDispatch()
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState([])
   const [logo, setLogo] = useState('')
@@ -80,21 +82,24 @@ export default function InfomationLeagues(props: Props) {
   })
 
   const onSubmit = async (data: any) => {
-    console.log(data)
     props.setIsLoading(true)
+    data.teamList = teamPicked
+
     data.isDisplayRank = data.isDisplayRank ? 1 : 0
     data.isDisplaySchedule = data.isDisplaySchedule ? 1 : 0
     let urlLogo: any = ''
     if (file) {
       urlLogo = await handleUploadImage(file)
+    } else {
+      urlLogo = logo
     }
+    console.log(data, teamPicked)
     try {
       if (params?.id) {
         const res = await editLeagues(
           {
             ...data,
             logo: urlLogo,
-            teamList: teamPicked,
           },
           params?.id,
         )
@@ -107,7 +112,6 @@ export default function InfomationLeagues(props: Props) {
         const res = await createLeagues({
           ...data,
           logo: urlLogo,
-          teamList: teamPicked,
         })
         if (res) {
           props.setIsLoading(false)
@@ -139,6 +143,10 @@ export default function InfomationLeagues(props: Props) {
 
   const fetchDetailLeague = async () => {
     const res = await getLeaguesById(params.id)
+    if (res) {
+      dispatch(saveLeagueCurrent(res))
+    }
+
     initDefaultValues(res)
   }
 

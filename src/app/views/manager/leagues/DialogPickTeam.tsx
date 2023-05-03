@@ -104,7 +104,7 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   React.useEffect(() => {
     fetchListTeam()
-  }, [page, doRerender, props.teamPicked])
+  }, [page, doRerender])
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -129,7 +129,6 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
       props.setTeamPicked(newListPicked)
     } else {
       const newListPicked = [...props.teamPicked, newList[id].id]
-      console.log(newListPicked)
       props.setTeamPicked(newListPicked)
     }
 

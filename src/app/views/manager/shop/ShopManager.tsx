@@ -163,7 +163,7 @@ export default function ShopManager(props: Props) {
                       <ListItem
                         button
                         onClick={() =>
-                          navigate(`/shop/category/${category.id}`, {
+                          navigate(`/shop/category/${item.id}`, {
                             state: { name: item.name },
                           })
                         }

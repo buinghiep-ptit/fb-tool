@@ -95,19 +95,18 @@ export interface IFeedsFilters {
 export interface PlayersFilters {
   name?: string
   position?: string
-  status?: 1 | -1 | 'all' | string | undefined //   1:Hoạt động -1:Không hoạt động
+  status?: 1 | 0 | 'all' | string | undefined //   1:Hoạt động -2:Không hoạt động
   page?: number | 0
   size?: number | 20
-  sort?: string
   team?: string
-  from?: string
-  to?: string
+  dateStart?: string
+  dateEnd?: string
 }
 export interface OrdersFilters {
-  name?: string
+  q?: string
   status?: 2 | 1 | 0 | string | undefined
   page?: number | 0
   size?: number | 20
-  from?: string
-  to?: string
+  dateStart?: string
+  dateEnd?: string
 }

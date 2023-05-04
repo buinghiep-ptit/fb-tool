@@ -1,32 +1,20 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import {
-  Grid,
-  Stack,
-  TableRow,
-  TableCell,
-  TableBody,
   Chip,
-  IconButton,
-  Tooltip,
-  Autocomplete,
+  Grid,
   Icon,
+  Stack,
+  TableBody,
+  TableCell,
+  TableRow,
 } from '@mui/material'
-import { useState } from 'react'
-import { MuiButton } from 'app/components/common/MuiButton'
-import {
-  IOrderDetail,
-  OrderResponse,
-  OrdersFilters,
-  TeamResponse,
-} from 'app/models'
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { Box } from '@mui/system'
 import { getOrderDetail } from 'app/apis/order/order.service'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import * as Yup from 'yup'
-import { getListTeam } from 'app/apis/teams/teams.service'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { MuiButton } from 'app/components/common/MuiButton'
+import { IOrderDetail } from 'app/models'
+import * as React from 'react'
+import { useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 export interface Props {}
 // type TypeElement = {
 //   status?: number | string
@@ -92,7 +80,7 @@ export default function OrderDetail(props: Props) {
           startIcon={<Icon>keyboard_return</Icon>}
         />
       </Stack>
-      <Stack flexDirection={'row'} gap={20}>
+      <Stack flexDirection={'row'} gap={10}>
         <SimpleCard title="Thông tin người đặt">
           <StyledTable>
             <TableBody>
@@ -228,7 +216,7 @@ export default function OrderDetail(props: Props) {
                   alt="bg"
                 />
               </Grid>
-              <Grid container item xs={3}>
+              <Grid container item xs={5}>
                 <Grid item xs={12}>
                   <p style={{ fontWeight: '600', fontSize: '15px' }}>
                     {item.name}
@@ -237,12 +225,15 @@ export default function OrderDetail(props: Props) {
                     Sản phẩm: {item.fullName}
                   </p>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={3}>
                   <p style={{ fontWeight: '500', fontSize: '15px' }}>
                     Số lượng: {item.quantity}
                   </p>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid container item xs={4} direction={'row'}>
+                  <p style={{ fontWeight: '500', fontSize: '14px' }}>
+                    Đơn giá:&nbsp;
+                  </p>
                   <p
                     style={{
                       color: 'red',
@@ -250,7 +241,26 @@ export default function OrderDetail(props: Props) {
                       fontSize: '15px',
                     }}
                   >
-                    {item.amount} VNĐ
+                    {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
+                  </p>
+                </Grid>
+                <Grid container item xs={5} direction={'row'}>
+                  <p style={{ fontWeight: '500', fontSize: '14px' }}>
+                    Thành tiền:&nbsp;
+                  </p>
+                  <p
+                    style={{
+                      color: 'red',
+                      fontWeight: '500',
+                      fontSize: '15px',
+                    }}
+                  >
+                    {item.amount && item.quantity
+                      ? (item.amount * item.quantity)
+                          .toLocaleString()
+                          .replace(/,/g, '.')
+                      : '-'}{' '}
+                    VNĐ
                   </p>
                 </Grid>
               </Grid>
@@ -265,7 +275,9 @@ export default function OrderDetail(props: Props) {
               <h3>Tổng tiền {order?.quantity} sản phẩm:</h3>
             </Grid>
             <Grid item xs={3}>
-              <h3 style={{ color: 'red' }}>{order?.amount} VNĐ</h3>
+              <h3 style={{ color: 'red' }}>
+                {order?.amount?.toLocaleString().replace(',', '.')} VNĐ
+              </h3>
             </Grid>
           </Grid>
         </SimpleCard>

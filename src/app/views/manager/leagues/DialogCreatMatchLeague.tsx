@@ -85,17 +85,20 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   })
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
-    const payload = [
-      {
-        idTeamA: data.idTeamA,
-        goalForTeamA: data.goalForTeamA,
-        idTeamB: data.idTeamB,
-        goalForTeamB: data.goalForTeamB,
-        dateStart: new Date(data.dateStart).toISOString() || null,
-        status: data.status,
-        stadium: data.stadium,
-      },
-    ]
+    const payload = {
+      rounds: [],
+      matches: [
+        {
+          idTeamA: data.idTeamA,
+          goalForTeamA: data.goalForTeamA,
+          idTeamB: data.idTeamB,
+          goalForTeamB: data.goalForTeamB,
+          dateStart: new Date(data.dateStart).toISOString() || null,
+          status: data.status,
+          stadium: data.stadium,
+        },
+      ],
+    }
     try {
       const res = await createMatch(payload, leagues.id)
       if (res) {

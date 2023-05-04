@@ -114,7 +114,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
       amount: data.amount,
       numOfYears: yearCount,
       years: years.join(','),
-      note: data.note,
+      note: data.note ? data.note : null,
     }
     setIsLoading(false)
     await approveMember(idRegistration, payload)

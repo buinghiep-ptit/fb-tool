@@ -83,7 +83,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
     await getNews({
       title: searchFilter,
       status: statusFilter === 99 ? null : statusFilter,
-      type: typeFilter === 99 ? null : typeFilter,
+      newCategory: typeFilter === 99 ? null : typeFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
           ? dayjs(fromFilter).toISOString()
@@ -198,7 +198,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                   <Grid item xs={12}>
                     <TextField
                       id="outlined-basic"
-                      label="Tiêu đề, tóm tắt, từ khóa:"
+                      label="Tiêu đề, tóm tắt, từ khóa"
                       variant="outlined"
                       fullWidth
                       value={searchFilter}

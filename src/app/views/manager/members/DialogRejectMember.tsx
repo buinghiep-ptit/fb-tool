@@ -62,7 +62,7 @@ const DialogRejectMember = React.forwardRef((props: Props, ref) => {
     setIsLoading(true)
 
     const payload: any = {
-      note: data.note,
+      note: data.note ? data.note : null,
     }
 
     await rejectMember(idRegistration, payload)

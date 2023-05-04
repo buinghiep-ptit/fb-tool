@@ -27,6 +27,7 @@ export default function MemberDetail(props: Props) {
 
   const dialogApproveMemberRef = useRef<any>(null)
   const dialogRejectMemberRef = useRef<any>(null)
+  const listActionHistoryRef = useRef<any>(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [member, setMember] = useState<any>()
@@ -39,6 +40,11 @@ export default function MemberDetail(props: Props) {
       .finally(() => {
         setIsLoading(false)
       })
+  }
+
+  const refresh = () => {
+    fetchMember()
+    listActionHistoryRef?.current.rerender()
   }
 
   useEffect(() => {
@@ -129,7 +135,7 @@ export default function MemberDetail(props: Props) {
         idRegistration={member?.id}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchMember}
+        refresh={refresh}
       />
 
       <DialogRejectMember
@@ -137,7 +143,7 @@ export default function MemberDetail(props: Props) {
         idRegistration={member?.id}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={fetchMember}
+        refresh={refresh}
       />
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
@@ -250,7 +256,7 @@ export default function MemberDetail(props: Props) {
           </SimpleCard>
         </Grid>
       </Grid>
-      <MemberActionHistory idMember={member?.id} />
+      <MemberActionHistory idMember={member?.id} ref={listActionHistoryRef} />
     </Container>
   )
 }

@@ -18,13 +18,17 @@ export interface Props {
   idMember: number
 }
 
-export default function MemberActionHistory(props: Props) {
+const MemberActionHistory = React.forwardRef((props: Props, ref) => {
   const { idMember } = props
   const [logs, setLogs] = useState<any>()
   const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [doRerender, setDoRerender] = useState(false)
+
+  React.useImperativeHandle(ref, () => ({
+    rerender: () => setDoRerender(!doRerender),
+  }))
 
   const fetchLogs = async () => {
     await getMemberLogs(idMember)
@@ -111,4 +115,6 @@ export default function MemberActionHistory(props: Props) {
       </Box>
     </SimpleCard>
   )
-}
+})
+
+export default MemberActionHistory

@@ -8,9 +8,14 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { Box } from '@mui/system'
+import {
+  getMatchStats,
+  updateMatchStats,
+} from 'app/apis/matches/matches.service'
 import { SimpleCard } from 'app/components'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
@@ -81,14 +86,14 @@ MatchDetailTabPanel3.propTypes = {
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
 }
 
 export default function MatchDetailTabPanel3(props: any) {
-  const { value, index, match, isLoading, setIsLoading, refresh, ...other } =
-    props
+  const { value, index, match, isLoading, setIsLoading, ...other } = props
 
   const navigate = useNavigate()
+
+  const [matchStats, setMatchStats] = useState<any>()
 
   const numberValidation = yup
     .number()
@@ -154,34 +159,88 @@ export default function MatchDetailTabPanel3(props: any) {
     },
   })
 
-  const initDefaultValues = (match: any) => {
+  const initDefaultValues = (matchStats: any) => {
     const defaultValues: any = {
       team1: {},
       team2: {},
     }
-    defaultValues.team1.possession = match?.team1?.possession ?? ''
-    defaultValues.team1.passAccuracy = match?.team1?.passAccuracy ?? ''
-    defaultValues.team1.shotsOnTarget = match?.team1?.shotsOnTarget ?? ''
-    defaultValues.team1.shots = match?.team1?.shots ?? ''
-    defaultValues.team1.passes = match?.team1?.passes ?? ''
-    defaultValues.team1.fouls = match?.team1?.fouls ?? ''
-    defaultValues.team1.yellowCards = match?.team1?.yellowCards ?? ''
-    defaultValues.team1.redCards = match?.team1?.redCards ?? ''
-    defaultValues.team1.offsides = match?.team1?.offsides ?? ''
-    defaultValues.team1.corners = match?.team1?.corners ?? ''
+    defaultValues.team1.possession = matchStats.team1Possession ?? ''
+    defaultValues.team1.passAccuracy = matchStats.team1PassAccuracy ?? ''
+    defaultValues.team1.shotsOnTarget = matchStats.team1ShotsOnTarget ?? ''
+    defaultValues.team1.shots = matchStats.team1Shots ?? ''
+    defaultValues.team1.passes = matchStats.team1Passes ?? ''
+    defaultValues.team1.fouls = matchStats.team1Fouls ?? ''
+    defaultValues.team1.yellowCards = matchStats.team1YellowCards ?? ''
+    defaultValues.team1.redCards = matchStats.team1RedCards ?? ''
+    defaultValues.team1.offsides = matchStats.team1Offsides ?? ''
+    defaultValues.team1.corners = matchStats.team1Corners ?? ''
+    defaultValues.team2.possession = matchStats.team2Possession ?? ''
+    defaultValues.team2.passAccuracy = matchStats.team2PassAccuracy ?? ''
+    defaultValues.team2.shotsOnTarget = matchStats.team2ShotsOnTarget ?? ''
+    defaultValues.team2.shots = matchStats.team2Shots ?? ''
+    defaultValues.team2.passes = matchStats.team2Passes ?? ''
+    defaultValues.team2.fouls = matchStats.team2Fouls ?? ''
+    defaultValues.team2.yellowCards = matchStats.team2YellowCards ?? ''
+    defaultValues.team2.redCards = matchStats.team2RedCards ?? ''
+    defaultValues.team2.offsides = matchStats.team2Offsides ?? ''
+    defaultValues.team2.corners = matchStats.team2Corners ?? ''
     methods.reset({ ...defaultValues })
   }
 
+  const fetchMatchStats = async () => {
+    setIsLoading(true)
+    await getMatchStats(match.id)
+      .then(res => {
+        setMatchStats(res)
+        initDefaultValues(res)
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
   React.useEffect(() => {
-    // TODO pending api
-    if (match) initDefaultValues(match)
+    fetchMatchStats()
   }, [])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
-    const payload: any = {}
-    // TODO consume api
-    setIsLoading(false)
+
+    const payload: any = {
+      idMatch: matchStats.idMatch,
+      team1Possession: data.team1.possession,
+      team2Possession: data.team2.possession,
+      team1PassAccuracy: data.team1.passAccuracy,
+      team2PassAccuracy: data.team2.passAccuracy,
+      team1ShotsOnTarget: data.team1.shotsOnTarget,
+      team2ShotsOnTarget: data.team2.shotsOnTarget,
+      team1Shots: data.team1.shots,
+      team2Shots: data.team2.shots,
+      team1Passes: data.team1.passes,
+      team2Passes: data.team2.passes,
+      team1Fouls: data.team1.fouls,
+      team2Fouls: data.team2.fouls,
+      team1YellowCards: data.team1.yellowCards,
+      team2YellowCards: data.team2.yellowCards,
+      team1RedCards: data.team1.redCards,
+      team2RedCards: data.team2.redCards,
+      team1Offsides: data.team1.offsides,
+      team2Offsides: data.team2.offsides,
+      team1Corners: data.team1.corners,
+      team2Corners: data.team2.corners,
+    }
+
+    await updateMatchStats(match.id, payload)
+      .then(() => {
+        toastSuccess({
+          message: 'Thành công',
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   return (
@@ -217,10 +276,10 @@ export default function MatchDetailTabPanel3(props: any) {
                       <TableRow>
                         <TableCell align="center">Thống kê trận đấu</TableCell>
                         <TableCell align="center">
-                          {match?.team1Name ?? 'Đội 1'}
+                          {matchStats?.team1Name ?? 'Đội 1'}
                         </TableCell>
                         <TableCell align="center">
-                          {match?.team2Name ?? 'Đội 2'}
+                          {matchStats?.team2Name ?? 'Đội 2'}
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -406,7 +465,7 @@ export default function MatchDetailTabPanel3(props: any) {
                     Lưu
                   </Button>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
                       navigate(-1)

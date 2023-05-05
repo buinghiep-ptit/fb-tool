@@ -17,18 +17,28 @@ export const updateMatch = async (params: any): Promise<any> => {
   return data
 }
 
-export const getMatchProcesses = async (id: any, params: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/matches/${id}/match-process`, {
-    params,
-  })
+export const getMatchStats = async (id: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/matches/${id}/statistic`)
   return data
 }
 
-export const updateMatchProcess = async (
-  id: any,
-  params: any,
-): Promise<any> => {
-  const { data } = await http.put<any>(`/api/match-process/${id}`, params)
+export const updateMatchStats = async (id: any, params: any): Promise<any> => {
+  const { data } = await http.put<any>(`/api/matches/${id}/statistic`, params)
+  return data
+}
+
+export const getMatchProcesses = async (id: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/matches/${id}/match-process`)
+  return data
+}
+
+export const updateMatchProcess = async (params: any): Promise<any> => {
+  const { data } = await http.put<any>(`/api/match-process`, params)
+  return data
+}
+
+export const getMatchProcessDetail = async (id: any): Promise<any> => {
+  const { data } = await http.get<any>(`/api/match-process/${id}`)
   return data
 }
 

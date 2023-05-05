@@ -16,7 +16,9 @@ import {
   Typography,
 } from '@mui/material'
 import { Box, Stack } from '@mui/system'
+import { updateMatchProcess } from 'app/apis/matches/matches.service'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import React, { useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -106,7 +108,7 @@ export default function MatchProcess(props: any) {
       time: '',
       idTeam: '',
       player: '',
-      description: '<p></p>',
+      description: '',
       team1Goal: '',
       team2Goal: '',
     },
@@ -116,26 +118,45 @@ export default function MatchProcess(props: any) {
     const defaultValues: any = {}
     defaultValues.type = matchProcess?.type
     defaultValues.time = matchProcess?.time ?? ''
-    defaultValues.idTeam = matchProcess?.idTeam ?? match.team1Id ?? ''
+    defaultValues.idTeam = matchProcess?.idTeam ?? ''
     defaultValues.player = matchProcess?.player ?? ''
-    defaultValues.description = matchProcess?.description ?? '<p></p>'
+    defaultValues.description = matchProcess?.description ?? ''
     defaultValues.team1Goal = matchProcess?.team1Goal ?? ''
     defaultValues.team2Goal = matchProcess?.team2Goal ?? ''
     methods.reset({ ...defaultValues })
   }
 
   React.useEffect(() => {
-    // TODO pending api
     if (matchProcess) {
       initDefaultValues(matchProcess)
     }
-  }, [])
+  }, [matchProcess])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
-    const payload: any = {}
-    // TODO consume api
-    setIsLoading(false)
+    const payload: any = {
+      id: matchProcess.id,
+      idMatch: matchProcess.idMatch,
+      type: data.type,
+      time: data.time,
+      idTeam: data.idTeam ?? null,
+      playerName: data.player ?? null,
+      team1Goal: data.team1Goal ?? null, // TODO api missing
+      team2Goal: data.team2Goal ?? null,
+      description: data.description ?? null,
+    }
+
+    await updateMatchProcess(payload)
+      .then(() => {
+        toastSuccess({
+          message: 'Thành công',
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+        refresh()
+      })
   }
 
   return (
@@ -246,7 +267,6 @@ export default function MatchProcess(props: any) {
                             fullWidth
                             disabled={!editable}
                           >
-                            {/* // TODO pending api */}
                             <MenuItem value={match?.team1Id ?? 0}>
                               {match?.team1Name ?? 'Doi 1'}
                             </MenuItem>
@@ -312,7 +332,6 @@ export default function MatchProcess(props: any) {
                               margin="dense"
                               disabled={!editable}
                             />
-                            // /* // TODO pending api */
                           )}
                         />
                         <MinimizeIcon sx={{ mt: '20px' }} />
@@ -390,16 +409,16 @@ export default function MatchProcess(props: any) {
                   p: 2,
                 }}
               >
-                <Button
+                {/* <Button
                   color="secondary"
                   disabled={isLoading}
                   onClick={() => {
                     console.info('gui thong bao')
                   }}
                 >
-                  {/* // TODO api: gui lai */}
+                  // TODO api: gui lai
                   Gửi thông báo
-                </Button>
+                </Button> */}
                 <Button
                   color="error"
                   disabled={isLoading}

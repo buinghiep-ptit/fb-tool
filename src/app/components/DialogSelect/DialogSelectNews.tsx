@@ -37,6 +37,7 @@ import { SimpleCard, StyledTable } from 'app/components'
 import { NEWS_TYPES, findNewsType } from 'app/constants/newsType'
 import dayjs from 'dayjs'
 import * as React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { headTableNews } from './headTableNews'
 
 const Transition = React.forwardRef(function Transition(
@@ -64,6 +65,8 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
   const { label, isLoading, setIsLoading, selectedList, setSelectedList } =
     props
 
+  const navigate = useNavigate()
+
   const [open, setOpen] = React.useState(false)
 
   const [page, setPage] = React.useState(0)
@@ -86,11 +89,11 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
       newCategory: typeFilter === 99 ? null : typeFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
-          ? dayjs(fromFilter).toISOString()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
           : '',
       dateEnd:
         toFilter && dayjs(toFilter).isValid()
-          ? dayjs(toFilter).toISOString()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
           : '',
       page: page,
       size: rowsPerPage,
@@ -159,7 +162,6 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
         label: item.title
       }),
     )
-    // TODO update?
   }
 
   const handlePick = (id: number) => {
@@ -378,7 +380,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                               <Button
                                 color="info"
                                 onClick={() => {
-                                  //TODO navigate news detail
+                                  navigate('/news/' + news.id)
                                 }}
                               >
                                 {news.title}

@@ -1,7 +1,8 @@
 import { LinearProgress, Tab, Tabs } from '@mui/material'
 import { Box } from '@mui/system'
+import { getMatchDetail } from 'app/apis/matches/matches.service'
 import { Breadcrumb, Container } from 'app/components'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import MatchDetailTabPanel1 from './MatchDetailTabPanel1'
 import MatchDetailTabPanel2 from './MatchDetailTabPanel2'
@@ -17,7 +18,7 @@ function a11yProps(index: any) {
 }
 
 export default function MatchManager(props: Props) {
-  const param = useParams()
+  const params = useParams()
 
   const [match, setMatch] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
@@ -27,9 +28,19 @@ export default function MatchManager(props: Props) {
     setTab(newValue)
   }
 
-  const getMatch = () => {
-    //TODO consume api
+  const getMatch = async () => {
+    setIsLoading(true)
+    await getMatchDetail(params.id)
+      .then(res => setMatch(res))
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
+
+  useEffect(() => {
+    getMatch()
+  }, [])
 
   return (
     <Container>
@@ -52,7 +63,7 @@ export default function MatchManager(props: Props) {
             { name: 'Quản lý thông tin trận đấu', path: '/matches' },
             {
               name: 'Cập nhật thông tin trận đấu',
-              path: `/matches/${param.id}`,
+              path: `/matches/${params.id}`,
             },
           ]}
         />
@@ -83,7 +94,6 @@ export default function MatchManager(props: Props) {
         match={match ?? {}}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={getMatch}
       />
       <MatchDetailTabPanel3
         value={tab}
@@ -91,9 +101,9 @@ export default function MatchManager(props: Props) {
         match={match ?? {}}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={getMatch}
       />
-      {/* TODO only show if status = 3 and has main team */}
+      {/* TODO panel 2 status in 1,2 and has main team */}
+      {/* TODO panel 3 status in 2 and has main team */}
     </Container>
   )
 }

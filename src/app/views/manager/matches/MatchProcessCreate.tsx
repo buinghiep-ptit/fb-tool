@@ -242,7 +242,6 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                               label="Loại diễn biến*"
                               fullWidth
                             >
-                              {/* // TODO pending api */}
                               <MenuItem value={match?.team1Id ?? 0}>
                                 {match?.team1Name ?? 'Doi 1'}
                               </MenuItem>
@@ -308,7 +307,6 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                                 variant="outlined"
                                 margin="dense"
                               />
-                              // /* // TODO pending api */
                             )}
                           />
                           <MinimizeIcon sx={{ mt: '20px' }} />

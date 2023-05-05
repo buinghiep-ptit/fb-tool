@@ -12,7 +12,6 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import {
-  createRound,
   deleteMatch,
   deleteRound,
   getSchedule,
@@ -25,7 +24,8 @@ import * as React from 'react'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import DialogCreateMatch from './DialogCreatMatch'
+import DialogCreateMatchLeague from './DialogCreatMatchLeague'
+import DialogCreateRound from './DialogCreatRound'
 import DialogEditMatch from './DialogEditMatch'
 import { headTableScheduleCup } from './const'
 export interface Props {
@@ -39,6 +39,7 @@ export default function ScheduleLeague(props: Props) {
   const params = useParams()
   const dialogCreateMatchRef = React.useRef<any>(null)
   const dialogEditMatchRef = React.useRef<any>(null)
+  const dialogCreateRoundRef = React.useRef<any>(null)
   const [idPicked, setIdPicked] = useState(null)
   const [idRoundPicked, setIdRoundPicked] = useState(null)
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
@@ -71,17 +72,6 @@ export default function ScheduleLeague(props: Props) {
     }
   }
 
-  const addRound = async () => {
-    const payload = {
-      name: 'Vòng ' + schedule[schedule.league] + 1,
-      description: null,
-      idOrder: schedule[schedule.league] + 1,
-      matches: [],
-    }
-    const res = await createRound(params.id, payload)
-    if (res) fetchScheduleCup()
-  }
-
   const handleDeleteRound = async () => {
     const res = await deleteRound(idRoundPicked)
     if (res) {
@@ -107,7 +97,7 @@ export default function ScheduleLeague(props: Props) {
           type="submit"
           startIcon={<Icon>control_point</Icon>}
           onClick={() => {
-            addRound()
+            dialogCreateRoundRef.current.handleClickOpen()
           }}
         />
       </div>
@@ -115,7 +105,9 @@ export default function ScheduleLeague(props: Props) {
         schedule.map((round: any, index: any) => {
           return (
             <div style={{ marginTop: '50px' }}>
-              <SimpleCard title={`Vòng ${index + 1} - ${league.shortName}`}>
+              <SimpleCard
+                title={`${index + 1} - ${round.name} - ${league.shortName}`}
+              >
                 <div style={{ position: 'relative' }}>
                   <Tooltip
                     title="Xóa vòng đấu"
@@ -234,14 +226,14 @@ export default function ScheduleLeague(props: Props) {
           )
         })}
 
-      <DialogCreateMatch
+      <DialogCreateMatchLeague
         ref={dialogCreateMatchRef}
         setIsLoading={props.setIsLoading}
         isLoading={props.isLoading}
         fetchScheduleCup={fetchScheduleCup}
       />
-      <DialogCreateMatch
-        // ref={dialogCreateRoundRef}
+      <DialogCreateRound
+        ref={dialogCreateRoundRef}
         setIsLoading={props.setIsLoading}
         isLoading={props.isLoading}
         fetchScheduleCup={fetchScheduleCup}

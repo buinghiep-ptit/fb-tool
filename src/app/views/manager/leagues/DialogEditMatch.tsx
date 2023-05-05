@@ -157,6 +157,7 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                         style={{ width: '400px' }}
                         margin="dense"
                         error={!!methods.formState.errors?.idTeamA}
+                        disabled
                       >
                         <InputLabel id="demo-simple-select-label">
                           Đội bóng 1*
@@ -192,6 +193,7 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                         style={{ width: '400px' }}
                         margin="dense"
                         error={!!methods.formState.errors?.idTeamB}
+                        disabled
                       >
                         <InputLabel id="demo-simple-select-label">
                           Đội bóng 2*

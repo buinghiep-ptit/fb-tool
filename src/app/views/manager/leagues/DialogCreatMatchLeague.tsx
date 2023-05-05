@@ -16,7 +16,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { createMatch } from 'app/apis/leagues/leagues.service'
+import { createMatchForRound } from 'app/apis/leagues/leagues.service'
 import { MuiRHFDateTimePicker } from 'app/components/common/MuiRHFDateTimePicker'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
@@ -29,7 +29,7 @@ interface Props {
   fetchScheduleCup: any
 }
 
-const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
+const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
 
@@ -86,21 +86,16 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
     const payload = {
-      rounds: [],
-      matches: [
-        {
-          idTeamA: data.idTeamA,
-          goalForTeamA: data.goalForTeamA,
-          idTeamB: data.idTeamB,
-          goalForTeamB: data.goalForTeamB,
-          dateStart: new Date(data.dateStart).toISOString() || null,
-          status: data.status,
-          stadium: data.stadium,
-        },
-      ],
+      idTeamA: data.idTeamA,
+      goalForTeamA: data.goalForTeamA,
+      idTeamB: data.idTeamB,
+      goalForTeamB: data.goalForTeamB,
+      dateStart: new Date(data.dateStart).toISOString() || null,
+      status: data.status,
+      stadium: data.stadium,
     }
     try {
-      const res = await createMatch(payload, leagues.id)
+      const res = await createMatchForRound(payload, leagues.id)
       if (res) {
         toastSuccess({
           message: 'Thêm trận đấu thành công',
@@ -333,4 +328,4 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   )
 })
 
-export default DialogCreateMatch
+export default DialogCreateMatchLeague

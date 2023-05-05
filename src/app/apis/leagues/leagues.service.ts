@@ -73,6 +73,11 @@ export const createRound = async (id: any, params: any): Promise<any> => {
   return data
 }
 
+export const editRound = async (id: any, params: any): Promise<any> => {
+  const { data } = await http.put<any>(`/api/leagues/round/${id}`, params)
+  return data
+}
+
 export const addTeam = async (id: any, teamId: any): Promise<any> => {
   const { data } = await http.put<any>(`/api/leagues/${id}/add/team/${teamId}`)
   return data

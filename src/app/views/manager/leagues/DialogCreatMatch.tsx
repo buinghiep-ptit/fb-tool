@@ -32,6 +32,7 @@ interface Props {
 const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
+  const [status, setStatus] = React.useState<any>(0)
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -66,8 +67,14 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       dateStart: yup.string().required('Giá trị bắt buộc'),
       status: yup.string(),
       stadium: yup.string().trim(),
-      goalForTeamA: yup.string().required('Giá trị bắt buộc'),
-      goalForTeamB: yup.string().required('Giá trị bắt buộc'),
+      goalForTeamA:
+        status === 1 || status === 2
+          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+          : yup.string(),
+      goalForTeamB:
+        status === 1 || status === 2
+          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+          : yup.string(),
     })
     .required()
 
@@ -92,7 +99,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
         idTeamB: data.idTeamB,
         goalForTeamB: data.goalForTeamB,
         dateStart: new Date(data.dateStart).toISOString() || null,
-        status: data.status,
+        status: status,
         stadium: data.stadium,
       },
     ]
@@ -248,6 +255,8 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Chân thuận"
+                          onChange={e => setStatus(e.target.value)}
+                          value={status}
                         >
                           <MenuItem value={0}>Chưa diễn ra</MenuItem>
                           <MenuItem value={1}>Đang diễn ra</MenuItem>
@@ -264,47 +273,49 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <InputLabel id="demo-simple-select-label">
-                    Tỷ số trận đấu*
-                  </InputLabel>
-                  <Controller
-                    name="goalForTeamA"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamA}
-                        helperText={
-                          methods.formState.errors?.goalForTeamA?.message
-                        }
-                        {...field}
-                        variant="outlined"
-                        margin="normal"
-                        style={{ width: '100px', marginRight: '20px' }}
-                      />
-                    )}
-                  />
+                {(status === 1 || status === 2) && (
+                  <Grid item xs={12}>
+                    <InputLabel id="demo-simple-select-label">
+                      Tỷ số trận đấu*
+                    </InputLabel>
+                    <Controller
+                      name="goalForTeamA"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamA}
+                          helperText={
+                            methods.formState.errors?.goalForTeamA?.message
+                          }
+                          {...field}
+                          variant="outlined"
+                          margin="normal"
+                          style={{ width: '100px', marginRight: '20px' }}
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="goalForTeamB"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamB}
-                        helperText={
-                          methods.formState.errors?.goalForTeamB?.message
-                        }
-                        {...field}
-                        style={{ width: '100px' }}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    )}
-                  />
-                </Grid>
+                    <Controller
+                      name="goalForTeamB"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamB}
+                          helperText={
+                            methods.formState.errors?.goalForTeamB?.message
+                          }
+                          {...field}
+                          style={{ width: '100px' }}
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      )}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </FormProvider>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ marginTop: '15px' }}>
               <Button
                 color="primary"
                 type="submit"

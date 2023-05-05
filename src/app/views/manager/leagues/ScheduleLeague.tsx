@@ -27,6 +27,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import DialogCreateMatchLeague from './DialogCreatMatchLeague'
 import DialogCreateRound from './DialogCreatRound'
 import DialogEditMatch from './DialogEditMatch'
+import DialogEditRound from './DialogEditRound'
 import { headTableScheduleCup } from './const'
 export interface Props {
   setIsLoading: any
@@ -40,6 +41,7 @@ export default function ScheduleLeague(props: Props) {
   const dialogCreateMatchRef = React.useRef<any>(null)
   const dialogEditMatchRef = React.useRef<any>(null)
   const dialogCreateRoundRef = React.useRef<any>(null)
+  const dialogEditRoundRef = React.useRef<any>(null)
   const [idPicked, setIdPicked] = useState(null)
   const [idRoundPicked, setIdRoundPicked] = useState(null)
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
@@ -109,21 +111,29 @@ export default function ScheduleLeague(props: Props) {
                 title={`${index + 1} - ${round.name} - ${league.shortName}`}
               >
                 <div style={{ position: 'relative' }}>
-                  <Tooltip
-                    title="Xóa vòng đấu"
-                    placement="top"
-                    style={{ position: 'absolute', top: '-48px', right: 0 }}
-                  >
-                    <IconButton
-                      color="primary"
-                      onClick={() => {
-                        setOpenConfirmDeleteRoundDialog(true)
-                        setIdRoundPicked(round.id)
-                      }}
-                    >
-                      <DeleteIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip>
+                  <div style={{ position: 'absolute', top: '-48px', right: 0 }}>
+                    <Tooltip title="Sửa" placement="top">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          dialogEditRoundRef.current.handleClickOpen(round)
+                        }}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Xóa vòng đấu" placement="top">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          setOpenConfirmDeleteRoundDialog(true)
+                          setIdRoundPicked(round.id)
+                        }}
+                      >
+                        <DeleteIcon fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
                 </div>
 
                 <Box width="100%" overflow="auto">
@@ -217,7 +227,7 @@ export default function ScheduleLeague(props: Props) {
                     type="submit"
                     startIcon={<Icon>control_point</Icon>}
                     onClick={() => {
-                      dialogCreateMatchRef.current.handleClickOpen(round.id)
+                      dialogCreateMatchRef.current.handleClickOpen(round)
                     }}
                   />
                 </div>
@@ -234,6 +244,12 @@ export default function ScheduleLeague(props: Props) {
       />
       <DialogCreateRound
         ref={dialogCreateRoundRef}
+        setIsLoading={props.setIsLoading}
+        isLoading={props.isLoading}
+        fetchScheduleCup={fetchScheduleCup}
+      />
+      <DialogEditRound
+        ref={dialogEditRoundRef}
         setIsLoading={props.setIsLoading}
         isLoading={props.isLoading}
         fetchScheduleCup={fetchScheduleCup}

@@ -3,7 +3,7 @@ import { Button, Grid, IconButton, TextField } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import { createRound } from 'app/apis/leagues/leagues.service'
+import { editRound } from 'app/apis/leagues/leagues.service'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
@@ -14,14 +14,18 @@ interface Props {
   fetchScheduleCup: any
 }
 
-const DialogCreateRound = React.forwardRef((props: Props, ref) => {
+const DialogEditRound = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
   const [nameRound, setNameRound] = React.useState<any>('')
   const [order, setOrder] = React.useState<any>('')
+  const [idRound, setIdRound] = React.useState<any>('')
   const params = useParams()
   React.useImperativeHandle(ref, () => ({
-    handleClickOpen: () => {
+    handleClickOpen: (round: any) => {
+      setNameRound(round.name)
+      setOrder(round.idOrder)
+      setIdRound(round.id)
       setOpen(true)
     },
     handleClose: () => {
@@ -29,7 +33,7 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
     },
   }))
 
-  const addRound = async () => {
+  const edit = async () => {
     props.setIsLoading(true)
     const payload = {
       name: nameRound,
@@ -38,17 +42,17 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
       matches: [],
     }
     try {
-      const res = await createRound(params.id, payload)
+      const res = await editRound(idRound, payload)
       if (res) {
         props.fetchScheduleCup()
         toastSuccess({
-          message: 'Tạo vòng thành công',
+          message: 'Sửa vòng thành công',
         })
         handleClose()
       }
     } catch (e) {
       toastError({
-        message: 'Tạo vòng thất bại',
+        message: 'Sửa vòng thất bại',
       })
     } finally {
       props.setIsLoading(false)
@@ -109,7 +113,7 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
                 variant="contained"
                 disabled={props.isLoading}
                 style={{ padding: '12px 20px' }}
-                onClick={addRound}
+                onClick={edit}
               >
                 Lưu
               </Button>
@@ -128,4 +132,4 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
   )
 })
 
-export default DialogCreateRound
+export default DialogEditRound

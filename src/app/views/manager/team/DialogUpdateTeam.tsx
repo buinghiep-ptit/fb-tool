@@ -95,7 +95,8 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
           else return true
         })
         .test('fileSize', 'Dung lượng file <= 10MB', value => {
-          return Math.floor(value?.size / 1000000) <= 10
+          if (value?.size) return Math.floor(value?.size / 1000000) <= 10
+          else return true
         }),
     })
     .required()
@@ -146,9 +147,12 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
   }
 
   const fetchTeamDetail = async () => {
-    const res = await getTeamDetail(props.teamId)
-    setTeam(res)
-    initDefaultValues(res)
+    await getTeamDetail(props.teamId)
+      .then(res => {
+        setTeam(res)
+        initDefaultValues(res)
+      })
+      .catch(() => {})
   }
 
   React.useEffect(() => {

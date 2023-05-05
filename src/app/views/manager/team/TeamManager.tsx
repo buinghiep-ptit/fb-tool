@@ -23,6 +23,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { red } from '@mui/material/colors'
 import { Box } from '@mui/system'
@@ -66,11 +67,15 @@ export default function TeamManager(props: Props) {
       type: typeFilter ? 1 : null,
       page: page,
       size: rowsPerPage,
-    }).then(res => {
-      setTeams(res.content)
-      setCountTable(res.totalElements)
     })
-    setIsLoading(false)
+      .then(res => {
+        setTeams(res.content)
+        setCountTable(res.totalElements)
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const search = () => {
@@ -124,7 +129,6 @@ export default function TeamManager(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý thông tin các đội bóng', path: '/teams' },
-            { name: 'Danh sách các đội bóng' },
           ]}
         />
       </Box>
@@ -143,7 +147,7 @@ export default function TeamManager(props: Props) {
         />
       </Stack>
 
-      <Stack gap={3}>
+      <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
             <Grid item xs={5}>
@@ -184,17 +188,24 @@ export default function TeamManager(props: Props) {
               </FormControl>
             </Grid>
             <Grid item xs={2} textAlign="center">
-              <FormControlLabel
-                label="Thuộc CAHN"
-                control={
-                  <Checkbox
-                    checked={typeFilter}
-                    onChange={e => {
-                      setTypeFilter(e.target.checked)
-                    }}
-                  />
-                }
-              />
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="100%"
+              >
+                <FormControlLabel
+                  label="Thuộc CAHN"
+                  control={
+                    <Checkbox
+                      checked={typeFilter}
+                      onChange={e => {
+                        setTypeFilter(e.target.checked)
+                      }}
+                    />
+                  }
+                />
+              </Box>
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid
@@ -239,8 +250,13 @@ export default function TeamManager(props: Props) {
         </SimpleCard>
 
         <div style={{ height: '30px' }} />
-        <SimpleCard title="Danh sách đội">
-          <Box width="100%" overflow="auto">
+        <SimpleCard title="Danh sách các đội bóng">
+          {teams?.length === 0 && (
+            <Typography color="gray" textAlign="center">
+              Không có dữ liệu
+            </Typography>
+          )}
+          <Box width="100%" overflow="auto" hidden={teams?.length === 0}>
             <StyledTable>
               <TableHead>
                 <TableRow>
@@ -322,20 +338,20 @@ export default function TeamManager(props: Props) {
                 })}
               </TableBody>
             </StyledTable>
+            <TablePagination
+              sx={{ px: 2 }}
+              page={page}
+              component="div"
+              rowsPerPage={rowsPerPage}
+              count={countTable}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[20, 50, 100]}
+              labelRowsPerPage={'Dòng / Trang'}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+            />
           </Box>
-          <TablePagination
-            sx={{ px: 2 }}
-            page={page}
-            component="div"
-            rowsPerPage={rowsPerPage}
-            count={countTable}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-          />
         </SimpleCard>
       </Stack>
 

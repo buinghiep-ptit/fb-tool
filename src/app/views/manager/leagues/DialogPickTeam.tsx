@@ -28,6 +28,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { red } from '@mui/material/colors'
 import { getTeams } from 'app/apis/teams/teams.service'
 import { SimpleCard, StyledTable } from 'app/components'
+import { remove } from 'lodash'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import { headTableTeams } from '../team/const'
@@ -102,9 +103,8 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
   }
 
   React.useEffect(() => {
-    console.log(props.teamPicked)
     fetchListTeam()
-  }, [page, doRerender, props.teamPicked])
+  }, [page, doRerender])
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -117,25 +117,28 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    const listPicked = (teams || []).filter(
-      (item: any) => item.isPicked === true,
-    )
-    props.setValue(
-      'teamList',
-      listPicked.map((item: any) => item.id),
-    )
-    props.setTeamPicked(listPicked.map((item: any) => item.id))
+    props.setValue('teamList', props.teamPicked)
   }
 
   const handlePick = (id: number) => {
     const newList = [...teams]
+    if (newList[id].isPicked) {
+      const newListPicked = remove(props.teamPicked, function (n) {
+        return n !== newList[id].id
+      })
+      props.setTeamPicked(newListPicked)
+    } else {
+      const newListPicked = [...props.teamPicked, newList[id].id]
+      props.setTeamPicked(newListPicked)
+    }
+
     newList[id].isPicked = !teams[id].isPicked
     setTeams(newList)
   }
 
   return (
     <div>
-      <Dialog open={open} fullScreen>
+      <Dialog open={open} maxWidth="xl">
         <DialogTitle>
           <div
             style={{

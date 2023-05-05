@@ -3,12 +3,11 @@ import { lazy } from 'react'
 
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
+const NewsDetail = Loadable(lazy(() => import('./news/NewsDetail')))
+const NewsCreate = Loadable(lazy(() => import('./news/NewsCreate')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
 const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
 const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
-const ScheduleManager = Loadable(
-  lazy(() => import('./schedule/ScheduleManager')),
-)
 const ShopManager = Loadable(lazy(() => import('./shop/ShopManager')))
 const TeamManager = Loadable(lazy(() => import('./team/TeamManager')))
 const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
@@ -22,8 +21,15 @@ const Product = Loadable(lazy(() => import('./shop/Product')))
 const PlayerDetail = Loadable(lazy(() => import('./player/PlayerDetail')))
 const CreatePlayer = Loadable(lazy(() => import('./player/CreatePlayer')))
 const LeaguesManager = Loadable(lazy(() => import('./leagues/Leagues')))
+const MatchManager = Loadable(lazy(() => import('./matches/MatchManager')))
+const MatchDetail = Loadable(lazy(() => import('./matches/MatchDetail')))
 const CreateLeagues = Loadable(lazy(() => import('./leagues/CreateLeagues')))
 const EditLeagues = Loadable(lazy(() => import('./leagues/EditLeagues')))
+const CoachManager = Loadable(lazy(() => import('./coach/CoachManager')))
+const MemberManager = Loadable(lazy(() => import('./members/MemberManager')))
+const MemberDetail = Loadable(lazy(() => import('./members/MemberDetail')))
+const MemberSetting = Loadable(lazy(() => import('./members/MemberSetting')))
+
 const managerRoutes = [
   {
     path: '/customers',
@@ -33,12 +39,14 @@ const managerRoutes = [
     path: '/customers/:idCustomer',
     element: <EditCustomer />,
   },
+  { path: '/coachs', element: <CoachManager /> },
   { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },
+  { path: '/news/:id', element: <NewsDetail /> },
+  { path: '/news/create', element: <NewsCreate /> },
   { path: '/accounts', element: <AccountManager /> },
   { path: '/teams', element: <TeamManager /> },
-  { path: '/schedules', element: <ScheduleManager /> },
   { path: '/videos', element: <VideoManager /> },
   { path: '/shop/sort', element: <SortManager /> },
   { path: '/shop/category/:id', element: <DetailCategory /> },
@@ -70,5 +78,10 @@ const managerRoutes = [
     path: '/banner/:bannerID/*',
     element: <AddBanner />,
   },
+  { path: '/matches', element: <MatchManager /> },
+  { path: '/matches/:id', element: <MatchDetail /> },
+  { path: '/members', element: <MemberManager /> },
+  { path: '/members/:id', element: <MemberDetail /> },
+  { path: '/members/setting', element: <MemberSetting /> },
 ]
 export default managerRoutes

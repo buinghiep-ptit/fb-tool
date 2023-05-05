@@ -78,31 +78,49 @@ export default function PlayerDetail(props: Props) {
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       dominantFoot: yup.string().nullable(),
       clothersNumber: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
-        .nullable(),
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable()
+        .max(2, 'Nhấp không quá 2 ký tự'),
       height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       sizeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số'),
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .nullable(),
       sizeSpikeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số'),
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .nullable(),
       sizeClothers: yup.string().nullable(),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
-        : yup.string(),
-      countMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
-      cleanMatch: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
-      goal: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
-      yellowCard: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
-      redCard: yup.string().matches(/^[0-9\s]*$/, 'Nhập số'),
+        : yup.string().nullable(),
+      countMatch: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable(),
+      cleanMatch: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable(),
+      goal: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable(),
+      yellowCard: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable(),
+      redCard: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
+        .nullable(),
       oldClub: yup
         .string()
         .trim()
-        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
+        .max(255, 'Tên đối tác không được vượt quá 255 ký tự')
+        .nullable(),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),
     })

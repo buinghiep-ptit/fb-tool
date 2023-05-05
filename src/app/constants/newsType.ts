@@ -1,7 +1,7 @@
 export const NEWS_TYPES = {
-  HIGHLIGHT: { id: 1, label: 'Trận đấu' },
+  MATCH: { id: 1, label: 'Trận đấu' },
   TEAM: { id: 2, label: 'Đội bóng' },
-  PLAYER: { id: 3, label: 'Phỏng vấn' },
+  INTERVIEW: { id: 3, label: 'Phỏng vấn' },
   PRODUCT: { id: 4, label: 'Sản phẩm' },
   MEMBERSHIP: { id: 5, label: 'Cổ động viên' },
   OTHER: { id: 6, label: 'Khác' },

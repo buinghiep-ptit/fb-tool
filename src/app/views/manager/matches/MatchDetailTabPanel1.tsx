@@ -16,6 +16,7 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { updateMatch } from 'app/apis/matches/matches.service'
 import { SimpleCard } from 'app/components'
 import DialogSelectNews from 'app/components/DialogSelect/DialogSelectNews'
 import DialogSelectVideo from 'app/components/DialogSelect/DialogSelectVideo'
@@ -23,8 +24,9 @@ import MultipleNewsSelect from 'app/components/DynamicAutocomplete/MultipleNewsS
 import MultipleVideosSelect from 'app/components/DynamicAutocomplete/MultipleVideosSelect'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { MATCH_STATUSES } from 'app/constants/matchStatuses'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import PropTypes from 'prop-types'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
@@ -50,10 +52,6 @@ export default function MatchDetailTabPanel1(props: any) {
 
   const [relatedNews, setRelatedNews] = useState([])
   const [relatedVideos, setRelatedVideos] = useState([])
-
-  useEffect(() => {
-    console.log(relatedVideos) // TODO consume api
-  }, [relatedVideos])
 
   const schema = yup.object({
     status: yup.number().required('Giá trị bắt buộc'),
@@ -131,22 +129,38 @@ export default function MatchDetailTabPanel1(props: any) {
   }
 
   React.useEffect(() => {
-    // TODO pending api, init related lists
-    if (match) initDefaultValues(match)
-  }, [])
+    if (match) {
+      initDefaultValues(match)
+      setRelatedNews(match.listNews.map((n: any) => n.id))
+      setRelatedVideos(match.listVideo.map((v: any) => v.id))
+    }
+  }, [match])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
     const payload: any = {
+      id: match.id,
       status: data.status,
       dateStart: data.dateStart,
       stadium: data.stadium,
       preMatchSummary: data.preMatchSummary,
       team1Goal: data.team1Goal,
       team2Goal: data.team2Goal,
+      listVideo: relatedVideos.map((v: any) => ({ id: v.id })),
+      listNews: relatedNews.map((n: any) => ({ id: n.id })),
     }
-    // TODO consume api
-    setIsLoading(false)
+
+    await updateMatch(payload)
+      .then(() => {
+        toastSuccess({
+          message: 'Thành công',
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+        refresh()
+      })
   }
 
   return (
@@ -337,7 +351,6 @@ export default function MatchDetailTabPanel1(props: any) {
                         />
                       )}
                     />
-                    {/* // TODO pending api */}
                     <MinimizeIcon sx={{ mt: '20px' }} />
                     <Controller
                       name="team2Goal"
@@ -380,7 +393,7 @@ export default function MatchDetailTabPanel1(props: any) {
                     Lưu
                   </Button>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
                       navigate(-1)

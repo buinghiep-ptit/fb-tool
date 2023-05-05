@@ -7,17 +7,18 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormLabel,
   Grid,
   IconButton,
   LinearProgress,
   TextField,
-  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { approveMember } from 'app/apis/members/members.service'
 import MuiRHFTextarea from 'app/components/common/MuiRHFTextarea'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import dayjs from 'dayjs'
 import React from 'react'
@@ -114,7 +115,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
       amount: data.amount,
       numOfYears: yearCount,
       years: years.join(','),
-      note: data.note,
+      note: data.note ? data.note : null,
     }
     setIsLoading(false)
     await approveMember(idRegistration, payload)
@@ -230,25 +231,20 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                 </Grid>
               </LocalizationProvider>
 
-              <Controller
-                name="amount"
-                control={methods.control}
-                render={({ field }) => (
-                  <TextField
-                    error={!!methods.formState.errors?.amount}
-                    helperText={methods.formState.errors?.amount?.message}
-                    {...field}
-                    label="Mức phí hội viên (tổng tiền)*"
-                    type="number"
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                  />
-                )}
-              />
+              <FormControl fullWidth margin="normal">
+                <MuiRHFNumericFormatInput
+                  name="amount"
+                  label="Mức phí hội viên (tổng tiền)*"
+                  fullWidth
+                />
+              </FormControl>
 
-              <Typography>Ghi chú</Typography>
-              <MuiRHFTextarea name="note" label="Ghi chú" />
+              <FormControl fullWidth margin="normal">
+                <FormLabel error={!!methods.formState.errors?.note}>
+                  Ghi chú
+                </FormLabel>
+                <MuiRHFTextarea name="note" label="Ghi chú" />
+              </FormControl>
             </DialogContent>
             <DialogActions sx={{ textAlign: 'center' }}>
               <Button

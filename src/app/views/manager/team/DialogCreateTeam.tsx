@@ -77,7 +77,11 @@ const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
         .mixed()
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
-          return ['png', 'jpg', 'jpeg'].includes(value?.name?.split('.').pop())
+          if (value && value.name)
+            return ['png', 'jpg', 'jpeg'].includes(
+              value?.name?.split('.').pop(),
+            )
+          else return true
         })
         .test('fileSize', 'Dung lượng file <= 10MB', value => {
           return Math.floor(value?.size / 1000000) <= 10

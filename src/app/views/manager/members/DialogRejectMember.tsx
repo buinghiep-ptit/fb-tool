@@ -6,9 +6,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormLabel,
   IconButton,
   LinearProgress,
-  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { rejectMember } from 'app/apis/members/members.service'
@@ -62,7 +63,7 @@ const DialogRejectMember = React.forwardRef((props: Props, ref) => {
     setIsLoading(true)
 
     const payload: any = {
-      note: data.note,
+      note: data.note ? data.note : null,
     }
 
     await rejectMember(idRegistration, payload)
@@ -112,8 +113,12 @@ const DialogRejectMember = React.forwardRef((props: Props, ref) => {
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
             <DialogContent>
-              <Typography>Ghi chú</Typography>
-              <MuiRHFTextarea name="note" label="Ghi chú" />
+              <FormControl fullWidth margin="normal">
+                <FormLabel error={!!methods.formState.errors?.note}>
+                  Ghi chú
+                </FormLabel>
+                <MuiRHFTextarea name="note" label="Ghi chú" />
+              </FormControl>
             </DialogContent>
             <DialogActions sx={{ textAlign: 'center' }}>
               <Button

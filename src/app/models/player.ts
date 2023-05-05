@@ -1,7 +1,7 @@
 export interface TitlePlayer {
   name?: string
   id?: number
-  idTeam?: number
+  idTeam?: string
   priority?: number
   position?: string
   height?: number

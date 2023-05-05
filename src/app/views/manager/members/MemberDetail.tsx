@@ -202,7 +202,9 @@ export default function MemberDetail(props: Props) {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell variant="head">Họ và tên</TableCell>
+                  <TableCell variant="head" style={{ minWidth: '100px' }}>
+                    Họ và tên
+                  </TableCell>
                   <TableCell variant="body">{member?.name}</TableCell>
                 </TableRow>
                 <TableRow>

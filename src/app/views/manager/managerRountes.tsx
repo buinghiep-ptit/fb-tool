@@ -3,6 +3,8 @@ import { lazy } from 'react'
 
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
+const NewsDetail = Loadable(lazy(() => import('./news/NewsDetail')))
+const NewsCreate = Loadable(lazy(() => import('./news/NewsCreate')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
 const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
 const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
@@ -41,6 +43,8 @@ const managerRoutes = [
   { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },
+  { path: '/news/:id', element: <NewsDetail /> },
+  { path: '/news/create', element: <NewsCreate /> },
   { path: '/accounts', element: <AccountManager /> },
   { path: '/teams', element: <TeamManager /> },
   { path: '/videos', element: <VideoManager /> },

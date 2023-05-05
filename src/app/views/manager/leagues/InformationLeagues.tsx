@@ -38,6 +38,7 @@ export default function InfomationLeagues(props: Props) {
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState([])
   const [logo, setLogo] = useState('')
+  const [typeLeague, setTypeLeague] = useState<any>('')
   const DialogPickTeamRef = useRef<any>(null)
   const schema = yup
     .object({
@@ -93,7 +94,7 @@ export default function InfomationLeagues(props: Props) {
     } else {
       urlLogo = logo
     }
-    console.log(data, teamPicked)
+
     try {
       if (params?.id) {
         const res = await editLeagues(
@@ -138,6 +139,7 @@ export default function InfomationLeagues(props: Props) {
     defaultValues.teamList = league.teamList.map((item: any) => item.id)
     setTeamPicked(league.teamList.map((item: any) => item.id))
     setLogo(league.logo || '')
+    setTypeLeague(league.category)
     methods.reset({ ...defaultValues })
   }
 
@@ -240,9 +242,15 @@ export default function InfomationLeagues(props: Props) {
                       </InputLabel>
                       <Select
                         {...field}
+                        disabled={!!params.id}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Thể Loại*"
+                        value={typeLeague}
+                        onChange={(e: any) => {
+                          setTypeLeague(e.target.value)
+                          methods.setValue('category', e.target.value)
+                        }}
                       >
                         <MenuItem value={1}>League</MenuItem>
                         <MenuItem value={2}>Cup</MenuItem>
@@ -373,10 +381,12 @@ export default function InfomationLeagues(props: Props) {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <MuiCheckBox
-                  name="isDisplayRank"
-                  label="Hiển thị BXH trên tràng chủ"
-                />
+                {typeLeague === 1 && (
+                  <MuiCheckBox
+                    name="isDisplayRank"
+                    label="Hiển thị BXH trên trang chủ"
+                  />
+                )}
                 <MuiCheckBox
                   name="isDisplaySchedule"
                   label="Hiển thị lịch đấu trên website"
@@ -408,14 +418,16 @@ export default function InfomationLeagues(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-      <DialogPickTeam
-        isLoading={props.isLoading}
-        setIsLoading={props.setIsLoading}
-        ref={DialogPickTeamRef}
-        setTeamPicked={setTeamPicked}
-        setValue={methods.setValue}
-        teamPicked={teamPicked}
-      />
+      {teamPicked.length && (
+        <DialogPickTeam
+          isLoading={props.isLoading}
+          setIsLoading={props.setIsLoading}
+          ref={DialogPickTeamRef}
+          setTeamPicked={setTeamPicked}
+          setValue={methods.setValue}
+          teamPicked={teamPicked}
+        />
+      )}
     </Container>
   )
 }

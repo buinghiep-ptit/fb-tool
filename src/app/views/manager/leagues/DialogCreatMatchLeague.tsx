@@ -10,13 +10,14 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { createMatch } from 'app/apis/leagues/leagues.service'
+import { createMatchForRound } from 'app/apis/leagues/leagues.service'
 import { MuiRHFDateTimePicker } from 'app/components/common/MuiRHFDateTimePicker'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
@@ -29,12 +30,17 @@ interface Props {
   fetchScheduleCup: any
 }
 
-const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
+const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
+  const [idRound, setIdRound] = React.useState(null)
+  const [nameRound, setNameRound] = React.useState(null)
+  const [status, setStatus] = React.useState<any>(0)
 
   React.useImperativeHandle(ref, () => ({
-    handleClickOpen: () => {
+    handleClickOpen: (round: any) => {
+      setIdRound(round.id)
+      setNameRound(round.name)
       setOpen(true)
     },
     handleClose: () => {
@@ -66,8 +72,14 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       dateStart: yup.string().required('Giá trị bắt buộc'),
       status: yup.string(),
       stadium: yup.string().trim(),
-      goalForTeamA: yup.string().required('Giá trị bắt buộc'),
-      goalForTeamB: yup.string().required('Giá trị bắt buộc'),
+      goalForTeamA:
+        status === 1 || status === 2
+          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+          : yup.string(),
+      goalForTeamB:
+        status === 1 || status === 2
+          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+          : yup.string(),
     })
     .required()
 
@@ -86,21 +98,16 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
     const payload = {
-      rounds: [],
-      matches: [
-        {
-          idTeamA: data.idTeamA,
-          goalForTeamA: data.goalForTeamA,
-          idTeamB: data.idTeamB,
-          goalForTeamB: data.goalForTeamB,
-          dateStart: new Date(data.dateStart).toISOString() || null,
-          status: data.status,
-          stadium: data.stadium,
-        },
-      ],
+      idTeamA: data.idTeamA,
+      goalForTeamA: data.goalForTeamA,
+      idTeamB: data.idTeamB,
+      goalForTeamB: data.goalForTeamB,
+      dateStart: new Date(data.dateStart).toISOString() || null,
+      status: status,
+      stadium: data.stadium,
     }
     try {
-      const res = await createMatch(payload, leagues.id)
+      const res = await createMatchForRound(payload, idRound)
       if (res) {
         toastSuccess({
           message: 'Thêm trận đấu thành công',
@@ -138,6 +145,9 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
+                  <Typography>Vòng đấu: {nameRound}</Typography>
+                </Grid>
+                <Grid item xs={12}>
                   <Controller
                     name="idTeamA"
                     control={methods.control}
@@ -148,14 +158,14 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                         error={!!methods.formState.errors?.idTeamA}
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Đội bóng 1*
+                          Đội bóng chủ nhà*
                         </InputLabel>
                         <Select
                           autoWidth
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Đội bóng 1*:"
+                          label="Đội bóng chủ nhà*"
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -183,14 +193,14 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                         error={!!methods.formState.errors?.idTeamB}
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Đội bóng 2*
+                          Đội bóng sân khách*
                         </InputLabel>
                         <Select
                           autoWidth
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Đội bóng 2*"
+                          label="Đội bóng sân khách*"
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -251,6 +261,8 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Chân thuận"
+                          onChange={e => setStatus(e.target.value)}
+                          value={status}
                         >
                           <MenuItem value={0}>Chưa diễn ra</MenuItem>
                           <MenuItem value={1}>Đang diễn ra</MenuItem>
@@ -267,47 +279,49 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <InputLabel id="demo-simple-select-label">
-                    Tỷ số trận đấu*
-                  </InputLabel>
-                  <Controller
-                    name="goalForTeamA"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamA}
-                        helperText={
-                          methods.formState.errors?.goalForTeamA?.message
-                        }
-                        {...field}
-                        variant="outlined"
-                        margin="normal"
-                        style={{ width: '100px', marginRight: '20px' }}
-                      />
-                    )}
-                  />
+                {(status === 1 || status === 2) && (
+                  <Grid item xs={12}>
+                    <InputLabel id="demo-simple-select-label">
+                      Tỷ số trận đấu*
+                    </InputLabel>
+                    <Controller
+                      name="goalForTeamA"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamA}
+                          helperText={
+                            methods.formState.errors?.goalForTeamA?.message
+                          }
+                          {...field}
+                          variant="outlined"
+                          margin="normal"
+                          style={{ width: '100px', marginRight: '20px' }}
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="goalForTeamB"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamB}
-                        helperText={
-                          methods.formState.errors?.goalForTeamB?.message
-                        }
-                        {...field}
-                        style={{ width: '100px' }}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    )}
-                  />
-                </Grid>
+                    <Controller
+                      name="goalForTeamB"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamB}
+                          helperText={
+                            methods.formState.errors?.goalForTeamB?.message
+                          }
+                          {...field}
+                          style={{ width: '100px' }}
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      )}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </FormProvider>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ marginTop: '15px' }}>
               <Button
                 color="primary"
                 type="submit"
@@ -333,4 +347,4 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
   )
 })
 
-export default DialogCreateMatch
+export default DialogCreateMatchLeague

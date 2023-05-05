@@ -280,6 +280,7 @@ export default function NewsCreate(props: Props) {
                                 Lưu ý: Sau khi chọn, tin tức sẽ được đưa lên đầu
                                 danh sách, và thay thế vào vị trí đã chọn
                               </FormHelperText>
+                              {/* TODO Tai 1 thoi diem chi co 3 tin tuc noi bat. Neu tiep tuc, tin tuc nay se thay the tin tuc noi bat o vi tri tuong ung */}
                               {!!methods.formState.errors?.priority
                                 ?.message && (
                                 <FormHelperText error>

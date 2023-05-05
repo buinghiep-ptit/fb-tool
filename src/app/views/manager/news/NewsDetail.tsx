@@ -474,6 +474,7 @@ export default function NewsDetail(props: Props) {
               >
                 {news?.status === 1 ? 'Hạ bài' : 'Đăng bài'}
               </Button>
+              {/* TODO confirmation */}
               <Button
                 variant="outlined"
                 disabled={isLoading}

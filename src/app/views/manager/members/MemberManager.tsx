@@ -55,11 +55,11 @@ export default function MatchManager(props: Props) {
       status: statusFilter === 99 ? null : statusFilter,
       from:
         fromFilter && dayjs(fromFilter).isValid()
-          ? dayjs(fromFilter).toISOString()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
           : '',
       to:
         toFilter && dayjs(toFilter).isValid()
-          ? dayjs(toFilter).toISOString()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
           : '',
       page: page,
       size: rowsPerPage,
@@ -189,6 +189,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Từ ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={fromFilter}
                   value={fromFilter}
                   onChange={newValue => setFromFilter(newValue)}
                   renderInput={(params: any) => (
@@ -209,6 +211,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Đến ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={toFilter}
                   value={toFilter}
                   onChange={newValue => setToFilter(newValue)}
                   renderInput={(params: any) => (

@@ -63,11 +63,11 @@ export default function NewsManager(props: Props) {
       newCategory: typeFilter === 99 ? null : typeFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
-          ? dayjs(fromFilter).toISOString()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
           : '',
       dateEnd:
         toFilter && dayjs(toFilter).isValid()
-          ? dayjs(toFilter).toISOString()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
           : '',
       page: page,
       size: rowsPerPage,
@@ -217,6 +217,7 @@ export default function NewsManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Từ ngày"
+                  key={fromFilter}
                   value={fromFilter}
                   onChange={newValue => setFromFilter(newValue)}
                   inputFormat="DD/MM/YYYY"
@@ -238,6 +239,7 @@ export default function NewsManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Đến ngày"
+                  key={toFilter}
                   value={toFilter}
                   onChange={newValue => setToFilter(newValue)}
                   inputFormat="DD/MM/YYYY"

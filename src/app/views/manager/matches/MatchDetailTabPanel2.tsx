@@ -2,8 +2,9 @@ import ControlPointIcon from '@mui/icons-material/ControlPoint'
 import SortIcon from '@mui/icons-material/Sort'
 import { Button, List, ListItem } from '@mui/material'
 import { Box } from '@mui/system'
+import { getMatchProcesses } from 'app/apis/matches/matches.service'
 import PropTypes from 'prop-types'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import DialogSortProcesses from './DialogSortProcesses'
 import MatchProcess from './MatchProcess'
 import MatchProcessCreate from './MatchProcessCreate'
@@ -15,15 +16,29 @@ MatchDetailTabPanel2.propTypes = {
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
-  refresh: PropTypes.func.isRequired,
 }
 
 export default function MatchDetailTabPanel2(props: any) {
-  const { value, index, match, isLoading, setIsLoading, refresh, ...other } =
-    props
+  const { value, index, match, isLoading, setIsLoading, ...other } = props
 
   const createMatcheProcessRef = useRef<any>(null)
   const sortProcessesRef = useRef<any>(null)
+
+  const [processes, setProcesses] = useState<any>([])
+
+  const fetchMatchProcesses = async () => {
+    setIsLoading(true)
+    await getMatchProcesses(match.id)
+      .then(res => setProcesses(res.content)) // TODO update api: page -> list
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    fetchMatchProcesses()
+  }, [])
 
   return (
     <div
@@ -67,27 +82,31 @@ export default function MatchDetailTabPanel2(props: any) {
             ref={sortProcessesRef}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-            list={[]}
-            refresh={() => {}}
+            list={processes}
+            refresh={fetchMatchProcesses}
           />
           <MatchProcessCreate
             ref={createMatcheProcessRef}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             match={match}
-            refresh={() => {}}
+            refresh={fetchMatchProcesses}
           />
-          {/* // TODO api */}
+
           <List>
-            <ListItem>
-              <MatchProcess />
-            </ListItem>
-            <ListItem>
-              <MatchProcess />
-            </ListItem>
-            <ListItem>
-              <MatchProcess />
-            </ListItem>
+            {(processes || []).map((process: any, index: any) => {
+              return (
+                <ListItem key={index}>
+                  <MatchProcess
+                    match={match}
+                    matchProcess={process}
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
+                    refresh={fetchMatchProcesses}
+                  />
+                </ListItem>
+              )
+            })}
           </List>
         </Box>
       )}

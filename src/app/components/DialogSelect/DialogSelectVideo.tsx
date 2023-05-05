@@ -37,6 +37,7 @@ import { SimpleCard, StyledTable } from 'app/components'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
 import dayjs from 'dayjs'
 import * as React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { headTableVideos } from './headTableVideos'
 
 const Transition = React.forwardRef(function Transition(
@@ -64,6 +65,8 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
   const { label, isLoading, setIsLoading, selectedList, setSelectedList } =
     props
 
+  const navigate = useNavigate()
+
   const [open, setOpen] = React.useState(false)
 
   const [page, setPage] = React.useState(0)
@@ -86,11 +89,11 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
       type: typeFilter === 99 ? null : typeFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
-          ? dayjs(fromFilter).toISOString()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
           : '',
       dateEnd:
         toFilter && dayjs(toFilter).isValid()
-          ? dayjs(toFilter).toISOString()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
           : '',
       page: page,
       size: rowsPerPage,
@@ -260,6 +263,8 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                     <Grid item xs={3}>
                       <DatePicker
                         label="Từ ngày"
+                        inputFormat="DD/MM/YYYY"
+                        key={fromFilter}
                         value={fromFilter}
                         onChange={newValue => setFromFilter(newValue)}
                         renderInput={(params: any) => (
@@ -280,6 +285,8 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                     <Grid item xs={3}>
                       <DatePicker
                         label="Đến ngày"
+                        inputFormat="DD/MM/YYYY"
+                        key={toFilter}
                         value={toFilter}
                         onChange={newValue => setToFilter(newValue)}
                         renderInput={(params: any) => (
@@ -373,7 +380,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                               <Button
                                 color="info"
                                 onClick={() => {
-                                  //TODO navigate video detail
+                                  navigate('/videos/' + video.id)
                                 }}
                               >
                                 {video.title}

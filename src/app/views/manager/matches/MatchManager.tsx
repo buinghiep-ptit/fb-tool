@@ -27,6 +27,7 @@ import { Box } from '@mui/system'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { getMatches } from 'app/apis/matches/matches.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import dayjs from 'dayjs'
 import * as React from 'react'
@@ -59,79 +60,31 @@ export default function MatchManager(props: Props) {
   const [cahnFilter, setCahnFilter] = useState(false)
 
   const fetchListMatches = async () => {
-    // TODO mocking data
-    setMatches([
-      {
-        id: 1,
-        teamName: 'CAHN - Nam Định',
-        dateStart: '2023-04-25T08:36:59Z',
-        leagueName: 'V.League 1',
-        idLeague: 1,
-        stadium: 'SVD Hàng Đẫy',
-        status: 0,
-      },
-      {
-        id: 1,
-        teamName: 'Viettel - HAGL',
-        dateStart: '2023-04-25T08:36:59Z',
-        leagueName: 'V.League 2',
-        idLeague: 1,
-        stadium: 'SVD Hàng Đẫy',
-        status: 1,
-      },
-      {
-        id: 1,
-        teamName: 'Bình Định - Thanh Hóa',
-        dateStart: '2023-04-25T08:36:59Z',
-        leagueName: 'V.League 1',
-        idLeague: 1,
-        stadium: 'SVD Quy Nhơn',
-        status: 2,
-      },
-      {
-        id: 1,
-        teamName: 'Hồng Lĩnh Hà Tĩnh - Đà Nẵng',
-        dateStart: '2023-04-25T08:36:59Z',
-        leagueName: 'V.League 1',
-        idLeague: 1,
-        stadium: 'SVD Hà Tĩnh',
-        status: 3,
-      },
-      {
-        id: 1,
-        teamName: 'Sông Lam Nghệ An - Bình Dương',
-        dateStart: '2023-04-25T08:36:59Z',
-        leagueName: 'Hạng Nhất Quốc Gia',
-        idLeague: 1,
-        stadium: 'SVD Vinh',
-        status: 4,
-      },
-    ])
-    // setIsLoading(true)
-    // await getMatches({
-    //   teamName: teamFilter,
-    //   idLeague: leagueFilter,
-    //   status: statusFilter === 99 ? null : statusFilter,
-    //   dateStart:
-    //     fromFilter && dayjs(fromFilter).isValid()
-    //       ? dayjs(fromFilter).toISOString()
-    //       : '',
-    //   dateEnd:
-    //     toFilter && dayjs(toFilter).isValid()
-    //       ? dayjs(toFilter).toISOString()
-    //       : '',
-    //   isCahn: cahnFilter ? 1 : null, // TODO pending api
-    //   page: page,
-    //   size: rowsPerPage,
-    // })
-    //   .then(res => {
-    //     setMatches(res.content)
-    //     setCountTable(res.totalElements)
-    //   })
-    //   .catch(() => {})
-    //   .finally(() => {
-    //     setIsLoading(false)
-    //   })
+    setIsLoading(true)
+    await getMatches({
+      teamName: teamFilter,
+      idLeague: leagueFilter,
+      status: statusFilter === 99 ? null : statusFilter,
+      dateStart:
+        fromFilter && dayjs(fromFilter).isValid()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
+          : '',
+      dateEnd:
+        toFilter && dayjs(toFilter).isValid()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
+          : '',
+      isCahn: cahnFilter ? 1 : null, // TODO pending api
+      page: page,
+      size: rowsPerPage,
+    })
+      .then(res => {
+        setMatches(res.content)
+        setCountTable(res.totalElements)
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const search = () => {
@@ -248,6 +201,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={4}>
                 <DatePicker
                   label="Từ ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={fromFilter}
                   value={fromFilter}
                   onChange={newValue => setFromFilter(newValue)}
                   renderInput={(params: any) => (
@@ -269,6 +224,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={4}>
                 <DatePicker
                   label="Đến ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={toFilter}
                   value={toFilter}
                   onChange={newValue => setToFilter(newValue)}
                   renderInput={(params: any) => (

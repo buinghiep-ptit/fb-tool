@@ -83,6 +83,7 @@ export default function MatchManager(props: Props) {
       <MatchDetailTabPanel1
         value={tab}
         index={0}
+        matchId={params.id}
         match={match ?? {}}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
@@ -91,6 +92,7 @@ export default function MatchManager(props: Props) {
       <MatchDetailTabPanel2
         value={tab}
         index={1}
+        matchId={params.id}
         match={match ?? {}}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
@@ -98,6 +100,7 @@ export default function MatchManager(props: Props) {
       <MatchDetailTabPanel3
         value={tab}
         index={2}
+        matchId={params.id}
         match={match ?? {}}
         isLoading={isLoading}
         setIsLoading={setIsLoading}

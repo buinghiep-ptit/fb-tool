@@ -62,18 +62,18 @@ export default function MatchManager(props: Props) {
   const fetchListMatches = async () => {
     setIsLoading(true)
     await getMatches({
-      teamName: teamFilter,
-      idLeague: leagueFilter,
+      teamName: teamFilter ?? null,
+      idLeague: leagueFilter ?? null,
       status: statusFilter === 99 ? null : statusFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
           ? dayjs(fromFilter).format('YYYY-MM-DD')
-          : '',
+          : null,
       dateEnd:
         toFilter && dayjs(toFilter).isValid()
           ? dayjs(toFilter).format('YYYY-MM-DD')
-          : '',
-      isCahn: cahnFilter ? 1 : null, // TODO pending api
+          : null,
+      isCahnfc: cahnFilter ? 1 : null,
       page: page,
       size: rowsPerPage,
     })

@@ -35,6 +35,7 @@ import './style.css'
 MatchDetailTabPanel1.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  matchId: PropTypes.any.isRequired,
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
@@ -42,8 +43,16 @@ MatchDetailTabPanel1.propTypes = {
 }
 
 export default function MatchDetailTabPanel1(props: any) {
-  const { value, index, match, isLoading, setIsLoading, refresh, ...other } =
-    props
+  const {
+    value,
+    index,
+    matchId,
+    match,
+    isLoading,
+    setIsLoading,
+    refresh,
+    ...other
+  } = props
 
   const navigate = useNavigate()
 
@@ -131,15 +140,15 @@ export default function MatchDetailTabPanel1(props: any) {
   React.useEffect(() => {
     if (match) {
       initDefaultValues(match)
-      setRelatedNews(match.listNews.map((n: any) => n.id))
-      setRelatedVideos(match.listVideo.map((v: any) => v.id))
+      setRelatedNews(match.listNews?.map((n: any) => n.id))
+      setRelatedVideos(match.listVideo?.map((v: any) => v.id))
     }
   }, [match])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
     const payload: any = {
-      id: match.id,
+      id: matchId,
       status: data.status,
       dateStart: data.dateStart,
       stadium: data.stadium,
@@ -193,7 +202,7 @@ export default function MatchDetailTabPanel1(props: any) {
                   label="Giải đấu"
                   variant="standard"
                   margin="normal"
-                  value={match.leagueName}
+                  value={match?.leagueName}
                   fullWidth
                   disabled
                 />
@@ -204,7 +213,7 @@ export default function MatchDetailTabPanel1(props: any) {
                   margin="normal"
                   fullWidth
                   disabled
-                  value={match.teamName}
+                  value={match?.teamName}
                 />
 
                 <Controller

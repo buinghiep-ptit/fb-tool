@@ -13,13 +13,15 @@ import './style.css'
 MatchDetailTabPanel2.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  matchId: PropTypes.any.isRequired,
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
 }
 
 export default function MatchDetailTabPanel2(props: any) {
-  const { value, index, match, isLoading, setIsLoading, ...other } = props
+  const { value, index, matchId, match, isLoading, setIsLoading, ...other } =
+    props
 
   const createMatcheProcessRef = useRef<any>(null)
   const sortProcessesRef = useRef<any>(null)
@@ -28,7 +30,7 @@ export default function MatchDetailTabPanel2(props: any) {
 
   const fetchMatchProcesses = async () => {
     setIsLoading(true)
-    await getMatchProcesses(match.id)
+    await getMatchProcesses(matchId)
       .then(res => setProcesses(res.content)) // TODO update api: page -> list
       .catch(() => {})
       .finally(() => {

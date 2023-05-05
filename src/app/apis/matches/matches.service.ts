@@ -8,12 +8,12 @@ export const getMatches = async (params: any): Promise<any> => {
 }
 
 export const getMatchDetail = async (id: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/matches/${id}`)
+  const { data } = await http.get<any>(`/api/match/${id}`)
   return data
 }
 
 export const updateMatch = async (params: any): Promise<any> => {
-  const { data } = await http.put<any>(`/api/matches`, params)
+  const { data } = await http.put<any>(`/api/match`, params)
   return data
 }
 

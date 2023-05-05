@@ -242,6 +242,7 @@ export default function InfomationLeagues(props: Props) {
                       </InputLabel>
                       <Select
                         {...field}
+                        disabled={!!params.id}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Thể Loại*"
@@ -417,14 +418,16 @@ export default function InfomationLeagues(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-      <DialogPickTeam
-        isLoading={props.isLoading}
-        setIsLoading={props.setIsLoading}
-        ref={DialogPickTeamRef}
-        setTeamPicked={setTeamPicked}
-        setValue={methods.setValue}
-        teamPicked={teamPicked}
-      />
+      {teamPicked.length && (
+        <DialogPickTeam
+          isLoading={props.isLoading}
+          setIsLoading={props.setIsLoading}
+          ref={DialogPickTeamRef}
+          setTeamPicked={setTeamPicked}
+          setValue={methods.setValue}
+          teamPicked={teamPicked}
+        />
+      )}
     </Container>
   )
 }

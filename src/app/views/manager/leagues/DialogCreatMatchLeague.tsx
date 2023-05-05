@@ -32,9 +32,11 @@ interface Props {
 const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
+  const [idRound, setIdRound] = React.useState(null)
 
   React.useImperativeHandle(ref, () => ({
-    handleClickOpen: () => {
+    handleClickOpen: (id: any) => {
+      setIdRound(id)
       setOpen(true)
     },
     handleClose: () => {
@@ -95,7 +97,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
       stadium: data.stadium,
     }
     try {
-      const res = await createMatchForRound(payload, leagues.id)
+      const res = await createMatchForRound(payload, idRound)
       if (res) {
         toastSuccess({
           message: 'Thêm trận đấu thành công',

@@ -74,12 +74,12 @@ export const createRound = async (id: any, params: any): Promise<any> => {
 }
 
 export const addTeam = async (id: any, teamId: any): Promise<any> => {
-  const { data } = await http.post<any>(`/api/leagues/${id}/add/team/${teamId}`)
+  const { data } = await http.put<any>(`/api/leagues/${id}/add/team/${teamId}`)
   return data
 }
 
 export const removeTeam = async (id: any, teamId: any): Promise<any> => {
-  const { data } = await http.post<any>(
+  const { data } = await http.put<any>(
     `/api/leagues/${id}/remove/team/${teamId}`,
   )
   return data

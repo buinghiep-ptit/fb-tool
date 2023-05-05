@@ -217,7 +217,7 @@ export default function ScheduleLeague(props: Props) {
                     type="submit"
                     startIcon={<Icon>control_point</Icon>}
                     onClick={() => {
-                      dialogCreateMatchRef.current.handleClickOpen()
+                      dialogCreateMatchRef.current.handleClickOpen(round.id)
                     }}
                   />
                 </div>

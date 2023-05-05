@@ -63,11 +63,11 @@ export default function NewsManager(props: Props) {
       newCategory: typeFilter === 99 ? null : typeFilter,
       dateStart:
         fromFilter && dayjs(fromFilter).isValid()
-          ? dayjs(fromFilter).toISOString()
+          ? dayjs(fromFilter).format('YYYY-MM-DD')
           : '',
       dateEnd:
         toFilter && dayjs(toFilter).isValid()
-          ? dayjs(toFilter).toISOString()
+          ? dayjs(toFilter).format('YYYY-MM-DD')
           : '',
       page: page,
       size: rowsPerPage,

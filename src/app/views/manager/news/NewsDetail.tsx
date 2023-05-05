@@ -103,9 +103,12 @@ export default function NewsDetail(props: Props) {
     defaultValues.priority = news.priority
     defaultValues.description = news.description
     defaultValues.content = news.content
-    defaultValues.keyword = news.keyWord.split(',').map((k: any) => ({
-      value: k,
-    }))
+    defaultValues.keyword =
+      news.keyWord.length > 0
+        ? news.keyWord.split(',').map((k: any) => ({
+            value: k,
+          }))
+        : []
     methods.reset({ ...defaultValues })
     setPreviewImage(news.imgUrl)
     setIsHot(!!news.priority)

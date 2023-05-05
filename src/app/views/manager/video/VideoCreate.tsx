@@ -171,103 +171,89 @@ export default function VideoCreate(props: Props) {
                     />
                   )}
                 />
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Controller
-                      name="type"
-                      control={methods.control}
-                      render={({ field }) => (
-                        <FormControl fullWidth margin="normal">
-                          <InputLabel id="demo-simple-select-label">
-                            Loại video*
-                          </InputLabel>
-                          <Select
-                            fullWidth
-                            {...field}
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            label="Loại video*"
-                          >
-                            {Object.values(VIDEO_TYPES).map((type, index) => {
-                              return (
-                                <MenuItem key={index} value={type.id}>
-                                  {type.label}
-                                </MenuItem>
-                              )
-                            })}
-                          </Select>
-                          {!!methods.formState.errors?.type?.message && (
-                            <FormHelperText>
-                              {methods.formState.errors?.type.message}
-                            </FormHelperText>
-                          )}
-                        </FormControl>
+
+                <Controller
+                  name="type"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel id="demo-simple-select-label">
+                        Loại video*
+                      </InputLabel>
+                      <Select
+                        fullWidth
+                        {...field}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Loại video*"
+                      >
+                        {Object.values(VIDEO_TYPES).map((type, index) => {
+                          return (
+                            <MenuItem key={index} value={type.id}>
+                              {type.label}
+                            </MenuItem>
+                          )
+                        })}
+                      </Select>
+                      {!!methods.formState.errors?.type?.message && (
+                        <FormHelperText>
+                          {methods.formState.errors?.type.message}
+                        </FormHelperText>
                       )}
+                    </FormControl>
+                  )}
+                />
+                <FormControlLabel
+                  label="Video nổi bật"
+                  control={
+                    <Checkbox
+                      checked={isHot}
+                      onChange={e => {
+                        setIsHot(e.target.checked)
+                      }}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      minHeight="100%"
-                    >
-                      <FormControlLabel
-                        label="Video nổi bật"
-                        control={
-                          <Checkbox
-                            checked={isHot}
-                            onChange={e => {
-                              setIsHot(e.target.checked)
-                            }}
-                          />
-                        }
-                      />
-                      {isHot && (
-                        <Controller
-                          name="priority"
-                          control={methods.control}
-                          render={({ field }) => (
-                            <FormControl fullWidth>
-                              <InputLabel id="demo-simple-select-label">
-                                Chọn vị trí*
-                              </InputLabel>
-                              <Select
-                                fullWidth
-                                {...field}
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                label="Chọn vị trí*"
-                              >
-                                <MenuItem value={1}>1</MenuItem>
-                                <MenuItem value={2}>2</MenuItem>
-                                <MenuItem value={3}>3</MenuItem>
-                              </Select>
-                              <FormHelperText>
-                                Lưu ý: Sau khi chọn, video sẽ được đưa lên đầu
-                                danh sách, và thay thế vào vị trí đã chọn
-                              </FormHelperText>
-                              {isHot && !!watchPriority && (
-                                <FormHelperText>
-                                  Tại 1 thời điểm chỉ có 3 video nổi bật. Nếu
-                                  tiếp tục, video này sẽ thay thế video nổi bật
-                                  ở vị trí tương ứng
-                                </FormHelperText>
-                              )}
-                              {!!methods.formState.errors?.priority
-                                ?.message && (
-                                <FormHelperText error>
-                                  {methods.formState.errors?.priority.message}
-                                </FormHelperText>
-                              )}
-                            </FormControl>
-                          )}
-                        />
-                      )}
-                    </Box>
-                  </Grid>
-                </Grid>
+                  }
+                />
+                {isHot && (
+                  <Controller
+                    name="priority"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Chọn vị trí*
+                        </InputLabel>
+                        <Select
+                          fullWidth
+                          {...field}
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Chọn vị trí*"
+                        >
+                          <MenuItem value={1}>1</MenuItem>
+                          <MenuItem value={2}>2</MenuItem>
+                          <MenuItem value={3}>3</MenuItem>
+                        </Select>
+                        <FormHelperText>
+                          Lưu ý: Sau khi chọn, video sẽ được đưa lên đầu danh
+                          sách, và thay thế vào vị trí đã chọn
+                        </FormHelperText>
+                        {isHot && !!watchPriority && (
+                          <FormHelperText>
+                            Tại 1 thời điểm chỉ có 3 video nổi bật. Nếu tiếp
+                            tục, video này sẽ thay thế video nổi bật ở vị trí
+                            tương ứng
+                          </FormHelperText>
+                        )}
+                        {!!methods.formState.errors?.priority?.message && (
+                          <FormHelperText error>
+                            {methods.formState.errors?.priority.message}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                    )}
+                  />
+                )}
                 <FormControl fullWidth margin="normal">
                   <FormLabel error={!!methods.formState.errors?.description}>
                     Tóm tắt:*

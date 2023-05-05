@@ -262,9 +262,17 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                               {rowsPerPage * page + index + 1}
                             </TableCell>
                             <TableCell align="left">
-                              <Button color="info">{team.name}</Button>
+                              <Button
+                                color="info"
+                                style={{ wordBreak: 'keep-all' }}
+                              >
+                                {team.name}
+                              </Button>
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="center"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {team.shortName}
                             </TableCell>
                             <TableCell align="center">
@@ -275,7 +283,12 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                                 src={team.logo}
                               />
                             </TableCell>
-                            <TableCell align="left">{team.homeField}</TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
+                              {team.homeField}
+                            </TableCell>
                             <TableCell align="center">
                               {team.status === 1
                                 ? 'Hoạt động'

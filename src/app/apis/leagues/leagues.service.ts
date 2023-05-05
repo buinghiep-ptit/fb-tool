@@ -56,3 +56,8 @@ export const getRank = async (id: any): Promise<any> => {
   const { data } = await http.get<any>(`/api/leagues/${id}/standings`)
   return data
 }
+
+export const createRound = async (id: any, params: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/leagues/${id}/round`, params)
+  return data
+}

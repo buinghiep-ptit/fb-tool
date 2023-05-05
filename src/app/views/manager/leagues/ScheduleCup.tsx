@@ -90,12 +90,18 @@ export default function ScheduleCup(props: Props) {
             {(schedule || []).map((item: any, index: any) => {
               return (
                 <TableRow hover key={item.name + index}>
-                  <TableCell align="center">{item.teamA.name}</TableCell>
-                  <TableCell align="center">{item.teamB.name}</TableCell>
-                  <TableCell align="center">
+                  <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                    {item.teamA.name}
+                  </TableCell>
+                  <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                    {item.teamB.name}
+                  </TableCell>
+                  <TableCell align="left">
                     {moment(item.dateStart).format('YYYY-MM-DD hh:mm')}
                   </TableCell>
-                  <TableCell align="center">{item.stadium}</TableCell>
+                  <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                    {item.stadium}
+                  </TableCell>
                   <TableCell align="center">
                     {item.status === 1 && (
                       <Chip label="Đang diễn ra" color="success" />
@@ -107,9 +113,9 @@ export default function ScheduleCup(props: Props) {
                       <Chip label="Kết thúc" color="primary" />
                     )}
                     {item.status === 3 && (
-                      <Chip label="Tạm dừng" color="secondary" />
+                      <Chip label="Hoãn" color="secondary" />
                     )}
-                    {item.status === 4 && <Chip label="Đóng" />}
+                    {item.status === 4 && <Chip label="Hủy" />}
                   </TableCell>
                   <TableCell align="center">
                     {!item.goalForTeamA || !item.goalForTeamB
@@ -160,8 +166,9 @@ export default function ScheduleCup(props: Props) {
       <ConfirmationDialog
         open={openConfirmDialog}
         onConfirmDialogClose={closeConfirmDialog}
-        text="Chắc chán muốn xóa giải đấu"
+        text="Bạn có chắc chắn muốn xóa lịch thi đấu"
         onYesClick={handleDeleteMatch}
+        textYes="Xóa"
         title="Xác nhận"
       />
     </SimpleCard>

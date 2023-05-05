@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import { Box } from '@mui/system'
 import {
+  createRound,
   deleteMatch,
   deleteRound,
   getSchedule,
@@ -48,6 +49,7 @@ export default function ScheduleLeague(props: Props) {
   const fetchScheduleCup = async () => {
     const res = await getSchedule(params.id)
     setSchedule(res.rounds)
+    console.log(res.rounds)
   }
 
   const closeConfirmDialog = () => {
@@ -67,6 +69,17 @@ export default function ScheduleLeague(props: Props) {
       setOpenConfirmDialog(false)
       fetchScheduleCup()
     }
+  }
+
+  const addRound = async () => {
+    const payload = {
+      name: 'Vòng ' + schedule[schedule.league] + 1,
+      description: null,
+      idOrder: schedule[schedule.league] + 1,
+      matches: [],
+    }
+    const res = await createRound(params.id, payload)
+    if (res) fetchScheduleCup()
   }
 
   const handleDeleteRound = async () => {
@@ -94,145 +107,141 @@ export default function ScheduleLeague(props: Props) {
           type="submit"
           startIcon={<Icon>control_point</Icon>}
           onClick={() => {
-            dialogCreateMatchRef.current.handleClickOpen()
+            addRound()
           }}
         />
       </div>
       {schedule &&
-        Array(league.teamList.length * 2 - 2)
-          .fill('')
-          .map((round, index) => {
-            return (
-              <div style={{ marginTop: '50px' }}>
-                <SimpleCard title={`Vòng ${index + 1} - ${league.shortName}`}>
-                  <div style={{ position: 'relative' }}>
-                    <Tooltip
-                      title="Xóa vòng đấu"
-                      placement="top"
-                      style={{ position: 'absolute', top: '-48px', right: 0 }}
-                    >
-                      <IconButton
-                        color="primary"
-                        onClick={() => {
-                          setOpenConfirmDeleteRoundDialog(true)
-                          setIdRoundPicked(schedule[index].id)
-                        }}
-                      >
-                        <DeleteIcon fontSize="inherit" />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-
-                  <Box width="100%" overflow="auto">
-                    <StyledTable>
-                      <TableHead>
-                        <TableRow>
-                          {headTableScheduleCup.map(header => (
-                            <TableCell
-                              align="center"
-                              style={{ minWidth: header.width }}
-                            >
-                              {header.name}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {(schedule[index]?.matches || []).map(
-                          (item: any, index: any) => {
-                            return (
-                              <TableRow hover key={item.name + index}>
-                                <TableCell align="center">
-                                  {item.teamA?.name || ''}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {item.teamB?.name || ''}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {moment(item.dateStart).format(
-                                    'YYYY-MM-DD hh:mm',
-                                  ) || ''}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {item.stadium || ''}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {item.status === 1 && (
-                                    <Chip
-                                      label="Đang diễn ra"
-                                      color="success"
-                                    />
-                                  )}
-                                  {item.status === 0 && (
-                                    <Chip
-                                      label="Chưa diễn ra"
-                                      color="warning"
-                                    />
-                                  )}
-                                  {item.status === 2 && (
-                                    <Chip label="Kết thúc" color="primary" />
-                                  )}
-                                  {item.status === 3 && (
-                                    <Chip label="Tạm dừng" color="secondary" />
-                                  )}
-                                  {item.status === 4 && <Chip label="Đóng" />}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {!item.goalForTeamA || !item.goalForTeamB
-                                    ? 'Chờ cập nhật'
-                                    : `${item.goalForTeamA} - ${item.goalForTeamB}`}
-                                </TableCell>
-                                <TableCell align="center">
-                                  <Tooltip title="Sửa" placement="top">
-                                    <IconButton
-                                      color="primary"
-                                      onClick={() => {
-                                        dialogEditMatchRef.current.handleClickOpen(
-                                          item,
-                                        )
-                                      }}
-                                    >
-                                      <Edit />
-                                    </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title="Xóa" placement="top">
-                                    <IconButton
-                                      color="primary"
-                                      onClick={() => {
-                                        setIdPicked(item.id)
-                                        setOpenConfirmDialog(true)
-                                      }}
-                                    >
-                                      <DeleteIcon />
-                                    </IconButton>
-                                  </Tooltip>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          },
-                        )}
-                      </TableBody>
-                    </StyledTable>
-                  </Box>
-                  <div style={{ textAlign: 'end', marginTop: '20px' }}>
-                    <MuiButton
-                      title="Thêm mới lịch đấu"
-                      variant="contained"
+        schedule.map((round: any, index: any) => {
+          return (
+            <div style={{ marginTop: '50px' }}>
+              <SimpleCard title={`Vòng ${index + 1} - ${league.shortName}`}>
+                <div style={{ position: 'relative' }}>
+                  <Tooltip
+                    title="Xóa vòng đấu"
+                    placement="top"
+                    style={{ position: 'absolute', top: '-48px', right: 0 }}
+                  >
+                    <IconButton
                       color="primary"
-                      type="submit"
-                      startIcon={<Icon>control_point</Icon>}
                       onClick={() => {
-                        dialogCreateMatchRef.current.handleClickOpen()
+                        setOpenConfirmDeleteRoundDialog(true)
+                        setIdRoundPicked(round.id)
                       }}
-                    />
-                  </div>
-                </SimpleCard>
-              </div>
-            )
-          })}
+                    >
+                      <DeleteIcon fontSize="inherit" />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+
+                <Box width="100%" overflow="auto">
+                  <StyledTable>
+                    <TableHead>
+                      <TableRow>
+                        {headTableScheduleCup.map(header => (
+                          <TableCell
+                            align="center"
+                            style={{ minWidth: header.width }}
+                          >
+                            {header.name}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {(round.matches || []).map((item: any, index: any) => {
+                        return (
+                          <TableRow hover key={item.name + index}>
+                            <TableCell align="center">
+                              {item.teamA?.name || ''}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.teamB?.name || ''}
+                            </TableCell>
+                            <TableCell align="center">
+                              {moment(item.dateStart).format(
+                                'YYYY-MM-DD hh:mm',
+                              ) || ''}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.stadium || ''}
+                            </TableCell>
+                            <TableCell align="center">
+                              {item.status === 1 && (
+                                <Chip label="Đang diễn ra" color="success" />
+                              )}
+                              {item.status === 0 && (
+                                <Chip label="Chưa diễn ra" color="warning" />
+                              )}
+                              {item.status === 2 && (
+                                <Chip label="Kết thúc" color="primary" />
+                              )}
+                              {item.status === 3 && (
+                                <Chip label="Hoãn" color="secondary" />
+                              )}
+                              {item.status === 4 && <Chip label="Hủy" />}
+                            </TableCell>
+                            <TableCell align="center">
+                              {!item.goalForTeamA || !item.goalForTeamB
+                                ? 'Chờ cập nhật'
+                                : `${item.goalForTeamA} - ${item.goalForTeamB}`}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Tooltip title="Sửa" placement="top">
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => {
+                                    dialogEditMatchRef.current.handleClickOpen(
+                                      item,
+                                    )
+                                  }}
+                                >
+                                  <Edit />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Xóa" placement="top">
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => {
+                                    setIdPicked(item.id)
+                                    setOpenConfirmDialog(true)
+                                  }}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </StyledTable>
+                </Box>
+                <div style={{ textAlign: 'end', marginTop: '20px' }}>
+                  <MuiButton
+                    title="Thêm mới lịch đấu"
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    startIcon={<Icon>control_point</Icon>}
+                    onClick={() => {
+                      dialogCreateMatchRef.current.handleClickOpen()
+                    }}
+                  />
+                </div>
+              </SimpleCard>
+            </div>
+          )
+        })}
 
       <DialogCreateMatch
         ref={dialogCreateMatchRef}
+        setIsLoading={props.setIsLoading}
+        isLoading={props.isLoading}
+        fetchScheduleCup={fetchScheduleCup}
+      />
+      <DialogCreateMatch
+        // ref={dialogCreateRoundRef}
         setIsLoading={props.setIsLoading}
         isLoading={props.isLoading}
         fetchScheduleCup={fetchScheduleCup}
@@ -246,14 +255,15 @@ export default function ScheduleLeague(props: Props) {
       <ConfirmationDialog
         open={openConfirmDeleteRoundDialog}
         onConfirmDialogClose={closeConfirmDeleteRoundDialog}
-        text="Chắc chán muốn xóa vòng đấu"
+        text="Chắc chắn muốn xóa vòng đấu"
         onYesClick={handleDeleteRound}
         title="Xác nhận"
       />
       <ConfirmationDialog
         open={openConfirmDialog}
         onConfirmDialogClose={closeConfirmDialog}
-        text="Chắc chán muốn xóa giải đấu"
+        text="Bạn có chắc chắn muốn xóa lịch thi đấu"
+        textYes="Xóa"
         onYesClick={handleDeleteMatch}
         title="Xác nhận"
       />

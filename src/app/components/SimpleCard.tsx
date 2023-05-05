@@ -17,7 +17,7 @@ interface Props {
 const CardTitle = styled(Box)<Props>(({ subtitle }) => ({
   fontSize: '1rem',
   fontWeight: '500',
-  textTransform: 'capitalize',
+  textTransform: 'none',
   marginBottom: !subtitle ? '16px' : 0,
 }))
 

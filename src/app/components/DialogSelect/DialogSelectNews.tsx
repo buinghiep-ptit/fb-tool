@@ -83,9 +83,15 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
     await getNews({
       title: searchFilter,
       status: statusFilter === 99 ? null : statusFilter,
-      type: typeFilter === 99 ? null : typeFilter,
-      dateStart: fromFilter ? dayjs(fromFilter).toISOString() : '',
-      dateEnd: toFilter ? dayjs(toFilter).toISOString() : '',
+      newCategory: typeFilter === 99 ? null : typeFilter,
+      dateStart:
+        fromFilter && dayjs(fromFilter).isValid()
+          ? dayjs(fromFilter).toISOString()
+          : '',
+      dateEnd:
+        toFilter && dayjs(toFilter).isValid()
+          ? dayjs(toFilter).toISOString()
+          : '',
       page: page,
       size: rowsPerPage,
     }).then(res => {
@@ -153,6 +159,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
         label: item.title
       }),
     )
+    // TODO update?
   }
 
   const handlePick = (id: number) => {
@@ -191,7 +198,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                   <Grid item xs={12}>
                     <TextField
                       id="outlined-basic"
-                      label="Tiêu đề, tóm tắt, từ khóa:"
+                      label="Tiêu đề, tóm tắt, từ khóa"
                       variant="outlined"
                       fullWidth
                       value={searchFilter}
@@ -264,7 +271,6 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"
@@ -285,7 +291,6 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                             InputLabelProps={{ shrink: true }}
                             size="medium"
                             variant="outlined"
-                            margin="dense"
                             fullWidth
                             color="primary"
                             autoComplete="bday"

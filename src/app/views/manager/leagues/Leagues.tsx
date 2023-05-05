@@ -37,16 +37,17 @@ export default function LeaguesManager(props: Props) {
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [leagues, setLeagues] = useState<any>()
-  const [nameFilter, setNameFilter] = useState<any>()
+  const [nameFilter, setNameFilter] = useState<any>('')
   const [statusFilter, setStatusFilter] = useState<any>()
-  const [nameShortFilter, setNameShortFilter] = useState<any>()
+  const [nameShortFilter, setNameShortFilter] = useState<any>('')
   const [typeFilter, setTypeFilter] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
+  const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    fetchLeagues()
+    setDoRerender(!doRerender)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -54,13 +55,14 @@ export default function LeaguesManager(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-    fetchLeagues()
+    setDoRerender(!doRerender)
   }
 
   const fetchLeagues = async () => {
+    setIsLoading(true)
     const res = await getLeagues({
-      name: nameFilter,
-      shortName: nameShortFilter,
+      name: nameFilter.trim(),
+      shortName: nameShortFilter.trim(),
       status: statusFilter === 2 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
       size: rowsPerPage,
@@ -68,22 +70,20 @@ export default function LeaguesManager(props: Props) {
     })
     setLeagues(res.content)
     setCountTable(res.totalElements)
+    setIsLoading(false)
   }
 
   const handleSearch = async () => {
-    setIsLoading(true)
-    await fetchLeagues()
-    setIsLoading(false)
+    setPage(0)
+    setDoRerender(!doRerender)
   }
 
   const handleClearFilter = async () => {
-    setIsLoading(true)
-    setNameFilter(null)
-    setNameShortFilter(null)
+    setNameFilter('')
+    setNameShortFilter('')
     setStatusFilter(2)
     setTypeFilter(99)
-    await fetchLeagues()
-    setIsLoading(false)
+    setDoRerender(!doRerender)
   }
 
   const handleDeleteLeagues = async (id: any) => {
@@ -92,13 +92,13 @@ export default function LeaguesManager(props: Props) {
       toastSuccess({
         message: 'Xóa thành công',
       })
-      fetchLeagues()
+      setDoRerender(!doRerender)
     }
   }
 
   React.useEffect(() => {
     fetchLeagues()
-  }, [])
+  }, [page, doRerender])
 
   return (
     <Container>
@@ -115,10 +115,17 @@ export default function LeaguesManager(props: Props) {
           <LinearProgress />
         </Box>
       )}
-      <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Quản lý giải đấu' }]} />
-      </Box>
-      <div style={{ textAlign: 'end' }}>
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Box className="breadcrumb">
+          <Breadcrumb routeSegments={[{ name: 'Quản lý giải đấu' }]} />
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddBoxOutlinedIcon />}
@@ -139,6 +146,7 @@ export default function LeaguesManager(props: Props) {
               onChange={e => {
                 setNameFilter(e.target.value)
               }}
+              value={nameFilter}
               onKeyDown={async e => {
                 if (e.keyCode === 13) {
                   handleSearch()
@@ -152,6 +160,7 @@ export default function LeaguesManager(props: Props) {
               label="Tên viết tắt"
               variant="outlined"
               fullWidth
+              value={nameShortFilter}
               onChange={e => {
                 setNameShortFilter(e.target.value)
               }}
@@ -169,6 +178,7 @@ export default function LeaguesManager(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Trạng thái"
+                value={typeFilter}
                 onChange={e => {
                   setTypeFilter(e.target.value)
                 }}
@@ -190,6 +200,7 @@ export default function LeaguesManager(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Trạng thái"
+                value={statusFilter}
                 onChange={e => {
                   setStatusFilter(e.target.value)
                 }}
@@ -201,22 +212,19 @@ export default function LeaguesManager(props: Props) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Button
               variant="contained"
               startIcon={<SearchIcon />}
-              style={{ width: '100%', padding: '15px' }}
               onClick={handleSearch}
+              style={{ marginRight: '15px' }}
               disabled={isLoading}
             >
               Tìm kiếm
             </Button>
-          </Grid>
-          <Grid item xs={3}>
             <Button
               variant="contained"
               startIcon={<CachedIcon />}
-              style={{ width: '100%', padding: '15px' }}
               onClick={handleClearFilter}
               disabled={isLoading}
             >
@@ -245,21 +253,25 @@ export default function LeaguesManager(props: Props) {
                     <TableCell align="center">
                       {rowsPerPage * page + index + 1}
                     </TableCell>
-                    <TableCell align="center">
-                      <Link to="/customers/1">{league.name}</Link>
+                    <TableCell align="left">
+                      <Link to="#" style={{ wordBreak: 'keep-all' }}>
+                        {league.name}
+                      </Link>
                     </TableCell>
                     <TableCell align="center">
                       <img
                         style={{
-                          objectFit: 'cover',
+                          objectFit: 'contain',
                           width: '100px',
                           height: '100px',
                         }}
                         src={league.logo}
                       ></img>
                     </TableCell>
-                    <TableCell align="center">{league.shortName}</TableCell>
-                    <TableCell align="center">
+                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                      {league.shortName}
+                    </TableCell>
+                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                       {typeLeagues[league.type - 1]}
                     </TableCell>
                     <TableCell align="center">

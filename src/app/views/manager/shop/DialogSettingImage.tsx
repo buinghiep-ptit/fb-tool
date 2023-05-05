@@ -23,7 +23,7 @@ interface Props {
 const DialogSettingImage = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const [file, setFile] = React.useState<any>(null)
-  const [previewImage, setPreviewImage] = React.useState<string>('')
+  const [previewImage, setPreviewImage] = React.useState<any>(null)
   const params = useParams()
 
   React.useImperativeHandle(ref, () => ({
@@ -129,7 +129,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
               paddingTop: '100px',
             }}
           >
-            {!file && previewImage === '' && (
+            {!file && previewImage === null && (
               <div>
                 <div>Chọn ảnh để tải lên</div>
                 <div>Hoặc kéo và thả tập tin</div>
@@ -140,7 +140,7 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
               </div>
             )}
 
-            {previewImage?.length !== 0 && (
+            {previewImage !== null && (
               <img src={previewImage} width="480px" height="270px"></img>
             )}
           </div>

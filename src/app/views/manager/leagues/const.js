@@ -29,11 +29,85 @@ export const headTableLeagues = [
   },
 ]
 
+export const headTableScheduleCup = [
+  {
+    name: 'Đội bóng 1',
+    width: '250px',
+  },
+  {
+    name: 'Đội bóng 2',
+    width: '250px',
+  },
+  {
+    name: 'Thời gian diễn ra',
+    width: '250px',
+  },
+  {
+    name: 'Sân vận động',
+    width: '200px',
+  },
+  {
+    name: 'Trạng thái',
+    width: '150px',
+  },
+  {
+    name: 'Tỷ số trận đấu',
+    width: '150px',
+  },
+  {
+    name: '',
+    width: '150px',
+  },
+]
+
+export const headTableRank = [
+  {
+    name: 'Thứ hạng',
+    width: '150px',
+  },
+  {
+    name: 'CLB',
+    width: '250px',
+  },
+  {
+    name: 'Trận',
+    width: '200px',
+  },
+  {
+    name: 'Thắng',
+    width: '200px',
+  },
+  {
+    name: 'Hòa',
+    width: '200px',
+  },
+  {
+    name: 'Thua',
+    width: '200px',
+  },
+  {
+    name: 'Bàn thắng',
+    width: '200px',
+  },
+  {
+    name: 'Bàn thua',
+    width: '200px',
+  },
+  {
+    name: 'hiệu số',
+    width: '200px',
+  },
+  {
+    name: 'Điểm',
+    width: '200px',
+  },
+]
+
 export const typeLeagues = [
   'Bóng đá nam',
   'Bóng đá nữ',
-  'futsal',
+  'Futsal',
   'Bóng đá bãi biển',
-  'Bóng đá địa phương',
+  'Phong trào - Cộng đồng',
   'Khác',
 ]

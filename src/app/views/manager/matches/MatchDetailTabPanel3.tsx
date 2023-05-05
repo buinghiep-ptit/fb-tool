@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Button, LinearProgress, TextField } from '@mui/material'
 import InputAdornment from '@mui/material/InputAdornment'
-import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -212,8 +211,8 @@ export default function MatchDetailTabPanel3(props: any) {
             )}
             <form onSubmit={methods.handleSubmit(onSubmit)}>
               <FormProvider {...methods}>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650, boxShadow: 0 }}>
+                <TableContainer>
+                  <Table sx={{ minWidth: 650 }}>
                     <TableHead>
                       <TableRow>
                         <TableCell align="center">Thống kê trận đấu</TableCell>

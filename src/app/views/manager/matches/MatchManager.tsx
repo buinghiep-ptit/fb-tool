@@ -33,6 +33,10 @@ import * as React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import LeagueSelect from '../../../components/DynamicAutocomplete/LeagueSelect'
+import {
+  MATCH_STATUSES,
+  findMatchStatus,
+} from '../../../constants/matchStatuses'
 import { headTableMatches } from './const'
 
 export interface Props {}
@@ -108,8 +112,14 @@ export default function MatchManager(props: Props) {
     //   teamName: teamFilter,
     //   idLeague: leagueFilter,
     //   status: statusFilter === 99 ? null : statusFilter,
-    // dateStart: fromFilter ? dayjs(fromFilter).toISOString() : '',
-    // dateEnd: toFilter ? dayjs(toFilter).toISOString() : '',
+    //   dateStart:
+    //     fromFilter && dayjs(fromFilter).isValid()
+    //       ? dayjs(fromFilter).toISOString()
+    //       : '',
+    //   dateEnd:
+    //     toFilter && dayjs(toFilter).isValid()
+    //       ? dayjs(toFilter).toISOString()
+    //       : '',
     //   isCahn: cahnFilter ? 1 : null, // TODO pending api
     //   page: page,
     //   size: rowsPerPage,
@@ -182,7 +192,7 @@ export default function MatchManager(props: Props) {
         />
       </Box>
 
-      <Stack gap={3}>
+      <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
             <Grid item xs={4}>
@@ -224,11 +234,13 @@ export default function MatchManager(props: Props) {
                   }}
                 >
                   <MenuItem value={99}>Tất cả</MenuItem>
-                  <MenuItem value={1}>Đang diễn ra</MenuItem>
-                  <MenuItem value={0}>Chưa diễn ra</MenuItem>
-                  <MenuItem value={3}>Hoãn</MenuItem>
-                  <MenuItem value={2}>Kết thúc</MenuItem>
-                  <MenuItem value={4}>Hủy</MenuItem>
+                  {Object.values(MATCH_STATUSES).map((type, index) => {
+                    return (
+                      <MenuItem key={index} value={type.id}>
+                        {type.label}
+                      </MenuItem>
+                    )
+                  })}
                 </Select>
               </FormControl>
             </Grid>
@@ -392,39 +404,14 @@ export default function MatchManager(props: Props) {
                       </TableCell>
                       <TableCell align="left"> {match.stadium} </TableCell>
                       <TableCell align="center">
-                        {match.status === 0 && (
-                          <Chip
-                            label="Chưa diễn ra"
-                            style={{ background: 'orange', color: 'white' }}
-                          />
-                        )}
-                        {match.status === 1 && (
-                          <Chip
-                            label="Đang diễn ra"
-                            style={{
-                              background: 'limegreen',
-                              color: 'white',
-                            }}
-                          />
-                        )}
-                        {match.status === 2 && (
-                          <Chip
-                            label="Kết thúc"
-                            style={{ background: 'royalBlue', color: 'white' }}
-                          />
-                        )}
-                        {match.status === 3 && (
-                          <Chip
-                            label="Hoãn"
-                            style={{ background: 'gray', color: 'white' }}
-                          />
-                        )}
-                        {match.status === 4 && (
-                          <Chip
-                            label="Hủy"
-                            style={{ background: 'red', color: 'white' }}
-                          />
-                        )}
+                        <Chip
+                          label={findMatchStatus(match.status)?.label}
+                          style={{
+                            background: findMatchStatus(match.status)
+                              ?.background,
+                            color: findMatchStatus(match.status)?.color,
+                          }}
+                        />
                       </TableCell>
                       <TableCell align="center">
                         <Tooltip title="Chỉnh sửa" placement="top">

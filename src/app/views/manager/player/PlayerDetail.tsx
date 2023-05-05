@@ -83,7 +83,7 @@ export default function PlayerDetail(props: Props) {
     defaultValues.sizeShoes = player.shoseSize || 0
     defaultValues.sizeSpikeShoes = player.nailShoseSize || 0
     defaultValues.sizeClothers = player.shirtSize || ''
-    defaultValues.viewPosition = player.isDisplayHome
+    defaultValues.viewPosition = player.priority
     defaultValues.countMatch = player.matchPlayedNo || 0
     defaultValues.cleanMatch = player.cleanSheetNo || 0
     defaultValues.goal = player.goalFor || 0
@@ -91,11 +91,12 @@ export default function PlayerDetail(props: Props) {
     defaultValues.redCard = player.redCardNo || 0
     defaultValues.editor_content = player.biography
     defaultValues.oldClub = player.oldClub
-    defaultValues.prioritize = player.priority
+    defaultValues.prioritize = player.isDisplayHome === 0 ? false : true
     defaultValues.status = player.status
     setPreviewImage(player.imageUrl)
     methods.reset({ ...defaultValues })
     setIdTeam(player.idTeam)
+    setDisableViewPosition(player.isDisplayHome === 0 ? true : false)
     setIdPosition(player.mainPosition)
   }
 
@@ -111,73 +112,54 @@ export default function PlayerDetail(props: Props) {
         .required('Giá trị bắt buộc')
         .trim()
         .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
-      phone: yup
-        .string()
-        .matches(/^[0-9]*$/, 'Chỉ nhập số')
-        .max(10, 'Số điện thoại không được vượt quá 10 ký tự'),
       dateOfBirth: yup.string().required('Gía trị bắt buộc'),
-      passPortDateRange: yup.date().nullable(),
-      married: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
-      citizenIdentification: yup.string(),
-      dateRange: yup.string().nullable(),
-      expirationDate: yup
-        .date()
-        .min(yup.ref('passPortDateRange'), 'Ngày hết hạn phải sau ngày cấp')
-        .nullable(),
       gatheringDay: yup.string(),
       team: yup.string().required('Giá trị bát buộc').nullable(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       dominantFoot: yup.string().nullable(),
       clothersNumber: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
       sizeShoes: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
         .nullable(),
       sizeSpikeShoes: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
         .nullable(),
       sizeClothers: yup.string().nullable(),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
-        : yup.string(),
+        : yup.string().nullable(),
       countMatch: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       cleanMatch: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       goal: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       yellowCard: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       redCard: yup
-        .number()
-        .min(0, 'Nhập số lớn hơn 0')
-        .typeError('Nhập số')
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số')
         .nullable(),
       oldClub: yup
         .string()
         .trim()
-        .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
+        .max(255, 'Tên đối tác không được vượt quá 255 ký tự')
+        .nullable(),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),
     })
@@ -188,14 +170,7 @@ export default function PlayerDetail(props: Props) {
     defaultValues: {
       namePlayer: '',
       homeTown: '',
-      phone: '',
       dateOfBirth: '',
-      married: 0,
-      citizenIdentification: null,
-      dateRange: '',
-      passPortDateRange: null,
-      passPort: '',
-      expirationDate: '',
       gatheringDay: moment(Date.now()).format('YYYY-MM-DD') || null,
       team: '',
       position: '',
@@ -214,7 +189,7 @@ export default function PlayerDetail(props: Props) {
       redCard: 0,
       editor_content: '',
       oldClub: '',
-      prioritize: true,
+      prioritize: false,
       status: 1,
     },
   })
@@ -403,127 +378,12 @@ export default function PlayerDetail(props: Props) {
                         )}
                       />
                     </Grid>
-                    <Grid item xs={4}>
-                      <Controller
-                        name="phone"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={!!methods.formState.errors?.phone}
-                            helperText={
-                              methods.formState.errors?.phone?.message
-                            }
-                            {...field}
-                            label="Số điện thoại"
-                            variant="outlined"
-                            fullWidth
-                            margin="dense"
-                          />
-                        )}
-                      />
-                    </Grid>
+
                     <Grid item xs={4}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <MuiRHFDatePicker
                           name="dateOfBirth"
                           label="Ngày sinh*"
-                          inputFormat={'DD/MM/YYYY'}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Controller
-                        name="married"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <FormControl fullWidth margin="dense">
-                            <InputLabel id="demo-simple-select-label">
-                              Tình trạng hôn nhân
-                            </InputLabel>
-                            <Select
-                              {...field}
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              label="Tình trạng hôn nhân"
-                            >
-                              <MenuItem value={0}>Độc thân</MenuItem>
-                              <MenuItem value={1}>Đã kết hôn</MenuItem>
-                            </Select>
-                            {!!methods.formState.errors?.married?.message && (
-                              <FormHelperText>
-                                {methods.formState.errors?.married.message}
-                              </FormHelperText>
-                            )}
-                          </FormControl>
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <Controller
-                        name="citizenIdentification"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={
-                              !!methods.formState.errors?.citizenIdentification
-                            }
-                            helperText={
-                              methods.formState.errors?.citizenIdentification
-                                ?.message
-                            }
-                            {...field}
-                            label="Số CCCD"
-                            variant="outlined"
-                            margin="dense"
-                            fullWidth
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MuiRHFDatePicker
-                          name="dateRange"
-                          label="Ngày cấp"
-                          inputFormat={'DD/MM/YYYY'}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2}>
-                    <Grid item xs={4}>
-                      <Controller
-                        name="passPort"
-                        control={methods.control}
-                        render={({ field }) => (
-                          <TextField
-                            error={!!methods.formState.errors?.passPort}
-                            helperText={
-                              methods.formState.errors?.passPort?.message
-                            }
-                            {...field}
-                            label="Số hộ chiếu"
-                            variant="outlined"
-                            margin="dense"
-                            fullWidth
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={4}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MuiRHFDatePicker
-                          name="passPortDateRange"
-                          label="Ngày cấp"
-                          inputFormat={'DD/MM/YYYY'}
-                        />
-                      </LocalizationProvider>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MuiRHFDatePicker
-                          name="expirationDate"
-                          label="Ngày hết hạn"
                           inputFormat={'DD/MM/YYYY'}
                         />
                       </LocalizationProvider>
@@ -558,7 +418,7 @@ export default function PlayerDetail(props: Props) {
                     }}
                     style={{
                       width: '80%',
-                      height: '90%',
+                      height: '300px',
                       border: '2px dashed black',
                       textAlign: 'center',
                     }}
@@ -874,7 +734,10 @@ export default function PlayerDetail(props: Props) {
                       name="viewPosition"
                       control={methods.control}
                       render={({ field }) => (
-                        <FormControl style={{ width: '200px' }}>
+                        <FormControl
+                          style={{ width: '200px' }}
+                          error={!!methods.formState.errors?.viewPosition}
+                        >
                           <InputLabel id="demo-simple-select-label">
                             Vị trí hiển thị
                           </InputLabel>

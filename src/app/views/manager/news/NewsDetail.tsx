@@ -2,7 +2,6 @@ export interface Props {}
 import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import {
-  Autocomplete,
   Button,
   Checkbox,
   FormControl,
@@ -20,6 +19,7 @@ import {
 import { Box } from '@mui/system'
 import { getNewsDetail, updateNews } from 'app/apis/news/news.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
+import { MuiRHFAutocompleteWithKeyword } from 'app/components/common/MuiRHFAutocompleteWithKeyword'
 import MuiRHFTextarea from 'app/components/common/MuiRHFTextarea'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { NEWS_TYPES } from 'app/constants/newsType'
@@ -39,7 +39,6 @@ export default function NewsDetail(props: Props) {
   const [news, setNews] = useState<any>()
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [keywordArr, setKeywordArr] = useState<any>([])
   const [isHot, setIsHot] = useState(false)
 
   const schema = yup
@@ -79,6 +78,7 @@ export default function NewsDetail(props: Props) {
             return Math.floor(value?.size / 1000000) <= 50
           else return true
         }),
+      keyword: yup.array().nullable(),
     })
     .required()
 
@@ -91,6 +91,7 @@ export default function NewsDetail(props: Props) {
       description: '',
       content: '',
       file: null,
+      keyword: [],
     },
   })
 
@@ -102,10 +103,12 @@ export default function NewsDetail(props: Props) {
     defaultValues.priority = news.priority
     defaultValues.description = news.description
     defaultValues.content = news.content
+    defaultValues.keyword = news.keyWord.split(',').map((k: any) => ({
+      value: k,
+    }))
     methods.reset({ ...defaultValues })
     setPreviewImage(news.imgUrl)
     setIsHot(!!news.priority)
-    setKeywordArr(news.keyWord.split(','))
   }
 
   const onSave = async (data: any) => {
@@ -124,7 +127,7 @@ export default function NewsDetail(props: Props) {
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
-      keyWord: keywordArr.join(','),
+      keyWord: data.keyword.map((k: any) => k.value).join(','),
       status: news.status,
     }
 
@@ -157,8 +160,8 @@ export default function NewsDetail(props: Props) {
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
-      keyWord: keywordArr.join(','),
-      status: !news.status,
+      keyWord: data.keyword.map((k: any) => k.value).join(','),
+      status: news.status ? 0 : 1,
     }
 
     await updateNews(payload)
@@ -438,20 +441,7 @@ export default function NewsDetail(props: Props) {
             </FormControl>
 
             <FormControl fullWidth margin="normal">
-              <Autocomplete
-                defaultValue={[]}
-                multiple
-                id="keywordArr"
-                options={[]}
-                freeSolo
-                onChange={(event: any, newValue: any[]) => {
-                  setKeywordArr(newValue)
-                }}
-                noOptionsText="Nhập từ khóa"
-                renderInput={params => (
-                  <TextField {...params} label="Từ khóa" margin="normal" />
-                )}
-              />
+              <MuiRHFAutocompleteWithKeyword name="keyword" label="Từ khóa" />
             </FormControl>
 
             <Box

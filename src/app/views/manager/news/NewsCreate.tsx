@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import {
-  Autocomplete,
   Button,
   Checkbox,
   FormControl,
@@ -19,6 +18,7 @@ import {
 import { Box } from '@mui/system'
 import { createNews } from 'app/apis/news/news.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
+import { MuiRHFAutocompleteWithKeyword } from 'app/components/common/MuiRHFAutocompleteWithKeyword'
 import MuiRHFTextarea from 'app/components/common/MuiRHFTextarea'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { NEWS_TYPES } from 'app/constants/newsType'
@@ -38,7 +38,6 @@ export default function NewsCreate(props: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [keywordArr, setKeywordArr] = useState<any>([])
   const [isHot, setIsHot] = useState(false)
 
   const schema = yup
@@ -76,6 +75,7 @@ export default function NewsCreate(props: Props) {
         .test('fileSize', 'Dung lượng file <= 50MB', value => {
           return Math.floor(value?.size / 1000000) <= 50
         }),
+      keyword: yup.array().nullable(),
     })
     .required()
 
@@ -88,6 +88,7 @@ export default function NewsCreate(props: Props) {
       description: '',
       content: '',
       file: null,
+      keyword: [],
     },
   })
 
@@ -106,7 +107,7 @@ export default function NewsCreate(props: Props) {
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
-      keyWord: keywordArr.join(','),
+      keyWord: data.keyword.map((k: any) => k.value).join(','),
       status: 0,
     }
 
@@ -121,6 +122,7 @@ export default function NewsCreate(props: Props) {
       .finally(() => {
         setIsLoading(false)
       })
+    setIsLoading(false)
   }
 
   const onPublish = async (data: any) => {
@@ -129,7 +131,6 @@ export default function NewsCreate(props: Props) {
     if (file) {
       imgUrl = await handleUploadImage(file)
     }
-
     const payload: any = {
       title: data.title,
       idCategory: data.type,
@@ -138,7 +139,7 @@ export default function NewsCreate(props: Props) {
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
-      keyWord: keywordArr.join(','),
+      keyWord: data.keyword.map((k: any) => k.value).join(','),
       status: 1,
     }
 
@@ -388,20 +389,7 @@ export default function NewsCreate(props: Props) {
             </FormControl>
 
             <FormControl fullWidth margin="normal">
-              <Autocomplete
-                defaultValue={[]}
-                multiple
-                id="keywordArr"
-                options={[]}
-                freeSolo
-                onChange={(event: any, newValue: any[]) => {
-                  setKeywordArr(newValue)
-                }}
-                noOptionsText="Nhập từ khóa"
-                renderInput={params => (
-                  <TextField {...params} label="Từ khóa" margin="normal" />
-                )}
-              />
+              <MuiRHFAutocompleteWithKeyword name="keyword" label="Từ khóa" />
             </FormControl>
 
             <Box

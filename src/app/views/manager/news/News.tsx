@@ -349,10 +349,14 @@ export default function NewsManager(props: Props) {
                         {findNewsType(news.newsCategory)?.label}
                       </TableCell>
                       <TableCell align="left">
-                        {dayjs(news.dateCreated).format('DD/MM/YYYY HH:mm')}
+                        {news.dateCreated
+                          ? dayjs(news.dateCreated).format('DD/MM/YYYY HH:mm')
+                          : ''}
                       </TableCell>
                       <TableCell align="left">
-                        {dayjs(news.datePublished).format('DD/MM/YYYY HH:mm')}
+                        {news.datePublished
+                          ? dayjs(news.datePublished).format('DD/MM/YYYY HH:mm')
+                          : ''}
                       </TableCell>
                       <TableCell align="center">
                         {news.status === 1 ? 'Đã đăng' : 'Chưa đăng'}

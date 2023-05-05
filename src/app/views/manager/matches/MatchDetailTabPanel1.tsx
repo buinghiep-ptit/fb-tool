@@ -140,8 +140,13 @@ export default function MatchDetailTabPanel1(props: any) {
   React.useEffect(() => {
     if (match) {
       initDefaultValues(match)
-      setRelatedNews(match.listNews?.map((n: any) => n.id))
-      setRelatedVideos(match.listVideo?.map((v: any) => v.id))
+      setRelatedNews(
+        match.listNews?.map((n: any) => ({ id: n.id, label: n.url })) || [],
+      )
+      setRelatedVideos(
+        match.listVideo?.map((v: any) => ({ id: v.id, label: v.url })) || [],
+      )
+      // TODO update api: url -> title
     }
   }, [match])
 
@@ -155,8 +160,8 @@ export default function MatchDetailTabPanel1(props: any) {
       preMatchSummary: data.preMatchSummary,
       team1Goal: data.team1Goal,
       team2Goal: data.team2Goal,
-      listVideo: relatedVideos.map((v: any) => ({ id: v.id })),
-      listNews: relatedNews.map((n: any) => ({ id: n.id })),
+      listVideo: relatedVideos.map((i: any) => ({ id: Number(i.id) })),
+      listNews: relatedNews.map((i: any) => ({ id: Number(i.id) })),
     }
 
     await updateMatch(payload)

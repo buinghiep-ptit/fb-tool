@@ -63,7 +63,7 @@ export default function MatchManager(props: Props) {
     setIsLoading(true)
     await getMatches({
       teamName: teamFilter ?? null,
-      idLeague: leagueFilter ?? null,
+      idLeague: leagueFilter?.id ?? null,
       status: statusFilter === 99 ? null : statusFilter,
       from:
         fromFilter && dayjs(fromFilter).isValid()
@@ -168,8 +168,8 @@ export default function MatchManager(props: Props) {
             <Grid item xs={4}>
               <LeagueSelect
                 label="Giải đấu"
-                leagueFilter={leagueFilter}
-                setLeagueFilter={setLeagueFilter}
+                selectedLeague={leagueFilter}
+                setSelectedLeague={setLeagueFilter}
               />
             </Grid>
             <Grid item xs={4}>
@@ -332,7 +332,7 @@ export default function MatchManager(props: Props) {
               <TableBody>
                 {(matches || []).map((match: any, index: any) => {
                   return (
-                    <TableRow hover key={match.teamName}>
+                    <TableRow hover key={index}>
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>

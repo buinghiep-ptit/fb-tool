@@ -36,7 +36,9 @@ import { getVideos } from 'app/apis/videos/video.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
 import dayjs from 'dayjs'
+import { remove } from 'lodash'
 import * as React from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { headTableVideos } from './headTableVideos'
 
@@ -99,7 +101,9 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
       size: rowsPerPage,
     }).then(res => {
       const newList = res.content.map((item: any) => {
-        item.isPicked = (selectedList || []).includes(item.id)
+        item.isPicked = (selectedList || [])
+          .map((i: any) => i.id + '')
+          .includes(item.id + '')
         return item
       })
       setVideos(newList)
@@ -140,7 +144,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
 
   React.useEffect(() => {
     fetchListVideo()
-  }, [page, doRerender, selectedList])
+  }, [page, doRerender])
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -153,19 +157,38 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    const listPicked = (videos || []).filter(
-      (item: any) => item.isPicked === true,
-    )
-    setSelectedList(
-      listPicked.map((item: any) => {
-        id: item.id
-        label: item.title
-      }),
-    )
   }
+
+  useEffect(() => {
+    if (open) {
+      const newList = videos.map((item: any) => {
+        item.isPicked = (selectedList || [])
+          .map((i: any) => i.id + '')
+          .includes(item.id + '')
+        return item
+      })
+      setVideos(newList)
+    }
+  }, [open])
 
   const handlePick = (id: number) => {
     const newList = [...videos]
+    if (newList[id].isPicked) {
+      const newListPicked = remove(selectedList, function (n) {
+        return n !== newList[id].id
+      })
+      setSelectedList(newListPicked)
+    } else {
+      const newListPicked = [
+        ...selectedList,
+        {
+          id: newList[id].id,
+          label: newList[id].title,
+        },
+      ]
+      setSelectedList(newListPicked)
+    }
+
     newList[id].isPicked = !videos[id].isPicked
     setVideos(newList)
   }

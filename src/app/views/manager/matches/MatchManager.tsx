@@ -248,6 +248,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={4}>
                 <DatePicker
                   label="Từ ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={fromFilter}
                   value={fromFilter}
                   onChange={newValue => setFromFilter(newValue)}
                   renderInput={(params: any) => (
@@ -269,6 +271,8 @@ export default function MatchManager(props: Props) {
               <Grid item xs={4}>
                 <DatePicker
                   label="Đến ngày"
+                  inputFormat="DD/MM/YYYY"
+                  key={toFilter}
                   value={toFilter}
                   onChange={newValue => setToFilter(newValue)}
                   renderInput={(params: any) => (

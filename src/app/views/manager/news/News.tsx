@@ -217,6 +217,7 @@ export default function NewsManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Từ ngày"
+                  key={fromFilter}
                   value={fromFilter}
                   onChange={newValue => setFromFilter(newValue)}
                   inputFormat="DD/MM/YYYY"
@@ -238,6 +239,7 @@ export default function NewsManager(props: Props) {
               <Grid item xs={3}>
                 <DatePicker
                   label="Đến ngày"
+                  key={toFilter}
                   value={toFilter}
                   onChange={newValue => setToFilter(newValue)}
                   inputFormat="DD/MM/YYYY"

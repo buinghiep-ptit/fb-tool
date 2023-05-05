@@ -261,6 +261,8 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                     <Grid item xs={3}>
                       <DatePicker
                         label="Từ ngày"
+                        inputFormat="DD/MM/YYYY"
+                        key={fromFilter}
                         value={fromFilter}
                         onChange={newValue => setFromFilter(newValue)}
                         renderInput={(params: any) => (
@@ -281,6 +283,8 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                     <Grid item xs={3}>
                       <DatePicker
                         label="Đến ngày"
+                        inputFormat="DD/MM/YYYY"
+                        key={toFilter}
                         value={toFilter}
                         onChange={newValue => setToFilter(newValue)}
                         renderInput={(params: any) => (

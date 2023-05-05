@@ -65,11 +65,11 @@ export default function MatchManager(props: Props) {
       teamName: teamFilter ?? null,
       idLeague: leagueFilter ?? null,
       status: statusFilter === 99 ? null : statusFilter,
-      dateStart:
+      from:
         fromFilter && dayjs(fromFilter).isValid()
           ? dayjs(fromFilter).format('YYYY-MM-DD')
           : null,
-      dateEnd:
+      to:
         toFilter && dayjs(toFilter).isValid()
           ? dayjs(toFilter).format('YYYY-MM-DD')
           : null,

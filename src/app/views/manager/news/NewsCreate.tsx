@@ -3,6 +3,9 @@ import BackupIcon from '@mui/icons-material/Backup'
 import {
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -39,6 +42,7 @@ export default function NewsCreate(props: Props) {
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [isHot, setIsHot] = useState(false)
+  const [showConfirmPublish, setShowConfirmPublish] = useState(false)
 
   const schema = yup
     .object({
@@ -91,6 +95,7 @@ export default function NewsCreate(props: Props) {
       keyword: [],
     },
   })
+  const watchPriority = methods.watch('priority')
 
   const onSave = async (data: any) => {
     setIsLoading(true)
@@ -103,7 +108,7 @@ export default function NewsCreate(props: Props) {
       title: data.title,
       idCategory: data.type,
       type: data.type,
-      priority: data.priority,
+      priority: isHot ? data.priority : null,
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
@@ -235,8 +240,7 @@ export default function NewsCreate(props: Props) {
                       )}
                     />
                   </Grid>
-                </Grid>
-                <Grid container spacing={2}>
+                  <Grid item xs={6}></Grid>
                   <Grid item xs={6}>
                     <Box
                       display="flex"
@@ -280,7 +284,13 @@ export default function NewsCreate(props: Props) {
                                 Lưu ý: Sau khi chọn, tin tức sẽ được đưa lên đầu
                                 danh sách, và thay thế vào vị trí đã chọn
                               </FormHelperText>
-                              {/* TODO Tai 1 thoi diem chi co 3 tin tuc noi bat. Neu tiep tuc, tin tuc nay se thay the tin tuc noi bat o vi tri tuong ung */}
+                              {isHot && !!watchPriority && (
+                                <FormHelperText>
+                                  Tại 1 thời điểm chỉ có 3 tin tức nổi bật. Nếu
+                                  tiếp tục, tin tức này sẽ thay thế tin tức nổi
+                                  bật ở vị trí tương ứng
+                                </FormHelperText>
+                              )}
                               {!!methods.formState.errors?.priority
                                 ?.message && (
                                 <FormHelperText error>
@@ -293,6 +303,7 @@ export default function NewsCreate(props: Props) {
                       )}
                     </Box>
                   </Grid>
+                  <Grid item xs={6}></Grid>
                 </Grid>
                 <FormControl fullWidth margin="normal">
                   <FormLabel error={!!methods.formState.errors?.description}>
@@ -415,7 +426,11 @@ export default function NewsCreate(props: Props) {
                 type="button"
                 variant="contained"
                 disabled={isLoading}
-                onClick={methods.handleSubmit(onPublish)}
+                onClick={() => {
+                  methods.trigger().then(() => {
+                    if (methods.formState.isValid) setShowConfirmPublish(true)
+                  })
+                }}
                 sx={{ mx: 1 }}
               >
                 Đăng bài
@@ -431,6 +446,31 @@ export default function NewsCreate(props: Props) {
                 Quay lại
               </Button>
             </Box>
+
+            <Dialog
+              open={showConfirmPublish}
+              onClose={() => setShowConfirmPublish(false)}
+            >
+              <DialogContent>Bạn có chắc muốn đăng bài?</DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => setShowConfirmPublish(false)}
+                  disabled={isLoading}
+                >
+                  Không
+                </Button>
+                <Button
+                  onClick={() => {
+                    methods.handleSubmit(onPublish)
+                    setShowConfirmPublish(false)
+                  }}
+                  disabled={isLoading}
+                  autoFocus
+                >
+                  Đồng ý
+                </Button>
+              </DialogActions>
+            </Dialog>
           </FormProvider>
         </form>
       </SimpleCard>

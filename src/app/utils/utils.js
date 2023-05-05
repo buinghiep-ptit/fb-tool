@@ -172,3 +172,27 @@ export const flat = array => {
   })
   return result
 }
+export function isUrl(string) {
+  let url
+
+  try {
+    url = new URL(string)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export function isYouTubeUrl(url) {
+  if (url != undefined || url != '') {
+    var regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+    var match = url.match(regExp)
+    if (match && match[2].length == 11) {
+      return match[2]
+    } else {
+      return false
+    }
+  }
+}

@@ -22,6 +22,11 @@ export const updateVideo = async (id: any, params: any): Promise<any> => {
   return data
 }
 
+export const deleteVideo = async (id: any): Promise<any> => {
+  const { data } = await http.delete<any>(`/api/videos/${id}`)
+  return data
+}
+
 export const checkVideoPriority = async (params: any): Promise<any> => {
   const { data } = await http.post<any>(`/api/videos/check-priority`, params)
   return data

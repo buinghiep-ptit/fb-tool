@@ -4,6 +4,9 @@ import BackupIcon from '@mui/icons-material/Backup'
 import {
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -40,6 +43,7 @@ export default function NewsDetail(props: Props) {
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [isHot, setIsHot] = useState(false)
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
 
   const schema = yup
     .object({
@@ -94,6 +98,7 @@ export default function NewsDetail(props: Props) {
       keyword: [],
     },
   })
+  const watchPriority = methods.watch('priority')
 
   const initDefaultValues = (news: any) => {
     const defaultValues: any = {}
@@ -109,24 +114,24 @@ export default function NewsDetail(props: Props) {
             value: k,
           }))
         : []
-    methods.reset({ ...defaultValues })
     setPreviewImage(news.imgUrl)
     setIsHot(!!news.priority)
+    methods.reset({ ...defaultValues })
   }
 
   const onSave = async (data: any) => {
     setIsLoading(true)
     let imgUrl: any = ''
-    if (file) {
+    if (file && file.name) {
       imgUrl = await handleUploadImage(file)
-    }
+    } else imgUrl = news.imgUrl
 
     const payload: any = {
       id: params.id,
       title: data.title,
       idCategory: data.type,
       type: data.type,
-      priority: data.priority,
+      priority: isHot ? data.priority : null,
       description: data.description,
       content: data.content,
       imgUrl: imgUrl,
@@ -150,9 +155,9 @@ export default function NewsDetail(props: Props) {
   const onPublishOrUnpublish = async (data: any) => {
     setIsLoading(true)
     let imgUrl: any = ''
-    if (file) {
+    if (file && file.name) {
       imgUrl = await handleUploadImage(file)
-    }
+    } else imgUrl = news.imgUrl
 
     const payload: any = {
       id: params.id,
@@ -335,6 +340,13 @@ export default function NewsDetail(props: Props) {
                                 Lưu ý: Sau khi chọn, tin tức sẽ được đưa lên đầu
                                 danh sách, và thay thế vào vị trí đã chọn
                               </FormHelperText>
+                              {isHot && !!watchPriority && (
+                                <FormHelperText>
+                                  Tại 1 thời điểm chỉ có 3 tin tức nổi bật. Nếu
+                                  tiếp tục, tin tức này sẽ thay thế tin tức nổi
+                                  bật ở vị trí tương ứng
+                                </FormHelperText>
+                              )}
                               {!!methods.formState.errors?.priority
                                 ?.message && (
                                 <FormHelperText error>
@@ -469,12 +481,16 @@ export default function NewsDetail(props: Props) {
                 type="button"
                 variant="contained"
                 disabled={isLoading}
-                onClick={methods.handleSubmit(onPublishOrUnpublish)}
+                onClick={() => {
+                  methods.trigger().then(() => {
+                    if (methods.formState.isValid)
+                      setShowConfirmationDialog(true)
+                  })
+                }}
                 sx={{ mx: 1 }}
               >
                 {news?.status === 1 ? 'Hạ bài' : 'Đăng bài'}
               </Button>
-              {/* TODO confirmation */}
               <Button
                 variant="outlined"
                 disabled={isLoading}
@@ -485,6 +501,33 @@ export default function NewsDetail(props: Props) {
               >
                 Quay lại
               </Button>
+
+              <Dialog
+                open={showConfirmationDialog}
+                onClose={() => setShowConfirmationDialog(false)}
+              >
+                <DialogContent>{`Bạn có chắc muốn ${
+                  news?.status === 1 ? 'hạ bài' : 'đăng bài'
+                }?`}</DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={() => setShowConfirmationDialog(false)}
+                    disabled={isLoading}
+                  >
+                    Không
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      methods.handleSubmit(onPublishOrUnpublish)
+                      setShowConfirmationDialog(false)
+                    }}
+                    disabled={isLoading}
+                    autoFocus
+                  >
+                    Đồng ý
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </Box>
           </FormProvider>
         </form>

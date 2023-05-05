@@ -1,57 +1,45 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import {
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Stack,
-  Icon,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Chip,
-  Tooltip,
-  IconButton,
-  TablePagination,
-  Autocomplete,
-} from '@mui/material'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { SearchSharp } from '@mui/icons-material'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import { useState } from 'react'
-import { MuiButton } from 'app/components/common/MuiButton'
-import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import {
-  Controller,
-  FormProvider,
-  SubmitHandler,
-  useForm,
-} from 'react-hook-form'
+  Autocomplete,
+  Chip,
+  Grid,
+  Icon,
+  IconButton,
+  MenuItem,
+  Stack,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Tooltip,
+} from '@mui/material'
+import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import FormInputText from 'app/components/common/MuiRHFInputText'
-import { SearchSharp } from '@mui/icons-material'
-import { columnsPlayers } from 'app/utils/columns'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import StarIcon from '@mui/icons-material/Star'
-import Star from '@mui/icons-material/Star'
-import RankIcon from 'app/components/common/RankIcon'
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { PlayersFilters, TeamResponse, TitlePlayer } from 'app/models'
-import { getListPlayer } from 'app/apis/players/players.service'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import * as Yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import MuiStyledPagination from 'app/components/common/MuiStyledPagination'
-import MuiStyledTable from 'app/components/common/MuiStyledTable'
-import { getListTeam } from 'app/apis/teams/teams.service'
+import { useQuery } from '@tanstack/react-query'
+import { getListPlayer, getTeams } from 'app/apis/players/players.service'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { MuiButton } from 'app/components/common/MuiButton'
 import { MuiRHFAutoComplete } from 'app/components/common/MuiRHFAutoComplete'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
+import RankIcon from 'app/components/common/RankIcon'
+import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { PlayersFilters, TitlePlayer } from 'app/models'
+import { columnsPlayers } from 'app/utils/columns'
+import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import moment from 'moment'
+import * as React from 'react'
+import { useState } from 'react'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import * as Yup from 'yup'
 
 export interface Props {}
 const optionPosition = [
@@ -62,8 +50,7 @@ const optionPosition = [
 ]
 
 export default function PlayerManager(props: Props) {
-  let count = 1
-  const [teamDefault, setTeamDefault] = useState<any>('')
+  const [teamDefault, setTeamDefault] = useState<any[]>([])
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -108,10 +95,9 @@ export default function PlayerManager(props: Props) {
     status: queryParams.status ?? 'all',
     name: queryParams.search ?? '',
     position: queryParams.position ?? '',
-    from: queryParams.from ?? '',
-    to: queryParams.to ?? '',
-    team: queryParams.team ?? '',
-    sort: queryParams.sort ?? '',
+    dateStart: queryParams.dateStart ?? '',
+    dateEnd: queryParams.dateEnd ?? '',
+    team: teamDefault.find(teams => teams.name === queryParams.team),
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -126,14 +112,14 @@ export default function PlayerManager(props: Props) {
     keepPreviousData: true,
     enabled: !!filters,
   })
+  const fetchTeam = async () => {
+    const res = await getTeams()
+    setTeamDefault(res)
+  }
 
-  const { data: teams }: UseQueryResult<TeamResponse, Error> = useQuery<
-    TeamResponse,
-    Error
-  >(['teams'], () => getListTeam({ size: 5000, page: 0 }), {
-    refetchOnWindowFocus: false,
-    staleTime: 15 * 60 * 1000,
-  })
+  React.useEffect(() => {
+    fetchTeam()
+  }, [])
 
   const validationSchema = Yup.object().shape(
     {
@@ -171,16 +157,17 @@ export default function PlayerManager(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-  const from = methods.watch('from')
-  const to = methods.watch('to')
-
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
   React.useEffect(() => {
-    if (!from || !to) return
-    if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
-      methods.clearErrors('from')
-      methods.clearErrors('to')
+    if (!dateStart || !dateEnd) return
+    if (
+      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
+    ) {
+      methods.clearErrors('dateStart')
+      methods.clearErrors('dateEnd')
     }
-  }, [from, to])
+  }, [dateStart, dateEnd])
 
   React.useEffect(() => {
     if (searchParams) {
@@ -223,8 +210,8 @@ export default function PlayerManager(props: Props) {
       name: '',
       position: '',
       status: 'all',
-      from: '',
-      to: '',
+      dateStart: '',
+      dateEnd: '',
       team: '',
       page: 0,
       size: 20,
@@ -245,10 +232,10 @@ export default function PlayerManager(props: Props) {
   }
   const getStatusText = (status: number) => {
     switch (status) {
-      case 0:
-        return 'Không hoạt động'
       case 1:
         return 'Hoạt động'
+      case -2:
+        return 'Không Hoạt động'
     }
   }
   const onExportEcel = (fileName: any) => {
@@ -312,26 +299,17 @@ export default function PlayerManager(props: Props) {
                   />
                 </Grid>
                 <Grid item xs={3}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      Trạng thái
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Trạng thái"
-                      name="status"
-                    >
-                      <MenuItem value={0}>Không hoạt động</MenuItem>
-                      <MenuItem value={1}>Hoạt động</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="all">Tất cả</MenuItem>
+                    <MenuItem value="0">Hoạt động</MenuItem>
+                    <MenuItem value="1">Không hoạt động</MenuItem>
+                  </SelectDropDown>
                 </Grid>
                 <Grid item xs={3}>
                   <MuiRHFAutoComplete
                     label="Đội thi đấu"
                     name="team"
-                    options={teams?.content ?? {}}
+                    options={teamDefault}
                     optionProperty="name"
                     getOptionLabel={option => option.name ?? ''}
                     defaultValue=""
@@ -342,10 +320,10 @@ export default function PlayerManager(props: Props) {
                 <Grid container spacing={2}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Grid item xs={3}>
-                      <MuiRHFDatePicker name="from" label="Từ ngày" />
+                      <MuiRHFDatePicker name="dateStart" label="Từ ngày" />
                     </Grid>
                     <Grid item xs={3}>
-                      <MuiRHFDatePicker name="to" label="Đến ngày" />
+                      <MuiRHFDatePicker name="dateEnd" label="Đến ngày" />
                     </Grid>
                   </LocalizationProvider>
                   <Grid
@@ -395,16 +373,22 @@ export default function PlayerManager(props: Props) {
             <TableHead>
               <TableRow>
                 {columnsPlayers.map(header => (
-                  <TableCell align="center" style={{ minWidth: header.width }}>
+                  <TableCell
+                    align="center"
+                    style={{ minWidth: header.width }}
+                    key={header.id}
+                  >
                     {header.name}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {data?.map(item => (
+              {data?.map((item, index) => (
                 <TableRow key={item.id}>
-                  <TableCell align="center">{count++}</TableCell>
+                  <TableCell align="center">
+                    {size * page + index + 1}
+                  </TableCell>
                   <TableCell align="center">
                     {item.priority !== null && (
                       <RankIcon
@@ -426,7 +410,10 @@ export default function PlayerManager(props: Props) {
                     </Link>
                   </TableCell>
                   <TableCell align="center">{item.position}</TableCell>
-                  <TableCell align="center">{item.idTeam}</TableCell>
+                  <TableCell align="center">
+                    {teamDefault.find(team => team.shortName === item.idTeam)
+                      ?.name || item.idTeam}
+                  </TableCell>
                   <TableCell align="center">{item.dateOfBirth}</TableCell>
                   <TableCell align="center">{item.height}</TableCell>
                   <TableCell align="center">{item.dateJoined}</TableCell>

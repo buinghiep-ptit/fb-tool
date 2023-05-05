@@ -1,51 +1,49 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { SearchSharp } from '@mui/icons-material'
 import {
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Stack,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
   Chip,
-  IconButton,
-  Tooltip,
-  Autocomplete,
+  Grid,
+  MenuItem,
+  Stack,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
-import AddBoxIcon from '@mui/icons-material/AddBox'
-import { useState } from 'react'
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import FormInputText from 'app/components/common/MuiRHFInputText'
+import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
-import { MuiButton } from 'app/components/common/MuiButton'
-import { SearchSharp } from '@mui/icons-material'
-import { columnsOrders } from 'app/utils/columns'
-import { OrderResponse, OrdersFilters } from 'app/models'
-import { UseQueryResult, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getListOrder } from 'app/apis/order/order.service'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { MuiButton } from 'app/components/common/MuiButton'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
+import FormInputText from 'app/components/common/MuiRHFInputText'
+import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { OrderResponse, OrdersFilters } from 'app/models'
+import { columnsOrders } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as Yup from 'yup'
 import moment from 'moment'
+import * as React from 'react'
+import { useState } from 'react'
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import * as Yup from 'yup'
 export interface Props {}
+export const dateDefault = () => {
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setDate(startDate.getDate() - 7)
+
+  return {
+    startDate: moment(startDate),
+    endDate: moment(endDate),
+  }
+}
 
 export default function OrderManager(props: Props) {
-  let count = 1
   const navigate = useNavigateParams()
   const navigation = useNavigate()
   const [searchParams] = useSearchParams()
@@ -84,21 +82,6 @@ export default function OrderManager(props: Props) {
       size: +event.target.value,
     } as any)
   }
-  React.useEffect(() => {
-    if (searchParams) {
-      if (!!Object.keys(queryParams).length) {
-        setPage(parseInt(queryParams.page) || 0)
-        setSize(parseInt(queryParams.size) || 20)
-
-        setFilters(prevFilters => {
-          return {
-            ...prevFilters,
-            ...queryParams,
-          }
-        })
-      }
-    }
-  }, [searchParams])
 
   const onSubmitHandler: SubmitHandler<OrdersFilters> = (
     values: OrdersFilters,
@@ -122,9 +105,13 @@ export default function OrderManager(props: Props) {
   }
   const [defaultValues] = useState<OrdersFilters>({
     status: queryParams.status ?? '',
-    name: queryParams.name ?? '',
-    from: queryParams.from ?? '',
-    to: queryParams.to ?? '',
+    q: queryParams.q ?? '',
+    dateStart:
+      queryParams.dateStart ??
+      (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
+    dateEnd:
+      queryParams.dateEnd ??
+      (dateDefault() as any).endDate?.format('YYYY-MM-DD'),
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,
   })
@@ -146,7 +133,7 @@ export default function OrderManager(props: Props) {
       enabled: !!filters,
     },
   )
-  console.log(orders?.content)
+
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .min(0, 'email must be at least 0 characters')
@@ -157,15 +144,33 @@ export default function OrderManager(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
-  const from = methods.watch('from')
-  const to = methods.watch('to')
   React.useEffect(() => {
-    if (!from || !to) return
-    if (moment(new Date(from)).unix() <= moment(new Date(to)).unix()) {
-      methods.clearErrors('from')
-      methods.clearErrors('to')
+    if (searchParams) {
+      if (!!Object.keys(queryParams).length) {
+        setPage(parseInt(queryParams.page) || 0)
+        setSize(parseInt(queryParams.size) || 20)
+
+        setFilters(prevFilters => {
+          return {
+            ...prevFilters,
+            ...queryParams,
+          }
+        })
+      }
     }
-  }, [from, to])
+  }, [searchParams])
+
+  const dateStart = methods.watch('dateStart')
+  const dateEnd = methods.watch('dateEnd')
+  React.useEffect(() => {
+    if (!dateStart || !dateEnd) return
+    if (
+      moment(new Date(dateStart)).unix() <= moment(new Date(dateEnd)).unix()
+    ) {
+      methods.clearErrors('dateStart')
+      methods.clearErrors('dateEnd')
+    }
+  }, [dateStart, dateEnd])
 
   const getStatusText = (status: number) => {
     switch (status) {
@@ -191,7 +196,7 @@ export default function OrderManager(props: Props) {
                 <Grid item xs={3}>
                   <FormInputText
                     type="text"
-                    name="name"
+                    name="q"
                     label={'SĐT, email người đặt, tên sản phẩm'}
                     defaultValue=""
                     placeholder="Nhập SĐT, email, mã đơn hàng"
@@ -199,28 +204,19 @@ export default function OrderManager(props: Props) {
                   />
                 </Grid>
                 <Grid item xs={1.5}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      Trạng thái
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Trạng thái"
-                    >
-                      <MenuItem value={0}>Hủy</MenuItem>
-                      <MenuItem value={1}>Chờ xử lý</MenuItem>
-                      <MenuItem value={2}>Hoàn thành</MenuItem>
-                    </Select>
-                  </FormControl>
+                  <SelectDropDown name="status" label="Trạng thái">
+                    <MenuItem value="0">Hủy</MenuItem>
+                    <MenuItem value="1">Chờ xử lý</MenuItem>
+                    <MenuItem value="2">Hoàn thành</MenuItem>
+                  </SelectDropDown>
                 </Grid>
                 <Grid item xs={6} container spacing={2}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Grid item xs={6}>
-                      <MuiRHFDatePicker name="from" label="Từ ngày" />
+                      <MuiRHFDatePicker name="dateStart" label="Từ ngày" />
                     </Grid>
                     <Grid item xs={6}>
-                      <MuiRHFDatePicker name="to" label="Đến ngày" />
+                      <MuiRHFDatePicker name="dateEnd" label="Đến ngày" />
                     </Grid>
                   </LocalizationProvider>
                 </Grid>
@@ -262,15 +258,19 @@ export default function OrderManager(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders?.content?.map(item => (
+              {orders?.content?.map((item, index) => (
                 <TableRow key={item.id}>
-                  <TableCell align="center">{count++}</TableCell>
+                  <TableCell align="center">
+                    {size * page + index + 1}
+                  </TableCell>
                   <TableCell align="center">{item.customerPhone}</TableCell>
                   <TableCell align="center" sx={{ color: 'red' }}>
                     {item.orderCode}
                   </TableCell>
                   <TableCell align="center">{item.quantity}</TableCell>
-                  <TableCell align="center">{item.amount}</TableCell>
+                  <TableCell align="center">
+                    {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
+                  </TableCell>
                   <TableCell align="center">
                     {item.createdDate
                       ? new Date(item.createdDate).toLocaleString()

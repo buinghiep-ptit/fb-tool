@@ -157,7 +157,9 @@ export default function MemberDetail(props: Props) {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell variant="head">Tài khoản</TableCell>
+                  <TableCell variant="head" style={{ minWidth: '100px' }}>
+                    Tài khoản
+                  </TableCell>
                   <TableCell variant="body">
                     {[
                       member?.customer?.fullName,

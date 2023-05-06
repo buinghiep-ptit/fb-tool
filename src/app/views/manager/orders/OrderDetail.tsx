@@ -276,7 +276,7 @@ export default function OrderDetail(props: Props) {
             </Grid>
             <Grid item xs={3}>
               <h3 style={{ color: 'red' }}>
-                {order?.amount?.toLocaleString().replace(',', '.')} VNĐ
+                {order?.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
               </h3>
             </Grid>
           </Grid>

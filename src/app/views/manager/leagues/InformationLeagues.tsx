@@ -19,7 +19,11 @@ import {
 import { Container, SimpleCard } from 'app/components'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import handleUploadImage from 'app/helpers/handleUploadImage'
-import { toastError, toastSuccess } from 'app/helpers/toastNofication'
+import {
+  toastError,
+  toastSuccess,
+  toastWarning,
+} from 'app/helpers/toastNofication'
 import { saveLeagueCurrent } from 'app/redux/actions/leagueActions'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -38,6 +42,7 @@ export default function InfomationLeagues(props: Props) {
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState([])
   const [logo, setLogo] = useState('')
+  const [typeLeague, setTypeLeague] = useState<any>('')
   const DialogPickTeamRef = useRef<any>(null)
   const schema = yup
     .object({
@@ -81,6 +86,12 @@ export default function InfomationLeagues(props: Props) {
     },
   })
 
+  const validateLogo = (file: any) => {
+    console.log(file)
+    if (file.size > 10000000) return false
+    return true
+  }
+
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
     data.teamList = teamPicked
@@ -93,7 +104,7 @@ export default function InfomationLeagues(props: Props) {
     } else {
       urlLogo = logo
     }
-    console.log(data, teamPicked)
+
     try {
       if (params?.id) {
         const res = await editLeagues(
@@ -132,12 +143,13 @@ export default function InfomationLeagues(props: Props) {
     defaultValues.status = league.status
     defaultValues.type = league.type
     defaultValues.category = league.category
-    defaultValues.isDisplayRank = league.displayRank === 0 ? false : true
+    defaultValues.isDisplayRank = league.isDisplayRank === 0 ? false : true
     defaultValues.isDisplaySchedule =
-      league.displaySchedule === 0 ? false : true
+      league.isDisplaySchedule === 0 ? false : true
     defaultValues.teamList = league.teamList.map((item: any) => item.id)
     setTeamPicked(league.teamList.map((item: any) => item.id))
     setLogo(league.logo || '')
+    setTypeLeague(league.category)
     methods.reset({ ...defaultValues })
   }
 
@@ -240,9 +252,15 @@ export default function InfomationLeagues(props: Props) {
                       </InputLabel>
                       <Select
                         {...field}
+                        disabled={!!params.id}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Thể Loại*"
+                        value={typeLeague}
+                        onChange={(e: any) => {
+                          setTypeLeague(e.target.value)
+                          methods.setValue('category', e.target.value)
+                        }}
                       >
                         <MenuItem value={1}>League</MenuItem>
                         <MenuItem value={2}>Cup</MenuItem>
@@ -263,6 +281,12 @@ export default function InfomationLeagues(props: Props) {
                   id="uploadImage"
                   style={{ display: 'none' }}
                   onChange={(e: any) => {
+                    if (!validateLogo(e.target.files[0])) {
+                      toastWarning({
+                        message: 'Dung lượng file lớn hơn 10MB',
+                      })
+                    }
+
                     setFile(e.target.files[0])
                   }}
                 />
@@ -296,7 +320,7 @@ export default function InfomationLeagues(props: Props) {
                       src={window.URL.createObjectURL(file)}
                     ></img>
                   )}
-                  {logo.length !== 0 && (
+                  {logo.length !== 0 && !file && (
                     <img
                       style={{
                         objectFit: 'cover',
@@ -373,10 +397,12 @@ export default function InfomationLeagues(props: Props) {
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <MuiCheckBox
-                  name="isDisplayRank"
-                  label="Hiển thị BXH trên tràng chủ"
-                />
+                {typeLeague === 1 && (
+                  <MuiCheckBox
+                    name="isDisplayRank"
+                    label="Hiển thị BXH trên trang chủ"
+                  />
+                )}
                 <MuiCheckBox
                   name="isDisplaySchedule"
                   label="Hiển thị lịch đấu trên website"
@@ -408,14 +434,16 @@ export default function InfomationLeagues(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-      <DialogPickTeam
-        isLoading={props.isLoading}
-        setIsLoading={props.setIsLoading}
-        ref={DialogPickTeamRef}
-        setTeamPicked={setTeamPicked}
-        setValue={methods.setValue}
-        teamPicked={teamPicked}
-      />
+      {teamPicked.length && (
+        <DialogPickTeam
+          isLoading={props.isLoading}
+          setIsLoading={props.setIsLoading}
+          ref={DialogPickTeamRef}
+          setTeamPicked={setTeamPicked}
+          setValue={methods.setValue}
+          teamPicked={teamPicked}
+        />
+      )}
     </Container>
   )
 }

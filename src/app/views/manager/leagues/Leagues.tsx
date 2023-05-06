@@ -281,13 +281,9 @@ export default function LeaguesManager(props: Props) {
                       {league.status === 0 && (
                         <Chip label="Chưa diễn ra" color="warning" />
                       )}
-                      {league.status === 2 && (
+                      {league.status === -1 && (
                         <Chip label="Kết thúc" color="primary" />
                       )}
-                      {league.status === 3 && (
-                        <Chip label="Tạm dừng" color="secondary" />
-                      )}
-                      {league.status === 4 && <Chip label="Đóng" />}
                     </TableCell>
                     <TableCell align="center">
                       <Tooltip title="Sửa" placement="top">

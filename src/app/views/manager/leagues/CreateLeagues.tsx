@@ -7,7 +7,7 @@ import { Box } from '@mui/system'
 import { Breadcrumb, Container } from 'app/components'
 import * as React from 'react'
 import { useState } from 'react'
-import InformationLeagues from './InformationLeagues'
+import InformationLeaguesCreate from './InformationLeaguesCreate'
 export interface Props {}
 
 export default function LeaguesManager(props: Props) {
@@ -52,7 +52,7 @@ export default function LeaguesManager(props: Props) {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <InformationLeagues
+            <InformationLeaguesCreate
               isLoading={isLoading}
               setIsLoading={setIsLoading}
             />

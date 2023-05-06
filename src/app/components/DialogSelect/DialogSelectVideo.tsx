@@ -97,16 +97,17 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
           : '',
       page: page,
       size: rowsPerPage,
-    }).then(res => {
-      const newList = res.content.map((item: any) => {
-        item.isPicked = (selectedList || []).includes(item.id)
-        return item
-      })
-      setVideos(newList)
-
-      setCountTable(res.totalElements)
     })
-    setIsLoading(false)
+      .then(res => {
+        const newList = res.content.map((item: any) => {
+          item.isPicked = (selectedList || []).includes(item.id)
+          return item
+        })
+        setVideos(newList)
+
+        setCountTable(res.totalElements)
+      })
+      .finally(() => setIsLoading(false))
   }
 
   const search = () => {
@@ -200,7 +201,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                   <Grid item xs={12}>
                     <TextField
                       id="outlined-basic"
-                      label="Tiêu đề, tóm tắt, từ khóa:"
+                      label="Tiêu đề, tóm tắt, từ khóa"
                       variant="outlined"
                       fullWidth
                       value={searchFilter}

@@ -1,4 +1,3 @@
-export interface Props {}
 import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import {
@@ -18,33 +17,37 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { getNewsDetail, updateNews } from 'app/apis/news/news.service'
+import {
+  deleteVideo,
+  getVideoDetail,
+  updateVideo,
+} from 'app/apis/videos/video.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiRHFAutocompleteWithKeyword } from 'app/components/common/MuiRHFAutocompleteWithKeyword'
 import MuiRHFTextarea from 'app/components/common/MuiRHFTextarea'
-import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
-import { NEWS_TYPES } from 'app/constants/newsType'
+import { VIDEO_TYPES } from 'app/constants/videoTypes'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { isYouTubeUrl } from 'app/utils/utils'
 import { useEffect, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
-import './style.css'
 
-export default function NewsDetail(props: Props) {
+export interface Props {}
+
+export default function VideoDetail(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
 
+  const [video, setVideo] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
-  const [news, setNews] = useState<any>()
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [isHot, setIsHot] = useState(false)
-  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const schema = yup
     .object({
@@ -52,7 +55,7 @@ export default function NewsDetail(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(500, 'Tối đa 500 ký tự'),
+        .max(255, 'Tối đa 255 ký tự'),
       type: yup.number().required(),
       priority: yup
         .number()
@@ -67,7 +70,7 @@ export default function NewsDetail(props: Props) {
         .required('Giá trị bắt buộc')
         .trim()
         .max(1000, 'Tối đa 1000 ký tự'),
-      content: yup.string().required('Giá trị bắt buộc').trim(),
+      url: yup.string().required('Giá trị bắt buộc').trim(),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')
@@ -83,6 +86,7 @@ export default function NewsDetail(props: Props) {
             return Math.floor(value?.size / 1000000) <= 50
           else return true
         }),
+      status: yup.number().required('Giá trị bắt buộc'),
       keyword: yup.array().nullable(),
     })
     .required()
@@ -94,58 +98,60 @@ export default function NewsDetail(props: Props) {
       type: 1,
       priority: '',
       description: '',
-      content: '',
+      url: '',
       file: null,
       keyword: [],
+      status: 1,
     },
   })
+  const watchUrl = methods.watch('url')
   const watchPriority = methods.watch('priority')
 
-  const initDefaultValues = (news: any) => {
+  const initDefaultValues = (video: any) => {
     const defaultValues: any = {}
-    defaultValues.file = news.imgUrl
-    defaultValues.title = news.title
-    defaultValues.type = news.newsCategory
-    defaultValues.priority = news.priority
-    defaultValues.description = news.description
-    defaultValues.content = news.content
+    defaultValues.file = video.imgUrl
+    defaultValues.title = video.title
+    defaultValues.type = video.newsCategory
+    defaultValues.priority = video.priority
+    defaultValues.description = video.description
+    defaultValues.url = video.url
+    defaultValues.status = video.status
     defaultValues.keyword =
-      news.keyWord.length > 0
-        ? news.keyWord.split(',').map((k: any) => ({
+      video.keyWord.length > 0
+        ? video.keyWord.split(',').map((k: any) => ({
             value: k,
           }))
         : []
-    setPreviewImage(news.imgUrl)
-    setIsHot(!!news.priority)
     methods.reset({ ...defaultValues })
+    setPreviewImage(video.imgUrl)
+    setIsHot(!!video.priority)
   }
 
-  const onSave = async (data: any) => {
+  const onSubmit = async (data: any) => {
     setIsLoading(true)
     let imgUrl: any = ''
     if (file && file.name) {
       imgUrl = await handleUploadImage(file)
-    } else imgUrl = news.imgUrl
+    } else imgUrl = previewImage
 
     const payload: any = {
       id: params.id,
       title: data.title,
-      idCategory: data.type,
       type: data.type,
       priority: isHot ? data.priority : null,
       description: data.description,
-      content: data.content,
+      url: data.url,
       imgUrl: imgUrl,
       keyWord: data.keyword.map((k: any) => k.value).join(','),
-      status: news.status,
+      status: data.status,
     }
 
-    await updateNews(payload)
+    await updateVideo(params.id, payload)
       .then(() => {
         toastSuccess({
           message: 'Thành công',
         })
-        navigate('/news')
+        navigate('/cahntv')
       })
       .catch(() => {})
       .finally(() => {
@@ -153,32 +159,14 @@ export default function NewsDetail(props: Props) {
       })
   }
 
-  const onPublishOrUnpublish = async (data: any) => {
+  const tryToDelete = async () => {
     setIsLoading(true)
-    let imgUrl: any = ''
-    if (file && file.name) {
-      imgUrl = await handleUploadImage(file)
-    } else imgUrl = news.imgUrl
-
-    const payload: any = {
-      id: params.id,
-      title: data.title,
-      idCategory: data.type,
-      type: data.type,
-      priority: data.priority,
-      description: data.description,
-      content: data.content,
-      imgUrl: imgUrl,
-      keyWord: data.keyword.map((k: any) => k.value).join(','),
-      status: news.status ? 0 : 1,
-    }
-
-    await updateNews(payload)
+    await deleteVideo(params.id)
       .then(() => {
         toastSuccess({
           message: 'Thành công',
         })
-        navigate('/news')
+        navigate('/cahntv')
       })
       .catch(() => {})
       .finally(() => {
@@ -186,11 +174,11 @@ export default function NewsDetail(props: Props) {
       })
   }
 
-  const fetchNews = async () => {
+  const fetchVideo = async () => {
     setIsLoading(true)
-    await getNewsDetail(params.id)
+    await getVideoDetail(params.id)
       .then(res => {
-        setNews(res)
+        setVideo(res)
         initDefaultValues(res)
       })
       .catch(() => {})
@@ -200,7 +188,7 @@ export default function NewsDetail(props: Props) {
   }
 
   useEffect(() => {
-    fetchNews()
+    fetchVideo()
   }, [])
 
   return (
@@ -222,27 +210,14 @@ export default function NewsDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý tin tức', path: '/news' },
-            { name: 'Chi tiết tin tức', path: '/news/' + params.id },
+            { name: 'Quản lý CAHN TV', path: '/cahntv' },
+            { name: 'Thêm mới video', path: '/cahntv/create' },
           ]}
         />
       </Box>
 
       <SimpleCard>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box></Box>
-          <Typography
-            style={{ color: news?.status === 1 ? 'limegreen' : 'grey' }}
-          >
-            {news?.status === 1 ? 'Đã đăng' : 'Chưa đăng'}
-          </Typography>
-        </Box>
-        <form onSubmit={methods.handleSubmit(onSave)}>
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
@@ -261,22 +236,23 @@ export default function NewsDetail(props: Props) {
                     />
                   )}
                 />
+
                 <Controller
                   name="type"
                   control={methods.control}
                   render={({ field }) => (
                     <FormControl fullWidth margin="normal">
                       <InputLabel id="demo-simple-select-label">
-                        Loại tin tức*
+                        Loại video*
                       </InputLabel>
                       <Select
                         fullWidth
                         {...field}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        label="Loại tin tức*"
+                        label="Loại video*"
                       >
-                        {Object.values(NEWS_TYPES).map((type, index) => {
+                        {Object.values(VIDEO_TYPES).map((type, index) => {
                           return (
                             <MenuItem key={index} value={type.id}>
                               {type.label}
@@ -294,7 +270,7 @@ export default function NewsDetail(props: Props) {
                 />
                 <FormControl fullWidth margin="normal">
                   <FormControlLabel
-                    label="Tin nổi bật"
+                    label="Video nổi bật"
                     control={
                       <Checkbox
                         checked={isHot}
@@ -325,16 +301,16 @@ export default function NewsDetail(props: Props) {
                             <MenuItem value={3}>3</MenuItem>
                           </Select>
                           <FormHelperText>
-                            Lưu ý: Sau khi chọn, tin tức sẽ được đưa lên đầu
-                            danh sách, và thay thế vào vị trí đã chọn
+                            Lưu ý: Sau khi chọn, video sẽ được đưa lên đầu danh
+                            sách, và thay thế vào vị trí đã chọn
                           </FormHelperText>
                           {isHot &&
                             !!watchPriority &&
-                            news?.priority !== watchPriority && (
+                            video?.priority !== watchPriority && (
                               <FormHelperText>
-                                Tại 1 thời điểm chỉ có 3 tin tức nổi bật. Nếu
-                                tiếp tục, tin tức này sẽ thay thế tin tức nổi
-                                bật ở vị trí tương ứng
+                                Tại 1 thời điểm chỉ có 3 video nổi bật. Nếu tiếp
+                                tục, video này sẽ thay thế video nổi bật ở vị
+                                trí tương ứng
                               </FormHelperText>
                             )}
                           {!!methods.formState.errors?.priority?.message && (
@@ -353,6 +329,38 @@ export default function NewsDetail(props: Props) {
                   </FormLabel>
                   <MuiRHFTextarea name="description" label="Tóm tắt*" />
                 </FormControl>
+                <FormControl fullWidth margin="normal">
+                  <Controller
+                    name="url"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        error={!!methods.formState.errors?.url}
+                        helperText={methods.formState.errors?.url?.message}
+                        {...field}
+                        label="Link youtube*"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
+                  <FormHelperText>
+                    Lưu ý: video trên youtube cần để chế độ public và cho phép
+                    nhúng
+                  </FormHelperText>
+                </FormControl>
+                {watchUrl && !!isYouTubeUrl(watchUrl) && (
+                  <iframe
+                    style={{ width: '100%', aspectRatio: '16/9' }}
+                    title="Youtube Player"
+                    sandbox="allow-same-origin allow-forms allow-popups allow-scripts allow-presentation"
+                    src={
+                      'https://youtube.com/embed/' +
+                      isYouTubeUrl(watchUrl) +
+                      '?autoplay=0'
+                    }
+                  ></iframe>
+                )}
               </Grid>
               <Grid item xs={6}>
                 <Box sx={{ mb: 2 }}>
@@ -432,15 +440,35 @@ export default function NewsDetail(props: Props) {
                     </FormHelperText>
                   )}
                 </Box>
+
+                <Controller
+                  name="status"
+                  control={methods.control}
+                  render={({ field }) => (
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel id="demo-simple-select-label">
+                        Trạng thái*
+                      </InputLabel>
+                      <Select
+                        fullWidth
+                        {...field}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Trạng thái*"
+                      >
+                        <MenuItem value={1}>Hoạt động</MenuItem>
+                        <MenuItem value={-1}>Không hoạt động</MenuItem>
+                      </Select>
+                      {!!methods.formState.errors?.status?.message && (
+                        <FormHelperText>
+                          {methods.formState.errors?.status.message}
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  )}
+                />
               </Grid>
             </Grid>
-
-            <FormControl fullWidth margin="normal">
-              <FormLabel error={!!methods.formState.errors?.content}>
-                Nội dung:*
-              </FormLabel>
-              <RHFWYSIWYGEditor name="content"></RHFWYSIWYGEditor>
-            </FormControl>
 
             <FormControl fullWidth margin="normal">
               <MuiRHFAutocompleteWithKeyword name="keyword" label="Từ khóa" />
@@ -455,10 +483,9 @@ export default function NewsDetail(props: Props) {
             >
               <Button
                 color="primary"
-                type="button"
+                type="submit"
                 variant="contained"
                 disabled={isLoading}
-                onClick={methods.handleSubmit(onSave)}
                 sx={{ mr: 1 }}
               >
                 Lưu
@@ -468,15 +495,10 @@ export default function NewsDetail(props: Props) {
                 type="button"
                 variant="contained"
                 disabled={isLoading}
-                onClick={() => {
-                  methods.trigger().then(() => {
-                    if (methods.formState.isValid)
-                      setShowConfirmationDialog(true)
-                  })
-                }}
-                sx={{ mx: 1 }}
+                sx={{ mr: 1 }}
+                onClick={() => setShowDeleteDialog(true)}
               >
-                {news?.status === 1 ? 'Hạ bài' : 'Đăng bài'}
+                Xóa
               </Button>
               <Button
                 variant="outlined"
@@ -488,31 +510,32 @@ export default function NewsDetail(props: Props) {
               >
                 Quay lại
               </Button>
-
-              <Dialog
-                open={showConfirmationDialog}
-                onClose={() => setShowConfirmationDialog(false)}
-              >
-                <DialogContent>{`Bạn có chắc muốn ${
-                  news?.status === 1 ? 'hạ bài' : 'đăng bài'
-                }?`}</DialogContent>
-                <DialogActions>
-                  <Button
-                    onClick={() => setShowConfirmationDialog(false)}
-                    disabled={isLoading}
-                  >
-                    Không
-                  </Button>
-                  <Button
-                    onClick={methods.handleSubmit(onPublishOrUnpublish)}
-                    disabled={isLoading}
-                    autoFocus
-                  >
-                    Đồng ý
-                  </Button>
-                </DialogActions>
-              </Dialog>
             </Box>
+
+            <Dialog
+              open={showDeleteDialog}
+              onClose={() => setShowDeleteDialog(false)}
+            >
+              <DialogContent>Bạn có chắc muốn xóa video?</DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => setShowDeleteDialog(false)}
+                  disabled={isLoading}
+                >
+                  Không
+                </Button>
+                <Button
+                  onClick={() => {
+                    tryToDelete()
+                    setShowDeleteDialog(false)
+                  }}
+                  disabled={isLoading}
+                  autoFocus
+                >
+                  Đồng ý
+                </Button>
+              </DialogActions>
+            </Dialog>
           </FormProvider>
         </form>
       </SimpleCard>

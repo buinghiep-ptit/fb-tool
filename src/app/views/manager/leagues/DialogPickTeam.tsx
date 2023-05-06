@@ -26,8 +26,10 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { red } from '@mui/material/colors'
+import { addTeam, removeTeam } from 'app/apis/leagues/leagues.service'
 import { getTeams } from 'app/apis/teams/teams.service'
 import { SimpleCard, StyledTable } from 'app/components'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import { remove } from 'lodash'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
@@ -120,20 +122,36 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
     props.setValue('teamList', props.teamPicked)
   }
 
-  const handlePick = (id: number) => {
+  const handlePick = async (id: number) => {
+    props.setIsLoading(true)
     const newList = [...teams]
     if (newList[id].isPicked) {
+      const res = await removeTeam(params.id, newList[id].id)
+      if (res) {
+        toastSuccess({
+          message: 'Đội đã được xóa',
+        })
+        props.setIsLoading(false)
+      }
       const newListPicked = remove(props.teamPicked, function (n) {
         return n !== newList[id].id
       })
       props.setTeamPicked(newListPicked)
     } else {
+      const res = await addTeam(params.id, newList[id].id)
+      if (res) {
+        toastSuccess({
+          message: 'Đội đã được thêm',
+        })
+        props.setIsLoading(false)
+      }
       const newListPicked = [...props.teamPicked, newList[id].id]
       props.setTeamPicked(newListPicked)
     }
 
     newList[id].isPicked = !teams[id].isPicked
     setTeams(newList)
+    setDoRerender(!doRerender)
   }
 
   return (
@@ -238,6 +256,7 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
               </SimpleCard>
 
               <div style={{ height: '30px' }} />
+
               <SimpleCard title="Danh sách đội">
                 <Box width="100%" overflow="auto">
                   <StyledTable>
@@ -262,9 +281,17 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                               {rowsPerPage * page + index + 1}
                             </TableCell>
                             <TableCell align="left">
-                              <Button color="info">{team.name}</Button>
+                              <Button
+                                color="info"
+                                style={{ wordBreak: 'keep-all' }}
+                              >
+                                {team.name}
+                              </Button>
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="center"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {team.shortName}
                             </TableCell>
                             <TableCell align="center">
@@ -275,7 +302,12 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                                 src={team.logo}
                               />
                             </TableCell>
-                            <TableCell align="left">{team.homeField}</TableCell>
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
+                              {team.homeField}
+                            </TableCell>
                             <TableCell align="center">
                               {team.status === 1
                                 ? 'Hoạt động'
@@ -284,13 +316,19 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                             <TableCell align="center">
                               {!team.isPicked ? (
                                 <Tooltip title="Thêm" placement="top">
-                                  <IconButton onClick={() => handlePick(index)}>
+                                  <IconButton
+                                    onClick={() => handlePick(index)}
+                                    disabled={props.isLoading}
+                                  >
                                     <AddCircleIcon sx={{ color: red[500] }} />
                                   </IconButton>
                                 </Tooltip>
                               ) : (
                                 <Tooltip title="Loại" placement="top">
-                                  <IconButton onClick={() => handlePick(index)}>
+                                  <IconButton
+                                    onClick={() => handlePick(index)}
+                                    disabled={props.isLoading}
+                                  >
                                     <RemoveCircle sx={{ color: red[500] }} />
                                   </IconButton>
                                 </Tooltip>

@@ -7,9 +7,7 @@ import {
   FormLabel,
   Grid,
   IconButton,
-  InputAdornment,
   LinearProgress,
-  TextField,
   Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
@@ -18,11 +16,13 @@ import {
   updateMembershipSettings,
 } from 'app/apis/members/members.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
+import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
+import { MuiTypography } from 'app/components/common/MuiTypography'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useEffect, useState } from 'react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
 import './style.css'
@@ -265,77 +265,40 @@ export default function MemberSetting(props: Props) {
 
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Controller
-                    name="price"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.price}
-                        helperText={methods.formState.errors?.price?.message}
-                        {...field}
-                        label="Mức hội phí*:"
-                        type="number"
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">VNĐ</InputAdornment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                  <FormControl fullWidth margin="normal">
+                    <MuiRHFNumericFormatInput
+                      name="price"
+                      label="Mức hội phí*:"
+                      fullWidth
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                      }
+                    />
+                  </FormControl>
                 </Grid>
                 <Grid item xs={4}>
-                  <Controller
-                    name="discountPrice"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.discountPrice}
-                        helperText={
-                          methods.formState.errors?.discountPrice?.message
-                        }
-                        {...field}
-                        label="Giá ưu đãi*:"
-                        type="number"
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">VNĐ</InputAdornment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                  <FormControl fullWidth margin="normal">
+                    <MuiRHFNumericFormatInput
+                      name="discountPrice"
+                      label="Giá ưu đãi*:"
+                      fullWidth
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                      }
+                    />
+                  </FormControl>
                 </Grid>
                 <Grid item xs={4}>
-                  <Controller
-                    name="extendPrice"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.extendPrice}
-                        helperText={
-                          methods.formState.errors?.extendPrice?.message
-                        }
-                        {...field}
-                        label="Giá duy trì*:"
-                        type="number"
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">VNĐ</InputAdornment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                  <FormControl fullWidth margin="normal">
+                    <MuiRHFNumericFormatInput
+                      name="extendPrice"
+                      label="Giá duy trì*:"
+                      fullWidth
+                      iconEnd={
+                        <MuiTypography variant="subtitle2">VNĐ</MuiTypography>
+                      }
+                    />
+                  </FormControl>
                 </Grid>
               </Grid>
 

@@ -25,6 +25,7 @@ import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { OrderResponse, OrdersFilters } from 'app/models'
 import { columnsOrders } from 'app/utils/columns'
 import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
+import { format } from 'date-fns'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
@@ -86,22 +87,28 @@ export default function OrderManager(props: Props) {
   const onSubmitHandler: SubmitHandler<OrdersFilters> = (
     values: OrdersFilters,
   ) => {
-    removeParamsHasDefaultValue(values)
+    setPage(0)
+    setSize(20)
     setFilters(prevFilters => {
       return {
-        ...prevFilters,
-        ...values,
+        ...extractMergeFiltersObject(prevFilters, {
+          ...values,
+          dateStart: format(new Date(values.dateStart ?? ''), 'yyyy-MM-dd'),
+          dateEnd: format(new Date(values.dateEnd ?? ''), 'yyyy-MM-dd'),
+        }),
+        page: 0,
+        size: 20,
       }
     })
     navigate('', {
-      ...filters,
-      ...values,
+      ...extractMergeFiltersObject(filters, {
+        ...values,
+        dateStart: format(new Date(values.dateStart ?? ''), 'yyyy-MM-dd'),
+        dateEnd: format(new Date(values.dateEnd ?? ''), 'yyyy-MM-dd'),
+      }),
+      page: 0,
+      size: 20,
     } as any)
-  }
-  const removeParamsHasDefaultValue = (objParams: Record<string, any>) => {
-    Object.keys(objParams).forEach(key => {
-      if (objParams[key] === 'all') objParams[key] = ''
-    })
   }
   const [defaultValues] = useState<OrdersFilters>({
     status: queryParams.status ?? '',

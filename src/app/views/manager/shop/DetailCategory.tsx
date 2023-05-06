@@ -145,12 +145,14 @@ export default function DetailCategory(props: Props) {
         </Box>
       )}
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Quản lý cửa hàng', path: '/shop' },
-            { name: state.name },
-          ]}
-        />
+        {products && (
+          <Breadcrumb
+            routeSegments={[
+              { name: 'Quản lý cửa hàng', path: '/shop' },
+              { name: products[0].categoryName || '' },
+            ]}
+          />
+        )}
       </Box>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Button
@@ -255,13 +257,7 @@ export default function DetailCategory(props: Props) {
                     <TableCell align="center">
                       <Typography
                         onClick={() =>
-                          navigate(`/shop/product/${product.masterProductId}`, {
-                            state: {
-                              name: product.name,
-                              category: state.name,
-                              path: pathname,
-                            },
-                          })
+                          navigate(`/shop/product/${product.masterProductId}`)
                         }
                       >
                         {product.name}

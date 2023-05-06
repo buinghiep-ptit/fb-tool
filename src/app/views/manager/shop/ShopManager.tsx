@@ -147,11 +147,7 @@ export default function ShopManager(props: Props) {
               >
                 <Typography
                   variant="h6"
-                  onClick={() =>
-                    navigate(`/shop/category/${category.id}`, {
-                      state: { name: category.name },
-                    })
-                  }
+                  onClick={() => navigate(`/shop/category/${category.id}`)}
                 >
                   {category?.name}
                 </Typography>

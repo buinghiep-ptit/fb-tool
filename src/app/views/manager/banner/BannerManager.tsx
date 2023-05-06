@@ -9,9 +9,14 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { getListBanner, sortBanner } from 'app/apis/banner/banner.service'
+import {
+  deleteBannerI,
+  getListBanner,
+  sortBanner,
+} from 'app/apis/banner/banner.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import React, { useState } from 'react'
 import RLDD from 'react-list-drag-and-drop/lib/RLDD'
@@ -50,7 +55,19 @@ export default function BannerManager(props: Props) {
     setIsloading(true)
     const res = await sortBanner({ priorityMap })
     if (res) {
+      toastSuccess({
+        message: 'Cập nhật thành công',
+      })
       setIsloading(false)
+      fetBanner()
+    }
+  }
+  const deleteBanner = async (id: any) => {
+    const res = await deleteBannerI(id)
+    if (res) {
+      toastSuccess({
+        message: 'Xoá thành công',
+      })
       fetBanner()
     }
   }
@@ -102,7 +119,11 @@ export default function BannerManager(props: Props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="Xóa" placement="top">
-            <IconButton color="primary" sx={{ width: '33%' }}>
+            <IconButton
+              color="primary"
+              sx={{ width: '33%' }}
+              onClick={() => deleteBanner(banner.id)}
+            >
               <Delete />
             </IconButton>
           </Tooltip>

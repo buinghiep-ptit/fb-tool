@@ -19,7 +19,11 @@ import {
 import { Container, SimpleCard } from 'app/components'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import handleUploadImage from 'app/helpers/handleUploadImage'
-import { toastError, toastSuccess } from 'app/helpers/toastNofication'
+import {
+  toastError,
+  toastSuccess,
+  toastWarning,
+} from 'app/helpers/toastNofication'
 import { saveLeagueCurrent } from 'app/redux/actions/leagueActions'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
@@ -82,6 +86,12 @@ export default function InfomationLeagues(props: Props) {
     },
   })
 
+  const validateLogo = (file: any) => {
+    console.log(file)
+    if (file.size > 10000000) return false
+    return true
+  }
+
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
     data.teamList = teamPicked
@@ -133,9 +143,9 @@ export default function InfomationLeagues(props: Props) {
     defaultValues.status = league.status
     defaultValues.type = league.type
     defaultValues.category = league.category
-    defaultValues.isDisplayRank = league.displayRank === 0 ? false : true
+    defaultValues.isDisplayRank = league.isDisplayRank === 0 ? false : true
     defaultValues.isDisplaySchedule =
-      league.displaySchedule === 0 ? false : true
+      league.isDisplaySchedule === 0 ? false : true
     defaultValues.teamList = league.teamList.map((item: any) => item.id)
     setTeamPicked(league.teamList.map((item: any) => item.id))
     setLogo(league.logo || '')
@@ -271,6 +281,12 @@ export default function InfomationLeagues(props: Props) {
                   id="uploadImage"
                   style={{ display: 'none' }}
                   onChange={(e: any) => {
+                    if (!validateLogo(e.target.files[0])) {
+                      toastWarning({
+                        message: 'Dung lượng file lớn hơn 10MB',
+                      })
+                    }
+
                     setFile(e.target.files[0])
                   }}
                 />
@@ -304,7 +320,7 @@ export default function InfomationLeagues(props: Props) {
                       src={window.URL.createObjectURL(file)}
                     ></img>
                   )}
-                  {logo.length !== 0 && (
+                  {logo.length !== 0 && !file && (
                     <img
                       style={{
                         objectFit: 'cover',

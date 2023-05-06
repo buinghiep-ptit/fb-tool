@@ -79,7 +79,7 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
             return this.parent.idTeamA !== value
           },
         ),
-      dateStart: yup.string().required('Giá trị bắt buộc'),
+      dateStart: yup.date().typeError('Nhập thời gian diễn ra'),
       status: yup.string(),
       stadium: yup.string().trim(),
       goalForTeamA: yup.string().required('Giá trị bắt buộc'),

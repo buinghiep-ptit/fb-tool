@@ -195,9 +195,6 @@ export default function PlayerDetail(props: Props) {
   })
 
   const onSubmit = async (data: any) => {
-    // console.log(moment(data.expirationDate).format('YYYY-MM-DD'))
-
-    // return
     setIsloading(true)
     let imageUrl: any = ''
     try {

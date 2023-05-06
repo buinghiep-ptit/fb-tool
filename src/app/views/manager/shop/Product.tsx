@@ -59,18 +59,20 @@ export default function Product(props: Props) {
         </Box>
       )}
       <Box className="breadcrumb">
-        <Breadcrumb
-          routeSegments={[
-            { name: 'Quản lý cửa hàng', path: '/shop' },
-            {
-              name: state?.category,
-              path: state?.path || '#',
-            },
-            {
-              name: state.name,
-            },
-          ]}
-        />
+        {products && (
+          <Breadcrumb
+            routeSegments={[
+              { name: 'Quản lý cửa hàng', path: '/shop' },
+              {
+                name: products[0].category,
+                path: `/shop/category/${products[0].idCategory}`,
+              },
+              {
+                name: products[0].category,
+              },
+            ]}
+          />
+        )}
       </Box>
       <SimpleCard title="">
         {(products || []).map((product: any, index: any) => {

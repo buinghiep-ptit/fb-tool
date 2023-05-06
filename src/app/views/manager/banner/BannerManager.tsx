@@ -1,3 +1,5 @@
+import { Delete, DragHandle } from '@mui/icons-material'
+import BorderColorIcon from '@mui/icons-material/BorderColor'
 import {
   Grid,
   Icon,
@@ -7,30 +9,30 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery } from '@tanstack/react-query'
 import { getListBanner, sortBanner } from 'app/apis/banner/banner.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { Banner } from 'app/models'
-import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
 import React, { useState } from 'react'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import RLDD, { RLDDItem } from 'react-list-drag-and-drop/lib/RLDD'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { Delete, DragHandle } from '@mui/icons-material'
-
+import RLDD from 'react-list-drag-and-drop/lib/RLDD'
+import { Link, useNavigate } from 'react-router-dom'
+import '../shop/shop.css'
+interface banner {
+  priority: number
+  id: number
+  title: string
+  dateCreated: string
+}
 export interface Props {}
 
 export default function BannerManager(props: Props) {
   const navigation = useNavigate()
   const navigate = useNavigateParams()
-  const [banners, setBanner] = useState<Banner[] | undefined>()
+  const [banners, setBanner] = useState<banner[]>()
   const [isLoading, setIsloading] = useState(false)
   const fetBanner = async () => {
     const res = await getListBanner()
     setBanner(res)
-    console.log(res)
   }
   React.useEffect(() => {
     fetBanner()
@@ -39,14 +41,14 @@ export default function BannerManager(props: Props) {
   const handleRLDDChange = (reorderedItems: any) => {
     setBanner(reorderedItems)
   }
+  const priorityMap: { [id: number]: number } = {}
+  banners?.forEach((item, index) => {
+    item.priority = index + 1
+    priorityMap[item.id] = item.priority
+  })
   const updateBanner = async () => {
     setIsloading(true)
-    const res = await sortBanner({
-      setBanner: banners?.map((item, index) => {
-        item.priority = index + 1
-        return item
-      }),
-    })
+    const res = await sortBanner({ priorityMap })
     if (res) {
       setIsloading(false)
       fetBanner()
@@ -55,22 +57,40 @@ export default function BannerManager(props: Props) {
 
   const tableRowRender = (banner: any): JSX.Element => {
     return (
-      <Grid container style={{ textAlign: 'center' }} className="item">
-        <Grid item xs={2} style={{ padding: 0, lineHeight: '80px' }}>
+      <Grid container className="item">
+        <Grid
+          item
+          xs={1}
+          style={{ padding: 0, lineHeight: '80px', textAlign: 'center' }}
+        >
           {banner.priority}
         </Grid>
-        <Grid item xs={4} style={{ padding: 0, lineHeight: '80px' }}>
+        <Grid item xs={6} style={{ padding: 0, lineHeight: '80px' }}>
           <Link
             to="/"
-            style={{ color: 'green', textDecorationLine: 'underline' }}
+            style={{
+              color: 'green',
+              textDecorationLine: 'underline',
+              textAlign: 'left',
+            }}
           >
             {banner.title}
           </Link>
         </Grid>
-        <Grid item xs={4} style={{ padding: 0, lineHeight: '80px' }}>
-          {banner.dateCreated}
+        <Grid
+          item
+          xs={3}
+          style={{ padding: 0, lineHeight: '80px', textAlign: 'center' }}
+        >
+          {banner.dateCreated
+            ? new Date(banner.dateCreated).toLocaleString()
+            : ''}
         </Grid>
-        <Grid item xs={2} style={{ padding: 0, lineHeight: '80px' }}>
+        <Grid
+          item
+          xs={2}
+          style={{ padding: 0, lineHeight: '80px', textAlign: 'center' }}
+        >
           <Tooltip title="Kéo để sắp xếp" placement="top">
             <IconButton color="info" sx={{ width: '33%' }}>
               <DragHandle />
@@ -136,27 +156,27 @@ export default function BannerManager(props: Props) {
       </Stack>
       <SimpleCard title="Danh sách banner">
         <Grid container style={{ textAlign: 'center', paddingTop: '20px' }}>
-          <Grid item xs={2}>
-            Vị trí hiển thị (trên Home)
+          <Grid item xs={1}>
+            Vị trí hiển thị
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={6}>
             Tiêu đề
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             Thời gian thêm
           </Grid>
           <Grid item xs={2}>
             Hành động
           </Grid>
         </Grid>
-        {/* {banners && (
+        {banners && (
           <RLDD
             cssClasses="list-container"
             items={banners}
             itemRenderer={tableRowRender}
             onChange={handleRLDDChange}
           />
-        )} */}
+        )}
       </SimpleCard>
     </Container>
   )

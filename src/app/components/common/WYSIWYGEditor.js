@@ -62,10 +62,6 @@ const WYSIWYGEditor = React.forwardRef(
           ADD_TAGS: ['iframe'],
           ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], //whitelist youtube
         })
-
-        console.log(currentContentAsHTML)
-        console.log(cleanHtml)
-
         return onChange(cleanHtml)
       },
       [onChange],

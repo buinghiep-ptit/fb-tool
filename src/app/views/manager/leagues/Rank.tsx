@@ -8,6 +8,7 @@ import {
 import { Box } from '@mui/system'
 import { getRank } from 'app/apis/leagues/leagues.service'
 import { SimpleCard, StyledTable } from 'app/components'
+import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -19,12 +20,17 @@ export interface Props {
 
 export default function Rank(props: Props) {
   const [ranks, setRanks] = useState<any>()
-
+  const [timeUpdate, setTimeUpdate] = useState<any>(null)
   const params = useParams()
 
   const fetchListRank = async () => {
     const res = await getRank(params.id)
     setRanks(res)
+    const newArr = res.sort(function (d1: any, d2: any) {
+      return Number(new Date(d2.dateUpdated)) - Number(new Date(d1.dateUpdated))
+    })
+    console.log(newArr)
+    setTimeUpdate(moment(newArr[0].dateUpdated).format('HH:mm DD/MM/YY'))
   }
 
   React.useEffect(() => {
@@ -34,7 +40,7 @@ export default function Rank(props: Props) {
   return (
     <SimpleCard>
       <div style={{ textAlign: 'end', marginBottom: '20px' }}>
-        <Typography>Cập nhật vào: </Typography>
+        <Typography>Cập nhật vào: {timeUpdate}</Typography>
       </div>
 
       <Box width="100%" overflow="auto">

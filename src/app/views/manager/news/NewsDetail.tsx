@@ -18,6 +18,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { getNewsDetail, updateNews } from 'app/apis/news/news.service'
@@ -235,12 +236,11 @@ export default function NewsDetail(props: Props) {
           }}
         >
           <Box></Box>
-          <Button
-            variant="text"
-            sx={{ color: news?.status === 1 ? 'limegreen' : 'grey' }}
+          <Typography
+            style={{ color: news?.status === 1 ? 'limegreen' : 'grey' }}
           >
             {news?.status === 1 ? 'Đã đăng' : 'Chưa đăng'}
-          </Button>
+          </Typography>
         </Box>
         <form onSubmit={methods.handleSubmit(onSave)}>
           <FormProvider {...methods}>
@@ -328,13 +328,15 @@ export default function NewsDetail(props: Props) {
                             Lưu ý: Sau khi chọn, tin tức sẽ được đưa lên đầu
                             danh sách, và thay thế vào vị trí đã chọn
                           </FormHelperText>
-                          {isHot && !!watchPriority && (
-                            <FormHelperText>
-                              Tại 1 thời điểm chỉ có 3 tin tức nổi bật. Nếu tiếp
-                              tục, tin tức này sẽ thay thế tin tức nổi bật ở vị
-                              trí tương ứng
-                            </FormHelperText>
-                          )}
+                          {isHot &&
+                            !!watchPriority &&
+                            news?.priority !== watchPriority && (
+                              <FormHelperText>
+                                Tại 1 thời điểm chỉ có 3 tin tức nổi bật. Nếu
+                                tiếp tục, tin tức này sẽ thay thế tin tức nổi
+                                bật ở vị trí tương ứng
+                              </FormHelperText>
+                            )}
                           {!!methods.formState.errors?.priority?.message && (
                             <FormHelperText error>
                               {methods.formState.errors?.priority.message}

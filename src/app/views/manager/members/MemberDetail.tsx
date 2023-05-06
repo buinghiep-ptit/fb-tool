@@ -7,6 +7,7 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { getMemberDetail } from 'app/apis/members/members.service'
@@ -122,12 +123,11 @@ export default function MemberDetail(props: Props) {
             </Button>
           )}
         </Box>
-        <Button
-          variant="text"
-          sx={{ color: findMemberStatus(member?.status)?.color ?? 'grey' }}
+        <Typography
+          style={{ color: findMemberStatus(member?.status)?.color ?? 'grey' }}
         >
           {findMemberStatus(member?.status)?.label ?? 'Trạng thái'}
-        </Button>
+        </Typography>
       </Box>
 
       <DialogApproveMember

@@ -43,8 +43,10 @@ const WYSIWYGEditor = React.forwardRef(
         const currentContentAsHTML = draftToHtml(
           convertToRaw(editorState.getCurrentContent()),
         )
-        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML)
-
+        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML, {
+          ADD_TAGS: ['iframe'],
+          ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], //whitelist youtube
+        })
         return onChange(cleanHtml)
       },
       [onChange],
@@ -56,7 +58,13 @@ const WYSIWYGEditor = React.forwardRef(
         const currentContentAsHTML = draftToHtml(
           convertToRaw(editorState.getCurrentContent()),
         )
-        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML)
+        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML, {
+          ADD_TAGS: ['iframe'],
+          ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], //whitelist youtube
+        })
+
+        console.log(currentContentAsHTML)
+        console.log(cleanHtml)
 
         return onChange(cleanHtml)
       },

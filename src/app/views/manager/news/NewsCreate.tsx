@@ -446,10 +446,7 @@ export default function NewsCreate(props: Props) {
                   Không
                 </Button>
                 <Button
-                  onClick={() => {
-                    methods.handleSubmit(onPublish)
-                    setShowConfirmPublish(false)
-                  }}
+                  onClick={methods.handleSubmit(onPublish)}
                   disabled={isLoading}
                   autoFocus
                 >

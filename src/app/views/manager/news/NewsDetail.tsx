@@ -502,10 +502,7 @@ export default function NewsDetail(props: Props) {
                     Không
                   </Button>
                   <Button
-                    onClick={() => {
-                      methods.handleSubmit(onPublishOrUnpublish)
-                      setShowConfirmationDialog(false)
-                    }}
+                    onClick={methods.handleSubmit(onPublishOrUnpublish)}
                     disabled={isLoading}
                     autoFocus
                   >

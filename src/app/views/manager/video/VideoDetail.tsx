@@ -304,13 +304,15 @@ export default function VideoDetail(props: Props) {
                             Lưu ý: Sau khi chọn, video sẽ được đưa lên đầu danh
                             sách, và thay thế vào vị trí đã chọn
                           </FormHelperText>
-                          {isHot && !!watchPriority && (
-                            <FormHelperText>
-                              Tại 1 thời điểm chỉ có 3 video nổi bật. Nếu tiếp
-                              tục, video này sẽ thay thế video nổi bật ở vị trí
-                              tương ứng
-                            </FormHelperText>
-                          )}
+                          {isHot &&
+                            !!watchPriority &&
+                            video?.priority !== watchPriority && (
+                              <FormHelperText>
+                                Tại 1 thời điểm chỉ có 3 video nổi bật. Nếu tiếp
+                                tục, video này sẽ thay thế video nổi bật ở vị
+                                trí tương ứng
+                              </FormHelperText>
+                            )}
                           {!!methods.formState.errors?.priority?.message && (
                             <FormHelperText error>
                               {methods.formState.errors?.priority.message}

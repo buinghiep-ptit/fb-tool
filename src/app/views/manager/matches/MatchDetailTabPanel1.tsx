@@ -59,8 +59,8 @@ export default function MatchDetailTabPanel1(props: any) {
   const dialogRelatedNewsRef = useRef<any>(null)
   const dialogRelatedVideosRef = useRef<any>(null)
 
-  const [relatedNews, setRelatedNews] = useState([])
-  const [relatedVideos, setRelatedVideos] = useState([])
+  const [relatedNews, setRelatedNews] = useState<any>()
+  const [relatedVideos, setRelatedVideos] = useState<any>()
 
   const schema = yup.object({
     status: yup.number().required('Giá trị bắt buộc'),
@@ -141,12 +141,11 @@ export default function MatchDetailTabPanel1(props: any) {
     if (match) {
       initDefaultValues(match)
       setRelatedNews(
-        match.listNews?.map((n: any) => ({ id: n.id, label: n.url })) || [],
+        match.listNews?.map((n: any) => ({ id: n.id, label: n.title })) || [],
       )
       setRelatedVideos(
-        match.listVideo?.map((v: any) => ({ id: v.id, label: v.url })) || [],
+        match.listVideo?.map((v: any) => ({ id: v.id, label: v.title })) || [],
       )
-      // TODO update api: url -> title
     }
   }, [match])
 
@@ -309,37 +308,45 @@ export default function MatchDetailTabPanel1(props: any) {
                   <RHFWYSIWYGEditor name="preMatchSummary"></RHFWYSIWYGEditor>
                 </FormControl>
 
-                <MultipleVideosSelect
-                  label="Video liên quan"
-                  selectedArr={relatedVideos}
-                  setSelectedArr={setRelatedVideos}
-                />
-                <Button
-                  sx={{ mt: 2 }}
-                  variant="contained"
-                  color="info"
-                  onClick={() =>
-                    dialogRelatedVideosRef?.current.handleClickOpen()
-                  }
-                >
-                  Chọn video liên quan
-                </Button>
+                {relatedVideos && (
+                  <>
+                    <MultipleVideosSelect
+                      label="Video liên quan"
+                      selectedArr={relatedVideos}
+                      setSelectedArr={setRelatedVideos}
+                    />
+                    <Button
+                      sx={{ mt: 2 }}
+                      variant="contained"
+                      color="info"
+                      onClick={() =>
+                        dialogRelatedVideosRef?.current.handleClickOpen()
+                      }
+                    >
+                      Chọn video liên quan
+                    </Button>
+                  </>
+                )}
                 <br />
-                <MultipleNewsSelect
-                  label="Tin tức liên quan"
-                  selectedArr={relatedNews}
-                  setSelectedArr={setRelatedNews}
-                />
-                <Button
-                  sx={{ mt: 2 }}
-                  variant="contained"
-                  color="info"
-                  onClick={() =>
-                    dialogRelatedNewsRef?.current.handleClickOpen()
-                  }
-                >
-                  Chọn tin tức liên quan
-                </Button>
+                {relatedNews && (
+                  <>
+                    <MultipleNewsSelect
+                      label="Tin tức liên quan"
+                      selectedArr={relatedNews}
+                      setSelectedArr={setRelatedNews}
+                    />
+                    <Button
+                      sx={{ mt: 2 }}
+                      variant="contained"
+                      color="info"
+                      onClick={() =>
+                        dialogRelatedNewsRef?.current.handleClickOpen()
+                      }
+                    >
+                      Chọn tin tức liên quan
+                    </Button>
+                  </>
+                )}
 
                 <FormControl fullWidth margin="normal">
                   <Typography color="grey">Kết quả:</Typography>

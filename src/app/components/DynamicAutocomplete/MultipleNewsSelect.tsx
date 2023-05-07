@@ -44,6 +44,10 @@ export default function MultipleNewsSelect(props: any) {
   }, [query])
 
   React.useEffect(() => {
+    fetchOptions()
+  }, [])
+
+  React.useEffect(() => {
     if (selectedArr.length === 0) fetchOptions()
   }, [selectedArr])
 
@@ -58,6 +62,9 @@ export default function MultipleNewsSelect(props: any) {
       id="selectedArr"
       noOptionsText="Không có tin tức nào"
       options={options ?? []}
+      getOptionDisabled={option =>
+        selectedArr.map((i: any) => i.id + '').includes(option.id + '')
+      }
       renderInput={params => (
         <TextField
           {...params}

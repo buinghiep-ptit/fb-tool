@@ -99,9 +99,9 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     const payload = {
       idTeamA: data.idTeamA,
-      goalForTeamA: data.goalForTeamA,
+      goalForTeamA: status === 1 || status === 2 ? data.goalForTeamA : '',
       idTeamB: data.idTeamB,
-      goalForTeamB: data.goalForTeamB,
+      goalForTeamB: status === 1 || status === 2 ? data.goalForTeamB : '',
       dateStart: new Date(data.dateStart).toISOString() || null,
       status: status,
       stadium: data.stadium,
@@ -260,7 +260,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Chân thuận"
+                          label="Trạng thái"
                           onChange={e => setStatus(e.target.value)}
                           value={status}
                         >

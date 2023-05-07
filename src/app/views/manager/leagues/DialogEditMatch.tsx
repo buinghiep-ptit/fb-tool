@@ -33,9 +33,8 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
   const [idMatch, setIdMatch] = React.useState()
-
+  const [status, setStatus] = React.useState<any>(0)
   const initDefaultValues = (match: any) => {
-    console.log(match)
     setIdMatch(match.id)
     const defaultValues: any = {}
     defaultValues.idTeamA = match.teamA.id
@@ -46,6 +45,7 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
     defaultValues.goalForTeamA = match.goalForTeamA
     defaultValues.goalForTeamB = match.goalForTeamB
     methods.reset({ ...defaultValues })
+    setStatus(match.status)
   }
 
   React.useImperativeHandle(ref, () => ({
@@ -82,8 +82,20 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
       dateStart: yup.date().typeError('Nhập thời gian diễn ra'),
       status: yup.string(),
       stadium: yup.string().trim(),
-      goalForTeamA: yup.string().required('Giá trị bắt buộc'),
-      goalForTeamB: yup.string().required('Giá trị bắt buộc'),
+      goalForTeamA:
+        status === 1 || status === 2
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+              .typeError('Nhập số lơn hơn bằng 0')
+          : yup.string(),
+      goalForTeamB:
+        status === 1 || status === 2
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
+              .typeError('Nhập số lơn hơn bằng 0')
+          : yup.string(),
     })
     .required()
 
@@ -101,15 +113,17 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
   })
   const onSubmit = async (data: any) => {
     props.setIsLoading(true)
+    console.log(data)
     const payload = {
       idTeamA: data.idTeamA,
-      goalForTeamA: data.goalForTeamA,
+      goalForTeamA: status === 1 || status === 2 ? data.goalForTeamA : '',
       idTeamB: data.idTeamB,
-      goalForTeamB: data.goalForTeamB,
+      goalForTeamB: status === 1 || status === 2 ? data.goalForTeamB : '',
       dateStart: new Date(data.dateStart).toISOString() || null,
-      status: data.status,
+      status: status,
       stadium: data.stadium,
     }
+
     try {
       const res = await editMatch(payload, idMatch)
       if (res) {
@@ -263,7 +277,9 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Chân thuận"
+                          label="Trạng thái"
+                          onChange={e => setStatus(e.target.value)}
+                          value={status}
                         >
                           <MenuItem value={0}>Chưa diễn ra</MenuItem>
                           <MenuItem value={1}>Đang diễn ra</MenuItem>
@@ -280,44 +296,46 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <InputLabel id="demo-simple-select-label">
-                    Tỷ số trận đấu*
-                  </InputLabel>
-                  <Controller
-                    name="goalForTeamA"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamA}
-                        helperText={
-                          methods.formState.errors?.goalForTeamA?.message
-                        }
-                        {...field}
-                        variant="outlined"
-                        margin="normal"
-                        style={{ width: '100px', marginRight: '20px' }}
-                      />
-                    )}
-                  />
+                {(status === 1 || status === 2) && (
+                  <Grid item xs={12}>
+                    <InputLabel id="demo-simple-select-label">
+                      Tỷ số trận đấu*
+                    </InputLabel>
+                    <Controller
+                      name="goalForTeamA"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamA}
+                          helperText={
+                            methods.formState.errors?.goalForTeamA?.message
+                          }
+                          {...field}
+                          variant="outlined"
+                          margin="normal"
+                          style={{ width: '100px', marginRight: '20px' }}
+                        />
+                      )}
+                    />
 
-                  <Controller
-                    name="goalForTeamB"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        error={!!methods.formState.errors?.goalForTeamB}
-                        helperText={
-                          methods.formState.errors?.goalForTeamB?.message
-                        }
-                        {...field}
-                        style={{ width: '100px' }}
-                        variant="outlined"
-                        margin="normal"
-                      />
-                    )}
-                  />
-                </Grid>
+                    <Controller
+                      name="goalForTeamB"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <TextField
+                          error={!!methods.formState.errors?.goalForTeamB}
+                          helperText={
+                            methods.formState.errors?.goalForTeamB?.message
+                          }
+                          {...field}
+                          style={{ width: '100px' }}
+                          variant="outlined"
+                          margin="normal"
+                        />
+                      )}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </FormProvider>
             <Grid item xs={12}>

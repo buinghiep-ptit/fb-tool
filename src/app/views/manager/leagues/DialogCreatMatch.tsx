@@ -95,9 +95,9 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
     const payload = [
       {
         idTeamA: data.idTeamA,
-        goalForTeamA: data.goalForTeamA,
+        goalForTeamA: status === 1 || status === 2 ? data.goalForTeamA : '',
         idTeamB: data.idTeamB,
-        goalForTeamB: data.goalForTeamB,
+        goalForTeamB: status === 1 || status === 2 ? data.goalForTeamB : '',
         dateStart: new Date(data.dateStart).toISOString() || null,
         status: status,
         stadium: data.stadium,

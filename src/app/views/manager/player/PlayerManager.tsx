@@ -369,93 +369,95 @@ export default function PlayerManager(props: Props) {
           </form>
         </SimpleCard>
         <SimpleCard title="Danh sách cầu thủ">
-          <StyledTable>
-            <TableHead>
-              <TableRow>
-                {columnsPlayers.map(header => (
-                  <TableCell
-                    align="center"
-                    style={{ minWidth: header.width }}
-                    key={header.id}
-                  >
-                    {header.name}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data?.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell align="center">
-                    {size * page + index + 1}
-                  </TableCell>
-                  <TableCell align="center">
-                    {item.priority !== null && (
-                      <RankIcon
-                        rank={item.priority ?? 0}
-                        sx={{ fontSize: 30 }}
-                      ></RankIcon>
-                    )}
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <Link
-                      to={`/players/${item.id}`}
-                      style={{
-                        color: 'green',
-                        textDecorationLine: 'underline',
-                      }}
+          <Box width="100%" overflow="auto">
+            <StyledTable>
+              <TableHead>
+                <TableRow>
+                  {columnsPlayers.map(header => (
+                    <TableCell
+                      align="center"
+                      style={{ minWidth: header.width }}
+                      key={header.id}
                     >
-                      {item.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell align="center">{item.position}</TableCell>
-                  <TableCell align="center">
-                    {teamDefault.find(team => team.shortName === item.idTeam)
-                      ?.name || item.idTeam}
-                  </TableCell>
-                  <TableCell align="center">{item.dateOfBirth}</TableCell>
-                  <TableCell align="center">{item.height}</TableCell>
-                  <TableCell align="center">{item.dateJoined}</TableCell>
-                  <TableCell align="center">
-                    {item.status !== undefined ? (
-                      <Chip
-                        label={getStatusText(item.status)}
-                        color={item.status === 1 ? 'success' : 'error'}
-                      />
-                    ) : (
-                      'Unknown'
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Sửa" placement="top">
-                      <IconButton
-                        color="primary"
-                        onClick={() => {
-                          navigation(`/players/${item.id}`)
+                      {header.name}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data?.map((item, index) => (
+                  <TableRow key={item.id}>
+                    <TableCell align="center">
+                      {size * page + index + 1}
+                    </TableCell>
+                    <TableCell align="center">
+                      {item.priority !== null && (
+                        <RankIcon
+                          rank={item.priority ?? 0}
+                          sx={{ fontSize: 30 }}
+                        ></RankIcon>
+                      )}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Link
+                        to={`/players/${item.id}`}
+                        style={{
+                          color: 'green',
+                          textDecorationLine: 'underline',
                         }}
                       >
-                        <BorderColorIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </StyledTable>
-          <TablePagination
-            sx={{ px: 2 }}
-            page={page}
-            component="div"
-            rowsPerPage={size}
-            count={data ? (data?.length as number) : 0}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-          />
+                        {item.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell align="center">{item.position}</TableCell>
+                    <TableCell align="center">
+                      {teamDefault.find(team => team.shortName === item.idTeam)
+                        ?.name || item.idTeam}
+                    </TableCell>
+                    <TableCell align="center">{item.dateOfBirth}</TableCell>
+                    <TableCell align="center">{item.height}</TableCell>
+                    <TableCell align="center">{item.dateJoined}</TableCell>
+                    <TableCell align="center">
+                      {item.status !== undefined ? (
+                        <Chip
+                          label={getStatusText(item.status)}
+                          color={item.status === 1 ? 'success' : 'error'}
+                        />
+                      ) : (
+                        'Unknown'
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Sửa" placement="top">
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            navigation(`/players/${item.id}`)
+                          }}
+                        >
+                          <BorderColorIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </StyledTable>
+            <TablePagination
+              sx={{ px: 2 }}
+              page={page}
+              component="div"
+              rowsPerPage={size}
+              count={data ? (data?.length as number) : 0}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[20, 50, 100]}
+              labelRowsPerPage={'Dòng / Trang'}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+            />
+          </Box>
         </SimpleCard>
       </Stack>
     </Container>

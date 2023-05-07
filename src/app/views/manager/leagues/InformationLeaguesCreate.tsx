@@ -352,7 +352,7 @@ export default function InfomationLeaguesCreate(props: Props) {
                       >
                         <MenuItem value={0}>Chưa diễn ra</MenuItem>
                         <MenuItem value={1}>Đang diễn ra</MenuItem>
-                        <MenuItem value={-1}>Kết thúc</MenuItem>
+                        <MenuItem value={2}>Kết thúc</MenuItem>
                       </Select>
                       {!!methods.formState.errors?.status?.message && (
                         <FormHelperText>

@@ -79,23 +79,25 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
             return this.parent.idTeamA !== value
           },
         ),
-      dateStart: yup.date().typeError('Nhập thời gian diễn ra'),
+      dateStart: yup
+        .date()
+        .typeError('Thời gian diễn ra không hợp lệ. Vui lòng nhập lại'),
       status: yup.string(),
       stadium: yup.string().trim(),
       goalForTeamA:
         status === 1 || status === 2
           ? yup
               .string()
-              .matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
-              .typeError('Nhập số lơn hơn bằng 0')
-          : yup.string(),
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+              .typeError('Vui lòng nhập số lớn hơn bằng 0')
+          : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
           ? yup
               .string()
-              .matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
-              .typeError('Nhập số lơn hơn bằng 0')
-          : yup.string(),
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+              .typeError('Vui lòng nhập số lớn hơn bằng 0')
+          : yup.string().nullable(),
     })
     .required()
 

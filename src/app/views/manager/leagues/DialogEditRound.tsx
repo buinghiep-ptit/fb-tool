@@ -76,7 +76,7 @@ const DialogEditRound = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Tạo vòng đấu</div>
+            <div>Cập nhật vòng đấu</div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>

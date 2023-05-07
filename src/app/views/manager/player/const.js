@@ -1,26 +1,34 @@
-export const headTableLeagues = [
+export const headTablePlayer = [
   {
     name: 'STT',
     width: '60px',
   },
   {
-    name: 'Tên giải đấu',
+    name: 'Tên cầu thủ',
     width: '250px',
   },
   {
-    name: 'Logo',
+    name: 'Vị trí',
     width: '150px',
   },
   {
-    name: 'Tên viết tắt',
+    name: 'Đội thi đấu',
     width: '150px',
   },
   {
-    name: 'Loại giải',
+    name: 'Ngày sinh',
     width: '150px',
   },
   {
-    name: 'Trạng thái',
+    name: 'Chiều cao(cm)',
+    width: '150px',
+  },
+  {
+    name: 'Ngày tham gia CAHN',
+    width: '150px',
+  },
+  {
+    name: 'Trạng thái',
     width: '150px',
   },
   {

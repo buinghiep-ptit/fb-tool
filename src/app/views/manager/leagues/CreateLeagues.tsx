@@ -47,8 +47,6 @@ export default function LeaguesManager(props: Props) {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               <Tab label="Thông tin giải đấu" value="1" />
-              <Tab label="Lịch thi đấu" value="2" />
-              <Tab label="Bảng xếp hạng" value="3" />
             </TabList>
           </Box>
           <TabPanel value="1">

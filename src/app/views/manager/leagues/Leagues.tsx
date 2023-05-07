@@ -39,7 +39,7 @@ export default function LeaguesManager(props: Props) {
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
-  const [statusFilter, setStatusFilter] = useState<any>(2)
+  const [statusFilter, setStatusFilter] = useState<any>(99)
   const [nameShortFilter, setNameShortFilter] = useState<any>('')
   const [typeFilter, setTypeFilter] = useState<any>(99)
   const [isLoading, setIsLoading] = useState(false)
@@ -63,7 +63,7 @@ export default function LeaguesManager(props: Props) {
     const res = await getLeagues({
       name: nameFilter.trim(),
       shortName: nameShortFilter.trim(),
-      status: statusFilter === 2 ? null : statusFilter,
+      status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
       size: rowsPerPage,
       page: page,
@@ -205,10 +205,10 @@ export default function LeaguesManager(props: Props) {
                   setStatusFilter(e.target.value)
                 }}
               >
-                <MenuItem value={2}>Tất cả</MenuItem>
+                <MenuItem value={99}>Tất cả</MenuItem>
                 <MenuItem value={0}>Chưa diễn ra</MenuItem>
                 <MenuItem value={1}>Đang diễn ra</MenuItem>
-                <MenuItem value={-1}>Kết thúc</MenuItem>
+                <MenuItem value={2}>Kết thúc</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -293,7 +293,7 @@ export default function LeaguesManager(props: Props) {
                         {league.status === 0 && (
                           <Chip label="Chưa diễn ra" color="warning" />
                         )}
-                        {league.status === -1 && (
+                        {league.status === 2 && (
                           <Chip label="Kết thúc" color="primary" />
                         )}
                       </TableCell>

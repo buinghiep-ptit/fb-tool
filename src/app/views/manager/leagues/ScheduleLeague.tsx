@@ -24,12 +24,12 @@ import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import DialogCreateMatchLeague from './DialogCreatMatchLeague'
 import DialogCreateRound from './DialogCreatRound'
 import DialogEditMatch from './DialogEditMatch'
 import DialogEditRound from './DialogEditRound'
-import { headTableScheduleCup } from './const'
+import { headTableScheduleLeague } from './const'
 export interface Props {
   setIsLoading: any
   isLoading: any
@@ -100,7 +100,9 @@ export default function ScheduleLeague(props: Props) {
           type="submit"
           startIcon={<Icon>control_point</Icon>}
           onClick={() => {
-            dialogCreateRoundRef.current.handleClickOpen()
+            dialogCreateRoundRef.current.handleClickOpen(
+              schedule[schedule.length - 1],
+            )
           }}
         />
       </div>
@@ -109,7 +111,7 @@ export default function ScheduleLeague(props: Props) {
           return (
             <div style={{ marginTop: '50px' }}>
               <SimpleCard
-                title={`${index + 1} - ${round.name} - ${league.shortName}`}
+                title={`${round.idOrder} - ${round.name} - ${league.shortName}`}
               >
                 <div style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', top: '-48px', right: 0 }}>
@@ -141,7 +143,7 @@ export default function ScheduleLeague(props: Props) {
                   <StyledTable>
                     <TableHead>
                       <TableRow>
-                        {headTableScheduleCup.map(header => (
+                        {headTableScheduleLeague.map(header => (
                           <TableCell
                             align="center"
                             style={{ minWidth: header.width }}
@@ -222,16 +224,15 @@ export default function ScheduleLeague(props: Props) {
                   </StyledTable>
                 </Box>
                 <div style={{ textAlign: 'end', marginTop: '20px' }}>
-                  <MuiButton
-                    title="Thêm mới lịch đấu"
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    startIcon={<Icon>control_point</Icon>}
+                  <Link
                     onClick={() => {
                       dialogCreateMatchRef.current.handleClickOpen(round)
                     }}
-                  />
+                    to={''}
+                    style={{ color: 'blue' }}
+                  >
+                    + Thêm mới lịch đấu
+                  </Link>
                 </div>
               </SimpleCard>
             </div>

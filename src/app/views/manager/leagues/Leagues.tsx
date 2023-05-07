@@ -39,9 +39,9 @@ export default function LeaguesManager(props: Props) {
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
-  const [statusFilter, setStatusFilter] = useState<any>()
+  const [statusFilter, setStatusFilter] = useState<any>(2)
   const [nameShortFilter, setNameShortFilter] = useState<any>('')
-  const [typeFilter, setTypeFilter] = useState<any>()
+  const [typeFilter, setTypeFilter] = useState<any>(99)
   const [isLoading, setIsLoading] = useState(false)
   const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
@@ -269,14 +269,16 @@ export default function LeaguesManager(props: Props) {
                         </Link>
                       </TableCell>
                       <TableCell align="center">
-                        <img
-                          style={{
-                            objectFit: 'contain',
-                            width: '100px',
-                            height: '100px',
-                          }}
-                          src={league.logo}
-                        ></img>
+                        {league.logo && (
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              width: '100px',
+                              height: '100px',
+                            }}
+                            src={league.logo}
+                          ></img>
+                        )}
                       </TableCell>
                       <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                         {league.shortName}

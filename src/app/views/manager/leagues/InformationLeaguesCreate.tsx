@@ -313,7 +313,7 @@ export default function InfomationLeaguesCreate(props: Props) {
                   {file && (
                     <img
                       style={{
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         width: '100px',
                         height: '100px',
                       }}
@@ -323,7 +323,7 @@ export default function InfomationLeaguesCreate(props: Props) {
                   {logo.length !== 0 && !file && (
                     <img
                       style={{
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         width: '100px',
                         height: '100px',
                       }}

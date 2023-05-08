@@ -119,7 +119,7 @@ export default function PlayerDetail(props: Props) {
       oldClub: yup
         .string()
         .trim()
-        .max(255, 'Câu lạc bộ cú không được vượt quá 255 ký tự')
+        .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
         .nullable(),
       editor_content: yup.string().required('Giá trị bắt buộc'),
       status: yup.string().required('Giá trị bát buộc'),

@@ -19,7 +19,7 @@ export const navigations = [
   { name: 'Quản lý đội bóng', path: '/teams', icon: 'groups' },
   // { name: 'Quản lý ban huấn luyện', path: '/coachs', icon: 'schedule' },
   { name: 'Quản lý giải đấu', path: '/leagues', icon: 'schedule' },
-  { name: 'Quản lý thông tin trận đấu', path: '/matches', icon: 'scoreboard' },
+  // { name: 'Quản lý thông tin trận đấu', path: '/matches', icon: 'scoreboard' },
   { name: 'Quản lý CAHN TV', path: '/cahntv', icon: 'movie' },
   { name: 'Quản lý cửa hàng', path: '/shop', icon: 'storefront' },
   { name: 'Quản lý tài khoản vận hành', path: '/accounts', icon: 'contacts' },

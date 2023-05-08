@@ -111,7 +111,7 @@ export default function VideoDetail(props: Props) {
     const defaultValues: any = {}
     defaultValues.file = video.imgUrl
     defaultValues.title = video.title
-    defaultValues.type = video.newsCategory
+    defaultValues.type = video.type
     defaultValues.priority = video.priority
     defaultValues.description = video.description
     defaultValues.url = video.url

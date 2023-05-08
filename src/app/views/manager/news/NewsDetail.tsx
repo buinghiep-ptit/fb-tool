@@ -105,7 +105,7 @@ export default function NewsDetail(props: Props) {
     const defaultValues: any = {}
     defaultValues.file = news.imgUrl
     defaultValues.title = news.title
-    defaultValues.type = news.newsCategory
+    defaultValues.type = news.idCategory
     defaultValues.priority = news.priority
     defaultValues.description = news.description
     defaultValues.content = news.content

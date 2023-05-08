@@ -28,6 +28,7 @@ export interface IOrderDetail {
   amount?: number
   orderDetails?: OrdersDetail[]
   delivery?: Delivery
+  customer?: Customer
 }
 
 export interface OrdersDetail {
@@ -52,4 +53,19 @@ export interface Delivery {
   wardName?: string
   address?: string
   note?: string
+}
+export interface Customer {
+  fullName?: string
+  address?: string
+  avatar?: string
+  registeredBy?: string
+  gender?: string
+  dateCreated?: string
+  mobilePhone?: string
+  idCustomer?: number
+  birthday?: string
+  email?: string
+  customerType?: number
+  lastLogin?: string
+  status?: number
 }

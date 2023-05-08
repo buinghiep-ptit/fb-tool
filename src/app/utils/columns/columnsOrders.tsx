@@ -2,7 +2,7 @@ export const columnsOrders = [
   {
     id: 'order',
     name: 'STT',
-    width: '10px',
+    width: '40px',
   },
   {
     id: 'account',
@@ -17,7 +17,7 @@ export const columnsOrders = [
   {
     id: 'quantity',
     name: 'Tổng số lượng sản phẩm',
-    width: '150px',
+    width: '122px',
   },
   {
     id: 'amount',

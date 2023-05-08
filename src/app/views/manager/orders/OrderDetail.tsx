@@ -92,11 +92,11 @@ export default function OrderDetail(props: Props) {
                   Người đặt
                 </TableCell>
                 <TableCell align="left">
-                  {order?.delivery?.fullName}
+                  {order?.customer?.fullName}
                   {'-'}
-                  {order?.customerPhone}
+                  {order?.customer?.mobilePhone}
                   {'-'}
-                  {order?.customerEmail}
+                  {order?.customer?.email}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -118,6 +118,15 @@ export default function OrderDetail(props: Props) {
                   sx={{ borderRight: '1px solid #e3dfdf', fontWeight: '600' }}
                 >
                   Mã đơn hàng
+                </TableCell>
+                <TableCell align="left">{order?.orderCode}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell
+                  align="left"
+                  sx={{ borderRight: '1px solid #e3dfdf', fontWeight: '600' }}
+                >
+                  Mã đơn hàng KioViet
                 </TableCell>
                 <TableCell align="left">{order?.orderCode}</TableCell>
               </TableRow>

@@ -40,6 +40,7 @@ import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import * as Yup from 'yup'
+import { dateDefault } from '../orders/OrderManager'
 
 export interface Props {}
 const optionPosition = [
@@ -95,8 +96,12 @@ export default function PlayerManager(props: Props) {
     status: queryParams.status ?? 'all',
     name: queryParams.search ?? '',
     position: queryParams.position ?? '',
-    dateStart: queryParams.dateStart ?? '',
-    dateEnd: queryParams.dateEnd ?? '',
+    dateStart:
+      queryParams.dateStart ??
+      (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
+    dateEnd:
+      queryParams.dateEnd ??
+      (dateDefault() as any).endDate?.format('YYYY-MM-DD'),
     team: teamDefault.find(teams => teams.name === queryParams.team),
     page: queryParams.page ? +queryParams.page : 0,
     size: queryParams.size ? +queryParams.size : 20,

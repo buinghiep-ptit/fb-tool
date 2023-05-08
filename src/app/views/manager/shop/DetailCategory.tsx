@@ -149,7 +149,7 @@ export default function DetailCategory(props: Props) {
           <Breadcrumb
             routeSegments={[
               { name: 'Quản lý cửa hàng', path: '/shop' },
-              { name: products[0].categoryName || '' },
+              { name: products[0]?.categoryName || '' },
             ]}
           />
         )}
@@ -235,7 +235,7 @@ export default function DetailCategory(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách khách hàng">
+      <SimpleCard title="Danh sách sản phẩm">
         <Box width="100%" overflow="auto">
           <StyledTable>
             <TableHead>

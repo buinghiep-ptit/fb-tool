@@ -4,20 +4,24 @@ export const headTablePlayer = [
     width: '60px',
   },
   {
+    name: '',
+    width: '60px',
+  },
+  {
     name: 'Tên cầu thủ',
     width: '250px',
   },
   {
     name: 'Vị trí',
-    width: '150px',
+    width: '250px',
   },
   {
     name: 'Đội thi đấu',
-    width: '150px',
+    width: '250px',
   },
   {
     name: 'Ngày sinh',
-    width: '150px',
+    width: '250px',
   },
   {
     name: 'Chiều cao(cm)',
@@ -25,7 +29,7 @@ export const headTablePlayer = [
   },
   {
     name: 'Ngày tham gia CAHN',
-    width: '150px',
+    width: '250px',
   },
   {
     name: 'Trạng thái',

@@ -64,8 +64,8 @@ export default function Product(props: Props) {
             routeSegments={[
               { name: 'Quản lý cửa hàng', path: '/shop' },
               {
-                name: products[0].category,
-                path: `/shop/category/${products[0].idCategory}`,
+                name: products[0]?.category,
+                path: `/shop/category/${products[0]?.idCategory}`,
               },
               {
                 name: products[0].category,

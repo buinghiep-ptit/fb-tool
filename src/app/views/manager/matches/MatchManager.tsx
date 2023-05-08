@@ -62,18 +62,18 @@ export default function MatchManager(props: Props) {
   const fetchListMatches = async () => {
     setIsLoading(true)
     await getMatches({
-      teamName: teamFilter,
-      idLeague: leagueFilter,
+      teamName: teamFilter ?? null,
+      idLeague: leagueFilter?.id ?? null,
       status: statusFilter === 99 ? null : statusFilter,
-      dateStart:
+      from:
         fromFilter && dayjs(fromFilter).isValid()
           ? dayjs(fromFilter).format('YYYY-MM-DD')
-          : '',
-      dateEnd:
+          : null,
+      to:
         toFilter && dayjs(toFilter).isValid()
           ? dayjs(toFilter).format('YYYY-MM-DD')
-          : '',
-      isCahn: cahnFilter ? 1 : null, // TODO pending api
+          : null,
+      isCahnfc: cahnFilter ? 1 : null,
       page: page,
       size: rowsPerPage,
     })
@@ -168,8 +168,8 @@ export default function MatchManager(props: Props) {
             <Grid item xs={4}>
               <LeagueSelect
                 label="Giải đấu"
-                leagueFilter={leagueFilter}
-                setLeagueFilter={setLeagueFilter}
+                selectedLeague={leagueFilter}
+                setSelectedLeague={setLeagueFilter}
               />
             </Grid>
             <Grid item xs={4}>
@@ -332,7 +332,7 @@ export default function MatchManager(props: Props) {
               <TableBody>
                 {(matches || []).map((match: any, index: any) => {
                   return (
-                    <TableRow hover key={match.teamName}>
+                    <TableRow hover key={index}>
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>

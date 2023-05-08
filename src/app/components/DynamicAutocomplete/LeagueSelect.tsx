@@ -57,6 +57,13 @@ export default function LeagueSelect(props: any) {
       id="selectedLeague"
       noOptionsText="Không có mùa giải nào"
       options={options ?? []}
+      renderOption={(props, option) => {
+        return (
+          <li {...props} key={option.id}>
+            {option.label}
+          </li>
+        )
+      }}
       renderInput={params => (
         <TextField
           {...params}

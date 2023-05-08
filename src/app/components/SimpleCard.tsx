@@ -1,10 +1,11 @@
 import { Card } from '@mui/material'
-import { Box, BoxProps, styled } from '@mui/system'
+import { Box, styled } from '@mui/system'
 import { ReactNode } from 'react'
 
 const CardRoot = styled(Card)(() => ({
   height: '100%',
   padding: '16px 20px',
+  overflow: 'visible',
 }))
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
 const CardTitle = styled(Box)<Props>(({ subtitle }) => ({
   fontSize: '1rem',
   fontWeight: '500',
-  textTransform: 'capitalize',
+  textTransform: 'none',
   marginBottom: !subtitle ? '16px' : 0,
 }))
 

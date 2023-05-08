@@ -92,10 +92,21 @@ export interface IFeedsFilters {
   stt?: any
 }
 
-export interface ServicesFilters {
-  search?: string
-  status?: 1 | -1 | 'all' | string | undefined //   1:Hiệu lực -1:Không hiệu lực
-  rentalType?: 1 | 2 | 3 | 'all' | string | undefined // 1: gói dịch vụ 2: lưu trú 3: Khác
+export interface PlayersFilters {
+  name?: string
+  position?: string
+  status?: 1 | 0 | 'all' | string | undefined //   1:Hoạt động -2:Không hoạt động
   page?: number | 0
   size?: number | 20
+  team?: string
+  dateStart?: string
+  dateEnd?: string
+}
+export interface OrdersFilters {
+  q?: string
+  status?: 2 | 1 | 0 | string | undefined
+  page?: number | 0
+  size?: number | 20
+  dateStart?: string
+  dateEnd?: string
 }

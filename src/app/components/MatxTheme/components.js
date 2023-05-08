@@ -50,10 +50,10 @@ export const components = {
         textTransform: 'none',
         fontWeight: '400',
         '&.MuiButton-containedPrimary:hover': {
-          backgroundColor: '#218332',
+          backgroundColor: '#ED1E24',
         },
         '&.MuiButton-containedSecondary:hover': {
-          backgroundColor: '#218332',
+          backgroundColor: '#ED1E24',
         },
       },
       contained: {

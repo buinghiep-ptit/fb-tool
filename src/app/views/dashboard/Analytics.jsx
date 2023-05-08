@@ -1,12 +1,7 @@
-import Index from 'app/components/common/Models'
 import { Fragment } from 'react'
 
 const Analytics = () => {
-  return (
-    <Fragment>
-      <Index />
-    </Fragment>
-  )
+  return <Fragment></Fragment>
 }
 
 export default Analytics

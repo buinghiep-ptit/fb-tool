@@ -1,7 +1,7 @@
 export const getColorByCusStatus = (status: number) => {
   switch (status) {
     case 1:
-      return '#2F9B42'
+      return '#ED1E24'
     case -1:
       return '#AAAAAA'
 

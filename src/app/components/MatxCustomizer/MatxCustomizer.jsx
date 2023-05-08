@@ -28,9 +28,9 @@ const Label = styled(Span)(({ theme }) => ({
   padding: '.25rem .5rem',
   transform: 'rotate(90deg)',
   color: theme.palette.secondary.main,
-  backgroundColor: '#2F9B42',
+  backgroundColor: '#ED1E24',
   '&:hover, &.open': {
-    backgroundColor: '#2F9B42',
+    backgroundColor: '#ED1E24',
     color: theme.palette.secondary.contrastText,
   },
 }))

@@ -1,0 +1,406 @@
+import { Edit } from '@mui/icons-material'
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
+import CachedIcon from '@mui/icons-material/Cached'
+import DeleteIcon from '@mui/icons-material/Delete'
+import SearchIcon from '@mui/icons-material/Search'
+import {
+  Button,
+  Chip,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Select,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import { Box } from '@mui/system'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { deleteLeagues } from 'app/apis/leagues/leagues.service'
+import { getListPlayer } from 'app/apis/players/players.service'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { toastSuccess } from 'app/helpers/toastNofication'
+import moment from 'moment'
+import * as React from 'react'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { headTablePlayer } from './const'
+
+export interface Props {}
+
+export default function PlayerManager(props: Props) {
+  const [page, setPage] = useState(0)
+  const [countTable, setCountTable] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [players, setPlayers] = useState<any>()
+  const [nameFilter, setNameFilter] = useState<any>('')
+  const [statusFilter, setStatusFilter] = useState<any>(99)
+  const [teamFilter, setTeamFilter] = useState<any>('')
+  const [positionFilter, setPositionFilter] = useState<any>(99)
+  const [dateStart, setDateStart] = useState<any>(99)
+  const [dateEnd, setDateEnd] = useState<any>(99)
+  const [isLoading, setIsLoading] = useState(false)
+  const [doRerender, setDoRerender] = React.useState(false)
+  const navigate = useNavigate()
+
+  const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
+    setPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = (event: {
+    target: { value: string | number }
+  }) => {
+    setRowsPerPage(+event.target.value)
+    setPage(0)
+    setDoRerender(!doRerender)
+  }
+
+  const fetchPlayer = async () => {
+    setIsLoading(true)
+    const res = await getListPlayer({
+      name: nameFilter.trim(),
+      position: positionFilter,
+      status: statusFilter === 99 ? null : statusFilter,
+      dateStart: moment(dateStart).format('YYYY-MM-DD'),
+      dateEnd: moment(dateEnd).format('YYYY-MM-DD'),
+      team: teamFilter,
+      size: rowsPerPage,
+      page: page,
+    })
+    setPlayers(res)
+    // setCountTable(res.totalElements)
+    setIsLoading(false)
+  }
+
+  const handleSearch = async () => {
+    setPage(0)
+    setDoRerender(!doRerender)
+  }
+
+  const handleClearFilter = async () => {
+    setNameFilter('')
+    setTeamFilter('')
+    setStatusFilter(2)
+    setPositionFilter(99)
+    setDateEnd('')
+    setDateStart('')
+    setDoRerender(!doRerender)
+  }
+
+  const handleDeletePlayer = async (id: any) => {
+    const res = await deleteLeagues(id)
+    if (res) {
+      toastSuccess({
+        message: 'Xóa thành công',
+      })
+      setDoRerender(!doRerender)
+    }
+  }
+
+  React.useEffect(() => {
+    fetchPlayer()
+  }, [page, doRerender])
+
+  return (
+    <Container>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Box className="breadcrumb">
+          <Breadcrumb routeSegments={[{ name: 'Quản lý giải đấu' }]} />
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddBoxOutlinedIcon />}
+          style={{ width: '200px', margin: '15px 0', height: '52px' }}
+          onClick={() => navigate('/leagues/create')}
+        >
+          Thêm mới giải đấu
+        </Button>
+      </div>
+      <SimpleCard>
+        <Grid container spacing={2}>
+          <Grid item xs={3}>
+            <TextField
+              id="name1"
+              label="Tên cầu thủ"
+              variant="outlined"
+              fullWidth
+              onChange={e => {
+                setNameFilter(e.target.value)
+              }}
+              value={nameFilter}
+              onKeyDown={async e => {
+                if (e.keyCode === 13) {
+                  handleSearch()
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Vị trí</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Vị trí"
+                value={positionFilter}
+                onChange={e => {
+                  setPositionFilter(e.target.value)
+                }}
+              >
+                <MenuItem value={99}>Tất cả</MenuItem>
+                <MenuItem value={1}>Bóng đá nam</MenuItem>
+                <MenuItem value={2}>Bóng đá nữ</MenuItem>
+                <MenuItem value={3}>Futsal</MenuItem>
+                <MenuItem value={4}>Bóng đá bãi biển</MenuItem>
+                <MenuItem value={5}>Phong trào cộng đồng</MenuItem>
+                <MenuItem value={6}>Khác</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={dateStart}
+                label="Từ ngày"
+                onChange={newValue => setDateStart(newValue)}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{ shrink: true }}
+                    size="medium"
+                    variant="outlined"
+                    fullWidth
+                    color="primary"
+                    autoComplete="bday"
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={3}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={dateEnd}
+                label="Đến ngày"
+                onChange={newValue => setDateEnd(newValue)}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    InputLabelProps={{ shrink: true }}
+                    size="medium"
+                    variant="outlined"
+                    fullWidth
+                    color="primary"
+                    autoComplete="bday"
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Trạng thái"
+                value={statusFilter}
+                onChange={e => {
+                  setStatusFilter(e.target.value)
+                }}
+              >
+                <MenuItem value={99}>Tất cả</MenuItem>
+                <MenuItem value={1}>Bóng đá nam</MenuItem>
+                <MenuItem value={2}>Bóng đá nữ</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Đội thi đấu</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Đội thi đấu"
+                value={teamFilter}
+                onChange={e => {
+                  setTeamFilter(e.target.value)
+                }}
+              >
+                <MenuItem value={99}>Tất cả</MenuItem>
+                <MenuItem value={1}>Bóng đá nam</MenuItem>
+                <MenuItem value={2}>Bóng đá nữ</MenuItem>
+                <MenuItem value={3}>Futsal</MenuItem>
+                <MenuItem value={4}>Bóng đá bãi biển</MenuItem>
+                <MenuItem value={5}>Phong trào cộng đồng</MenuItem>
+                <MenuItem value={6}>Khác</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6}>
+            <Button
+              variant="contained"
+              startIcon={<SearchIcon />}
+              onClick={handleSearch}
+              style={{ marginRight: '15px' }}
+              disabled={isLoading}
+            >
+              Tìm kiếm
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<CachedIcon />}
+              onClick={handleClearFilter}
+              style={{ marginRight: '15px' }}
+              disabled={isLoading}
+            >
+              Làm mới
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<CachedIcon />}
+              onClick={handleClearFilter}
+              disabled={isLoading}
+            >
+              Xuất Excel
+            </Button>
+          </Grid>
+        </Grid>
+      </SimpleCard>
+      <div style={{ height: '30px' }} />
+      <SimpleCard title="Danh sách khách hàng">
+        {players?.length === 0 && (
+          <Typography color="gray" textAlign="center">
+            Không có dữ liệu
+          </Typography>
+        )}
+        <Box width="100%" overflow="auto" hidden={players?.length === 0}>
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {headTablePlayer.map(header => (
+                  <TableCell
+                    align="center"
+                    style={{ minWidth: header.width }}
+                    key={header.name}
+                  >
+                    {header.name}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            {players && (
+              <TableBody>
+                {(players || []).map((player: any, index: any) => {
+                  return (
+                    <TableRow hover key={player.id}>
+                      <TableCell align="center">
+                        {rowsPerPage * page + index + 1}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Link
+                          to={`/palyer/${player.id}`}
+                          style={{ wordBreak: 'keep-all' }}
+                        >
+                          {player.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {player.position}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {player.idTeam}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
+                        {player.dateOfBirth}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
+                        {player.height}
+                      </TableCell>
+                      <TableCell align="center">{player.dateJoined}</TableCell>
+                      <TableCell align="center">
+                        {player.status === 1 && (
+                          <Chip label="Hoạt động" color="success" />
+                        )}
+                        {player.status === -2 && (
+                          <Chip label="Không hoạt động" color="warning" />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title="Sửa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => navigate(`/players/${player.id}`)}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Xóa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleDeletePlayer(player.id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            )}
+          </StyledTable>
+        </Box>
+        <TablePagination
+          sx={{ px: 2 }}
+          page={page}
+          component="div"
+          rowsPerPage={rowsPerPage}
+          count={countTable}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[20, 50, 100]}
+          labelRowsPerPage={'Dòng / Trang'}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+          backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+        />
+      </SimpleCard>
+    </Container>
+  )
+}

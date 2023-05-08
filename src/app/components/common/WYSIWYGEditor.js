@@ -24,7 +24,7 @@ const getInitialState = defaultValue => {
 }
 
 const WYSIWYGEditor = React.forwardRef(
-  ({ onChange, value: defaultValue }, ref) => {
+  ({ onChange, value: defaultValue, readOnly }, ref) => {
     const [editorState, setEditorState] = useState()
     const [defaultValueState, setDefaultValueState] = useState()
     const abortController = useRef(null)
@@ -38,13 +38,15 @@ const WYSIWYGEditor = React.forwardRef(
 
     const onEditorDefaultStateChange = useCallback(
       editorState => {
-        console.log(editorState)
+        // console.log(editorState)
         setDefaultValueState(editorState)
         const currentContentAsHTML = draftToHtml(
           convertToRaw(editorState.getCurrentContent()),
         )
-        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML)
-
+        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML, {
+          ADD_TAGS: ['iframe'],
+          ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], //whitelist youtube
+        })
         return onChange(cleanHtml)
       },
       [onChange],
@@ -56,8 +58,10 @@ const WYSIWYGEditor = React.forwardRef(
         const currentContentAsHTML = draftToHtml(
           convertToRaw(editorState.getCurrentContent()),
         )
-        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML)
-
+        const cleanHtml = DOMPurify.sanitize(currentContentAsHTML, {
+          ADD_TAGS: ['iframe'],
+          ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'], //whitelist youtube
+        })
         return onChange(cleanHtml)
       },
       [onChange],
@@ -72,7 +76,8 @@ const WYSIWYGEditor = React.forwardRef(
         e => {},
         abortController.current,
       ).then(file => {
-        return { data: { link: file.url } }
+        console.log(file)
+        return { data: { link: file.path } }
       })
     }
 
@@ -80,6 +85,8 @@ const WYSIWYGEditor = React.forwardRef(
       <React.Fragment>
         <div className="editor">
           <Editor
+            readOnly={readOnly}
+            toolbarHidden={readOnly}
             spellCheck
             editorState={editorState ? editorState : defaultValueState}
             onEditorStateChange={onEditorStateChange}

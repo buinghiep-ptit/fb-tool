@@ -90,7 +90,7 @@ const FormInputText: FC<IFormInputTextProps> = ({
             ...inputProps,
             sx: {
               cursor: iconEnd ? 'pointer' : 'default',
-              caretColor: '#218332',
+              caretColor: '#ED1E24',
             },
             inputComponent: inputComponent,
             startAdornment: iconStart ? (

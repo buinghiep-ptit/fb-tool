@@ -1,0 +1,131 @@
+.list-container {
+  margin-top: 50px;
+}
+
+.list-container .item {
+  height: 80px;
+  font-family: sans-serif;
+  background-color: #eeeeee;
+  border-radius: 0.25rem;
+  opacity: 1;
+  margin-bottom: 5px;
+}
+
+.dragged .item {
+  opacity: 0.1;
+}
+
+.floating .item {
+  background-color: #ffffff;
+  box-shadow: 0 0.2rem 2rem #666666;
+}
+
+.slider {
+  padding: 32px;
+  color: #fff;
+}
+.slider .swiper-container1 {
+  width: 100%;
+  height: 100%;
+}
+
+.slider .swiper-container2 {
+  width: 100%;
+  height: 100%;
+}
+.slider__flex {
+  display: flex;
+  align-items: flex-start;
+}
+.slider__col {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  height: 300px;
+  margin-right: 30px;
+}
+.slider__prev,
+.slider__next {
+  color: black;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.slider__prev:focus,
+.slider__next:focus {
+  outline: none;
+}
+.slider__thumbs {
+  height: 200px;
+  width: 100%;
+}
+.slider__thumbs .slider__image {
+  transition: 0.25s;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  opacity: 1;
+}
+.slider__thumbs .slider__image:hover {
+  opacity: 1;
+}
+.slider__thumbs .swiper-slide-thumb-active .slider__image {
+  -webkit-filter: grayscale(0%);
+  filter: grayscale(0%);
+  opacity: 1;
+}
+.slider__images {
+  height: 300px;
+  width: 80%;
+}
+.slider__images .slider__image img {
+  transition: 3s;
+}
+.slider__images .slider__image:hover img {
+  transform: scale(1.1);
+}
+.slider__image {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.slider__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+/* @media (max-width: 767.98px) {
+  .slider__flex {
+    flex-direction: column-reverse;
+  }
+  .slider__col {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 0;
+    margin-top: 24px;
+    width: 100%;
+  }
+  .slider__images {
+    width: 100%;
+  }
+  .slider__thumbs {
+    height: 100px;
+    width: calc(100% - 96px);
+    margin: 0 16px;
+  }
+  .slider__prev,
+  .slider__next {
+    height: auto;
+    width: 32px;
+  }
+} */

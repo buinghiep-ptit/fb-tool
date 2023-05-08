@@ -49,7 +49,7 @@ const themeRoot = {
       contrastText: '#FFFFFF',
     },
     success: {
-      main: '#14B8A6',
+      main: '#1aa3ff',
       light: '#43C6B7',
       dark: '#0E8074',
       contrastText: '#FFFFFF',

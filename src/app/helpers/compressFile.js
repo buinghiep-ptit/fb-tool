@@ -171,12 +171,12 @@ const compressImage = (imgToCompress, resizingFactor = 1, quality = 0.8) => {
     canvas.toBlob(
       async blob => {
         if (blob) {
-          const compressedBlobToFile = blobToFile(blob, 'compressed.jpeg')
+          const compressedBlobToFile = blobToFile(blob, 'compressed.png')
 
           resolve(compressedBlobToFile)
         }
       },
-      'image/jpeg',
+      'image/png',
       quality,
     )
   })

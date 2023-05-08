@@ -6,10 +6,11 @@ import WYSIWYGEditor from './WYSIWYGEditor'
 type Props = {
   name: string
   defaultValue?: any
+  readOnly?: boolean
   resetEditor?: (x: boolean) => void
 }
 
-const RHFWYSIWYGEditor = ({ name, resetEditor, ...props }: Props) => {
+const RHFWYSIWYGEditor = ({ name, resetEditor, readOnly, ...props }: Props) => {
   const {
     formState: { errors },
     control,
@@ -18,7 +19,10 @@ const RHFWYSIWYGEditor = ({ name, resetEditor, ...props }: Props) => {
   return (
     <>
       <Controller
-        render={({ field }) => <WYSIWYGEditor {...field} />}
+        render={({ field }) => {
+          const fields = { readOnly, ...field }
+          return <WYSIWYGEditor {...fields} />
+        }}
         name={name}
         control={control}
         defaultValue=""

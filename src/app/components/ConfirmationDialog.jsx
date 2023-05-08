@@ -50,6 +50,8 @@ const ConfirmationDialog = ({
   open,
   onConfirmDialogClose,
   text,
+  textYes = 'Đồng ý',
+  textNo = 'Hủy',
   title = 'confirm',
   onYesClick,
 }) => {
@@ -65,7 +67,7 @@ const ConfirmationDialog = ({
             color="primary"
             onClick={onYesClick}
           >
-            Yes
+            {textYes}
           </StyledButton>
           <StyledButton
             className="noBtn"
@@ -73,7 +75,7 @@ const ConfirmationDialog = ({
             color="secondary"
             onClick={onConfirmDialogClose}
           >
-            No
+            {textNo}
           </StyledButton>
         </Controller>
       </DialogBox>

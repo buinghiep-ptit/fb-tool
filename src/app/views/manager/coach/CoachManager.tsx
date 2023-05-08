@@ -46,15 +46,13 @@ export default function CoachManager(props: Props) {
   const [statusFilter, setStatusFilter] = useState<any>()
   const [from, setFrom] = useState<any>(null)
   const [to, setTo] = useState<any>(null)
-  const [nameShortFilter, setNameShortFilter] = useState<any>('')
-  const [typeFilter, setTypeFilter] = useState<any>()
+  const [position, setPosition] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    setDoRerender(!doRerender)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -69,9 +67,10 @@ export default function CoachManager(props: Props) {
     setIsLoading(true)
     const res = await getCoachs({
       name: nameFilter.trim(),
-      shortName: nameShortFilter.trim(),
+      position: position,
       status: statusFilter === 2 ? null : statusFilter,
-      type: typeFilter === 99 ? null : typeFilter,
+      dateStart: from,
+      dateEnd: to,
       size: rowsPerPage,
       page: page,
     })
@@ -87,9 +86,9 @@ export default function CoachManager(props: Props) {
 
   const handleClearFilter = async () => {
     setNameFilter('')
-    setNameShortFilter('')
+
     setStatusFilter(2)
-    setTypeFilter(99)
+
     setDoRerender(!doRerender)
   }
 
@@ -169,10 +168,7 @@ export default function CoachManager(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Vị trí"
-                value={typeFilter}
-                onChange={e => {
-                  setTypeFilter(e.target.value)
-                }}
+                onChange={e => {}}
               >
                 <MenuItem value={99}>Tất cả</MenuItem>
                 <MenuItem value={1}>Bóng đá nam</MenuItem>

@@ -313,7 +313,7 @@ export default function InfomationLeagues(props: Props) {
                   {file && (
                     <img
                       style={{
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         width: '100px',
                         height: '100px',
                       }}
@@ -323,7 +323,7 @@ export default function InfomationLeagues(props: Props) {
                   {logo.length !== 0 && !file && (
                     <img
                       style={{
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         width: '100px',
                         height: '100px',
                       }}
@@ -352,7 +352,7 @@ export default function InfomationLeagues(props: Props) {
                       >
                         <MenuItem value={0}>Chưa diễn ra</MenuItem>
                         <MenuItem value={1}>Đang diễn ra</MenuItem>
-                        <MenuItem value={-1}>Kết thúc</MenuItem>
+                        <MenuItem value={2}>Kết thúc</MenuItem>
                       </Select>
                       {!!methods.formState.errors?.status?.message && (
                         <FormHelperText>

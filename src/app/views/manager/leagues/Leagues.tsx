@@ -20,6 +20,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { deleteLeagues, getLeagues } from 'app/apis/leagues/leagues.service'
@@ -38,16 +39,15 @@ export default function LeaguesManager(props: Props) {
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [leagues, setLeagues] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
-  const [statusFilter, setStatusFilter] = useState<any>()
+  const [statusFilter, setStatusFilter] = useState<any>(99)
   const [nameShortFilter, setNameShortFilter] = useState<any>('')
-  const [typeFilter, setTypeFilter] = useState<any>()
+  const [typeFilter, setTypeFilter] = useState<any>(99)
   const [isLoading, setIsLoading] = useState(false)
   const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
-    setDoRerender(!doRerender)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -63,7 +63,7 @@ export default function LeaguesManager(props: Props) {
     const res = await getLeagues({
       name: nameFilter.trim(),
       shortName: nameShortFilter.trim(),
-      status: statusFilter === 2 ? null : statusFilter,
+      status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
       size: rowsPerPage,
       page: page,
@@ -205,10 +205,10 @@ export default function LeaguesManager(props: Props) {
                   setStatusFilter(e.target.value)
                 }}
               >
-                <MenuItem value={2}>Tất cả</MenuItem>
+                <MenuItem value={99}>Tất cả</MenuItem>
                 <MenuItem value={0}>Chưa diễn ra</MenuItem>
                 <MenuItem value={1}>Đang diễn ra</MenuItem>
-                <MenuItem value={-1}>Kết thúc</MenuItem>
+                <MenuItem value={2}>Kết thúc</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -235,78 +235,91 @@ export default function LeaguesManager(props: Props) {
       </SimpleCard>
       <div style={{ height: '30px' }} />
       <SimpleCard title="Danh sách khách hàng">
-        <Box width="100%" overflow="auto">
+        {leagues?.length === 0 && (
+          <Typography color="gray" textAlign="center">
+            Không có dữ liệu
+          </Typography>
+        )}
+        <Box width="100%" overflow="auto" hidden={leagues?.length === 0}>
           <StyledTable>
             <TableHead>
               <TableRow>
                 {headTableLeagues.map(header => (
-                  <TableCell align="center" style={{ minWidth: header.width }}>
+                  <TableCell
+                    align="center"
+                    style={{ minWidth: header.width }}
+                    key={header.name}
+                  >
                     {header.name}
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {(leagues || []).map((league: any, index: any) => {
-                return (
-                  <TableRow hover key={league.name}>
-                    <TableCell align="center">
-                      {rowsPerPage * page + index + 1}
-                    </TableCell>
-                    <TableCell align="left">
-                      <Link to="#" style={{ wordBreak: 'keep-all' }}>
-                        {league.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell align="center">
-                      <img
-                        style={{
-                          objectFit: 'contain',
-                          width: '100px',
-                          height: '100px',
-                        }}
-                        src={league.logo}
-                      ></img>
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {league.shortName}
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {typeLeagues[league.type - 1]}
-                    </TableCell>
-                    <TableCell align="center">
-                      {league.status === 1 && (
-                        <Chip label="Đang diễn ra" color="success" />
-                      )}
-                      {league.status === 0 && (
-                        <Chip label="Chưa diễn ra" color="warning" />
-                      )}
-                      {league.status === -1 && (
-                        <Chip label="Kết thúc" color="primary" />
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Tooltip title="Sửa" placement="top">
-                        <IconButton
-                          color="primary"
-                          onClick={() => navigate(`/leagues/${league.id}`)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Xóa" placement="top">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleDeleteLeagues(league.id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
+            {leagues && (
+              <TableBody>
+                {(leagues || []).map((league: any, index: any) => {
+                  return (
+                    <TableRow hover key={league.id}>
+                      <TableCell align="center">
+                        {rowsPerPage * page + index + 1}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Link to="#" style={{ wordBreak: 'keep-all' }}>
+                          {league.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell align="center">
+                        {league.logo && (
+                          <img
+                            style={{
+                              objectFit: 'contain',
+                              width: '100px',
+                              height: '100px',
+                            }}
+                            src={league.logo}
+                          ></img>
+                        )}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {league.shortName}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {typeLeagues[league.type - 1]}
+                      </TableCell>
+                      <TableCell align="center">
+                        {league.status === 1 && (
+                          <Chip label="Đang diễn ra" color="success" />
+                        )}
+                        {league.status === 0 && (
+                          <Chip label="Chưa diễn ra" color="warning" />
+                        )}
+                        {league.status === 2 && (
+                          <Chip label="Kết thúc" color="primary" />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title="Sửa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => navigate(`/leagues/${league.id}`)}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Xóa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleDeleteLeagues(league.id)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            )}
           </StyledTable>
         </Box>
         <TablePagination

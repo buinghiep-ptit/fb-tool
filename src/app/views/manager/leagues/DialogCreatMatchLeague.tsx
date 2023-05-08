@@ -69,17 +69,19 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
             return this.parent.idTeamA !== value
           },
         ),
-      dateStart: yup.date().typeError('Nhập thời gian diễn ra'),
+      dateStart: yup
+        .date()
+        .typeError('Thời gian diễn ra không hợp lệ. Vui lòng nhập lại'),
       status: yup.string(),
       stadium: yup.string().trim(),
       goalForTeamA:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
-          : yup.string(),
+          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Nhập số lơn hơn bằng 0')
-          : yup.string(),
+          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          : yup.string().nullable(),
     })
     .required()
 
@@ -99,9 +101,9 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     const payload = {
       idTeamA: data.idTeamA,
-      goalForTeamA: data.goalForTeamA,
+      goalForTeamA: status === 1 || status === 2 ? data.goalForTeamA : '',
       idTeamB: data.idTeamB,
-      goalForTeamB: data.goalForTeamB,
+      goalForTeamB: status === 1 || status === 2 ? data.goalForTeamB : '',
       dateStart: new Date(data.dateStart).toISOString() || null,
       status: status,
       stadium: data.stadium,
@@ -260,7 +262,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Chân thuận"
+                          label="Trạng thái"
                           onChange={e => setStatus(e.target.value)}
                           value={status}
                         >

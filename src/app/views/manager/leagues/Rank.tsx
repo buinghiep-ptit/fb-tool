@@ -30,7 +30,7 @@ export default function Rank(props: Props) {
       return Number(new Date(d2.dateUpdated)) - Number(new Date(d1.dateUpdated))
     })
     console.log(newArr)
-    setTimeUpdate(moment(newArr[0].dateUpdated).format('HH:mm DD/MM/YY'))
+    setTimeUpdate(moment(newArr[0].dateUpdated).format('HH:mm DD/MM/YYYY'))
   }
 
   React.useEffect(() => {
@@ -40,7 +40,9 @@ export default function Rank(props: Props) {
   return (
     <SimpleCard>
       <div style={{ textAlign: 'end', marginBottom: '20px' }}>
-        <Typography>Cập nhật vào: {timeUpdate}</Typography>
+        <Typography style={{ fontStyle: 'italic' }}>
+          Cập nhật vào: {timeUpdate}
+        </Typography>
       </div>
 
       <Box width="100%" overflow="auto">

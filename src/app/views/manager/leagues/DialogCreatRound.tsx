@@ -6,7 +6,6 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { createRound } from 'app/apis/leagues/leagues.service'
 import { toastError, toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 interface Props {
   isLoading: boolean
@@ -16,12 +15,14 @@ interface Props {
 
 const DialogCreateRound = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-  const leagues = useSelector((state: any) => state.leagues)
+
   const [nameRound, setNameRound] = React.useState<any>('')
   const [order, setOrder] = React.useState<any>('')
   const params = useParams()
   React.useImperativeHandle(ref, () => ({
-    handleClickOpen: () => {
+    handleClickOpen: (round: any) => {
+      setNameRound(`Vòng ${round.idOrder + 1} - Tên giải đấu `)
+      setOrder(round.idOrder + 1)
       setOpen(true)
     },
     handleClose: () => {

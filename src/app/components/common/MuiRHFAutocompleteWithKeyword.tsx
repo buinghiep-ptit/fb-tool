@@ -35,8 +35,7 @@ export function MuiRHFAutocompleteWithKeyword({
   const handleKeyDown = (event: any) => {
     switch (event.key) {
       case 'Enter':
-      case ',':
-      case ' ': {
+      case ',': {
         event.preventDefault()
         event.stopPropagation()
         if (event.target.value.length > 0) {

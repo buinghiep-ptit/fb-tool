@@ -2,6 +2,7 @@ import { LinearProgress, Tab, Tabs } from '@mui/material'
 import { Box } from '@mui/system'
 import { getMatchDetail } from 'app/apis/matches/matches.service'
 import { Breadcrumb, Container } from 'app/components'
+import { MATCH_STATUSES } from 'app/constants/matchStatuses'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import MatchDetailTabPanel1 from './MatchDetailTabPanel1'
@@ -68,42 +69,53 @@ export default function MatchManager(props: Props) {
           ]}
         />
       </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={tab}
-          onChange={handleChangeTab}
-          aria-label="tabs"
-          variant="fullWidth"
-        >
-          <Tab label="Thông tin chung" {...a11yProps(0)} />
-          <Tab label="Diễn biến trận đấu" {...a11yProps(1)} />
-          <Tab label="Thống kê trận đấu" {...a11yProps(2)} />
-        </Tabs>
-      </Box>
-      <MatchDetailTabPanel1
-        value={tab}
-        index={0}
-        match={match ?? {}}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        refresh={getMatch}
-      />
-      <MatchDetailTabPanel2
-        value={tab}
-        index={1}
-        match={match ?? {}}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-      />
-      <MatchDetailTabPanel3
-        value={tab}
-        index={2}
-        match={match ?? {}}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-      />
-      {/* TODO panel 2 status in 1,2 and has main team */}
-      {/* TODO panel 3 status in 2 and has main team */}
+      {match && (
+        <>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={tab}
+              onChange={handleChangeTab}
+              aria-label="tabs"
+              variant="fullWidth"
+            >
+              <Tab label="Thông tin chung" {...a11yProps(0)} />
+              {match.isCahn &&
+                [MATCH_STATUSES.STARTING.id, MATCH_STATUSES.ENDED.id].includes(
+                  match.status,
+                ) && <Tab label="Diễn biến trận đấu" {...a11yProps(1)} />}
+              {match.isCahn &&
+                [MATCH_STATUSES.ENDED.id].includes(match.status) && (
+                  <Tab label="Thống kê trận đấu" {...a11yProps(2)} />
+                )}
+            </Tabs>
+          </Box>
+          <MatchDetailTabPanel1
+            value={tab}
+            index={0}
+            matchId={params.id}
+            match={match ?? {}}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            refresh={getMatch}
+          />
+          <MatchDetailTabPanel2
+            value={tab}
+            index={1}
+            matchId={params.id}
+            match={match ?? {}}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
+          <MatchDetailTabPanel3
+            value={tab}
+            index={2}
+            matchId={params.id}
+            match={match ?? {}}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+          />
+        </>
+      )}
     </Container>
   )
 }

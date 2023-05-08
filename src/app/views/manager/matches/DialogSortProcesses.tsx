@@ -15,21 +15,23 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Box } from '@mui/system'
+import { updateMatchProcessSort } from 'app/apis/matches/matches.service'
 import { findMatchProcessType } from 'app/constants/matchProcessTypes'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-import { exampleList } from './const'
 
 export interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   refresh: () => void
   list: any
+  matchId: any
 }
 
 const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
-  const { isLoading, setIsLoading, refresh, list } = props
+  const { isLoading, setIsLoading, refresh, list, matchId } = props
 
   const [open, setOpen] = React.useState(false)
 
@@ -44,10 +46,9 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    // set exList = list
   }
 
-  const [exList, setExList] = useState(exampleList)
+  const [exList, setExList] = useState<any>([])
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return
@@ -59,14 +60,39 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
     setExList(items)
   }
 
-  // useEffect(() => {
-  //   console.log(exList.map(i => i.id))
-  // }, [exList])
+  useEffect(() => {
+    setExList(list)
+  }, [list])
+
+  const onSubmit = async () => {
+    setIsLoading(true)
+
+    const payload = {
+      listMatchProcess: exList.map((item: any, index: any) => ({
+        id: item.id,
+        idOrder: index + 1,
+      })),
+    }
+
+    await updateMatchProcessSort(matchId, payload)
+      .then(() => {
+        toastSuccess({
+          message: 'Thành công',
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+        refresh()
+        handleClose()
+      })
+    setIsLoading(false)
+  }
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose} fullWidth>
-        {props.isLoading && (
+        {isLoading && (
           <Box
             sx={{
               width: '100%',
@@ -95,10 +121,10 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
         </DialogTitle>
         <DialogContent>
           <DragDropContext onDragEnd={handleOnDragEnd}>
-            <Droppable droppableId="characters">
+            <Droppable droppableId="processes">
               {provided => (
                 <List {...provided.droppableProps} ref={provided.innerRef}>
-                  {exList.map((item, index) => {
+                  {exList.map((item: any, index: any) => {
                     return (
                       <Draggable
                         key={item?.id}
@@ -111,7 +137,7 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                           >
-                            <ListItemIcon>
+                            <ListItemIcon sx={{ mr: 1 }}>
                               <Chip label={item.time} />
                             </ListItemIcon>
                             <ListItemText
@@ -121,9 +147,7 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
                               }
                               secondary={
                                 <React.Fragment>
-                                  {item.team ? item.team : ''}
-                                  {(item.team ? ' - ' : '') +
-                                    (item.player ? item.player : '')}
+                                  {item.player ? item.player : ''}
                                   {item.team1Goal && item.team2Goal
                                     ? item.team1Goal + ' - ' + item.team2Goal
                                     : ''}
@@ -145,21 +169,16 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
           </DragDropContext>
         </DialogContent>
         <DialogActions sx={{ textAlign: 'center' }}>
-          <Button
-            onClick={handleClose}
-            variant="outlined"
-            disabled={props.isLoading}
-          >
+          <Button onClick={handleClose} variant="outlined" disabled={isLoading}>
             Đóng
           </Button>
-          {/* // TODO api */}
           <Button
-            onClick={() => {}}
+            onClick={onSubmit}
             autoFocus
             variant="contained"
-            disabled={props.isLoading}
+            disabled={isLoading}
           >
-            {props.isLoading ? 'Đang lưu...' : 'Lưu'}
+            {isLoading ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </DialogActions>
       </Dialog>

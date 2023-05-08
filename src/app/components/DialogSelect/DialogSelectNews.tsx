@@ -36,7 +36,9 @@ import { getNews } from 'app/apis/news/news.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { NEWS_TYPES, findNewsType } from 'app/constants/newsType'
 import dayjs from 'dayjs'
+import { remove } from 'lodash'
 import * as React from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { headTableNews } from './headTableNews'
 
@@ -99,7 +101,9 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
       size: rowsPerPage,
     }).then(res => {
       const newList = res.content.map((item: any) => {
-        item.isPicked = (selectedList || []).includes(item.id)
+        item.isPicked = (selectedList || [])
+          .map((i: any) => i.id + '')
+          .includes(item.id + '')
         return item
       })
       setNews(newList)
@@ -140,7 +144,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
 
   React.useEffect(() => {
     fetchListNews()
-  }, [page, doRerender, selectedList])
+  }, [page, doRerender])
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -153,19 +157,38 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    const listPicked = (news || []).filter(
-      (item: any) => item.isPicked === true,
-    )
-    setSelectedList(
-      listPicked.map((item: any) => {
-        id: item.id
-        label: item.title
-      }),
-    )
   }
+
+  useEffect(() => {
+    if (open) {
+      const newList = news.map((item: any) => {
+        item.isPicked = (selectedList || [])
+          .map((i: any) => i.id + '')
+          .includes(item.id + '')
+        return item
+      })
+      setNews(newList)
+    }
+  }, [open])
 
   const handlePick = (id: number) => {
     const newList = [...news]
+    if (newList[id].isPicked) {
+      const newListPicked = remove(selectedList, function (n) {
+        return n !== newList[id].id
+      })
+      setSelectedList(newListPicked)
+    } else {
+      const newListPicked = [
+        ...selectedList,
+        {
+          id: newList[id].id,
+          label: newList[id].title,
+        },
+      ]
+      setSelectedList(newListPicked)
+    }
+
     newList[id].isPicked = !news[id].isPicked
     setNews(newList)
   }

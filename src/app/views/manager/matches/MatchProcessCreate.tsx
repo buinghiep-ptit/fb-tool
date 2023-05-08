@@ -2,12 +2,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import MinimizeIcon from '@mui/icons-material/Minimize'
 import {
   Button,
-  Card,
   CardActions,
   CardContent,
   Collapse,
   FormControl,
   FormHelperText,
+  FormLabel,
   Grid,
   InputLabel,
   LinearProgress,
@@ -17,7 +17,10 @@ import {
   Typography,
 } from '@mui/material'
 import { Box, Stack } from '@mui/system'
+import { createMatchProcess } from 'app/apis/matches/matches.service'
+import { SimpleCard } from 'app/components'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import React, { useEffect, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -84,7 +87,13 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
           return schema.required('Giá trị bắt buộc')
         else return schema
       }),
-    description: yup.string(),
+    description: yup
+      .string()
+      .required('Giá trị bắt buộc')
+      .trim()
+      .test('notEmpty', 'Giá trị bắt buộc', value => {
+        return value !== '<p></p>'
+      }),
     team1Goal: yup
       .number()
       .min(0, 'Số dương')
@@ -128,7 +137,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       time: '',
       idTeam: '',
       player: '',
-      description: '<p></p>',
+      description: '',
       team1Goal: '',
       team2Goal: '',
     },
@@ -136,10 +145,29 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
-    const payload: any = {}
-    // TODO consume api
-    handleClose()
-    setIsLoading(false)
+    const payload: any = {
+      idMatch: match.id,
+      type: data.type,
+      time: data.time,
+      idTeam: data.idTeam ?? null,
+      player: data.player ?? null,
+      team1Goal: data.team1Goal ?? null,
+      team2Goal: data.team2Goal ?? null,
+      description: data.description,
+    }
+
+    await createMatchProcess(payload)
+      .then(() => {
+        toastSuccess({
+          message: 'Thành công',
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsLoading(false)
+        handleClose()
+        refresh()
+      })
   }
 
   return (
@@ -161,7 +189,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
 
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
-            <Card sx={{ width: '100%' }}>
+            <SimpleCard>
               <CardContent>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
@@ -333,7 +361,11 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                   )}
                   <Grid item xs={12}>
                     <FormControl fullWidth margin="dense">
-                      <Typography color="grey">Mô tả diễn biến:</Typography>
+                      <FormLabel
+                        error={!!methods.formState.errors?.description}
+                      >
+                        Mô tả diễn biến:*
+                      </FormLabel>
                       <RHFWYSIWYGEditor
                         name="description"
                         key={show ? 1 : 2}
@@ -369,7 +401,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                   Hủy
                 </Button>
               </CardActions>
-            </Card>
+            </SimpleCard>
           </FormProvider>
         </form>
       </Box>

@@ -31,7 +31,7 @@ export default function MatchDetailTabPanel2(props: any) {
   const fetchMatchProcesses = async () => {
     setIsLoading(true)
     await getMatchProcesses(matchId)
-      .then(res => setProcesses(res.content)) // TODO update api: page -> list
+      .then(res => setProcesses(res))
       .catch(() => {})
       .finally(() => {
         setIsLoading(false)
@@ -80,13 +80,16 @@ export default function MatchDetailTabPanel2(props: any) {
               Sắp xếp
             </Button>
           </Box>
-          <DialogSortProcesses
-            ref={sortProcessesRef}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            list={processes}
-            refresh={fetchMatchProcesses}
-          />
+          {processes && (
+            <DialogSortProcesses
+              ref={sortProcessesRef}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              matchId={match.id}
+              list={processes}
+              refresh={fetchMatchProcesses}
+            />
+          )}
           <MatchProcessCreate
             ref={createMatcheProcessRef}
             isLoading={isLoading}
@@ -98,7 +101,7 @@ export default function MatchDetailTabPanel2(props: any) {
           <List>
             {(processes || []).map((process: any, index: any) => {
               return (
-                <ListItem key={index}>
+                <ListItem key={index} sx={{ padding: 0, marginTop: 2 }}>
                   <MatchProcess
                     match={match}
                     matchProcess={process}

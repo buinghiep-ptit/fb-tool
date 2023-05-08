@@ -2,11 +2,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import MinimizeIcon from '@mui/icons-material/Minimize'
 import {
   Button,
-  Card,
   CardActions,
   CardContent,
   FormControl,
   FormHelperText,
+  FormLabel,
   Grid,
   InputLabel,
   LinearProgress,
@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 import { Box, Stack } from '@mui/system'
 import { updateMatchProcess } from 'app/apis/matches/matches.service'
+import { SimpleCard } from 'app/components'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import React, { useState } from 'react'
@@ -64,7 +65,13 @@ export default function MatchProcess(props: any) {
           return schema.required('Giá trị bắt buộc')
         else return schema
       }),
-    description: yup.string(),
+    description: yup
+      .string()
+      .required('Giá trị bắt buộc')
+      .trim()
+      .test('notEmpty', 'Giá trị bắt buộc', value => {
+        return value !== '<p></p>'
+      }),
     team1Goal: yup
       .number()
       .min(0, 'Số dương')
@@ -118,7 +125,7 @@ export default function MatchProcess(props: any) {
     const defaultValues: any = {}
     defaultValues.type = matchProcess?.type
     defaultValues.time = matchProcess?.time ?? ''
-    defaultValues.idTeam = matchProcess?.idTeam ?? ''
+    defaultValues.idTeam = matchProcess?.scoredTeam ?? ''
     defaultValues.player = matchProcess?.player ?? ''
     defaultValues.description = matchProcess?.description ?? ''
     defaultValues.team1Goal = matchProcess?.team1Goal ?? ''
@@ -134,16 +141,17 @@ export default function MatchProcess(props: any) {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
+    setEditable(false)
     const payload: any = {
       id: matchProcess.id,
       idMatch: matchProcess.idMatch,
       type: data.type,
       time: data.time,
       idTeam: data.idTeam ?? null,
-      playerName: data.player ?? null,
-      team1Goal: data.team1Goal ?? null, // TODO api missing
+      player: data.player ?? null,
+      team1Goal: data.team1Goal ?? null,
       team2Goal: data.team2Goal ?? null,
-      description: data.description ?? null,
+      description: data.description,
     }
 
     await updateMatchProcess(payload)
@@ -152,7 +160,9 @@ export default function MatchProcess(props: any) {
           message: 'Thành công',
         })
       })
-      .catch(() => {})
+      .catch(() => {
+        setEditable(true)
+      })
       .finally(() => {
         setIsLoading(false)
         refresh()
@@ -185,7 +195,7 @@ export default function MatchProcess(props: any) {
 
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <FormProvider {...methods}>
-          <Card sx={{ width: '100%' }}>
+          <SimpleCard>
             <CardContent>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
@@ -359,7 +369,9 @@ export default function MatchProcess(props: any) {
                 )}
                 <Grid item xs={12}>
                   <FormControl fullWidth margin="dense">
-                    <Typography color="grey">Mô tả diễn biến:</Typography>
+                    <FormLabel error={!!methods.formState.errors?.description}>
+                      Mô tả diễn biến:*
+                    </FormLabel>
                     <RHFWYSIWYGEditor
                       name="description"
                       readOnly={!editable}
@@ -439,7 +451,7 @@ export default function MatchProcess(props: any) {
                 </Button>
               </CardActions>
             )}
-          </Card>
+          </SimpleCard>
         </FormProvider>
       </form>
     </Box>

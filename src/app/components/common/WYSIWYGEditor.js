@@ -89,6 +89,7 @@ const WYSIWYGEditor = React.forwardRef(
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
+            editorStyle={{ color: readOnly ? 'lightgray' : 'black' }}
             toolbar={{
               inline: { inDropdown: true },
               list: { inDropdown: true },

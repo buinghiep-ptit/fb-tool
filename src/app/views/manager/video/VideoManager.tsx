@@ -6,7 +6,6 @@ import WhatshotIcon from '@mui/icons-material/Whatshot'
 import {
   Badge,
   Box,
-  Container,
   FormControl,
   Grid,
   Icon,
@@ -29,10 +28,11 @@ import Button from '@mui/material/Button'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getVideos } from 'app/apis/videos/video.service'
-import { Breadcrumb, SimpleCard, StyledTable } from 'app/components'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { WEB_DOMAIN } from 'app/constants'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
+import { createSlugName } from 'app/utils/common'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -372,7 +372,9 @@ export default function VideoManager(props: Props) {
                           <IconButton
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                WEB_DOMAIN + '/cahntv/' + video.id,
+                                WEB_DOMAIN +
+                                  '/videos/' +
+                                  createSlugName(video.title, video.id),
                               )
                             }}
                           >

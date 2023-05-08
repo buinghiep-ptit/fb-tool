@@ -1,3 +1,5 @@
+import slugify from 'slugify'
+
 export const getColorByCusStatus = (status: number) => {
   switch (status) {
     case 1:
@@ -53,4 +55,14 @@ export const convertDateToUTC = (date: string) => {
   const result = d.toISOString()
 
   return result
+}
+
+export const createSlugName = (name: string, id: number) => {
+  const slugName = slugify(name, {
+    lower: false, // Chuyển tất cả các chữ hoa thành chữ thường
+    remove: /[*+~.()'"!:@]/g, // Loại bỏ các ký tự đặc biệt trừ dấu gạch ngang (-)
+    locale: 'vi', // Giữ nguyên kí tự tiếng Việt
+  })
+
+  return slugName + '.' + id
 }

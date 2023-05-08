@@ -114,7 +114,11 @@ export default function BannerManager(props: Props) {
             </IconButton>
           </Tooltip>
           <Tooltip title="Sửa" placement="top">
-            <IconButton color="secondary" sx={{ width: '33%' }}>
+            <IconButton
+              color="secondary"
+              sx={{ width: '33%' }}
+              onClick={() => navigate(`/banner/${banner.id}`, {})}
+            >
               <BorderColorIcon />
             </IconButton>
           </Tooltip>
@@ -160,7 +164,7 @@ export default function BannerManager(props: Props) {
           variant="contained"
           color="primary"
           type="submit"
-          onClick={() => navigation(`chi-tiet-banner`, {})}
+          onClick={() => navigation(`them-moi-banner`, {})}
           startIcon={<Icon>control_point</Icon>}
           sx={{ width: '50%' }}
         />

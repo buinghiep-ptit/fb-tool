@@ -1,113 +1,57 @@
-import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Grid, Icon, IconButton, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import { createBannerI } from 'app/apis/banner/banner.service'
+import { getBannerDetail } from 'app/apis/banner/banner.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
-import handleUploadImage from 'app/helpers/handleUploadImage'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { useState } from 'react'
+import { BannerDetail } from 'app/models'
+import React, { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import * as yup from 'yup'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export interface Props {}
-type NewBanner = {
-  id?: number
-  title?: string
-  titlePosition?: number
-  titleColor?: string
-  buttonContent?: string
-  butonPosition?: number
-  url?: string
-  mediaUrl?: string
-}
-export default function AddBanner(props: Props) {
-  const navigation = useNavigate()
-  const navigate = useNavigateParams()
-  const [bannerId, setBannerId] = useState<any>()
-  const [searchParams] = useSearchParams()
-  const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(
-    queryParams.page ? +queryParams.page : 0,
-  )
-  const [size, setSize] = useState<number>(
-    queryParams.size ? +queryParams.size : 20,
-  )
 
-  const [color, setColor] = useState('')
+export default function DetailBanner(props: Props) {
+  const navigation = useNavigate()
+  const params = useParams()
+  const navigate = useNavigateParams()
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [banner, setBanner] = useState<any>()
+  const [banner, setBanner] = useState<BannerDetail | undefined>()
 
-  const schema = yup
-    .object({
-      title: yup.string().max(255, 'Tối đa 255 ký tự'),
-      titlePosition: yup.number(),
-      titleColor: yup.string(),
-      buttonContent: yup.string().max(255, 'Tối đa 255 ký tự'),
-      url: yup.string().required('Giá trị bắt buộc').trim(),
-      butonPosition: yup.number(),
-      file: yup
-        .mixed()
-        .required('Giá trị bắt buộc')
-        .test('fileType', 'File không hợp lệ', value => {
-          if (value && value.name)
-            return ['png', 'jpg', 'jpeg'].includes(
-              value?.name?.split('.').pop(),
-            )
-          else return true
-        })
-        .test('fileSize', 'Dung lượng file <= 50MB', value => {
-          return Math.floor(value?.size / 1000000) <= 50
-        }),
-    })
-    .required()
-  const methods = useForm({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      title: '',
-      titlePosition: '',
-      titleColor: '#fff',
-      buttonContent: '',
-      butonPosition: '',
-      url: '',
-      file: null,
-      type: '1',
-    },
-  })
-  const onSubmitHandler = async (data: any) => {
-    let imgUrl: any = ''
-    if (file) {
-      imgUrl = await handleUploadImage(file)
+  const fetchBannerDetail = async () => {
+    const res = await getBannerDetail(params.bannerID)
+    setBanner(res)
+  }
+  React.useEffect(() => {
+    fetchBannerDetail()
+  }, [])
+  console.log(banner)
+
+  const methods = useForm()
+  const onSubmitHandler = () => {}
+  const getTitlePosition = (titlePosition: number) => {
+    switch (titlePosition) {
+      case 0:
+        return 'Không hiển thị'
+      case 1:
+        return 'Trái'
+      case 2:
+        return 'Giữa'
+      case 3:
+        return 'Phải'
     }
-    const payload: any = {
-      title: data.title,
-      titlePosition: data.titlePosition,
-      titleColor: data.titleColor,
-      buttonContent: data.buttonContent,
-      butonPosition: data.butonPosition,
-      type: data.type,
-      url: data.url,
-      imgUrl: imgUrl,
-    }
-    await createBannerI(payload).then(() => {
-      toastSuccess({
-        message: 'Thành công',
-      })
-      navigate('/banner', {})
-    })
   }
   return (
     <Container>
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Thêm mới banner' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Chi tiết banner' }]} />
       </Box>
       <SimpleCard>
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
@@ -121,6 +65,7 @@ export default function AddBanner(props: Props) {
                     label={'Tiêu đề'}
                     defaultValue=""
                     placeholder="Nhập tiêu đề"
+                    value={banner?.title}
                     fullWidth
                   />
                   <Stack direction={'row'} gap={2}>
@@ -128,6 +73,7 @@ export default function AddBanner(props: Props) {
                       name="titlePosition"
                       label="Vị trí tiêu đề"
                       sx={{ width: '75%' }}
+                      value={banner?.titlePosition || 0}
                     >
                       <MenuItem value="0">Không hiển thị</MenuItem>
                       <MenuItem value="1">Trái</MenuItem>
@@ -137,7 +83,7 @@ export default function AddBanner(props: Props) {
                     <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
                       <div
                         style={{
-                          backgroundColor: '#fff',
+                          backgroundColor: 'red',
                           width: '50px',
                           height: '35px',
                           border: '1px solid #aeaaaa',
@@ -150,6 +96,7 @@ export default function AddBanner(props: Props) {
                         defaultValue=""
                         placeholder=""
                         fullWidth
+                        value={banner?.titleColor}
                       />
                     </Stack>
                   </Stack>
@@ -161,6 +108,7 @@ export default function AddBanner(props: Props) {
                     defaultValue=""
                     placeholder="Nhập nội dung muốn hiển thị"
                     fullWidth
+                    value={banner?.buttonContent}
                   />
 
                   <Stack flexDirection={'row'} gap={2}>
@@ -168,6 +116,7 @@ export default function AddBanner(props: Props) {
                       name="butonPosition"
                       label="Vị trí nút điều hướng"
                       sx={{ width: '75%' }}
+                      value={banner?.titlePosition || 0}
                     >
                       <MenuItem value="0">Không hiển thị</MenuItem>
                       <MenuItem value="1">Trái</MenuItem>
@@ -190,6 +139,7 @@ export default function AddBanner(props: Props) {
                         defaultValue="#fff"
                         placeholder=""
                         fullWidth
+                        value={banner?.butonColor}
                       />
                     </Stack>
                     <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
@@ -208,6 +158,7 @@ export default function AddBanner(props: Props) {
                         defaultValue="#fff"
                         placeholder=""
                         fullWidth
+                        value={banner?.titleColor}
                       />
                     </Stack>
                   </Stack>
@@ -218,6 +169,7 @@ export default function AddBanner(props: Props) {
                     defaultValue=""
                     placeholder="http://"
                     fullWidth
+                    value={banner?.url}
                   />
                   <Stack flexDirection={'row'} gap={2}>
                     <MuiButton
@@ -244,7 +196,7 @@ export default function AddBanner(props: Props) {
                   <SelectDropDown
                     name="type"
                     label="Loại"
-                    value={type}
+                    value={banner?.type}
                     onChange={(e: any) => setType(e.target.value)}
                     sx={{ width: '80%' }}
                   >
@@ -307,7 +259,7 @@ export default function AddBanner(props: Props) {
                                 onClick={event => {
                                   setFile(null)
                                   console.log(banner)
-                                  setPreviewImage(banner.imageUrl)
+                                  setPreviewImage(banner?.mediaUrl ?? '')
                                   event.stopPropagation()
                                 }}
                               >
@@ -367,7 +319,7 @@ export default function AddBanner(props: Props) {
                                 onClick={event => {
                                   setFile(null)
                                   console.log(banner)
-                                  setPreviewImage(banner.imageUrl)
+                                  // setPreviewImage(banner.imageUrl)
                                   event.stopPropagation()
                                 }}
                               >

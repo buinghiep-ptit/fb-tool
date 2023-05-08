@@ -251,71 +251,74 @@ export default function OrderManager(props: Props) {
         </SimpleCard>
         <SimpleCard title="Danh sách đơn hàng">
           <StyledTable>
-            <TableHead>
-              <TableRow>
-                {columnsOrders.map(header => (
-                  <TableCell
-                    align="center"
-                    style={{ minWidth: header.width }}
-                    key={header.id}
-                  >
-                    {header.name}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {orders?.content?.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell align="center">
-                    {size * page + index + 1}
-                  </TableCell>
-                  <TableCell align="center">{item.customerPhone}</TableCell>
-                  <TableCell align="center" sx={{ color: 'red' }}>
-                    {item.orderCode}
-                  </TableCell>
-                  <TableCell align="center">{item.quantity}</TableCell>
-                  <TableCell align="center">
-                    {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
-                  </TableCell>
-                  <TableCell align="center">
-                    {item.createdDate
-                      ? new Date(item.createdDate).toLocaleString()
-                      : ''}
-                  </TableCell>
-                  <TableCell align="center">
-                    {item.status !== undefined ? (
-                      <Chip
-                        sx={{ width: '100px' }}
-                        label={getStatusText(item.status)}
-                        color={
-                          item.status === 2
-                            ? 'success'
-                            : item.status === 1
-                            ? 'warning'
-                            : 'error'
-                        }
-                      />
-                    ) : (
-                      'Unknown'
-                    )}
-                  </TableCell>
-                  <TableCell align="center">{item.note}</TableCell>
-                  <TableCell align="center">
-                    <Link
-                      to={`${item.id}`}
-                      style={{
-                        color: 'green',
-                        textDecorationLine: 'underline',
-                      }}
+            <div style={{ overflowX: 'auto' }}>
+              <TableHead>
+                <TableRow>
+                  {columnsOrders.map(header => (
+                    <TableCell
+                      align="center"
+                      style={{ minWidth: header.width }}
+                      key={header.id}
                     >
-                      Chi tiết
-                    </Link>
-                  </TableCell>
+                      {header.name}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableHead>
+              <TableBody>
+                {orders?.content?.map((item, index) => (
+                  <TableRow key={item.id}>
+                    <TableCell align="center">
+                      {size * page + index + 1}
+                    </TableCell>
+                    <TableCell align="center">{item.customerPhone}</TableCell>
+                    <TableCell align="center" sx={{ color: 'red' }}>
+                      {item.orderCode}
+                    </TableCell>
+                    <TableCell align="center">{item.quantity}</TableCell>
+                    <TableCell align="center">
+                      {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
+                    </TableCell>
+                    <TableCell align="center">
+                      {item.createdDate
+                        ? new Date(item.createdDate).toLocaleString()
+                        : ''}
+                    </TableCell>
+                    <TableCell align="center">
+                      {item.status !== undefined ? (
+                        <Chip
+                          sx={{ width: '100px' }}
+                          label={getStatusText(item.status)}
+                          color={
+                            item.status === 2
+                              ? 'success'
+                              : item.status === 1
+                              ? 'warning'
+                              : 'error'
+                          }
+                        />
+                      ) : (
+                        'Unknown'
+                      )}
+                    </TableCell>
+                    <TableCell align="center">{item.note}</TableCell>
+                    <TableCell align="center">
+                      <Link
+                        to={`${item.id}`}
+                        style={{
+                          color: 'green',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        Chi tiết
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </div>
           </StyledTable>
+
           <TablePagination
             sx={{ px: 2 }}
             page={page}

@@ -128,7 +128,7 @@ export default function OrderDetail(props: Props) {
                 >
                   Mã đơn hàng KioViet
                 </TableCell>
-                <TableCell align="left">{order?.orderCode}</TableCell>
+                <TableCell align="left">{order?.orderCodePartner}</TableCell>
               </TableRow>
             </TableBody>
           </StyledTable>
@@ -209,7 +209,7 @@ export default function OrderDetail(props: Props) {
         <SimpleCard title="Danh sách sản phẩm">
           {order?.orderDetails?.map(item => (
             <Grid container spacing={3} key={item.productId}>
-              <Grid item xs={2}>
+              <Grid item xs={3}>
                 <img
                   src={
                     item.imgUrl && item.imgUrl.length
@@ -234,42 +234,36 @@ export default function OrderDetail(props: Props) {
                     Sản phẩm: {item.fullName}
                   </p>
                 </Grid>
-                <Grid item xs={3}>
-                  <p style={{ fontWeight: '500', fontSize: '15px' }}>
+                <Grid item xs={12}>
+                  <p style={{ fontWeight: '500', fontSize: '14px' }}>
                     Số lượng: {item.quantity}
                   </p>
-                </Grid>
-                <Grid container item xs={4} direction={'row'}>
                   <p style={{ fontWeight: '500', fontSize: '14px' }}>
                     Đơn giá:&nbsp;
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '14px',
+                      }}
+                    >
+                      {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
+                    </span>
                   </p>
-                  <p
-                    style={{
-                      color: 'red',
-                      fontWeight: '500',
-                      fontSize: '15px',
-                    }}
-                  >
-                    {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
-                  </p>
-                </Grid>
-                <Grid container item xs={5} direction={'row'}>
                   <p style={{ fontWeight: '500', fontSize: '14px' }}>
-                    Thành tiền:&nbsp;
-                  </p>
-                  <p
-                    style={{
-                      color: 'red',
-                      fontWeight: '500',
-                      fontSize: '15px',
-                    }}
-                  >
-                    {item.amount && item.quantity
-                      ? (item.amount * item.quantity)
-                          .toLocaleString()
-                          .replace(/,/g, '.')
-                      : '-'}{' '}
-                    VNĐ
+                    Thành tiền:&nbsp;{' '}
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '14px',
+                      }}
+                    >
+                      {item.amount && item.quantity
+                        ? (item.amount * item.quantity)
+                            .toLocaleString()
+                            .replace(/,/g, '.')
+                        : '-'}{' '}
+                      VNĐ
+                    </span>
                   </p>
                 </Grid>
               </Grid>

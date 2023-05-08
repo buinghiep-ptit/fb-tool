@@ -22,6 +22,7 @@ export interface IOrderDetail {
   customerEmail?: string
   customerPhone?: string
   orderCode?: string
+  orderCodePartner?: string
   quantity?: number
   createdDate?: string
   status?: number

@@ -268,7 +268,7 @@ export default function CoachManager(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách khách hàng">
+      <SimpleCard title="Danh sách BHL">
         <Box width="100%" overflow="auto">
           <StyledTable>
             <TableHead>

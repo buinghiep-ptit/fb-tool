@@ -504,6 +504,10 @@ export default function PlayerDetail(props: Props) {
                           {...field}
                           value={idTeam}
                           onChange={e => {
+                            if (e.target.value.toString() === '1') {
+                              setDisableViewPosition(true)
+                              methods.setValue('prioritize', false)
+                            }
                             setIdTeam(e.target.value)
                             methods.setValue('team', e.target.value.toString())
                           }}

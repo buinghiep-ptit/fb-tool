@@ -354,7 +354,7 @@ export default function VideoManager(props: Props) {
                         {findVideoType(video.type)?.label}
                       </TableCell>
                       <TableCell align="left">
-                        {dayjs(video.dateCreated).format('DD/MM/YYYY HH:mm')}
+                        {dayjs(video.dateCreated).format('DD-MM-YYYY HH:mm')}
                       </TableCell>
                       <TableCell
                         align="center"

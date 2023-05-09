@@ -21,7 +21,7 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
   const params = useParams()
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: (round: any) => {
-      setNameRound(`Vòng ${round.idOrder + 1} - Tên giải đấu `)
+      setNameRound(`Vòng ${round.idOrder + 1}`)
       setOrder(round.idOrder + 1)
       setOpen(true)
     },

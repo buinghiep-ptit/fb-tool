@@ -1,31 +1,17 @@
-import {
-  Grid,
-  Icon,
-  IconButton,
-  MenuItem,
-  Stack,
-  TableCell,
-  Tooltip,
-} from '@mui/material'
+import BackupIcon from '@mui/icons-material/Backup'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { Grid, Icon, IconButton, MenuItem, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import { useQuery } from '@tanstack/react-query'
-import { getListBanner } from 'app/apis/banner/banner.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { Banner } from 'app/models'
-import { extractMergeFiltersObject } from 'app/utils/extraSearchFilters'
-import React, { useState } from 'react'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import RLDD, { RLDDItem } from 'react-list-drag-and-drop/lib/RLDD'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
-import { Delete, DragHandle } from '@mui/icons-material'
-import { FormProvider, useForm } from 'react-hook-form'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import BackupIcon from '@mui/icons-material/Backup'
-import DeleteIcon from '@mui/icons-material/Delete'
+import { useNavigateParams } from 'app/hooks/useNavigateParams'
+import { useState } from 'react'
+import { SketchPicker } from 'react-color'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 export interface Props {}
 export interface BannerFilters {
@@ -39,20 +25,18 @@ export default function AddBanner(props: Props) {
   const [bannerId, setBannerId] = useState<any>()
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
-  const [page, setPage] = useState<number>(
-    queryParams.page ? +queryParams.page : 0,
-  )
-  const [size, setSize] = useState<number>(
-    queryParams.size ? +queryParams.size : 20,
-  )
 
-  const [color, setColor] = useState('')
+  const [colorDisplay, setColorDisplay] = useState('')
+  const [colorButton, setColorButton] = useState('')
+  const [colorText, setColorText] = useState('')
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [banner, setBanner] = useState<any>()
 
-  const onSubmitHandler = () => {}
+  const onSubmitHandler = (data: any) => {
+    console.log(data)
+  }
   const methods = useForm()
   return (
     <Container>
@@ -97,6 +81,12 @@ export default function AddBanner(props: Props) {
                           border: '1px solid #aeaaaa',
                         }}
                       ></div>
+                      <SketchPicker
+                        color={colorDisplay}
+                        onChangeComplete={(color: any, event: any) =>
+                          setColorDisplay(color.hex)
+                        }
+                      />
                       <FormInputText
                         type="text"
                         name="titleColor"

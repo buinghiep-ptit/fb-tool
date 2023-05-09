@@ -28,6 +28,7 @@ export interface IOrderDetail {
   amount?: number
   orderDetails?: OrdersDetail[]
   delivery?: Delivery
+  customer?: any
 }
 
 export interface OrdersDetail {

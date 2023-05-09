@@ -110,14 +110,22 @@ export default function DetailCategory(props: Props) {
     }
   }
 
-  const toggleDisplay = async (id: any) => {
+  const toggleDisplay = async (id: any, index: any) => {
     const res = await displayProduct(id)
-    if (res) fetchListProduct()
+    if (res) {
+      const newProducts = [...products]
+      newProducts[index].isDisplay = newProducts[index].isDisplay === 1 ? 0 : 1
+      setProducts(newProducts)
+    }
   }
 
-  const togglePrority = async (id: any) => {
+  const togglePrority = async (id: any, index: any) => {
     const res = await priorityProduct(id)
-    if (res) fetchListProduct()
+    if (res) {
+      const newProducts = [...products]
+      newProducts[index].priority = newProducts[index].priority === 1 ? 0 : 1
+      setProducts(newProducts)
+    }
   }
 
   const watchStatusSync = async () => {
@@ -280,7 +288,7 @@ export default function DetailCategory(props: Props) {
                         color="success"
                         checked={product.isDisplay === 0 ? false : true}
                         onChange={e => {
-                          toggleDisplay(product.id)
+                          toggleDisplay(product.id, index)
                         }}
                       />
                     </TableCell>
@@ -289,12 +297,12 @@ export default function DetailCategory(props: Props) {
                         color="success"
                         checked={product.priority === 0 ? false : true}
                         onChange={e => {
-                          togglePrority(product.id)
+                          togglePrority(product.id, index)
                         }}
                       />
                     </TableCell>
                     <TableCell align="center">
-                      {moment(product.dateUpdated).format('YYYY-MM-DD hh:mm')}
+                      {moment(product.dateUpdated).format('DD-MM-YYYY HH:mm')}
                     </TableCell>
                     <TableCell align="center">
                       <Tooltip title="Chi tiết" placement="top">

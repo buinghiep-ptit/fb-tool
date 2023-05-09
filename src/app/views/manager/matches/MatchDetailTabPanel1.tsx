@@ -78,11 +78,7 @@ export default function MatchDetailTabPanel1(props: any) {
       })
       .nullable()
       .transform((curr, orig) => (orig === '' ? null : curr)),
-    stadium: yup
-      .string()
-      .required('Giá trị bắt buộc')
-      .trim()
-      .max(255, 'Tối đa 255 ký tự'),
+    stadium: yup.string().trim().max(255, 'Tối đa 255 ký tự'),
     preMatchSummary: yup.string(),
     team1Goal: yup
       .number()
@@ -305,7 +301,7 @@ export default function MatchDetailTabPanel1(props: any) {
                         error={!!methods.formState.errors?.stadium}
                         helperText={methods.formState.errors?.stadium?.message}
                         {...field}
-                        label="Sân vận động*"
+                        label="Sân vận động"
                         variant="outlined"
                         sx={{ width: { xs: '100%', md: '50%' } }}
                       />

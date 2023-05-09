@@ -392,7 +392,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                   Lưu
                 </Button>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   disabled={isLoading}
                   onClick={() => {
                     handleClose()

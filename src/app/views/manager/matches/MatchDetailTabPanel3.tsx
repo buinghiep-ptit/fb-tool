@@ -254,7 +254,7 @@ export default function MatchDetailTabPanel3(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box

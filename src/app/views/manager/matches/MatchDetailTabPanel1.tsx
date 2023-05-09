@@ -185,7 +185,7 @@ export default function MatchDetailTabPanel1(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box
@@ -230,7 +230,7 @@ export default function MatchDetailTabPanel1(props: any) {
                       </InputLabel>
                       <Select
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                         {...field}
                         onClose={() =>
                           methods.trigger().then(() => methods.clearErrors())
@@ -275,7 +275,7 @@ export default function MatchDetailTabPanel1(props: any) {
                                 methods.formState.errors?.dateStart?.message
                               }
                               InputLabelProps={{ shrink: true }}
-                              sx={{ width: '50%' }}
+                              sx={{ width: { xs: '100%', md: '50%' } }}
                               variant="outlined"
                               autoComplete="bday"
                             />
@@ -296,7 +296,7 @@ export default function MatchDetailTabPanel1(props: any) {
                         {...field}
                         label="Sân vận động*"
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                       />
                     </FormControl>
                   )}

@@ -1,5 +1,5 @@
 import { Card } from '@mui/material'
-import { Box, styled } from '@mui/system'
+import { Box, SystemCssProperties, styled } from '@mui/system'
 import { ReactNode } from 'react'
 
 const CardRoot = styled(Card)(() => ({
@@ -13,6 +13,7 @@ interface Props {
   title?: string
   subtitle?: string
   icon?: ReactNode
+  sx?: SystemCssProperties
 }
 
 const CardTitle = styled(Box)<Props>(({ subtitle }) => ({
@@ -22,9 +23,9 @@ const CardTitle = styled(Box)<Props>(({ subtitle }) => ({
   marginBottom: !subtitle ? '16px' : 0,
 }))
 
-const SimpleCard = ({ children, title, subtitle, icon }: Props) => {
+const SimpleCard = ({ children, title, subtitle, icon, sx }: Props) => {
   return (
-    <CardRoot elevation={6}>
+    <CardRoot elevation={6} sx={sx}>
       <CardTitle subtitle={subtitle}>{title}</CardTitle>
       {subtitle && <Box sx={{ mb: 2 }}>{subtitle}</Box>}
       {children}

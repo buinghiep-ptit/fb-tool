@@ -32,7 +32,7 @@ import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import LeagueSelect from '../../../components/DynamicAutocomplete/LeagueSelect'
 import {
   MATCH_STATUSES,
@@ -148,7 +148,7 @@ export default function MatchManager(props: Props) {
       <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <TextField
                 id="outlined-basic"
                 label="Đội bóng tham gia"
@@ -165,14 +165,14 @@ export default function MatchManager(props: Props) {
                 }}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <LeagueSelect
                 label="Giải đấu"
                 selectedLeague={leagueFilter}
                 setSelectedLeague={setLeagueFilter}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
@@ -198,7 +198,7 @@ export default function MatchManager(props: Props) {
               </FormControl>
             </Grid>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Grid item xs={4}>
+              <Grid item xs={12} md={4}>
                 <DatePicker
                   label="Từ ngày"
                   inputFormat="DD/MM/YYYY"
@@ -221,7 +221,7 @@ export default function MatchManager(props: Props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={12} md={4}>
                 <DatePicker
                   label="Đến ngày"
                   inputFormat="DD/MM/YYYY"
@@ -245,7 +245,7 @@ export default function MatchManager(props: Props) {
                 />
               </Grid>
             </LocalizationProvider>
-            <Grid item xs={4} textAlign="left">
+            <Grid item xs={12} md={4} textAlign="left">
               <Box
                 display="flex"
                 justifyContent="start"
@@ -268,7 +268,8 @@ export default function MatchManager(props: Props) {
             <Grid item xs={8}></Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              md={2}
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -287,7 +288,8 @@ export default function MatchManager(props: Props) {
             </Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              md={2}
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -337,27 +339,31 @@ export default function MatchManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/matches/' + match.id)
+                        <Link
+                          to={`/matches/${match.id}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
+                          {' '}
                           {match.teamName}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="left">
                         {dayjs(match.dateStart).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/leagues/' + match.idLeague)
+                        <Link
+                          to={`/leagues/${match.idLeague}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
+                          {' '}
                           {match.leagueName}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="left"> {match.stadium} </TableCell>
                       <TableCell align="center">

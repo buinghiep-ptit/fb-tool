@@ -67,7 +67,13 @@ export default function NewsDetail(props: Props) {
         .required('Giá trị bắt buộc')
         .trim()
         .max(255, 'Tối đa 255 ký tự'),
-      content: yup.string().required('Giá trị bắt buộc').trim(),
+      content: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('notEmpty', 'Giá trị bắt buộc', value => {
+          return value !== '<p></p>'
+        }),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')

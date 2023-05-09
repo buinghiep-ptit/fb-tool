@@ -211,6 +211,17 @@ export default function MatchDetailTabPanel1(props: any) {
                   disabled
                 />
 
+                {match.leagueCategory === 1 && (
+                  <TextField
+                    label="Vòng đấu"
+                    variant="standard"
+                    margin="normal"
+                    fullWidth
+                    disabled
+                    value={match?.roundName}
+                  />
+                )}
+
                 <TextField
                   label="Đội bóng tham gia"
                   variant="standard"

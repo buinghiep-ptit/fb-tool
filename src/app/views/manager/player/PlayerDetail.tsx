@@ -120,40 +120,59 @@ export default function PlayerDetail(props: Props) {
       clothersNumber: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
-        .nullable(),
-      height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
-      weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
+        .max(2, 'Nhập không quá 2 kí tự')
+        .nullable()
+        .max(2, 'Nhấp không quá 2 ký tự'),
+      height: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
+        .required('Giá trị bắt buộc')
+        .max(4, 'Nhập không quá 4 kí tự')
+        .typeError('Nhập số'),
+      weight: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
+        .required('Giá trị bắt buộc')
+        .max(4, 'Nhập không quá 4 kí tự')
+        .typeError('Nhập số'),
       sizeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập size giày')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       sizeSpikeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập size giày')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
-      sizeClothers: yup.string().nullable(),
+      sizeClothers: yup.string().nullable().max(4, 'Nhập không quá 4 kí tự'),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
         : yup.string().nullable(),
       countMatch: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       cleanMatch: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       goal: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       yellowCard: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       redCard: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       oldClub: yup
         .string()

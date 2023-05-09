@@ -12,7 +12,6 @@ export interface IMuiRHFDatePickerProps {
   name: string
   defaultValue?: string
   label?: string
-  inputFormat?: 'DD/MM/YYYY' | 'DD/MM'
   required?: boolean
   disabled?: boolean
 }
@@ -42,7 +41,7 @@ export function MuiRHFDateTimePicker({
           disabled={disabled}
           disableFuture={false}
           value={value}
-          // inputFormat={inputFormat}
+          inputFormat="DD/MM/YYYY HH:mm"
           onChange={(value: any) => onChange(value)}
           renderInput={(params: any) => (
             <TextField

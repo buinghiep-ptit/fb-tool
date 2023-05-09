@@ -250,85 +250,89 @@ export default function OrderManager(props: Props) {
           </form>
         </SimpleCard>
         <SimpleCard title="Danh sách đơn hàng">
-          <StyledTable>
-            <TableHead>
-              <TableRow>
-                {columnsOrders.map(header => (
-                  <TableCell
-                    align="center"
-                    style={{ minWidth: header.width }}
-                    key={header.id}
-                  >
-                    {header.name}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {orders?.content?.map((item, index) => (
-                <TableRow key={item.id}>
-                  <TableCell align="center">
-                    {size * page + index + 1}
-                  </TableCell>
-                  <TableCell align="center">{item.customerPhone}</TableCell>
-                  <TableCell align="center" sx={{ color: 'red' }}>
-                    {item.orderCode}
-                  </TableCell>
-                  <TableCell align="center">{item.quantity}</TableCell>
-                  <TableCell align="center">
-                    {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
-                  </TableCell>
-                  <TableCell align="center">
-                    {item.createdDate
-                      ? new Date(item.createdDate).toLocaleString()
-                      : ''}
-                  </TableCell>
-                  <TableCell align="center">
-                    {item.status !== undefined ? (
-                      <Chip
-                        sx={{ width: '100px' }}
-                        label={getStatusText(item.status)}
-                        color={
-                          item.status === 2
-                            ? 'success'
-                            : item.status === 1
-                            ? 'warning'
-                            : 'error'
-                        }
-                      />
-                    ) : (
-                      'Unknown'
-                    )}
-                  </TableCell>
-                  <TableCell align="center">{item.note}</TableCell>
-                  <TableCell align="center">
-                    <Link
-                      to={`${item.id}`}
-                      style={{
-                        color: 'green',
-                        textDecorationLine: 'underline',
-                      }}
+          <Box width="100%" overflow="auto">
+            <StyledTable>
+              <TableHead>
+                <TableRow>
+                  {columnsOrders.map(header => (
+                    <TableCell
+                      align="center"
+                      style={{ minWidth: header.width }}
+                      key={header.id}
                     >
-                      Chi tiết
-                    </Link>
-                  </TableCell>
+                      {header.name}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </StyledTable>
-          <TablePagination
-            sx={{ px: 2 }}
-            page={page}
-            component="div"
-            rowsPerPage={size}
-            count={orders ? (orders?.totalElements as number) : 0}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[20, 50, 100]}
-            labelRowsPerPage={'Dòng / Trang'}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-          />
+              </TableHead>
+              <TableBody>
+                {orders?.content?.map((item, index) => (
+                  <TableRow key={item.id}>
+                    <TableCell align="center">
+                      {size * page + index + 1}
+                    </TableCell>
+                    <TableCell align="left">{item.customerPhone}</TableCell>
+                    <TableCell align="left" sx={{ color: 'red' }}>
+                      {item.orderCode}
+                    </TableCell>
+                    <TableCell align="center">{item.quantity}</TableCell>
+                    <TableCell align="left">
+                      {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
+                    </TableCell>
+                    <TableCell align="center">
+                      {item.createdDate
+                        ? new Date(item.createdDate).toLocaleString()
+                        : ''}
+                    </TableCell>
+                    <TableCell align="center">
+                      {item.status !== undefined ? (
+                        <Chip
+                          sx={{ width: '100px' }}
+                          label={getStatusText(item.status)}
+                          color={
+                            item.status === 2
+                              ? 'success'
+                              : item.status === 1
+                              ? 'warning'
+                              : 'error'
+                          }
+                        />
+                      ) : (
+                        'Unknown'
+                      )}
+                    </TableCell>
+                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                      {item.note}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Link
+                        to={`${item.id}`}
+                        style={{
+                          color: 'green',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        Chi tiết
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </StyledTable>
+            <TablePagination
+              sx={{ px: 2 }}
+              page={page}
+              component="div"
+              rowsPerPage={size}
+              count={orders ? (orders?.totalElements as number) : 0}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[20, 50, 100]}
+              labelRowsPerPage={'Dòng / Trang'}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+            />
+          </Box>
         </SimpleCard>
       </Stack>
     </Container>

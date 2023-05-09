@@ -92,11 +92,11 @@ export default function OrderDetail(props: Props) {
                   Người đặt
                 </TableCell>
                 <TableCell align="left">
-                  {order?.delivery?.fullName}
-                  {'-'}
-                  {order?.customerPhone}
-                  {'-'}
-                  {order?.customerEmail}
+                  {order?.customer?.fullName}
+                  {' - '}
+                  {order?.customer?.mobilePhone}
+                  {' - '}
+                  {order?.customer?.email}
                 </TableCell>
               </TableRow>
               <TableRow>

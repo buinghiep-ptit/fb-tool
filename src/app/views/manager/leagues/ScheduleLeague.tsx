@@ -165,7 +165,7 @@ export default function ScheduleLeague(props: Props) {
                             </TableCell>
                             <TableCell align="center">
                               {moment(item.dateStart).format(
-                                'YYYY-MM-DD hh:mm',
+                                'DD-MM-YYYY HH:mm',
                               ) || ''}
                             </TableCell>
                             <TableCell align="center">

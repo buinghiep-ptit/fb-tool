@@ -97,7 +97,7 @@ export default function ScheduleCup(props: Props) {
                     {item.teamB.name}
                   </TableCell>
                   <TableCell align="left">
-                    {moment(item.dateStart).format('YYYY-MM-DD hh:mm')}
+                    {moment(item.dateStart).format('DD-MM-YYYY HH:mm')}
                   </TableCell>
                   <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                     {item.stadium}

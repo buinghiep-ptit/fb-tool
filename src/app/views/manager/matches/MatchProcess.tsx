@@ -277,10 +277,10 @@ export default function MatchProcess(props: any) {
                             fullWidth
                             disabled={!editable}
                           >
-                            <MenuItem value={match?.team1Id ?? 0}>
+                            <MenuItem value={match?.idTeam1 ?? 0}>
                               {match?.team1Name ?? 'Doi 1'}
                             </MenuItem>
-                            <MenuItem value={match?.team2Id ?? 1}>
+                            <MenuItem value={match?.idTeam2 ?? 1}>
                               {match?.team2Name ?? 'Doi 2'}
                             </MenuItem>
                           </Select>

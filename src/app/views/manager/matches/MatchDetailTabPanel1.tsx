@@ -224,7 +224,10 @@ export default function MatchDetailTabPanel1(props: any) {
                   margin="normal"
                   fullWidth
                   disabled
-                  value={match?.teamName}
+                  value={match?.team1Name
+                    .concat(match.teamSide === 1 ? ' (Chủ nhà)' : '')
+                    .concat(' - '.concat(match?.team2Name))
+                    .concat(match.teamSide === 2 ? ' (Chủ nhà)' : '')}
                 />
 
                 <Controller

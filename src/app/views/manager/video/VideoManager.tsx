@@ -356,7 +356,10 @@ export default function VideoManager(props: Props) {
                       <TableCell align="left">
                         {dayjs(video.dateCreated).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
                         {video.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                       </TableCell>
                       <TableCell align="center">

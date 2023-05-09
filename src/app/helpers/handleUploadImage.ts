@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { compressImageFile } from './compressFile'
 
-const handleUploadImage = async (file: any) => {
+const handleUploadImage = async (file: any, format = 'jpg') => {
   const formData = new FormData()
-  const newFile = await compressImageFile(file)
+  const newFile = await compressImageFile(file, format)
   formData.append('file', newFile)
   try {
     const token = window.localStorage.getItem('accessToken')

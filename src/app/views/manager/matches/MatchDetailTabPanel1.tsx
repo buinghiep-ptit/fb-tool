@@ -78,11 +78,7 @@ export default function MatchDetailTabPanel1(props: any) {
       })
       .nullable()
       .transform((curr, orig) => (orig === '' ? null : curr)),
-    stadium: yup
-      .string()
-      .required('Giá trị bắt buộc')
-      .trim()
-      .max(255, 'Tối đa 255 ký tự'),
+    stadium: yup.string().trim().max(255, 'Tối đa 255 ký tự'),
     preMatchSummary: yup.string(),
     team1Goal: yup
       .number()
@@ -185,7 +181,7 @@ export default function MatchDetailTabPanel1(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box
@@ -211,6 +207,17 @@ export default function MatchDetailTabPanel1(props: any) {
                   disabled
                 />
 
+                {match.leagueCategory === 1 && (
+                  <TextField
+                    label="Vòng đấu"
+                    variant="standard"
+                    margin="normal"
+                    fullWidth
+                    disabled
+                    value={match?.roundName}
+                  />
+                )}
+
                 <TextField
                   label="Đội bóng tham gia"
                   variant="standard"
@@ -230,7 +237,7 @@ export default function MatchDetailTabPanel1(props: any) {
                       </InputLabel>
                       <Select
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                         {...field}
                         onClose={() =>
                           methods.trigger().then(() => methods.clearErrors())
@@ -275,7 +282,7 @@ export default function MatchDetailTabPanel1(props: any) {
                                 methods.formState.errors?.dateStart?.message
                               }
                               InputLabelProps={{ shrink: true }}
-                              sx={{ width: '50%' }}
+                              sx={{ width: { xs: '100%', md: '50%' } }}
                               variant="outlined"
                               autoComplete="bday"
                             />
@@ -294,9 +301,9 @@ export default function MatchDetailTabPanel1(props: any) {
                         error={!!methods.formState.errors?.stadium}
                         helperText={methods.formState.errors?.stadium?.message}
                         {...field}
-                        label="Sân vận động*"
+                        label="Sân vận động"
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                       />
                     </FormControl>
                   )}

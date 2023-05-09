@@ -1,5 +1,3 @@
-import { uploadApi } from 'app/apis/uploads/upload.service'
-
 export const importFileandPreview = (file, revoke) => {
   return new Promise((resolve, reject) => {
     window.URL = window.URL || window.webkitURL
@@ -118,21 +116,26 @@ export const getVideoDuration = videoFile => {
   })
 }
 
-export const compressImageFile = async imageFile => {
+export const compressImageFile = async (imageFile, format) => {
   return new Promise(async resolve => {
     let originalImage = new Image()
     originalImage.src = await fileToDataUri(imageFile)
 
     originalImage.addEventListener('load', () => {
-      compressImage(originalImage).then(file => resolve(file))
+      compressImage(originalImage, format).then(file => resolve(file))
     })
   })
 }
 
-const compressImage = (imgToCompress, resizingFactor = 1, quality = 0.8) => {
+const compressImage = (
+  imgToCompress,
+  format = 'jpg',
+  resizingFactor = 1,
+  quality = 0.8,
+) => {
   return new Promise(resolve => {
-    const MAX_WIDTH = 1440
-    const MAX_HEIGHT = 812
+    const MAX_WIDTH = 640
+    const MAX_HEIGHT = 480
 
     // showing the compressed image
     const canvas = document.createElement('canvas')
@@ -171,12 +174,12 @@ const compressImage = (imgToCompress, resizingFactor = 1, quality = 0.8) => {
     canvas.toBlob(
       async blob => {
         if (blob) {
-          const compressedBlobToFile = blobToFile(blob, 'compressed.png')
+          const compressedBlobToFile = blobToFile(blob, 'compressed.' + format)
 
           resolve(compressedBlobToFile)
         }
       },
-      'image/png',
+      'image/' + format,
       quality,
     )
   })

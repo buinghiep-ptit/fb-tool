@@ -35,7 +35,7 @@ import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
 import { createSlugName } from 'app/utils/common'
 import dayjs from 'dayjs'
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { headTableVideos } from './const'
 
 export interface Props {}
@@ -333,14 +333,15 @@ export default function VideoManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/cahntv/' + video.id)
+                        <Link
+                          to={`/cahntv/${video.id}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
                           {video.title}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="center">
                         {video.priority && (
@@ -355,7 +356,10 @@ export default function VideoManager(props: Props) {
                       <TableCell align="left">
                         {dayjs(video.dateCreated).format('DD-MM-YYYY HH:mm')}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
                         {video.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                       </TableCell>
                       <TableCell align="center">

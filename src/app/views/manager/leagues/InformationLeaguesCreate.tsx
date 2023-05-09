@@ -100,7 +100,7 @@ export default function InfomationLeaguesCreate(props: Props) {
     data.isDisplaySchedule = data.isDisplaySchedule ? 1 : 0
     let urlLogo: any = ''
     if (file) {
-      urlLogo = await handleUploadImage(file)
+      urlLogo = await handleUploadImage(file, 'png')
     } else {
       urlLogo = logo
     }

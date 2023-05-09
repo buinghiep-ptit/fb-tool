@@ -400,7 +400,7 @@ export default function MatchProcess(props: any) {
                   Lưu
                 </Button>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   disabled={isLoading}
                   onClick={() => {
                     methods.reset()

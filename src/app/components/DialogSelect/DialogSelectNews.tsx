@@ -39,7 +39,7 @@ import dayjs from 'dayjs'
 import { remove } from 'lodash'
 import * as React from 'react'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { headTableNews } from './headTableNews'
 
 const Transition = React.forwardRef(function Transition(
@@ -66,8 +66,6 @@ interface Props {
 const DialogSelectNews = React.forwardRef((props: Props, ref) => {
   const { label, isLoading, setIsLoading, selectedList, setSelectedList } =
     props
-
-  const navigate = useNavigate()
 
   const [open, setOpen] = React.useState(false)
 
@@ -237,7 +235,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} md={3}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         Loại tin tức
@@ -262,7 +260,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} md={3}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         Trạng thái
@@ -283,7 +281,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                     </FormControl>
                   </Grid>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} md={3}>
                       <DatePicker
                         label="Từ ngày"
                         inputFormat="DD/MM/YYYY"
@@ -305,7 +303,7 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                         )}
                       />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} md={3}>
                       <DatePicker
                         label="Đến ngày"
                         inputFormat="DD/MM/YYYY"
@@ -331,7 +329,8 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                   <Grid item xs={4}></Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={12}
+                    md={2}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -350,7 +349,8 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                   </Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={12}
+                    md={2}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -400,14 +400,15 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
                               {rowsPerPage * page + index + 1}
                             </TableCell>
                             <TableCell align="left">
-                              <Button
-                                color="info"
-                                onClick={() => {
-                                  navigate('/news/' + news.id)
+                              <Link
+                                to={`/news/${news.id}`}
+                                style={{
+                                  color: '#2196F3',
+                                  wordBreak: 'keep-all',
                                 }}
                               >
                                 {news.title}
-                              </Button>
+                              </Link>
                             </TableCell>
                             <TableCell align="center">
                               {news.priority && (

@@ -1,3 +1,4 @@
+import { compressImageFile } from 'app/helpers/compressFile'
 import { http } from 'app/helpers/http-config'
 
 export const uploadFile = async (
@@ -11,6 +12,7 @@ export const uploadFile = async (
     path = '/api/video/upload'
   } else if (mediaFormat === 2) {
     path = '/api/file/upload?directory=cahnfc'
+    file = await compressImageFile(file, 'jpg')
   } else {
     path = '/api/file/upload'
   }

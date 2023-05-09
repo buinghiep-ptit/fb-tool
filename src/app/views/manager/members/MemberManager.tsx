@@ -28,7 +28,7 @@ import { MEMBER_STATUSES, findMemberStatus } from 'app/constants/memberStatus'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { headTableMembers } from './const'
 
 export interface Props {}
@@ -307,14 +307,15 @@ export default function MatchManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/customers/' + registration.customerId)
+                        <Link
+                          to={`/customers/${registration.customerId}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
                           {registration.customerName}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="left">
                         {registration.registerInfo}

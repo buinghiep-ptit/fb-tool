@@ -100,6 +100,7 @@ export default function MatchDetailTabPanel3(props: any) {
   const numberValidation = yup
     .number()
     .min(0, 'Số dương')
+    .max(9999, 'Tối đa 4 chữ số')
     .integer('Số nguyên')
     .nullable()
     .transform((curr, orig) => (orig === '' ? null : curr))
@@ -254,7 +255,7 @@ export default function MatchDetailTabPanel3(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box

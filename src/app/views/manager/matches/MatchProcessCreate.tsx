@@ -100,12 +100,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .integer('Số nguyên')
       .when('type', (type, schema) => {
         // kết thúc hiệp 1/ kết thúc trận đấu
-        if (
-          [
-            MATCH_PROCESS_TYPES.END_ROUND1.id,
-            MATCH_PROCESS_TYPES.END.id,
-          ].includes(type)
-        )
+        if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))
           return schema.required('Giá trị bắt buộc')
         else return schema
       })
@@ -117,12 +112,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .integer('Số nguyên')
       .when('type', (type, schema) => {
         // bắt buộc nếu cập nhật tỷ số hiệp 1/ kết thúc trận đấu
-        if (
-          [
-            MATCH_PROCESS_TYPES.END_ROUND1.id,
-            MATCH_PROCESS_TYPES.END.id,
-          ].includes(type)
-        )
+        if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))
           return schema.required('Giá trị bắt buộc')
         else return schema
       })
@@ -312,10 +302,9 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                       />
                     </Grid>
                   )}
-                  {[
-                    MATCH_PROCESS_TYPES.END_ROUND1.id,
-                    MATCH_PROCESS_TYPES.END.id,
-                  ].includes(methods.getValues('type')) && (
+                  {[MATCH_PROCESS_TYPES.END_ROUND1.id].includes(
+                    methods.getValues('type'),
+                  ) && (
                     <Grid item xs={12}>
                       <FormControl fullWidth margin="dense">
                         <Typography color="grey">Tỷ số:</Typography>
@@ -392,7 +381,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                   Lưu
                 </Button>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   disabled={isLoading}
                   onClick={() => {
                     handleClose()

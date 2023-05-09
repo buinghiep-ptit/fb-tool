@@ -148,15 +148,15 @@ export default function PlayerManager(props: Props) {
         }}
       >
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Quản lý giải đấu' }]} />
+          <Breadcrumb routeSegments={[{ name: 'Quản lý cầu thủ' }]} />
         </Box>
         <Button
           variant="contained"
           startIcon={<AddBoxOutlinedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
-          onClick={() => navigate('/leagues/create')}
+          onClick={() => navigate('/players/create')}
         >
-          Thêm mới giải đấu
+          Thêm mới cầu thủ
         </Button>
       </div>
       <SimpleCard>

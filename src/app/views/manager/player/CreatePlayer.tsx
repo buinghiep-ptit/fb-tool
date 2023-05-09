@@ -161,7 +161,7 @@ export default function PlayerDetail(props: Props) {
     try {
       let imageUrl: any = ''
       if (file) {
-        imageUrl = await handleUploadImage(file)
+        imageUrl = await handleUploadImage(file, 'png')
       } else {
         imageUrl = previewImage
       }

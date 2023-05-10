@@ -84,6 +84,7 @@ export default function MatchDetailTabPanel1(props: any) {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
         if (
@@ -98,6 +99,7 @@ export default function MatchDetailTabPanel1(props: any) {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
         if (

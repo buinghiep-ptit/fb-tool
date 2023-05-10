@@ -98,6 +98,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // kết thúc hiệp 1/ kết thúc trận đấu
         if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))
@@ -110,6 +111,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // bắt buộc nếu cập nhật tỷ số hiệp 1/ kết thúc trận đấu
         if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))

@@ -76,6 +76,7 @@ export default function MatchProcess(props: any) {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // kết thúc hiệp 1/ kết thúc trận đấu
         if (
@@ -93,6 +94,7 @@ export default function MatchProcess(props: any) {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // bắt buộc nếu cập nhật tỷ số hiệp 1/ kết thúc trận đấu
         if (

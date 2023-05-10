@@ -36,7 +36,6 @@ import { getVideos } from 'app/apis/videos/video.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
 import dayjs from 'dayjs'
-import { remove } from 'lodash'
 import * as React from 'react'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
@@ -173,9 +172,9 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
   const handlePick = (id: number) => {
     const newList = [...videos]
     if (newList[id].isPicked) {
-      const newListPicked = remove(selectedList, function (n) {
-        return n !== newList[id].id
-      })
+      const newListPicked = selectedList.filter(
+        (n: any) => n.id !== newList[id].id,
+      )
       setSelectedList(newListPicked)
     } else {
       const newListPicked = [

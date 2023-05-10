@@ -271,12 +271,12 @@ export default function OrderManager(props: Props) {
                     <TableCell align="center">
                       {size * page + index + 1}
                     </TableCell>
-                    <TableCell align="left">{item.customerPhone}</TableCell>
-                    <TableCell align="left" sx={{ color: 'red' }}>
+                    <TableCell align="center">{item.customerPhone}</TableCell>
+                    <TableCell align="center" sx={{ color: 'red' }}>
                       {item.orderCode}
                     </TableCell>
                     <TableCell align="center">{item.quantity}</TableCell>
-                    <TableCell align="left">
+                    <TableCell align="center">
                       {item.amount?.toLocaleString().replace(/,/g, '.')} VNĐ
                     </TableCell>
                     <TableCell align="center">
@@ -301,9 +301,7 @@ export default function OrderManager(props: Props) {
                         'Unknown'
                       )}
                     </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {item.note}
-                    </TableCell>
+                    <TableCell align="center">{item.note}</TableCell>
                     <TableCell align="center">
                       <Link
                         to={`${item.id}`}
@@ -319,6 +317,7 @@ export default function OrderManager(props: Props) {
                 ))}
               </TableBody>
             </StyledTable>
+
             <TablePagination
               sx={{ px: 2 }}
               page={page}

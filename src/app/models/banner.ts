@@ -13,3 +13,15 @@ export interface Banner {
   buttonContent?: string
   butonColor?: string
 }
+export interface BannerDetail {
+  id?: number
+  title?: string
+  titlePosition?: number // 0: không hiển thị, 1: trái, 2: giữa, 3: phải
+  titleColor?: string // mã màu
+  buttonContent?: string
+  butonColor?: string
+  type?: number // 1: ảnh, 2: video
+  butonPosition?: number
+  mediaUrl?: string
+  url?: string
+}

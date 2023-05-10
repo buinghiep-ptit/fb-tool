@@ -1,5 +1,5 @@
-import { styled } from '@mui/system'
 import { Table } from '@mui/material'
+import { styled } from '@mui/system'
 
 const StyledTable = styled(Table)(({ theme }) => ({
   whiteSpace: 'pre',

@@ -96,7 +96,7 @@ const DialogUpdateLogo = React.forwardRef((props: Props, ref) => {
   const initDefaultValues = (logo: any) => {
     const defaultValues: any = {}
     defaultValues.file = logo.logo
-    defaultValues.strUrl = logo.strUrl
+    defaultValues.strUrl = logo.strUrl || ''
     setPreviewImage(logo.logo)
     methods.reset({ ...defaultValues })
   }
@@ -120,14 +120,14 @@ const DialogUpdateLogo = React.forwardRef((props: Props, ref) => {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
-    let logo: any = ''
+    let imgUrl: any = ''
     if (file) {
-      logo = await handleUploadImage(file, 'png')
-    } else logo = logo.logo
+      imgUrl = await handleUploadImage(file, 'png')
+    } else imgUrl = logo.logo
 
     const payload: any = {
       strUrl: data.strUrl,
-      logo: logo,
+      logo: imgUrl,
       status: 1,
     }
 

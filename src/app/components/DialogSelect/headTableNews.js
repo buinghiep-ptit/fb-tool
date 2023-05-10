@@ -5,7 +5,7 @@ export const headTableNews = [
   },
   {
     name: 'Tiêu đề',
-    width: '300px',
+    width: '250px',
   },
   {
     name: '',
@@ -25,7 +25,7 @@ export const headTableNews = [
   },
   {
     name: 'Trạng thái',
-    width: '100px',
+    width: '150px',
   },
   {
     name: 'Hành động',

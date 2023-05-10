@@ -425,7 +425,10 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                                 'DD/MM/YYYY HH:mm',
                               )}
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="center"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {video.status === 1
                                 ? 'Hoạt động'
                                 : 'Không hoạt động'}

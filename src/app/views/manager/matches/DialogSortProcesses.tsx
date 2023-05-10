@@ -169,9 +169,6 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
           </DragDropContext>
         </DialogContent>
         <DialogActions sx={{ textAlign: 'center' }}>
-          <Button onClick={handleClose} variant="outlined" disabled={isLoading}>
-            Đóng
-          </Button>
           <Button
             onClick={onSubmit}
             autoFocus
@@ -179,6 +176,9 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
             disabled={isLoading}
           >
             {isLoading ? 'Đang lưu...' : 'Lưu'}
+          </Button>
+          <Button onClick={handleClose} variant="outlined" disabled={isLoading}>
+            Đóng
           </Button>
         </DialogActions>
       </Dialog>

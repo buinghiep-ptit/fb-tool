@@ -417,15 +417,6 @@ export default function MatchDetailTabPanel1(props: any) {
                   }}
                 >
                   <Button
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{ mx: 1 }}
-                  >
-                    Lưu
-                  </Button>
-                  <Button
                     variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
@@ -434,6 +425,15 @@ export default function MatchDetailTabPanel1(props: any) {
                     sx={{ mx: 1 }}
                   >
                     Quay lại
+                  </Button>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ mx: 1 }}
+                  >
+                    Lưu
                   </Button>
                 </Box>
               </FormProvider>

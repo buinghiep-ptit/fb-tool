@@ -219,7 +219,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={8}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MuiRHFDateTimePicker
                       name="dateStart"

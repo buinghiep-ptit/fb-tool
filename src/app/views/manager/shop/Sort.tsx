@@ -1,14 +1,14 @@
 import { Box } from '@mui/system'
+import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container } from 'app/components'
 
-import { Chip, Grid, Button, LinearProgress, Typography } from '@mui/material'
+import { Button, Chip, Grid, LinearProgress, Typography } from '@mui/material'
 
-import { useState } from 'react'
 import {
   getCategoriesSort,
   updateCategoriesSort,
 } from 'app/apis/shop/shop.service'
+import { useState } from 'react'
 import RLDD from 'react-list-drag-and-drop/lib/RLDD'
 import './shop.css'
 
@@ -55,9 +55,7 @@ export default function Sort(props: Props) {
   const renderStatus = (status: any) => {
     switch (status) {
       case 0:
-        return <Chip label="Không hoạt động" color="warning" />
-      case -1:
-        return <Chip label="Đã xóa từ KiotVuet" />
+        return <Chip label="Ngừng kinh doanh" color="warning" />
       default:
         return <Chip label="Hoạt động" color="success" />
     }

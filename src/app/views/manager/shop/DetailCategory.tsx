@@ -215,9 +215,8 @@ export default function DetailCategory(props: Props) {
                 }}
               >
                 <MenuItem value={2}>Tất cả</MenuItem>
-                <MenuItem value={0}>Không hoạt động</MenuItem>
+                <MenuItem value={0}>Ngừng kinh doanh</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={-1}>Đã xóa từ Kiotviet</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -274,13 +273,10 @@ export default function DetailCategory(props: Props) {
                     <TableCell align="center">{product.amount}</TableCell>
                     <TableCell align="center">
                       {product.status === 0 && (
-                        <Chip label="Không hoạt động" color="success" />
+                        <Chip label="Ngừng kinh doanh" color="warning" />
                       )}
                       {product.status === 1 && (
                         <Chip label="Hoạt động" color="success" />
-                      )}
-                      {product.status === -1 && (
-                        <Chip label="Đã xóa từ kiotviet" />
                       )}
                     </TableCell>
                     <TableCell align="center">

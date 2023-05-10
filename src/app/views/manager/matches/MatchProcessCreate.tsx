@@ -98,6 +98,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // kết thúc hiệp 1/ kết thúc trận đấu
         if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))
@@ -110,6 +111,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('type', (type, schema) => {
         // bắt buộc nếu cập nhật tỷ số hiệp 1/ kết thúc trận đấu
         if ([MATCH_PROCESS_TYPES.END_ROUND1.id].includes(type))
@@ -260,10 +262,10 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                               label="Loại diễn biến*"
                               fullWidth
                             >
-                              <MenuItem value={match?.team1Id ?? 0}>
+                              <MenuItem value={match?.idTeam1 ?? 0}>
                                 {match?.team1Name ?? 'Doi 1'}
                               </MenuItem>
-                              <MenuItem value={match?.team2Id ?? 1}>
+                              <MenuItem value={match?.idTeam2 ?? 1}>
                                 {match?.team2Name ?? 'Doi 2'}
                               </MenuItem>
                             </Select>

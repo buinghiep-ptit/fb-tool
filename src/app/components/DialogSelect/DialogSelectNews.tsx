@@ -36,7 +36,6 @@ import { getNews } from 'app/apis/news/news.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { NEWS_TYPES, findNewsType } from 'app/constants/newsType'
 import dayjs from 'dayjs'
-import { remove } from 'lodash'
 import * as React from 'react'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
@@ -172,9 +171,9 @@ const DialogSelectNews = React.forwardRef((props: Props, ref) => {
   const handlePick = (id: number) => {
     const newList = [...news]
     if (newList[id].isPicked) {
-      const newListPicked = remove(selectedList, function (n) {
-        return n !== newList[id].id
-      })
+      const newListPicked = selectedList.filter(
+        (n: any) => n.id !== newList[id].id,
+      )
       setSelectedList(newListPicked)
     } else {
       const newListPicked = [

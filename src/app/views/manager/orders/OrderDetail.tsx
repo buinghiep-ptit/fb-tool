@@ -126,7 +126,7 @@ export default function OrderDetail(props: Props) {
                   align="left"
                   sx={{ borderRight: '1px solid #e3dfdf', fontWeight: '600' }}
                 >
-                  Mã đơn hàng KioViet
+                  Mã đơn hàng KiotViet
                 </TableCell>
                 <TableCell align="left">{order?.orderCodePartner}</TableCell>
               </TableRow>

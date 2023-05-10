@@ -9,7 +9,7 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { useState } from 'react'
-import { SketchPicker } from 'react-color'
+import { GithubPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -33,6 +33,7 @@ export default function AddBanner(props: Props) {
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [banner, setBanner] = useState<any>()
+  const [showColorPicker, setShowColorPicker] = useState<any>(false)
 
   const onSubmitHandler = (data: any) => {
     console.log(data)
@@ -73,21 +74,41 @@ export default function AddBanner(props: Props) {
                       <MenuItem value="3">Phải</MenuItem>
                     </SelectDropDown>
                     <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
-                      <div
-                        style={{
-                          backgroundColor: '#fff',
-                          width: '50px',
-                          height: '35px',
-                          border: '1px solid #aeaaaa',
-                        }}
-                      ></div>
-                      <SketchPicker
-                        color={colorDisplay}
-                        onChangeComplete={(color: any, event: any) =>
-                          setColorDisplay(color.hex)
-                        }
-                      />
+                      <div style={{ position: 'relative' }}>
+                        <div
+                          style={{
+                            backgroundColor: colorDisplay,
+                            width: '50px',
+                            height: '35px',
+                            border: '1px solid #aeaaaa',
+                          }}
+                        ></div>
+                        <div
+                          style={{
+                            zIndex: 1000,
+                            display: showColorPicker ? 'block' : 'none',
+                          }}
+                        >
+                          <GithubPicker
+                            color={colorDisplay}
+                            onChangeComplete={(color: any, event: any) =>
+                              setColorDisplay(color.hex)
+                            }
+                          />
+                        </div>
+                      </div>
+
                       <FormInputText
+                        onFocus={() => {
+                          setShowColorPicker(true)
+                        }}
+                        // onBlur={() => {
+                        //   setShowColorPicker(false)
+                        // }}
+                        value={colorDisplay}
+                        onChange={e => {
+                          setColorDisplay(e.target.value)
+                        }}
                         type="text"
                         name="titleColor"
                         label={'Màu hiển thị'}

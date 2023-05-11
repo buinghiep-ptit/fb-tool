@@ -227,17 +227,8 @@ export default function MatchDetailTabPanel1(props: any) {
                   fullWidth
                   disabled
                   value={match?.team1Name
-                    .concat(
-                      match.leagueCategory === 1 && match.teamSide === 1
-                        ? ' (Chủ nhà)'
-                        : '',
-                    )
-                    .concat(' - '.concat(match?.team2Name))
-                    .concat(
-                      match.leagueCategory === 1 && match.teamSide === 2
-                        ? ' (Chủ nhà)'
-                        : '',
-                    )}
+                    .concat(match.leagueCategory === 1 ? ' (Chủ nhà)' : '')
+                    .concat(' - '.concat(match?.team2Name))}
                 />
 
                 <Controller

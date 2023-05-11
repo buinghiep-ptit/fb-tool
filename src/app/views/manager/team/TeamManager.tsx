@@ -62,7 +62,7 @@ export default function TeamManager(props: Props) {
   const fetchListTeam = async () => {
     setIsLoading(true)
     await getTeams({
-      q: nameFilter,
+      q: nameFilter.trim(),
       status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter ? 1 : null,
       page: page,
@@ -253,7 +253,7 @@ export default function TeamManager(props: Props) {
         <SimpleCard title="Danh sách các đội bóng">
           {teams?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={teams?.length === 0}>

@@ -62,7 +62,7 @@ export default function MatchManager(props: Props) {
   const fetchListMatches = async () => {
     setIsLoading(true)
     await getMatches({
-      teamName: teamFilter ?? null,
+      teamName: teamFilter.trim() ?? null,
       idLeague: leagueFilter?.id ?? null,
       status: statusFilter === 99 ? null : statusFilter,
       from:
@@ -313,7 +313,7 @@ export default function MatchManager(props: Props) {
         <SimpleCard title="Danh sách thông tin trận đấu">
           {matches?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={matches?.length === 0}>

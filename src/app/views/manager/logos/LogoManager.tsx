@@ -157,7 +157,7 @@ export default function LogoManager(props: Props) {
           </Grid>
           {logos?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={logos?.length === 0}>

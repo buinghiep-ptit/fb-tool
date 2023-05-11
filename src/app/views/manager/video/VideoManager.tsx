@@ -59,7 +59,7 @@ export default function VideoManager(props: Props) {
   const fetchListVideo = async () => {
     setIsLoading(true)
     await getVideos({
-      search: searchFilter,
+      search: searchFilter.trim(),
       status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
       dateStart:
@@ -307,7 +307,7 @@ export default function VideoManager(props: Props) {
         <SimpleCard>
           {videos?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={videos?.length === 0}>

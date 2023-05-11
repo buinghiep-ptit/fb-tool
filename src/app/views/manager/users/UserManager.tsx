@@ -54,7 +54,7 @@ export default function UserManager(props: Props) {
   const fetchListUsers = async () => {
     setIsLoading(true)
     await getUsers({
-      email: emailFilter,
+      email: emailFilter.trim(),
       role: roleFilter === 99 ? null : roleFilter,
       status: statusFilter === 99 ? null : statusFilter,
       page: page,

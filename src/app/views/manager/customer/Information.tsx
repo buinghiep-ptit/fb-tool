@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
 import LockPersonIcon from '@mui/icons-material/LockPerson'
 import {
@@ -9,13 +10,10 @@ import {
   FormControlLabel,
   FormLabel,
   Grid,
-  InputLabel,
   LinearProgress,
-  MenuItem,
   Paper,
   Radio,
   RadioGroup,
-  Select,
   TableBody,
   TableCell,
   TableHead,
@@ -24,13 +22,18 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { styled } from '@mui/system'
+import { Stack, styled } from '@mui/system'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getCustomer, getLogs } from 'app/apis/customer/customer.service'
 import { SimpleCard, StyledTable } from 'app/components'
+import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
+import * as yup from 'yup'
 import { headTableAccountLog } from './const'
 import LockDialog from './dialog/LockDialog'
 
@@ -43,7 +46,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Information(props: Props) {
   const [page, setPage] = useState(0)
-  const [customer, setCustomer] = useState(null)
+  const [customer, setCustomer] = useState<any>(null)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [countTable, setCountTable] = useState(0)
   const lockDialogRef = React.useRef<any>(null)
@@ -68,6 +71,7 @@ export default function Information(props: Props) {
   const fetchCustomerDetail = async () => {
     const res = await getCustomer(params.idCustomer)
     setCustomer(res)
+    initDefaultValues(res)
   }
 
   const fetchLogs = async () => {
@@ -83,6 +87,43 @@ export default function Information(props: Props) {
     setCountTable(res.totalElements)
     setIsLoading(false)
   }
+
+  const schema = yup
+    .object({
+      fullName: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .max(255, 'Tối đa 255 ký tự'),
+      birthday: yup
+        .date()
+        .required('Gía trị bắt buộc')
+        .typeError('Vui lòng nhập đúng ngày sinh'),
+    })
+    .required()
+
+  const methods = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      gender: '',
+      birthday: null,
+      phone: '',
+    },
+  })
+
+  const initDefaultValues = (customer: any) => {
+    const defaultValues: any = {}
+    defaultValues.fullName = customer.fullName
+    defaultValues.gender = customer.gender
+    defaultValues.birthday = customer.birthday
+    defaultValues.email = customer.email
+    defaultValues.phone = customer.mobilePhone
+    methods.reset({ ...defaultValues })
+  }
+
+  const onSubmit = async (data: any) => {}
 
   React.useEffect(() => {
     fetchLogs()
@@ -104,129 +145,174 @@ export default function Information(props: Props) {
           <LinearProgress />
         </Box>
       )}
+
+      <Stack
+        spacing={2}
+        direction="row"
+        style={{
+          position: 'fixed',
+          top: '150px',
+          right: '70px',
+        }}
+      >
+        <Button variant="contained">Cập nhật</Button>
+        <Button variant="outlined" onClick={() => navigate('/customers')}>
+          Quay lại
+        </Button>
+      </Stack>
       <SimpleCard>
-        <Grid container spacing={2}>
-          <Grid item xs={3}>
-            <Item>
-              <TextField
-                id="outlined-basic"
-                label="Email, SDT, Tên hiển thị"
-                variant="outlined"
-                fullWidth
-              />
-            </Item>
-            <Item>
-              <TextField
-                id="outlined-basic"
-                label="Email, SDT, Tên hiển thị"
-                variant="outlined"
-                fullWidth
-              />
-            </Item>
-            <Item>
-              <TextField
-                id="outlined-basic"
-                label="Email, SDT, Tên hiển thị"
-                variant="outlined"
-                fullWidth
-              />
-            </Item>
-          </Grid>
-          <Grid item xs={3}>
-            <Item>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">
-                  Loại tài khoản
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Loại tài khoản"
-                >
-                  <MenuItem value={0}>Tất cả</MenuItem>
-                  <MenuItem value={1}>Thường</MenuItem>
-                  <MenuItem value={2}>Fan</MenuItem>
-                </Select>
-              </FormControl>
-            </Item>
-            <Item>
-              <FormControl>
-                <FormLabel id="sex-radio">Giới tính</FormLabel>
-                <RadioGroup
-                  row
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  defaultValue="Nam"
-                  name="radio-buttons-group"
-                >
-                  <FormControlLabel
-                    value="Nam"
-                    control={<Radio />}
-                    label="Name"
+        <form onSubmit={methods.handleSubmit(onSubmit)}>
+          <FormProvider {...methods}>
+            <Grid container spacing={2}>
+              <Grid item xs={3}>
+                <Item>
+                  <Controller
+                    name="email"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        margin="dense"
+                        disabled
+                      />
+                    )}
                   />
-                  <FormControlLabel value="Nữ" control={<Radio />} label="Nữ" />
-                  <FormControlLabel
-                    value="Khác"
-                    control={<Radio />}
-                    label="Khác"
+                </Item>
+                <Item>
+                  <Controller
+                    name="phone"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Số điện thoại"
+                        variant="outlined"
+                        disabled
+                        fullWidth
+                        margin="dense"
+                      />
+                    )}
                   />
-                </RadioGroup>
-              </FormControl>
-            </Item>
-            <Item>
-              <div>
-                <FormLabel id="sex-radio">Trạng thái: </FormLabel>
-                <Chip label="Hoạt động" color="success" />
-              </div>
-            </Item>
-          </Grid>
-          <Grid
-            item
-            xs={3}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-around',
-            }}
-          >
-            <Item>
-              <div>
-                <FormLabel id="sex-radio">
-                  Đăng ký bằng: Số điện thoại
-                </FormLabel>
-              </div>
-            </Item>
-            <Item>
-              <div>
-                <FormLabel id="sex-radio">Ngày đăng ký: 01/02/2023</FormLabel>
-              </div>
-            </Item>
-            <Item>
-              <div>
-                <FormLabel id="sex-radio">
-                  Lần cuối đăng nhập: 01/02/2023
-                </FormLabel>
-              </div>
-            </Item>
-          </Grid>
-          <Grid item xs={3} sx={{ textAlign: 'center' }}>
-            <Item>
-              <AccountCircleRoundedIcon sx={{ fontSize: 100 }} />
-            </Item>
-            <Item>
-              <ButtonGroup variant="text" aria-label="text button group">
-                <Button startIcon={<LockPersonIcon />} onClick={() => {}}>
-                  Khóa
-                </Button>
-                <Button color="success">Loại tài khoản: Fan</Button>
-              </ButtonGroup>
-            </Item>
-          </Grid>
-          <Grid item xs={12}>
-            <Item>
-              <div>Địa chỉ nhận hàng: Tòa nhà FPT Tower</div>
-            </Item>
-          </Grid>
-        </Grid>
+                </Item>
+                <Item>
+                  <Controller
+                    name="fullName"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Tên hiển thị"
+                        variant="outlined"
+                        fullWidth
+                        margin="dense"
+                      />
+                    )}
+                  />
+                </Item>
+              </Grid>
+              <Grid item xs={3}>
+                <Item>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <MuiRHFDatePicker
+                      name="birthday"
+                      label="Ngày sinh nhật"
+                      inputFormat={'DD/MM/YYYY'}
+                    />
+                  </LocalizationProvider>
+                </Item>
+                <Item>
+                  <FormControl>
+                    <FormLabel id="sex-radio">Giới tính</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-radio-buttons-group-label"
+                      defaultValue="Nam"
+                      name="radio-buttons-group"
+                    >
+                      <FormControlLabel
+                        value="Nam"
+                        control={<Radio />}
+                        label="Name"
+                      />
+                      <FormControlLabel
+                        value="Nữ"
+                        control={<Radio />}
+                        label="Nữ"
+                      />
+                      <FormControlLabel
+                        value="Khác"
+                        control={<Radio />}
+                        label="Khác"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Item>
+                <Item>
+                  <div>
+                    <FormLabel id="sex-radio">Trạng thái: </FormLabel>
+                    {customer?.status === 1 ? (
+                      <Chip label="Hoạt động" color="success" />
+                    ) : (
+                      <Chip label="Khóa" color="error" />
+                    )}
+                  </div>
+                </Item>
+              </Grid>
+              <Grid
+                item
+                xs={3}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-around',
+                }}
+              >
+                <Item>
+                  <div>
+                    <FormLabel id="sex-radio">
+                      Đăng ký bằng: Số điện thoại
+                    </FormLabel>
+                  </div>
+                </Item>
+                <Item>
+                  <div>
+                    <FormLabel id="sex-radio">
+                      Ngày đăng ký: 01/02/2023
+                    </FormLabel>
+                  </div>
+                </Item>
+                <Item>
+                  <div>
+                    <FormLabel id="sex-radio">
+                      Lần cuối đăng nhập: 01/02/2023
+                    </FormLabel>
+                  </div>
+                </Item>
+              </Grid>
+              <Grid item xs={3} sx={{ textAlign: 'center' }}>
+                <Item>
+                  <AccountCircleRoundedIcon sx={{ fontSize: 100 }} />
+                </Item>
+                <Item>
+                  <ButtonGroup variant="text" aria-label="text button group">
+                    <Button startIcon={<LockPersonIcon />} onClick={() => {}}>
+                      Khóa
+                    </Button>
+                    <Button color="success">Loại tài khoản: Fan</Button>
+                  </ButtonGroup>
+                </Item>
+              </Grid>
+              <Grid item xs={12}>
+                <Item>
+                  <div>Địa chỉ nhận hàng: Tòa nhà FPT Tower</div>
+                </Item>
+              </Grid>
+            </Grid>
+          </FormProvider>
+        </form>
       </SimpleCard>
       <LockDialog ref={lockDialogRef} />
       <div style={{ height: '30px' }} />

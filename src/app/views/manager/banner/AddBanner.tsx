@@ -123,7 +123,7 @@ export default function AddBanner(props: Props) {
       buttonPosition: data.buttonPosition,
       buttonColor: colorButton,
       buttonTextColor: colorText,
-      type: data.type,
+      type: type,
       url: data.url,
       mediaUrl: imgUrl,
     }
@@ -239,7 +239,7 @@ export default function AddBanner(props: Props) {
 
                   <Stack flexDirection={'row'} gap={2}>
                     <SelectDropDown
-                      name="butonPosition"
+                      name="buttonPosition"
                       label="Vị trí nút điều hướng"
                       sx={{ width: '75%' }}
                     >

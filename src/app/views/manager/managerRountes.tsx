@@ -33,6 +33,7 @@ const MemberManager = Loadable(lazy(() => import('./members/MemberManager')))
 const MemberDetail = Loadable(lazy(() => import('./members/MemberDetail')))
 const MemberSetting = Loadable(lazy(() => import('./members/MemberSetting')))
 const LogoManager = Loadable(lazy(() => import('./logos/LogoManager')))
+const UserManager = Loadable(lazy(() => import('./users/UserManager')))
 
 const managerRoutes = [
   {
@@ -87,5 +88,6 @@ const managerRoutes = [
   { path: '/members/:id', element: <MemberDetail /> },
   { path: '/members/setting', element: <MemberSetting /> },
   { path: '/logos', element: <LogoManager /> },
+  { path: '/users', element: <UserManager /> },
 ]
 export default managerRoutes

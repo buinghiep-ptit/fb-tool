@@ -1,10 +1,10 @@
 export const navigations = [
   { name: 'Trang chủ', path: '/dashboard', icon: 'dashboard' },
-  // {
-  //   name: 'Quản lý khách hàng',
-  //   path: '/customers',
-  //   icon: 'person',
-  // },
+  {
+    name: 'Quản lý khách hàng',
+    path: '/customers',
+    icon: 'person',
+  },
   {
     name: 'Quản lý hội viên',
     path: '/members',

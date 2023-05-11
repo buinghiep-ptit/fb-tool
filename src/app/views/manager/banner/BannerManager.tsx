@@ -84,7 +84,7 @@ export default function BannerManager(props: Props) {
         </Grid>
         <Grid item xs={6} style={{ padding: 0, lineHeight: '80px' }}>
           <Link
-            to="/"
+            to={`/banner/${banner.id}`}
             style={{
               color: 'green',
               textDecorationLine: 'underline',

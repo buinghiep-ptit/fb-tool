@@ -227,9 +227,17 @@ export default function MatchDetailTabPanel1(props: any) {
                   fullWidth
                   disabled
                   value={match?.team1Name
-                    .concat(match.teamSide === 1 ? ' (Chủ nhà)' : '')
+                    .concat(
+                      match.leagueCategory === 1 && match.teamSide === 1
+                        ? ' (Chủ nhà)'
+                        : '',
+                    )
                     .concat(' - '.concat(match?.team2Name))
-                    .concat(match.teamSide === 2 ? ' (Chủ nhà)' : '')}
+                    .concat(
+                      match.leagueCategory === 1 && match.teamSide === 2
+                        ? ' (Chủ nhà)'
+                        : '',
+                    )}
                 />
 
                 <Controller
@@ -417,15 +425,6 @@ export default function MatchDetailTabPanel1(props: any) {
                   }}
                 >
                   <Button
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{ mx: 1 }}
-                  >
-                    Lưu
-                  </Button>
-                  <Button
                     variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
@@ -434,6 +433,15 @@ export default function MatchDetailTabPanel1(props: any) {
                     sx={{ mx: 1 }}
                   >
                     Quay lại
+                  </Button>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ mx: 1 }}
+                  >
+                    Lưu
                   </Button>
                 </Box>
               </FormProvider>

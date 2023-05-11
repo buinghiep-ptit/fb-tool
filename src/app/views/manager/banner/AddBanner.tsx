@@ -85,7 +85,7 @@ export default function AddBanner(props: Props) {
               .required('Giá trị bắt buộc')
               .test('fileType', 'File không hợp lệ', value => {
                 if (value && value.name)
-                  return ['mp4', 'mov', '3gp', 'webm'].includes(
+                  return ['mp4', 'mov', '3gp'].includes(
                     value?.name?.split('.').pop(),
                   )
                 else return true

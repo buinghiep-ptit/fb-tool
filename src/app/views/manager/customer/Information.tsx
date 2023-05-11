@@ -1,33 +1,38 @@
-import { Box, shadows, styled } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link } from 'react-router-dom'
-import {
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
-  Chip,
-  FormLabel,
-  Radio,
-  FormControlLabel,
-  RadioGroup,
-  Paper,
-  ButtonGroup,
-} from '@mui/material'
-import LockDialog from './dialog/LockDialog'
-import { headTableAccountLog } from './const'
-import { useState, useRef } from 'react'
-import LockPersonIcon from '@mui/icons-material/LockPerson'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
+import LockPersonIcon from '@mui/icons-material/LockPerson'
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Chip,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Paper,
+  Radio,
+  RadioGroup,
+  Select,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Typography,
+} from '@mui/material'
+import { styled } from '@mui/system'
+import { getCustomer, getLogs } from 'app/apis/customer/customer.service'
+import { SimpleCard, StyledTable } from 'app/components'
+import moment from 'moment'
+import * as React from 'react'
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { headTableAccountLog } from './const'
+import LockDialog from './dialog/LockDialog'
 
 export interface Props {}
 
@@ -38,8 +43,15 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export default function Information(props: Props) {
   const [page, setPage] = useState(0)
+  const [customer, setCustomer] = useState(null)
   const [rowsPerPage, setRowsPerPage] = useState(20)
+  const [countTable, setCountTable] = useState(0)
   const lockDialogRef = React.useRef<any>(null)
+  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false)
+  const [doRerender, setDoRerender] = React.useState(false)
+  const [logs, setLogs] = useState<any>()
+  const params = useParams()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
@@ -50,11 +62,48 @@ export default function Information(props: Props) {
   }) => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-    const newSize = +event.target.value
+    setDoRerender(!doRerender)
   }
+
+  const fetchCustomerDetail = async () => {
+    const res = await getCustomer(params.idCustomer)
+    setCustomer(res)
+  }
+
+  const fetchLogs = async () => {
+    setIsLoading(true)
+    const res = await getLogs(
+      {
+        size: rowsPerPage,
+        page: page,
+      },
+      params.idCustomer,
+    )
+    setLogs(res.content)
+    setCountTable(res.totalElements)
+    setIsLoading(false)
+  }
+
+  React.useEffect(() => {
+    fetchLogs()
+    fetchCustomerDetail()
+  }, [page, doRerender])
 
   return (
     <>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <SimpleCard>
         <Grid container spacing={2}>
           <Grid item xs={3}>
@@ -182,43 +231,66 @@ export default function Information(props: Props) {
       <LockDialog ref={lockDialogRef} />
       <div style={{ height: '30px' }} />
       <SimpleCard title="Log hành động">
-        <StyledTable>
-          <TableHead>
-            <TableRow>
-              {headTableAccountLog.map(header => (
-                <TableCell align="center" style={{ minWidth: header.width }}>
-                  {header.name}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow hover>
-              <TableCell align="center">1</TableCell>
-              <TableCell align="center">
-                <Link to="/customers/1">123</Link>
-              </TableCell>
-              <TableCell align="center">1</TableCell>
-              <TableCell align="center">1</TableCell>
-              <TableCell align="center">
-                <Chip label="fan" color="warning" />
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </StyledTable>
-        <TablePagination
-          sx={{ px: 2 }}
-          page={page}
-          component="div"
-          rowsPerPage={rowsPerPage}
-          count={40}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[20, 50, 100]}
-          labelRowsPerPage={'Dòng / Trang'}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          nextIconButtonProps={{ 'aria-label': 'Next Page' }}
-          backIconButtonProps={{ 'aria-label': 'Previous Page' }}
-        />
+        {logs?.length === 0 && (
+          <Typography color="gray" textAlign="center">
+            Không có dữ liệu
+          </Typography>
+        )}
+        <Box width="100%" overflow="auto" hidden={logs?.length === 0}>
+          <StyledTable>
+            <TableHead>
+              <TableRow>
+                {headTableAccountLog.map(header => (
+                  <TableCell align="center" style={{ minWidth: header.width }}>
+                    {header.name}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            {logs && (
+              <TableBody>
+                {(logs || []).map((log: any, index: any) => {
+                  return (
+                    <TableRow hover key={log.id}>
+                      <TableCell align="center">
+                        {rowsPerPage * page + index + 1}
+                      </TableCell>
+
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {log.actionName}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {log.performer}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {log.note}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
+                        {moment(log.dateCreated).format('DD-MM-YYYY HH:ss')}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            )}
+          </StyledTable>
+          <TablePagination
+            sx={{ px: 2 }}
+            page={page}
+            component="div"
+            rowsPerPage={rowsPerPage}
+            count={countTable}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[20, 50, 100]}
+            labelRowsPerPage={'Dòng / Trang'}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            nextIconButtonProps={{ 'aria-label': 'Next Page' }}
+            backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+          />
+        </Box>
       </SimpleCard>
     </>
   )

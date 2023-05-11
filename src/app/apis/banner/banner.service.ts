@@ -21,3 +21,14 @@ export const getBannerDetail = async (bannerID: any): Promise<BannerDetail> => {
   const { data } = await http.get<BannerDetail>(`/api/banners/${bannerID}`)
   return data
 }
+
+export const updateBannerDetail = async (
+  bannerID: any,
+  params: any,
+): Promise<BannerDetail> => {
+  const { data } = await http.put<BannerDetail>(
+    `/api/banners/${bannerID}`,
+    params,
+  )
+  return data
+}

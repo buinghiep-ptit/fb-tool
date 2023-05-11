@@ -371,7 +371,6 @@ export default function PlayerManager(props: Props) {
                             wordBreak: 'keep-all',
                           }}
                         >
-                          {' '}
                           {player.name}
                         </Link>
                       </TableCell>

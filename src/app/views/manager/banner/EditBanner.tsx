@@ -11,7 +11,10 @@ import {
   Stack,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { createBannerI } from 'app/apis/banner/banner.service'
+import {
+  getBannerDetail,
+  updateBannerDetail,
+} from 'app/apis/banner/banner.service'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import FormInputText from 'app/components/common/MuiRHFInputText'
@@ -20,10 +23,10 @@ import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import * as yup from 'yup'
 
 export interface Props {}
@@ -45,13 +48,16 @@ export default function AddBanner(props: Props) {
   const queryParams = Object.fromEntries([...searchParams])
   const [isLoading, setIsLoading] = useState(false)
 
+  const params = useParams()
+
   const [colorDisplay, setColorDisplay] = useState('#FFFFFF')
   const [colorButton, setColorButton] = useState('#FFFFFF')
   const [colorText, setColorText] = useState('#FFFFFF')
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [banner, setBanner] = useState<any>()
+  const [currentMediaUrl, setCurrentMediaUrl] = useState<any>('')
+  const [MediaUrlResponse, setMediaUrlResponse] = useState<any>()
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
@@ -69,8 +75,8 @@ export default function AddBanner(props: Props) {
         type === 1
           ? yup
               .mixed()
-              .required('Giá trị bắt buộc')
               .test('fileType', 'File không hợp lệ', value => {
+                if (currentMediaUrl?.length > 0) return true
                 if (value && value.name)
                   return ['png', 'jpg', 'jpeg'].includes(
                     value?.name?.split('.').pop(),
@@ -78,23 +84,44 @@ export default function AddBanner(props: Props) {
                 else return true
               })
               .test('fileSize', 'Dung lượng không quá 50MB', value => {
+                if (currentMediaUrl?.length > 0) return true
                 return Math.floor(value?.size / 1000000) <= 50
               })
           : yup
               .mixed()
-              .required('Giá trị bắt buộc')
               .test('fileType', 'File không hợp lệ', value => {
+                if (currentMediaUrl?.length > 0) return true
                 if (value && value.name)
-                  return ['mp4', 'mov', '3gp', 'webm'].includes(
+                  return ['mp4', 'mov', '3gp'].includes(
                     value?.name?.split('.').pop(),
                   )
                 else return true
               })
               .test('fileSize', 'Dung lượng không quá 50MB', value => {
+                console.log(currentMediaUrl)
+                if (currentMediaUrl?.length > 0) return true
                 return Math.floor(value?.size / 1000000) <= 10
               }),
     })
     .required()
+
+  const initDefaultValues = (banner: any) => {
+    const defaultValues: any = {}
+    defaultValues.title = banner.title
+    defaultValues.titlePosition = banner.titlePosition
+    defaultValues.buttonContent = banner.buttonContent
+    defaultValues.buttonPosition = banner.buttonPosition
+    defaultValues.url = banner.url
+    setColorButton(banner.buttonColor)
+    setColorDisplay(banner.titleColor)
+    setColorText(banner.buttonTextColor)
+    defaultValues.type = banner.type
+    setPreviewImage(banner.mediaUrl)
+    setType(banner.type)
+    setMediaUrlResponse(banner.mediaUrl)
+    setCurrentMediaUrl(banner.mediaUrl)
+    methods.reset({ ...defaultValues })
+  }
 
   const methods = useForm({
     resolver: yupResolver(schema),
@@ -111,11 +138,12 @@ export default function AddBanner(props: Props) {
 
   const onSubmitHandler = async (data: any) => {
     setIsLoading(true)
-    let imgUrl: any = ''
+    let imgUrl: any = MediaUrlResponse
     if (file && type === 1) imgUrl = await handleUploadImage(file)
     if (file && type === 2) imgUrl = await handleUploadVideo(file)
 
     const payload: any = {
+      id: params.id,
       title: data.title ? data.title : null,
       titlePosition: data.titlePosition,
       titleColor: colorDisplay,
@@ -127,14 +155,23 @@ export default function AddBanner(props: Props) {
       url: data.url,
       mediaUrl: imgUrl,
     }
-    await createBannerI(payload).then(() => {
+    await updateBannerDetail(params.id, payload).then(() => {
       toastSuccess({
-        message: 'Thêm thành công',
+        message: 'Cập nhật thành công',
       })
       setIsLoading(false)
       navigate('/banner', {})
     })
   }
+
+  const fetchBanner = async () => {
+    const res = await getBannerDetail(params.id)
+    initDefaultValues(res)
+  }
+
+  useEffect(() => {
+    fetchBanner()
+  }, [])
 
   return (
     <Container>
@@ -239,7 +276,7 @@ export default function AddBanner(props: Props) {
 
                   <Stack flexDirection={'row'} gap={2}>
                     <SelectDropDown
-                      name="butonPosition"
+                      name="buttonPosition"
                       label="Vị trí nút điều hướng"
                       sx={{ width: '75%' }}
                     >
@@ -400,7 +437,7 @@ export default function AddBanner(props: Props) {
                       }
                       methods.setValue('file', e.target.files[0])
                       setFile(e.target.files[0])
-                      console.log(window.URL.createObjectURL(e.target.files[0]))
+                      setCurrentMediaUrl('')
                       setPreviewImage(
                         window.URL.createObjectURL(e.target.files[0]),
                       )

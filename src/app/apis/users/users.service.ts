@@ -13,6 +13,6 @@ export const createUser = async (params: any): Promise<any> => {
 }
 
 export const updateUser = async (id: any, params: any): Promise<any> => {
-  const { data } = await http.get<any>(`/api/user/${id}`, params)
+  const { data } = await http.put<any>(`/api/user/${id}`, params)
   return data
 }

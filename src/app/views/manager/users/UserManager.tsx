@@ -258,7 +258,7 @@ export default function UserManager(props: Props) {
               <TableBody>
                 {(users || []).map((user: any, index: any) => {
                   return (
-                    <TableRow hover key={user.name}>
+                    <TableRow hover key={user.userId}>
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
@@ -324,15 +324,13 @@ export default function UserManager(props: Props) {
         setIsLoading={setIsLoading}
         refresh={search}
       />
-      {focusedUser && (
-        <DialogUpdateUser
-          ref={dialogUpdateUserRef}
-          user={focusedUser}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-          refresh={search}
-        />
-      )}
+      <DialogUpdateUser
+        ref={dialogUpdateUserRef}
+        user={focusedUser}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        refresh={search}
+      />
     </Container>
   )
 }

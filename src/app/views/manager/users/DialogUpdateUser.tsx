@@ -80,8 +80,8 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
   }
 
   useEffect(() => {
-    if (user) initDefaultValues(user)
-  }, [])
+    if (user && open) initDefaultValues(user)
+  }, [open])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
@@ -92,23 +92,23 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
       role: data.role,
     }
 
-    await updateUser(user.id, payload)
+    await updateUser(user.userId, payload)
       .then(() => {
         toastSuccess({
           message: 'Thành công',
         })
-        setIsLoading(false)
         refresh()
       })
       .catch(() => {})
       .finally(() => {
         handleClose()
+        setIsLoading(false)
       })
   }
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth>
         {isLoading && (
           <Box
             sx={{
@@ -130,7 +130,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Thêm tài khoản</div>
+            <div>Chi tiết tài khoản</div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>
@@ -157,7 +157,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
             name="status"
             control={methods.control}
             render={({ field }) => (
-              <FormControl fullWidth>
+              <FormControl fullWidth margin="normal">
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái*
                 </InputLabel>
@@ -183,7 +183,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
             name="role"
             control={methods.control}
             render={({ field }) => (
-              <FormControl fullWidth>
+              <FormControl fullWidth margin="normal">
                 <InputLabel id="demo-simple-select-label">
                   Nhóm quyền*
                 </InputLabel>

@@ -110,12 +110,12 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
         toastSuccess({
           message: 'Thành công',
         })
-        setIsLoading(false)
         refresh()
       })
       .catch(() => {})
       .finally(() => {
         handleClose()
+        setIsLoading(false)
       })
   }
 
@@ -168,6 +168,9 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
                     variant="outlined"
                     margin="normal"
                     fullWidth
+                    inputProps={{
+                      autoComplete: 'new-password',
+                    }}
                   />
                 )}
               />
@@ -238,6 +241,9 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
                 }
                 fullWidth
                 margin="normal"
+                inputProps={{
+                  autoComplete: 'new-password',
+                }}
               />
             </DialogContent>
             <DialogActions sx={{ textAlign: 'center' }}>

@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded'
+import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockPersonIcon from '@mui/icons-material/LockPerson'
 import {
   Box,
@@ -25,9 +26,14 @@ import {
 import { Stack, styled } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { getCustomer, getLogs } from 'app/apis/customer/customer.service'
+import {
+  getCustomer,
+  getLogs,
+  updateCustomer,
+} from 'app/apis/customer/customer.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
@@ -37,12 +43,17 @@ import * as yup from 'yup'
 import { headTableAccountLog } from './const'
 import LockDialog from './dialog/LockDialog'
 
-export interface Props {}
+export interface Props {
+  isLoading: any
+  setIsLoading: any
+}
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   boxShadow: 'none',
 }))
+
+const typeCustomer = ['Thường', 'Fan']
 
 export default function Information(props: Props) {
   const [page, setPage] = useState(0)
@@ -55,6 +66,7 @@ export default function Information(props: Props) {
   const [doRerender, setDoRerender] = React.useState(false)
   const [logs, setLogs] = useState<any>()
   const params = useParams()
+  const [gender, setGender] = useState<any>(0)
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
@@ -120,10 +132,29 @@ export default function Information(props: Props) {
     defaultValues.birthday = customer.birthday
     defaultValues.email = customer.email
     defaultValues.phone = customer.mobilePhone
+    setGender(customer.gender)
     methods.reset({ ...defaultValues })
   }
 
-  const onSubmit = async (data: any) => {}
+  const onSubmit = async (data: any) => {
+    props.setIsLoading(true)
+    const payload = {
+      id: params.idCustomer,
+      fullName: data.fullName,
+      birthday: new Date(data.birthday).toISOString(),
+      gender: gender,
+    }
+
+    const res = await updateCustomer(params.idCustomer, payload)
+    if (res) {
+      toastSuccess({
+        message: 'Cập nhật thành công',
+      })
+      props.setIsLoading(false)
+      navigate('/customers')
+    }
+    props.setIsLoading(false)
+  }
 
   React.useEffect(() => {
     fetchLogs()
@@ -146,23 +177,25 @@ export default function Information(props: Props) {
         </Box>
       )}
 
-      <Stack
-        spacing={2}
-        direction="row"
-        style={{
-          position: 'fixed',
-          top: '150px',
-          right: '70px',
-        }}
-      >
-        <Button variant="contained">Cập nhật</Button>
-        <Button variant="outlined" onClick={() => navigate('/customers')}>
-          Quay lại
-        </Button>
-      </Stack>
       <SimpleCard>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
+            <Stack
+              spacing={2}
+              direction="row"
+              style={{
+                position: 'fixed',
+                top: '150px',
+                right: '70px',
+              }}
+            >
+              <Button variant="contained" type="submit">
+                Cập nhật
+              </Button>
+              <Button variant="outlined" onClick={() => navigate('/customers')}>
+                Quay lại
+              </Button>
+            </Stack>
             <Grid container spacing={2}>
               <Grid item xs={3}>
                 <Item>
@@ -203,8 +236,10 @@ export default function Information(props: Props) {
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
+                        error={!!methods.formState.errors?.fullName}
+                        helperText={methods.formState.errors?.fullName?.message}
                         {...field}
-                        label="Tên hiển thị"
+                        label="Tên hiển thị*"
                         variant="outlined"
                         fullWidth
                         margin="dense"
@@ -218,7 +253,7 @@ export default function Information(props: Props) {
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MuiRHFDatePicker
                       name="birthday"
-                      label="Ngày sinh nhật"
+                      label="Ngày sinh nhật*"
                       inputFormat={'DD/MM/YYYY'}
                     />
                   </LocalizationProvider>
@@ -229,21 +264,22 @@ export default function Information(props: Props) {
                     <RadioGroup
                       row
                       aria-labelledby="demo-radio-buttons-group-label"
-                      defaultValue="Nam"
+                      value={gender}
+                      onChange={e => setGender(e.target.value)}
                       name="radio-buttons-group"
                     >
                       <FormControlLabel
-                        value="Nam"
+                        value={1}
                         control={<Radio />}
-                        label="Name"
+                        label="Nam"
                       />
                       <FormControlLabel
-                        value="Nữ"
+                        value={0}
                         control={<Radio />}
                         label="Nữ"
                       />
                       <FormControlLabel
-                        value="Khác"
+                        value={2}
                         control={<Radio />}
                         label="Khác"
                       />
@@ -273,21 +309,27 @@ export default function Information(props: Props) {
                 <Item>
                   <div>
                     <FormLabel id="sex-radio">
-                      Đăng ký bằng: Số điện thoại
+                      Đăng ký bằng: {customer && customer.registeredBy}
                     </FormLabel>
                   </div>
                 </Item>
                 <Item>
                   <div>
                     <FormLabel id="sex-radio">
-                      Ngày đăng ký: 01/02/2023
+                      Ngày đăng ký:{' '}
+                      {moment(customer && customer?.dateCreated).format(
+                        'DD-MM-YYYY HH:ss',
+                      )}
                     </FormLabel>
                   </div>
                 </Item>
                 <Item>
                   <div>
                     <FormLabel id="sex-radio">
-                      Lần cuối đăng nhập: 01/02/2023
+                      Lần cuối đăng nhập:{' '}
+                      {moment(customer && customer?.lastLogin).format(
+                        'DD-MM-YYYY HH:ss',
+                      )}
                     </FormLabel>
                   </div>
                 </Item>
@@ -298,10 +340,29 @@ export default function Information(props: Props) {
                 </Item>
                 <Item>
                   <ButtonGroup variant="text" aria-label="text button group">
-                    <Button startIcon={<LockPersonIcon />} onClick={() => {}}>
-                      Khóa
+                    {customer && customer.status === 1 && (
+                      <Button
+                        startIcon={<LockPersonIcon />}
+                        onClick={() => {
+                          lockDialogRef.current.handleClickOpen()
+                        }}
+                      >
+                        Khóa
+                      </Button>
+                    )}
+                    {customer && customer.status !== 1 && (
+                      <Button
+                        startIcon={<LockOpenIcon />}
+                        color="success"
+                        onClick={() => {}}
+                      >
+                        Mở khóa
+                      </Button>
+                    )}
+                    <Button color="success">
+                      Loại tài khoản:{' '}
+                      {customer && typeCustomer[customer.customerType - 1]}
                     </Button>
-                    <Button color="success">Loại tài khoản: Fan</Button>
                   </ButtonGroup>
                 </Item>
               </Grid>

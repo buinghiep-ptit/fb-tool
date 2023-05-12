@@ -1,13 +1,12 @@
-import * as React from 'react'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import { IconButton, TextField } from '@mui/material'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import { IconButton, TextField } from '@mui/material'
-import HighlightOffIcon from '@mui/icons-material/HighlightOff'
-import { textAlign } from '@mui/system'
+import * as React from 'react'
 
 const LockDiaLog = React.forwardRef((props, ref) => {
   const [open, setOpen] = React.useState(false)
@@ -44,7 +43,7 @@ const LockDiaLog = React.forwardRef((props, ref) => {
           <DialogContentText>
             Bạn có chắc muốn mở khóa tài khoản? Vui lòng nhập lý do và xác nhận!
           </DialogContentText>
-          <TextField label="Lý do*"></TextField>
+          <TextField label="Lý do*" margin="normal"></TextField>
         </DialogContent>
         <DialogActions sx={{ textAlign: 'center' }}>
           <Button onClick={handleClose} autoFocus>

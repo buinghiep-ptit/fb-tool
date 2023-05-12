@@ -30,7 +30,12 @@ import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom'
 import * as Yup from 'yup'
 export interface Props {}
 export const dateDefault = () => {
@@ -47,10 +52,13 @@ export const dateDefault = () => {
 export default function OrderManager(props: Props) {
   const navigate = useNavigateParams()
   const navigation = useNavigate()
+  const location = useLocation()
+  const { q } = location.state || ''
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [page, setPage] = useState<number>(0)
   const [size, setSize] = useState<number>(20)
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
     setFilters(prevFilters => {
@@ -112,7 +120,7 @@ export default function OrderManager(props: Props) {
   }
   const [defaultValues] = useState<OrdersFilters>({
     status: queryParams.status ?? '',
-    q: queryParams.q ?? '',
+    q: (q || queryParams.q) ?? '',
     dateStart:
       queryParams.dateStart ??
       (dateDefault() as any).startDate?.format('YYYY-MM-DD'),
@@ -151,6 +159,7 @@ export default function OrderManager(props: Props) {
     mode: 'onChange',
     resolver: yupResolver(validationSchema),
   })
+
   React.useEffect(() => {
     if (searchParams) {
       if (!!Object.keys(queryParams).length) {
@@ -169,6 +178,7 @@ export default function OrderManager(props: Props) {
 
   const dateStart = methods.watch('dateStart')
   const dateEnd = methods.watch('dateEnd')
+
   React.useEffect(() => {
     if (!dateStart || !dateEnd) return
     if (

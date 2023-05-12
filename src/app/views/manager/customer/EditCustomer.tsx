@@ -44,7 +44,7 @@ export default function EditCustomer(props: Props) {
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               <Tab label="Thông tin" value="1" />
-              <Tab label="Lịch sử mua hàng" value="2" />
+              <Tab label="Hội viên" value="2" />
             </TabList>
           </Box>
           <TabPanel value="1">

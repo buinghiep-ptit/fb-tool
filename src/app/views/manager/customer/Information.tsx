@@ -42,6 +42,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
 import { headTableAccountLog } from './const'
 import LockDialog from './dialog/LockDialog'
+import OpenDialog from './dialog/OpenDialog'
 
 export interface Props {
   isLoading: any
@@ -67,6 +68,7 @@ export default function Information(props: Props) {
   const [logs, setLogs] = useState<any>()
   const params = useParams()
   const [gender, setGender] = useState<any>(0)
+  const openDialogRef = React.useRef<any>(null)
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
@@ -354,7 +356,9 @@ export default function Information(props: Props) {
                       <Button
                         startIcon={<LockOpenIcon />}
                         color="success"
-                        onClick={() => {}}
+                        onClick={() => {
+                          openDialogRef.current.handleClickOpen()
+                        }}
                       >
                         Mở khóa
                       </Button>
@@ -375,7 +379,31 @@ export default function Information(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-      <LockDialog ref={lockDialogRef} />
+      <Typography
+        style={{
+          marginTop: '20px',
+          textDecoration: 'underline',
+          color: '#1AA3FF',
+          cursor: 'pointer',
+        }}
+        onClick={() =>
+          navigate('/orders', {
+            state: { q: customer.email || customer.mobilePhone },
+          })
+        }
+      >
+        Lịch sử mua hàng
+      </Typography>
+      <LockDialog
+        ref={lockDialogRef}
+        setIsLoading={setIsLoading}
+        function={fetchCustomerDetail}
+      />
+      <OpenDialog
+        ref={openDialogRef}
+        setIsLoading={setIsLoading}
+        function={fetchCustomerDetail}
+      />
       <div style={{ height: '30px' }} />
       <SimpleCard title="Log hành động">
         {logs?.length === 0 && (

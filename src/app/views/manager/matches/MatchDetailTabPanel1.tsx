@@ -277,6 +277,7 @@ export default function MatchDetailTabPanel1(props: any) {
                           methods.getValues('status') === 3 ? '' : '*'
                         }:`}
                         ampm={false}
+                        inputFormat="DD/MM/YYYY HH:mm"
                         renderInput={(params: any) => (
                           <FormControl fullWidth margin="normal">
                             <TextField

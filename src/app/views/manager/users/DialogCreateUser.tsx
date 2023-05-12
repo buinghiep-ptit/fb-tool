@@ -81,7 +81,7 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
           } else return false
         })
         .matches(/^\S*$/, messages.MSG21)
-        .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
+        .matches(/^(?=.*?[A-Za-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
     })
     .required()
 

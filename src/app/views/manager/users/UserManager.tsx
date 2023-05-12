@@ -161,9 +161,9 @@ export default function UserManager(props: Props) {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Quyền"
-                  value={statusFilter}
+                  value={roleFilter}
                   onChange={e => {
-                    setStatusFilter(e.target.value as number)
+                    setRoleFilter(e.target.value as number)
                   }}
                 >
                   <MenuItem value={99}>Tất cả</MenuItem>

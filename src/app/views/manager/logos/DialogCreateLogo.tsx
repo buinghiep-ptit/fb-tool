@@ -67,7 +67,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
           if (value && value.name)
-            return ['png', 'jpg', 'jpeg'].includes(
+            return ['png', 'jpg', 'jpeg', 'svg'].includes(
               value?.name?.split('.').pop(),
             )
           else return true
@@ -150,7 +150,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
             </FormLabel>
             <input
               type="file"
-              accept="image/png,image/jpg,image/jpeg"
+              accept="image/png,image/jpg,image/jpeg,image/svg+xml"
               id="uploadImage"
               style={{ display: 'none' }}
               onChange={(event: any) => {
@@ -186,7 +186,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
                 <div style={{ marginTop: '10px', cursor: 'pointer' }}>
                   <div>Chọn ảnh để tải lên</div>
                   <BackupIcon fontSize="large" />
-                  <div>PNG/JPEG hoặc JPG</div>
+                  <div>PNG/JPEG/JPG/SVG</div>
                   <div>Dung lượng không quá 50mb</div>
                   <div>(Tỷ lệ ảnh phù hợp 3:2)</div>
                 </div>

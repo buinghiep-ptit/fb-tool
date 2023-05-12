@@ -78,11 +78,26 @@ export default function BannerManager(props: Props) {
         <Grid
           item
           xs={1}
-          style={{ padding: 0, lineHeight: '80px', textAlign: 'center' }}
+          style={{
+            padding: 0,
+            lineHeight: '80px',
+            textAlign: 'center',
+          }}
         >
           {banner.priority}
         </Grid>
-        <Grid item xs={6} style={{ padding: 0, lineHeight: '80px' }}>
+        <Grid
+          item
+          xs={6}
+          style={{
+            padding: 0,
+            lineHeight: '80px',
+            textAlign: 'center',
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+          }}
+        >
           <Link
             to={`/banner/${banner.id}`}
             style={{

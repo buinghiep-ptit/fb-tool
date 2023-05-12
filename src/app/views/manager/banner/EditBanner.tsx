@@ -151,7 +151,7 @@ export default function AddBanner(props: Props) {
       buttonPosition: data.buttonPosition,
       buttonColor: colorButton,
       buttonTextColor: colorText,
-      type: data.type,
+      type: type,
       url: data.url,
       mediaUrl: imgUrl,
     }
@@ -200,6 +200,7 @@ export default function AddBanner(props: Props) {
                   <FormInputText
                     type="text"
                     name="title"
+                    defaultValue=""
                     label={'Tiêu đề'}
                     placeholder="Nhập tiêu đề"
                     fullWidth
@@ -368,9 +369,9 @@ export default function AddBanner(props: Props) {
                         onFocus={() => {
                           setShowColorPicker3(true)
                         }}
-                        value={colorDisplay}
+                        value={colorText}
                         onChange={e => {
-                          setColorDisplay(e.target.value)
+                          setColorText(e.target.value)
                         }}
                         clearIcon={false}
                         type="text"

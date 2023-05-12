@@ -1,23 +1,36 @@
+import { LinearProgress, Tab } from '@mui/material'
 import { Box } from '@mui/system'
-import * as React from 'react'
 import { Breadcrumb, Container } from 'app/components'
-import { Tab } from '@mui/material'
+import * as React from 'react'
 
-import { useState } from 'react'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
+import { useState } from 'react'
 import Information from './Information'
 import PurchaseHistory from './PurchaseHistory'
 export interface Props {}
 
 export default function EditCustomer(props: Props) {
   const [value, setValue] = useState('1')
-
+  const [isLoading, setIsLoading] = useState(false)
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
   }
 
   return (
     <Container>
+      {isLoading && (
+        <Box
+          sx={{
+            width: '100%',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '1000',
+          }}
+        >
+          <LinearProgress />
+        </Box>
+      )}
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
@@ -35,7 +48,7 @@ export default function EditCustomer(props: Props) {
             </TabList>
           </Box>
           <TabPanel value="1">
-            <Information />
+            <Information isLoading={isLoading} setIsLoading={setIsLoading} />
           </TabPanel>
           <TabPanel value="2">
             <PurchaseHistory />

@@ -163,6 +163,7 @@ export default function AddBanner(props: Props) {
                   <FormInputText
                     type="text"
                     name="title"
+                    defaultValue=""
                     label={'Tiêu đề'}
                     placeholder="Nhập tiêu đề"
                     fullWidth

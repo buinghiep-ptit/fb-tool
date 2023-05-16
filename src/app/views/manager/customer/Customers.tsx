@@ -154,7 +154,7 @@ export default function CustomerManager(props: Props) {
       .then(result => {
         ExportToExcel(
           convertToXlsxData(result?.content ?? []),
-          'Danh_Sach_Khack_Hang_',
+          'Danh_Sach_Khach_Hang_',
         )
       })
       .catch(() => {

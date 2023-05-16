@@ -168,6 +168,15 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng chủ nhà*"
+                          onChange={e => {
+                            methods.setValue(
+                              'stadium',
+                              leagues.teamList.find(
+                                (team: any) => team.id === e.target.value,
+                              ).homeField || '',
+                            )
+                            methods.setValue('idTeamA', e.target.value)
+                          }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>

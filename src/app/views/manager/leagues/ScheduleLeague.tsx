@@ -1,5 +1,6 @@
 import { Edit } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import LaunchIcon from '@mui/icons-material/Launch'
 import {
   Chip,
   Icon,
@@ -216,6 +217,19 @@ export default function ScheduleLeague(props: Props) {
                                   }}
                                 >
                                   <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip
+                                title="thông tin trận đấu"
+                                placement="top"
+                              >
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => {
+                                    navigate(`/matches/${item.id}`)
+                                  }}
+                                >
+                                  <LaunchIcon />
                                 </IconButton>
                               </Tooltip>
                             </TableCell>

@@ -110,39 +110,48 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
+    console.log(props.teamPicked)
     props.setValue('teamList', props.teamPicked)
   }
 
   const handlePick = async (id: number) => {
     props.setIsLoading(true)
-    const newList = [...teams]
-    if (newList[id].isPicked) {
-      const res = await removeTeam(params.id, newList[id].id)
-      if (res) {
-        toastSuccess({
-          message: 'Đội đã được xóa',
+    try {
+      const newList = [...teams]
+      if (newList[id].isPicked) {
+        const res = await removeTeam(params.id, newList[id].id)
+        if (res) {
+          toastSuccess({
+            message: 'Đội đã được xóa',
+          })
+          props.setIsLoading(false)
+        }
+        const newListPicked = remove(props.teamPicked, function (n) {
+          return n !== newList[id].id
         })
-        props.setIsLoading(false)
+        props.setTeamPicked(newListPicked)
+        props.setValue('teamList', newListPicked)
+      } else {
+        const res = await addTeam(params.id, newList[id].id)
+        if (res) {
+          toastSuccess({
+            message: 'Đội đã được thêm',
+          })
+          props.setIsLoading(false)
+        }
+        const newListPicked = [...props.teamPicked, newList[id].id]
+        props.setTeamPicked(newListPicked)
+        props.setValue('teamList', newListPicked)
       }
-      const newListPicked = remove(props.teamPicked, function (n) {
-        return n !== newList[id].id
-      })
-      props.setTeamPicked(newListPicked)
-    } else {
-      const res = await addTeam(params.id, newList[id].id)
-      if (res) {
-        toastSuccess({
-          message: 'Đội đã được thêm',
-        })
-        props.setIsLoading(false)
-      }
-      const newListPicked = [...props.teamPicked, newList[id].id]
-      props.setTeamPicked(newListPicked)
-    }
 
-    newList[id].isPicked = !teams[id].isPicked
-    setTeams(newList)
-    setDoRerender(!doRerender)
+      newList[id].isPicked = !teams[id].isPicked
+      setTeams(newList)
+      setDoRerender(!doRerender)
+    } catch (e) {
+      props.setIsLoading(false)
+    } finally {
+      props.setIsLoading(false)
+    }
   }
 
   return (

@@ -8,7 +8,6 @@ const NewsCreate = Loadable(lazy(() => import('./news/NewsCreate')))
 const PlayerManager = Loadable(lazy(() => import('./player/PlayerManager')))
 const BannerManager = Loadable(lazy(() => import('./banner/BannerManager')))
 const AddBanner = Loadable(lazy(() => import('./banner/AddBanner')))
-const DetailBanner = Loadable(lazy(() => import('./banner/DetailBanner')))
 const ShopManager = Loadable(lazy(() => import('./shop/ShopManager')))
 const TeamManager = Loadable(lazy(() => import('./team/TeamManager')))
 const VideoManager = Loadable(lazy(() => import('./video/VideoManager')))
@@ -75,10 +74,6 @@ const managerRoutes = [
   },
   { path: '/banner', element: <BannerManager /> },
   { path: '/banner/:id', element: <EditBanner /> },
-  {
-    path: '/banner/:bannerID',
-    element: <DetailBanner />,
-  },
   {
     path: '/banner/them-moi-banner',
     element: <AddBanner />,

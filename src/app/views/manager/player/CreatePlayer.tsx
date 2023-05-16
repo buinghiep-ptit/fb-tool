@@ -139,7 +139,13 @@ export default function PlayerDetail(props: Props) {
         .trim()
         .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
         .nullable(),
-      editor_content: yup.string().required('Giá trị bắt buộc'),
+      editor_content: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('notEmpty', 'Giá trị bắt buộc', value => {
+          return value !== '<p></p>'
+        }),
       status: yup.string().required('Giá trị bát buộc'),
     })
     .required()

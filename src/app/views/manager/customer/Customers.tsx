@@ -26,11 +26,40 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getCustomers } from 'app/apis/customer/customer.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { toastError } from 'app/helpers/toastNofication'
+import { ExportToExcel } from 'app/utils/exportFile'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { headTableAccount } from './const'
+
+const convertToXlsxData = (data: any): any[] => {
+  return data
+    .map((item: any, index: any) => ({
+      ...item,
+      index,
+      dateCreated: item.dateCreated
+        ? moment(item.dateCreated).format('DD-MM-YYYY HH:ss')
+        : '',
+      lastLogin: item.lastLogin
+        ? moment(item.lastLogin).format('DD-MM-YYYY HH:ss')
+        : '',
+      status: item.status === 1 ? 'Hoạt động' : 'Không hoạt động',
+      customerType: item.customerType === 2 ? 'Fan' : 'Thường',
+    }))
+    .map((item: any) => ({
+      ['STT']: item.index + 1 + '',
+      ['Số điện thoại']: item.mobilePhone,
+      ['Email']: item.email,
+      ['Tên hiển thị']: item.fullName,
+      ['Loại tài khoản']: item.customerType,
+      ['Thời gian đăng ký']: item.dateCreated,
+      ['Thời gian đăng nhập cuối cùng']: item.lastLogin,
+      ['Trạng thái']: item.status,
+    })) as any
+}
+
 export interface Props {}
 
 export default function CustomerManager(props: Props) {
@@ -103,6 +132,38 @@ export default function CustomerManager(props: Props) {
   React.useEffect(() => {
     fetchCustomers()
   }, [page, doRerender])
+
+  const handleExportExcel = async () => {
+    setIsLoading(true)
+    await getCustomers({
+      search: search.trim(),
+      customerType: type === 99 ? null : type,
+      status: statusFilter === 99 ? null : statusFilter,
+      dateStart:
+        moment(dateStart).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(dateStart).format('YYYY-MM-DD'),
+      dateEnd:
+        moment(dateEnd).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(dateEnd).format('YYYY-MM-DD'),
+      registeredBy: registeredBy === 99 ? null : registeredBy,
+      page: 0,
+      size: countTable ?? 0,
+    })
+      .then(result => {
+        ExportToExcel(
+          convertToXlsxData(result?.content ?? []),
+          'Danh_Sach_Khach_Hang_',
+        )
+      })
+      .catch(() => {
+        toastError({ message: 'Có lỗi xảy ra vui lòng thử lại!' })
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
 
   return (
     <Container>
@@ -277,6 +338,7 @@ export default function CustomerManager(props: Props) {
                 marginBottom: '3px',
                 marginRight: '15px',
               }}
+              onClick={handleExportExcel}
             >
               Xuất Excel
             </Button>

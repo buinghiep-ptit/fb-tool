@@ -6,12 +6,8 @@ import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Container,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TableBody,
   TableCell,
@@ -45,7 +41,7 @@ interface Props {
 
 const DialogPickTeam = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-  const [focusedTeam, setFocusedTeam] = React.useState<any>()
+
   const params = useParams()
   const [page, setPage] = React.useState(0)
   const [countTable, setCountTable] = React.useState(0)
@@ -54,15 +50,12 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   const [teams, setTeams] = React.useState<any>()
   const [nameFilter, setNameFilter] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState(99)
-  const [typeFilter, setTypeFilter] = React.useState(false)
 
   const fetchListTeam = async () => {
     props.setIsLoading(true)
     await getTeams({
       q: nameFilter,
-      status: statusFilter === 99 ? null : statusFilter,
-      type: typeFilter ? 1 : null,
+      status: 1,
       page: page,
       size: rowsPerPage,
     }).then(res => {
@@ -84,8 +77,6 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   const resetFilter = () => {
     setNameFilter('')
-    setStatusFilter(99)
-    setTypeFilter(false)
     setRowsPerPage(20)
     setPage(0)
     setDoRerender(!doRerender)
@@ -193,30 +184,10 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Trạng thái
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Trạng thái"
-                        value={statusFilter}
-                        onChange={e => {
-                          setStatusFilter(e.target.value as number)
-                        }}
-                      >
-                        <MenuItem value={99}>Tất cả</MenuItem>
-                        <MenuItem value={-1}>Không hoạt động</MenuItem>
-                        <MenuItem value={1}>Hoạt động</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}></Grid>
+
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -235,7 +206,7 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                   </Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',

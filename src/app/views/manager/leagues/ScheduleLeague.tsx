@@ -53,7 +53,6 @@ export default function ScheduleLeague(props: Props) {
   const fetchScheduleCup = async () => {
     const res = await getSchedule(params.id)
     setSchedule(res.rounds)
-    console.log(res.rounds)
   }
 
   const closeConfirmDialog = () => {
@@ -185,6 +184,9 @@ export default function ScheduleLeague(props: Props) {
                                 <Chip label="Hoãn" color="secondary" />
                               )}
                               {item.status === 4 && <Chip label="Hủy" />}
+                              {item.status === 5 && (
+                                <Chip label="Chờ cập nhật" color="warning" />
+                              )}
                             </TableCell>
                             <TableCell align="center">
                               {!isNumber(item.goalForTeamA) ||

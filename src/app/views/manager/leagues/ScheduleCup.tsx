@@ -116,6 +116,9 @@ export default function ScheduleCup(props: Props) {
                       <Chip label="Hoãn" color="secondary" />
                     )}
                     {item.status === 4 && <Chip label="Hủy" />}
+                    {item.status === 5 && (
+                      <Chip label="Chờ cập nhật" color="warning" />
+                    )}
                   </TableCell>
                   <TableCell align="center">
                     {!item.goalForTeamA || !item.goalForTeamB

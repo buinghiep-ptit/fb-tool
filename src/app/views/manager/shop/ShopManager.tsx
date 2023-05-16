@@ -141,7 +141,9 @@ export default function ShopManager(props: Props) {
           return (
             <Accordion key={category.name}>
               <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
+                expandIcon={
+                  category.children.length !== 0 ? <ExpandMoreIcon /> : ''
+                }
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >

@@ -12,7 +12,7 @@ export const navigations = [
   },
   { name: 'Quản lý tin tức', path: '/news', icon: 'newspaper' },
   { name: 'Quản lý CAHN TV', path: '/cahntv', icon: 'movie' },
-  { name: 'Quản lý banner', path: '/banner', icon: 'flag-pennant' },
+  { name: 'Quản lý banner', path: '/banner', icon: 'image' },
   { name: 'Quản lý đơn hàng', path: '/orders', icon: 'notes' },
   { name: 'Quản lý cửa hàng', path: '/shop', icon: 'storefront' },
   { name: 'Quản lý đội bóng', path: '/teams', icon: 'groups' },

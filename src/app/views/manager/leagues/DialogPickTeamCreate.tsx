@@ -117,7 +117,10 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    props.setValue('teamList', props.teamPicked)
+    props.setValue(
+      'teamList',
+      props.teamPicked.length === 0 ? null : props.teamPicked,
+    )
   }
 
   const handlePick = async (id: number) => {
@@ -127,9 +130,11 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
         return n !== newList[id].id
       })
       props.setTeamPicked(newListPicked)
+      props.setValue('teamList', newListPicked)
     } else {
       const newListPicked = [...props.teamPicked, newList[id].id]
       props.setTeamPicked(newListPicked)
+      props.setValue('teamList', newListPicked)
     }
 
     newList[id].isPicked = !teams[id].isPicked

@@ -68,7 +68,10 @@ export default function InfomationLeaguesCreate(props: Props) {
         .number()
         .required('Giá trị bắt buộc')
         .typeError('Giá trị bắt buộc'),
-      teamList: yup.array().required('Giá trị bắt buộc'),
+      teamList: yup
+        .array()
+        .required('Giá trị bắt buộc')
+        .min(2, 'Chọn ít nhất 2 đội'),
     })
     .required()
 
@@ -281,12 +284,24 @@ export default function InfomationLeaguesCreate(props: Props) {
                   id="uploadImage"
                   style={{ display: 'none' }}
                   onChange={(e: any) => {
+                    if (
+                      !(
+                        e.target.files[0].type.endsWith('png') ||
+                        e.target.files[0].type.endsWith('jpg') ||
+                        e.target.files[0].type.endsWith('jpeg')
+                      )
+                    ) {
+                      toastWarning({
+                        message: 'Định dạng cho phép: JPG, JPEG, PNG',
+                      })
+                      return
+                    }
                     if (!validateLogo(e.target.files[0])) {
                       toastWarning({
-                        message: 'Dung lượng file lớn hơn 10MB',
+                        message: 'Giới hạn dung lượng tối đa 10mb',
                       })
+                      return
                     }
-
                     setFile(e.target.files[0])
                   }}
                 />
@@ -381,7 +396,7 @@ export default function InfomationLeaguesCreate(props: Props) {
               </Grid>
               {methods.formState.errors?.teamList && (
                 <FormHelperText style={{ color: 'red', paddingLeft: '20px' }}>
-                  Chọn đội tham gia giải
+                  Chọn ít nhất 2 đội
                 </FormHelperText>
               )}
               <Grid
@@ -436,6 +451,7 @@ export default function InfomationLeaguesCreate(props: Props) {
       </SimpleCard>
 
       <DialogPickTeamCreate
+        key={teamPicked.length}
         isLoading={props.isLoading}
         setIsLoading={props.setIsLoading}
         ref={DialogPickTeamRef}

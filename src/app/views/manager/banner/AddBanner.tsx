@@ -59,11 +59,11 @@ export default function AddBanner(props: Props) {
 
   const schema = yup
     .object({
-      title: yup.string().max(255, 'Tối đa 255 ký tự').trim(),
+      title: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
       titlePosition: yup.number().required('Giá trị bắt buộc'),
       titleColor: yup.string().trim(),
       buttonContent: yup.string().max(255, 'Tối đa 255 ký tự').trim(),
-      url: yup.string().trim().required('Giá trị bắt buộc'),
+      url: yup.string().trim().nullable(),
       buttonPosition: yup.number().required('Giá trị bắt buộc'),
       file:
         type === 1
@@ -152,7 +152,12 @@ export default function AddBanner(props: Props) {
         </Box>
       )}
       <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Thêm mới banner' }]} />
+        <Breadcrumb
+          routeSegments={[
+            { name: 'Quản lý banner', path: '/banner' },
+            { name: 'Thêm mới banner' },
+          ]}
+        />
       </Box>
       <SimpleCard>
         <form onSubmit={methods.handleSubmit(onSubmitHandler)}>
@@ -349,7 +354,7 @@ export default function AddBanner(props: Props) {
                   <FormInputText
                     type="text"
                     name="url"
-                    label={'Link tới*'}
+                    label={'Link tới'}
                     defaultValue=""
                     placeholder="http://"
                     fullWidth

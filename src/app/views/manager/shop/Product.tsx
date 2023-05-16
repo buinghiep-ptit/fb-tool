@@ -68,7 +68,7 @@ export default function Product(props: Props) {
                 path: `/shop/category/${products[0]?.idCategory}`,
               },
               {
-                name: products[0].category,
+                name: products[0].name,
               },
             ]}
           />

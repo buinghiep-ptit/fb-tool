@@ -92,7 +92,7 @@ export default function BannerManager(props: Props) {
           style={{
             padding: 0,
             lineHeight: '80px',
-            textAlign: 'center',
+            textAlign: 'left',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
@@ -101,7 +101,7 @@ export default function BannerManager(props: Props) {
           <Link
             to={`/banner/${banner.id}`}
             style={{
-              color: 'green',
+              color: '#1AA3FF',
               textDecorationLine: 'underline',
               textAlign: 'left',
             }}

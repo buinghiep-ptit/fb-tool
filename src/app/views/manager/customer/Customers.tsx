@@ -46,7 +46,7 @@ const convertToXlsxData = (data: any): any[] => {
         ? moment(item.lastLogin).format('DD-MM-YYYY HH:ss')
         : '',
       status: item.status === 1 ? 'Hoạt động' : 'Không hoạt động',
-      customerType: item.customerType === 2 ? 'Fan' : 'Thường',
+      customerType: item.customerType === 2 ? 'Hội viên' : 'Thường',
     }))
     .map((item: any) => ({
       ['STT']: item.index + 1 + '',
@@ -97,11 +97,11 @@ export default function CustomerManager(props: Props) {
       search: search.trim(),
       customerType: type === 99 ? null : type,
       status: statusFilter === 99 ? null : statusFilter,
-      dateStart:
+      from:
         moment(dateStart).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(dateStart).format('YYYY-MM-DD'),
-      dateEnd:
+      to:
         moment(dateEnd).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(dateEnd).format('YYYY-MM-DD'),
@@ -215,7 +215,7 @@ export default function CustomerManager(props: Props) {
               >
                 <MenuItem value={99}>Tất cả</MenuItem>
                 <MenuItem value={1}>Thường</MenuItem>
-                <MenuItem value={2}>Fan</MenuItem>
+                <MenuItem value={2}>Hội viên</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -260,6 +260,7 @@ export default function CustomerManager(props: Props) {
               <DatePicker
                 value={dateStart}
                 label="Từ ngày"
+                inputFormat="DD/MM/YYYY"
                 onChange={newValue => {
                   setDateStart(new Date(newValue))
                 }}
@@ -282,6 +283,7 @@ export default function CustomerManager(props: Props) {
               <DatePicker
                 value={dateEnd}
                 label="Đến ngày"
+                inputFormat="DD/MM/YYYY"
                 onChange={newValue => setDateEnd(new Date(newValue))}
                 renderInput={(params: any) => (
                   <TextField
@@ -424,7 +426,7 @@ export default function CustomerManager(props: Props) {
                           <Chip label="Thường" color="success" />
                         )}
                         {customer.customerType === 2 && (
-                          <Chip label="Fan" color="warning" />
+                          <Chip label="Hội viên" color="warning" />
                         )}
                       </TableCell>
                       <TableCell
@@ -446,7 +448,7 @@ export default function CustomerManager(props: Props) {
                           <Chip label="Hoạt động" color="success" />
                         )}
                         {customer.status === -2 && (
-                          <Chip label="Không hoạt động" color="warning" />
+                          <Chip label="Khóa" color="warning" />
                         )}
                       </TableCell>
                       <TableCell align="center">

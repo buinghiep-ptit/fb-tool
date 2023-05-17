@@ -54,7 +54,7 @@ const Item = styled(Paper)(({ theme }) => ({
   boxShadow: 'none',
 }))
 
-const typeCustomer = ['Thường', 'Fan']
+const typeCustomer = ['Thường', 'Hội viên']
 
 export default function Information(props: Props) {
   const [page, setPage] = useState(0)
@@ -372,7 +372,7 @@ export default function Information(props: Props) {
               </Grid>
               <Grid item xs={12}>
                 <Item>
-                  <div>Địa chỉ nhận hàng: Tòa nhà FPT Tower</div>
+                  <div>Địa chỉ nhận hàng: {customer.address}</div>
                 </Item>
               </Grid>
             </Grid>

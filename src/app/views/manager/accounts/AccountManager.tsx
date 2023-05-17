@@ -1,31 +1,27 @@
-import { Box } from '@mui/system'
-import * as React from 'react'
-import { Breadcrumb, SimpleCard, Container, StyledTable } from 'app/components'
-import { Link } from 'react-router-dom'
-import {
-  Grid,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
-  Chip,
-  IconButton,
-  Tooltip,
-} from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
-import BorderColorIcon from '@mui/icons-material/BorderColor'
-import AutorenewIcon from '@mui/icons-material/Autorenew'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
 import AddBoxIcon from '@mui/icons-material/AddBox'
-import { headTableAccount } from './const'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
+import SearchIcon from '@mui/icons-material/Search'
+import {
+  Button,
+  Chip,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+} from '@mui/material'
+import { Box } from '@mui/system'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import * as React from 'react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { headTableAccount } from './const'
 export interface Props {}
 
 export default function CustomerManager(props: Props) {
@@ -145,7 +141,7 @@ export default function CustomerManager(props: Props) {
               <TableCell align="center">1</TableCell>
               <TableCell align="center">1</TableCell>
               <TableCell align="center">
-                <Chip label="fan" color="warning" />
+                <Chip label="Hội viên" color="warning" />
               </TableCell>
               <TableCell align="center">
                 <Chip label="Hoạt động" color="success" />

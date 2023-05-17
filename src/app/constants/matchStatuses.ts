@@ -8,7 +8,7 @@ export const MATCH_STATUSES = {
   WAIT_UPDATE: {
     id: 5,
     label: 'Chờ cập nhật',
-    background: 'orange',
+    background: 'purple',
     color: 'white',
   },
   STARTING: {

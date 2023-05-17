@@ -365,14 +365,14 @@ export default function Information(props: Props) {
                     )}
                     <Button color="success">
                       Loại tài khoản:{' '}
-                      {customer && typeCustomer[customer.customerType - 1]}
+                      {customer && typeCustomer[customer?.customerType - 1]}
                     </Button>
                   </ButtonGroup>
                 </Item>
               </Grid>
               <Grid item xs={12}>
                 <Item>
-                  <div>Địa chỉ nhận hàng: {customer.address}</div>
+                  <div>Địa chỉ nhận hàng: {customer?.address}</div>
                 </Item>
               </Grid>
             </Grid>

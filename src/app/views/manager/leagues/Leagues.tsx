@@ -264,7 +264,10 @@ export default function LeaguesManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Link to="#" style={{ wordBreak: 'keep-all' }}>
+                        <Link
+                          to={`/leagues/${league.id}`}
+                          style={{ wordBreak: 'keep-all', color: '#1AA3FF' }}
+                        >
                           {league.name}
                         </Link>
                       </TableCell>

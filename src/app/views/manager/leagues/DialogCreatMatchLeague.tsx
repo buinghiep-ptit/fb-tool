@@ -168,6 +168,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng chủ nhà*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                           onChange={e => {
                             methods.setValue(
                               'stadium',
@@ -212,6 +213,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng sân khách*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>

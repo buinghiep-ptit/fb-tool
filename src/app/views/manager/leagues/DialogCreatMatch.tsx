@@ -23,6 +23,7 @@ import * as React from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import * as yup from 'yup'
+import './leagues.css'
 interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -122,6 +123,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       props.setIsLoading(false)
     }
   }
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm">
@@ -162,6 +164,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng 1*:"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -197,6 +200,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng 2*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>

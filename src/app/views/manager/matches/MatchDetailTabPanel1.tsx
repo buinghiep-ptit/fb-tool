@@ -251,11 +251,12 @@ export default function MatchDetailTabPanel1(props: any) {
                         label="Trạng thái*"
                       >
                         {Object.values(MATCH_STATUSES).map((type, index) => {
-                          return (
-                            <MenuItem key={index} value={type.id}>
-                              {type.label}
-                            </MenuItem>
-                          )
+                          if (type.id !== MATCH_STATUSES.WAIT_UPDATE.id)
+                            return (
+                              <MenuItem key={index} value={type.id}>
+                                {type.label}
+                              </MenuItem>
+                            )
                         })}
                       </Select>
                       {!!methods.formState.errors?.status?.message && (

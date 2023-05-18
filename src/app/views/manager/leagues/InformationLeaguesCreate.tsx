@@ -451,7 +451,6 @@ export default function InfomationLeaguesCreate(props: Props) {
       </SimpleCard>
 
       <DialogPickTeamCreate
-        key={teamPicked.length}
         isLoading={props.isLoading}
         setIsLoading={props.setIsLoading}
         ref={DialogPickTeamRef}

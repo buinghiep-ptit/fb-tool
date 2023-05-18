@@ -30,7 +30,6 @@ import { getTeams } from 'app/apis/teams/teams.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { remove } from 'lodash'
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
 import { headTableTeams } from '../team/const'
 
 interface Props {
@@ -43,8 +42,7 @@ interface Props {
 
 const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-  const [focusedTeam, setFocusedTeam] = React.useState<any>()
-  const params = useParams()
+
   const [page, setPage] = React.useState(0)
   const [countTable, setCountTable] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(20)
@@ -59,7 +57,7 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     await getTeams({
       q: nameFilter,
-      status: statusFilter === 99 ? null : statusFilter,
+      status: 1,
       type: typeFilter ? 1 : null,
       page: page,
       size: rowsPerPage,

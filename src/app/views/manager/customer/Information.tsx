@@ -108,7 +108,8 @@ export default function Information(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(255, 'Tối đa 255 ký tự'),
+        .max(255, 'Tối đa 255 ký tự')
+        .nullable(),
       birthday: yup
         .date()
         .required('Gía trị bắt buộc')

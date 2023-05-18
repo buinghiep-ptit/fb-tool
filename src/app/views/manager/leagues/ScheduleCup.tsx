@@ -15,6 +15,7 @@ import { deleteMatch, getSchedule } from 'app/apis/leagues/leagues.service'
 import { ConfirmationDialog, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { isNumber } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
@@ -121,7 +122,8 @@ export default function ScheduleCup(props: Props) {
                     )}
                   </TableCell>
                   <TableCell align="center">
-                    {!item.goalForTeamA || !item.goalForTeamB
+                    {!isNumber(item.goalForTeamA) ||
+                    !isNumber(item.goalForTeamB)
                       ? 'Chờ cập nhật'
                       : `${item.goalForTeamA} - ${item.goalForTeamB}`}
                   </TableCell>

@@ -202,6 +202,7 @@ export default function ScheduleLeague(props: Props) {
                                   onClick={() => {
                                     dialogEditMatchRef.current.handleClickOpen(
                                       item,
+                                      round.name,
                                     )
                                   }}
                                 >

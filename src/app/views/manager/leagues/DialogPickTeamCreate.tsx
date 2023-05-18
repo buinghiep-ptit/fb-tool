@@ -6,12 +6,8 @@ import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Container,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TableBody,
   TableCell,
@@ -178,30 +174,10 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Trạng thái
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Trạng thái"
-                        value={statusFilter}
-                        onChange={e => {
-                          setStatusFilter(e.target.value as number)
-                        }}
-                      >
-                        <MenuItem value={99}>Tất cả</MenuItem>
-                        <MenuItem value={-1}>Không hoạt động</MenuItem>
-                        <MenuItem value={1}>Hoạt động</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}></Grid>
+
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -220,7 +196,7 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
                   </Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',

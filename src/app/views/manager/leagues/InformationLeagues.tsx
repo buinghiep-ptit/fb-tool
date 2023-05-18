@@ -120,7 +120,6 @@ export default function InfomationLeagues(props: Props) {
         if (res) {
           toastSuccess({ message: 'Lưu thành công' })
           props.setIsLoading(false)
-          navigate('/leagues')
         }
       } else {
         const res = await createLeagues({
@@ -130,7 +129,6 @@ export default function InfomationLeagues(props: Props) {
         if (res) {
           props.setIsLoading(false)
           toastSuccess({ message: 'Tạo thành công' })
-          navigate('/leagues')
         }
       }
     } catch (e) {
@@ -173,7 +171,7 @@ export default function InfomationLeagues(props: Props) {
 
   return (
     <Container>
-      <SimpleCard title="Thêm thông tin giải đấu">
+      <SimpleCard title="Cập nhật thông tin giải đấu">
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
             <Grid container spacing={2}>

@@ -17,7 +17,7 @@ export interface Props {}
 export default function EditLeagues(props: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const league = useSelector((state: any) => state.leagues)
-  console.log(league)
+
   const [value, setValue] = React.useState('1')
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -53,7 +53,7 @@ export default function EditLeagues(props: Props) {
             <TabList onChange={handleChange} aria-label="lab API tabs example">
               <Tab label="Thông tin giải đấu" value="1" />
               <Tab label="Lịch thi đấu" value="2" />
-              <Tab label="Bảng xếp hạng" value="3" />
+              {league.category === 1 && <Tab label="Bảng xếp hạng" value="3" />}
             </TabList>
           </Box>
           <TabPanel value="1">
@@ -72,11 +72,12 @@ export default function EditLeagues(props: Props) {
               />
             )}
           </TabPanel>
-          <TabPanel value="3">
-            {league.category === 1 && (
+
+          {league.category === 1 && (
+            <TabPanel value="3">
               <Rank setIsLoading={setIsLoading} isLoading={isLoading} />
-            )}
-          </TabPanel>
+            </TabPanel>
+          )}
         </TabContext>
       </Box>
     </Container>

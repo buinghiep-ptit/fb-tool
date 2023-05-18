@@ -27,16 +27,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import * as yup from 'yup'
 
 export interface Props {}
-type NewBanner = {
-  id?: number
-  title?: string
-  titlePosition?: number
-  titleColor?: string
-  buttonContent?: string
-  butonPosition?: number
-  url?: string
-  mediaUrl?: string
-}
+
 export default function AddBanner(props: Props) {
   const navigation = useNavigate()
   const navigate = useNavigateParams()

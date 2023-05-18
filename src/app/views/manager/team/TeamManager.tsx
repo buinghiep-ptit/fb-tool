@@ -78,6 +78,10 @@ export default function TeamManager(props: Props) {
       })
   }
 
+  const refresh = () => {
+    setDoRerender(!doRerender)
+  }
+
   const search = () => {
     setPage(0)
     setDoRerender(!doRerender)
@@ -359,7 +363,7 @@ export default function TeamManager(props: Props) {
         ref={dialogCreateTeamRef}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogUpdateTeam
@@ -367,7 +371,7 @@ export default function TeamManager(props: Props) {
         teamId={focusedTeam?.id}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogUpdateTeamStatus
@@ -375,7 +379,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogDeleteTeam
@@ -383,7 +387,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
     </Container>
   )

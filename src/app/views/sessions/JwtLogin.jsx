@@ -38,6 +38,7 @@ const JWTRoot = styled(JustifyBox)(() => ({
   // background: '#BD0F14', //'#1A2038',
   backgroundImage: `url('/assets/images/login/bg-login.png')`,
   backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
   minHeight: '100% !important',
   '& .card': {
     maxWidth: 800,

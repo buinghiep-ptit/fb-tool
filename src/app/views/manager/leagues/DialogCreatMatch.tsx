@@ -72,11 +72,15 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       stadium: yup.string().trim(),
       goalForTeamA:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
     })
     .required()

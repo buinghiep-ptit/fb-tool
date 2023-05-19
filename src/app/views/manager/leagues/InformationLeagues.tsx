@@ -40,7 +40,7 @@ export default function InfomationLeagues(props: Props) {
   const params = useParams()
   const dispatch = useDispatch()
   const [file, setFile] = useState()
-  const [teamPicked, setTeamPicked] = useState([])
+  const [teamPicked, setTeamPicked] = useState<any>(null)
   const [logo, setLogo] = useState('')
   const [typeLeague, setTypeLeague] = useState<any>('')
   const DialogPickTeamRef = useRef<any>(null)
@@ -406,7 +406,7 @@ export default function InfomationLeagues(props: Props) {
                   Số lượng đội bóng tham gia:
                 </InputLabel>
                 <Typography style={{ marginLeft: '20px' }}>
-                  {teamPicked.length}
+                  {teamPicked?.length}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -447,16 +447,16 @@ export default function InfomationLeagues(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-
-      <DialogPickTeam
-        key={teamPicked.length}
-        isLoading={props.isLoading}
-        setIsLoading={props.setIsLoading}
-        ref={DialogPickTeamRef}
-        setTeamPicked={setTeamPicked}
-        setValue={methods.setValue}
-        teamPicked={teamPicked}
-      />
+      {teamPicked && teamPicked?.length && (
+        <DialogPickTeam
+          isLoading={props.isLoading}
+          setIsLoading={props.setIsLoading}
+          ref={DialogPickTeamRef}
+          setTeamPicked={setTeamPicked}
+          setValue={methods.setValue}
+          teamPicked={teamPicked}
+        />
+      )}
     </Container>
   )
 }

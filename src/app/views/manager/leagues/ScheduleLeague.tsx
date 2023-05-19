@@ -157,10 +157,16 @@ export default function ScheduleLeague(props: Props) {
                       {(round.matches || []).map((item: any, index: any) => {
                         return (
                           <TableRow hover key={item.name + index}>
-                            <TableCell align="center">
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {item.teamA?.name || ''}
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {item.teamB?.name || ''}
                             </TableCell>
                             <TableCell align="center">
@@ -168,8 +174,10 @@ export default function ScheduleLeague(props: Props) {
                                 'DD-MM-YYYY HH:mm',
                               ) || ''}
                             </TableCell>
-                            <TableCell align="center">
-                              {item.stadium || ''}
+                            <TableCell align="left">
+                              <p className="overflow-hidden">
+                                {item.stadium || ''}
+                              </p>
                             </TableCell>
                             <TableCell align="center">
                               {item.status === 1 && (

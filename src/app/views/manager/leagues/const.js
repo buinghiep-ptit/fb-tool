@@ -98,7 +98,7 @@ export const headTableRank = [
   },
   {
     name: 'CLB',
-    width: '200px',
+    width: '250px',
   },
   {
     name: 'Trận',

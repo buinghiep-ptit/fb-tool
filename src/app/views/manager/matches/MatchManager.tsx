@@ -32,7 +32,7 @@ import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import LeagueSelect from '../../../components/DynamicAutocomplete/LeagueSelect'
 import {
   MATCH_STATUSES,
@@ -45,24 +45,39 @@ export interface Props {}
 export default function MatchManager(props: Props) {
   const navigate = useNavigate()
 
-  const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
   const [doRerender, setDoRerender] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const [matches, setMatches] = useState<any>()
-  const [teamFilter, setTeamFilter] = useState('')
-  const [leagueFilter, setLeagueFilter] = useState<any>(null)
-  const [statusFilter, setStatusFilter] = useState(99)
-  const [fromFilter, setFromFilter] = useState<any>('')
-  const [toFilter, setToFilter] = useState<any>('')
-  const [cahnFilter, setCahnFilter] = useState(false)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 0)
+  const [rowsPerPage, setRowsPerPage] = useState(
+    Number(searchParams.get('size')) || 20,
+  )
+  const [teamFilter, setTeamFilter] = useState(
+    searchParams.get('teamName') || '',
+  )
+  const [leagueFilter, setLeagueFilter] = useState<any>(
+    Number(searchParams.get('idLeague')) || null,
+  )
+  const [statusFilter, setStatusFilter] = useState(
+    Number(searchParams.get('status')) || 99,
+  )
+  const [fromFilter, setFromFilter] = useState<any>(
+    searchParams.get('from') || '',
+  )
+  const [toFilter, setToFilter] = useState<any>(searchParams.get('to') || '')
+  const [cahnFilter, setCahnFilter] = useState(
+    Number(searchParams.get('isCahnfc')) === 1 ? true : false,
+  )
 
   const fetchListMatches = async () => {
     setIsLoading(true)
-    await getMatches({
-      teamName: teamFilter.trim() ?? null,
+
+    const params: any = {
+      teamName: teamFilter ? teamFilter.trim() : null,
       idLeague: leagueFilter?.id ?? null,
       status: statusFilter === 99 ? null : statusFilter,
       from:
@@ -73,10 +88,20 @@ export default function MatchManager(props: Props) {
         toFilter && dayjs(toFilter).isValid()
           ? dayjs(toFilter).format('YYYY-MM-DD')
           : null,
-      isCahnfc: cahnFilter ? 1 : null,
+      isCahnfc: cahnFilter ? 1 : 0,
       page: page,
       size: rowsPerPage,
+    }
+    Object.keys(params).forEach(k => params[k] == null && delete params[k])
+
+    setSearchParams(prevParams => {
+      return new URLSearchParams({
+        ...Object.fromEntries(prevParams.entries()),
+        ...params,
+      })
     })
+
+    await getMatches(params)
       .then(res => {
         setMatches(res.content)
         setCountTable(res.totalElements)

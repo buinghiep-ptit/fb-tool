@@ -69,7 +69,7 @@ export default function VideoDetail(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(255, 'Tối đa 255 ký tự'),
+        .max(1000, 'Tối đa 1000 ký tự'),
       url: yup
         .string()
         .required('Giá trị bắt buộc')

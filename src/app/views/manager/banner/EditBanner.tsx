@@ -22,7 +22,6 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { useEffect, useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -31,10 +30,9 @@ import * as yup from 'yup'
 
 export interface Props {}
 
-export default function AddBanner(props: Props) {
-  const navigation = useNavigate()
-  const navigate = useNavigateParams()
-  const [bannerId, setBannerId] = useState<any>()
+export default function EditBanner(props: Props) {
+  const navigate = useNavigate()
+  const [position, setPosition] = useState<any>(1)
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
   const [isLoading, setIsLoading] = useState(false)
@@ -83,15 +81,13 @@ export default function AddBanner(props: Props) {
               .test('fileType', 'File không hợp lệ', value => {
                 if (currentMediaUrl?.length > 0) return true
                 if (value && value.name)
-                  return ['mp4', 'mov', '3gp'].includes(
-                    value?.name?.split('.').pop(),
-                  )
+                  return ['mp4'].includes(value?.name?.split('.').pop())
                 else return true
               })
               .test('fileSize', 'Dung lượng không quá 50MB', value => {
                 console.log(currentMediaUrl)
                 if (currentMediaUrl?.length > 0) return true
-                return Math.floor(value?.size / 1000000) <= 10
+                return Math.floor(value?.size / 1000000) <= 50
               }),
     })
     .required()
@@ -110,6 +106,7 @@ export default function AddBanner(props: Props) {
     setPreviewImage(banner.mediaUrl)
     setType(banner.type)
     setMediaUrlResponse(banner.mediaUrl)
+    setPosition(banner.position)
     setCurrentMediaUrl(banner.mediaUrl)
     methods.reset({ ...defaultValues })
   }
@@ -151,7 +148,7 @@ export default function AddBanner(props: Props) {
         message: 'Cập nhật thành công',
       })
       setIsLoading(false)
-      navigate('/banner', {})
+      navigate(-1)
     })
   }
 
@@ -201,184 +198,202 @@ export default function AddBanner(props: Props) {
                     placeholder="Nhập tiêu đề"
                     fullWidth
                   />
-                  <Stack direction={'row'} gap={2}>
-                    <SelectDropDown
-                      name="titlePosition"
-                      label="Vị trí tiêu đề"
-                      sx={{ width: '75%' }}
-                    >
-                      <MenuItem value={0}>Không hiển thị</MenuItem>
-                      <MenuItem value={1}>Trái</MenuItem>
-                      <MenuItem value={2}>Giữa</MenuItem>
-                      <MenuItem value={3}>Phải</MenuItem>
-                    </SelectDropDown>
-                    <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
-                      <div style={{ position: 'relative' }}>
-                        <div
-                          onMouseEnter={() => setShowColorPicker1(true)}
-                          id="colorDisplay"
-                          style={{
-                            backgroundColor: colorDisplay,
-                            width: '50px',
-                            height: '35px',
-                            border: '1px solid #aeaaaa',
-                          }}
-                        ></div>
-                        <div
-                          style={{
-                            zIndex: 1000,
-                            position: 'absolute',
-                            top: '40px',
-                            left: '0',
-                            display: showColorPicker1 ? 'block' : 'none',
-                          }}
-                        >
-                          <SketchPicker
-                            color={colorDisplay}
-                            onChangeComplete={(color: any, event: any) => {
-                              setColorDisplay(color.hex)
-                              setShowColorPicker1(false)
+                  {position !== 2 && (
+                    <Stack direction={'row'} gap={2}>
+                      <SelectDropDown
+                        name="titlePosition"
+                        label="Vị trí tiêu đề"
+                        sx={{ width: '75%' }}
+                      >
+                        <MenuItem value={0}>Không hiển thị</MenuItem>
+                        <MenuItem value={1}>Trái</MenuItem>
+                        <MenuItem value={2}>Giữa</MenuItem>
+                        <MenuItem value={3}>Phải</MenuItem>
+                      </SelectDropDown>
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1}
+                        alignItems={'center'}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          <div
+                            onMouseEnter={() => setShowColorPicker1(true)}
+                            id="colorDisplay"
+                            style={{
+                              backgroundColor: colorDisplay,
+                              width: '50px',
+                              height: '35px',
+                              border: '1px solid #aeaaaa',
                             }}
-                          />
+                          ></div>
+                          <div
+                            style={{
+                              zIndex: 1000,
+                              position: 'absolute',
+                              top: '40px',
+                              left: '0',
+                              display: showColorPicker1 ? 'block' : 'none',
+                            }}
+                          >
+                            <SketchPicker
+                              color={colorDisplay}
+                              onChangeComplete={(color: any, event: any) => {
+                                setColorDisplay(color.hex)
+                                setShowColorPicker1(false)
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
 
+                        <FormInputText
+                          onFocus={() => {
+                            setShowColorPicker1(true)
+                          }}
+                          value={colorDisplay}
+                          onChange={e => {
+                            setColorDisplay(e.target.value)
+                          }}
+                          clearIcon={false}
+                          type="text"
+                          name="titleColor"
+                          label={'Màu hiển thị'}
+                          defaultValue=""
+                          placeholder=""
+                          fullWidth
+                        />
+                      </Stack>
+                    </Stack>
+                  )}
+                  {position !== 2 && (
+                    <>
+                      {' '}
                       <FormInputText
-                        onFocus={() => {
-                          setShowColorPicker1(true)
-                        }}
-                        value={colorDisplay}
-                        onChange={e => {
-                          setColorDisplay(e.target.value)
-                        }}
-                        clearIcon={false}
                         type="text"
-                        name="titleColor"
-                        label={'Màu hiển thị'}
+                        name="buttonContent"
+                        label={'Nội dung nút điều hướng'}
                         defaultValue=""
-                        placeholder=""
+                        placeholder="Nhập nội dung muốn hiển thị"
                         fullWidth
                       />
-                    </Stack>
-                  </Stack>
-
-                  <FormInputText
-                    type="text"
-                    name="buttonContent"
-                    label={'Nội dung nút điều hướng'}
-                    defaultValue=""
-                    placeholder="Nhập nội dung muốn hiển thị"
-                    fullWidth
-                  />
-
-                  <Stack flexDirection={'row'} gap={2}>
-                    <SelectDropDown
-                      name="buttonPosition"
-                      label="Vị trí nút điều hướng"
-                      sx={{ width: '75%' }}
-                    >
-                      <MenuItem value={0}>Không hiển thị</MenuItem>
-                      <MenuItem value={1}>Trái</MenuItem>
-                      <MenuItem value={2}>Giữa</MenuItem>
-                      <MenuItem value={3}>Phải</MenuItem>
-                    </SelectDropDown>
-                    <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
-                      <div style={{ position: 'relative' }}>
-                        <div
-                          onMouseEnter={() => setShowColorPicker2(true)}
-                          id="colorDisplay"
-                          style={{
-                            backgroundColor: colorButton,
-                            width: '50px',
-                            height: '35px',
-                            border: '1px solid #aeaaaa',
-                          }}
-                        ></div>
-                        <div
-                          style={{
-                            zIndex: 1000,
-                            position: 'absolute',
-                            top: '40px',
-                            left: '0',
-                            display: showColorPicker2 ? 'block' : 'none',
-                          }}
+                      <Stack flexDirection={'row'} gap={2}>
+                        <SelectDropDown
+                          name="buttonPosition"
+                          label="Vị trí nút điều hướng"
+                          sx={{ width: '75%' }}
                         >
-                          <SketchPicker
-                            color={colorButton}
-                            onChangeComplete={(color: any, event: any) => {
-                              setColorButton(color.hex)
-                              setShowColorPicker2(false)
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <FormInputText
-                        onFocus={() => {
-                          setShowColorPicker2(true)
-                        }}
-                        value={colorButton}
-                        onChange={e => {
-                          setColorButton(e.target.value)
-                        }}
-                        clearIcon={false}
-                        type="text"
-                        name="titleColor"
-                        label={'Màu nút'}
-                        defaultValue=""
-                        placeholder=""
-                        fullWidth
-                      />
-                    </Stack>
-                    <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
-                      <div style={{ position: 'relative' }}>
-                        <div
-                          onMouseEnter={() => setShowColorPicker3(true)}
-                          id="colorDisplay"
-                          style={{
-                            backgroundColor: colorText,
-                            width: '50px',
-                            height: '35px',
-                            border: '1px solid #aeaaaa',
-                          }}
-                        ></div>
-                        <div
-                          style={{
-                            zIndex: 1000,
-                            position: 'absolute',
-                            top: '40px',
-                            left: '0',
-                            display: showColorPicker3 ? 'block' : 'none',
-                          }}
+                          <MenuItem value={0}>Không hiển thị</MenuItem>
+                          <MenuItem value={1}>Trái</MenuItem>
+                          <MenuItem value={2}>Giữa</MenuItem>
+                          <MenuItem value={3}>Phải</MenuItem>
+                        </SelectDropDown>
+                        <Stack
+                          flexDirection={'row'}
+                          gap={1}
+                          alignItems={'center'}
                         >
-                          <SketchPicker
-                            color={colorText}
-                            onChangeComplete={(color: any, event: any) => {
-                              setColorText(color.hex)
-                              setShowColorPicker3(false)
-                            }}
-                          />
-                        </div>
-                      </div>
+                          <div style={{ position: 'relative' }}>
+                            <div
+                              onMouseEnter={() => setShowColorPicker2(true)}
+                              id="colorDisplay"
+                              style={{
+                                backgroundColor: colorButton,
+                                width: '50px',
+                                height: '35px',
+                                border: '1px solid #aeaaaa',
+                              }}
+                            ></div>
+                            <div
+                              style={{
+                                zIndex: 1000,
+                                position: 'absolute',
+                                top: '40px',
+                                left: '0',
+                                display: showColorPicker2 ? 'block' : 'none',
+                              }}
+                            >
+                              <SketchPicker
+                                color={colorButton}
+                                onChangeComplete={(color: any, event: any) => {
+                                  setColorButton(color.hex)
+                                  setShowColorPicker2(false)
+                                }}
+                              />
+                            </div>
+                          </div>
 
-                      <FormInputText
-                        onFocus={() => {
-                          setShowColorPicker3(true)
-                        }}
-                        value={colorText}
-                        onChange={e => {
-                          setColorText(e.target.value)
-                        }}
-                        clearIcon={false}
-                        type="text"
-                        name="titleColor"
-                        label={'Màu chữ'}
-                        defaultValue=""
-                        placeholder=""
-                        fullWidth
-                      />
-                    </Stack>
-                  </Stack>
+                          <FormInputText
+                            onFocus={() => {
+                              setShowColorPicker2(true)
+                            }}
+                            value={colorButton}
+                            onChange={e => {
+                              setColorButton(e.target.value)
+                            }}
+                            clearIcon={false}
+                            type="text"
+                            name="titleColor"
+                            label={'Màu nút'}
+                            defaultValue=""
+                            placeholder=""
+                            fullWidth
+                          />
+                        </Stack>
+                        <Stack
+                          flexDirection={'row'}
+                          gap={1}
+                          alignItems={'center'}
+                        >
+                          <div style={{ position: 'relative' }}>
+                            <div
+                              onMouseEnter={() => setShowColorPicker3(true)}
+                              id="colorDisplay"
+                              style={{
+                                backgroundColor: colorText,
+                                width: '50px',
+                                height: '35px',
+                                border: '1px solid #aeaaaa',
+                              }}
+                            ></div>
+                            <div
+                              style={{
+                                zIndex: 1000,
+                                position: 'absolute',
+                                top: '40px',
+                                left: '0',
+                                display: showColorPicker3 ? 'block' : 'none',
+                              }}
+                            >
+                              <SketchPicker
+                                color={colorText}
+                                onChangeComplete={(color: any, event: any) => {
+                                  setColorText(color.hex)
+                                  setShowColorPicker3(false)
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <FormInputText
+                            onFocus={() => {
+                              setShowColorPicker3(true)
+                            }}
+                            value={colorText}
+                            onChange={e => {
+                              setColorText(e.target.value)
+                            }}
+                            clearIcon={false}
+                            type="text"
+                            name="titleColor"
+                            label={'Màu chữ'}
+                            defaultValue=""
+                            placeholder=""
+                            fullWidth
+                          />
+                        </Stack>
+                      </Stack>
+                    </>
+                  )}
+
                   <FormInputText
                     type="text"
                     name="url"
@@ -393,15 +408,13 @@ export default function AddBanner(props: Props) {
                       variant="contained"
                       color="primary"
                       type="submit"
-                      // onClick={() => navigation(`chi-tiet-banner`, {})}
                       sx={{ width: '100px' }}
                     />
                     <MuiButton
                       title="Quay lại"
                       variant="outlined"
                       color="primary"
-                      type="submit"
-                      onClick={() => navigation(`/banner`, {})}
+                      onClick={() => navigate(-1)}
                       startIcon={<Icon>keyboard_return</Icon>}
                     />
                   </Stack>
@@ -417,7 +430,7 @@ export default function AddBanner(props: Props) {
                     sx={{ width: '80%' }}
                   >
                     <MenuItem value={1}>Ảnh</MenuItem>
-                    <MenuItem value={2}>Video</MenuItem>
+                    {position !== 2 && <MenuItem value={2}>Video</MenuItem>}
                   </SelectDropDown>
 
                   <input
@@ -501,7 +514,7 @@ export default function AddBanner(props: Props) {
                           <div>Chọn video để tải lên</div>
                           <div>Hoặc kéo và thả tập tin</div>
                           <BackupIcon fontSize="large" />
-                          <div>MP4, MOV, 3GP hoặc WebM</div>
+                          <div>MP4</div>
                           <div>Dung lượng không quá 50mb</div>
                           <div>
                             (Lưu ý: video nặng sẽ khiến trải nghiệm người dùng

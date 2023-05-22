@@ -1,8 +1,8 @@
 import { http } from 'app/helpers/http-config'
 import { BannerDetail } from 'app/models'
 
-export const getListBanner = async (): Promise<any> => {
-  const { data } = await http.get<any>('/api/banners')
+export const getListBanner = async (params: any): Promise<any> => {
+  const { data } = await http.get<any>('/api/banners', { params })
   return data
 }
 export const sortBanner = async (params: any): Promise<any> => {

@@ -1,13 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
-import { Card, Grid, IconButton, Typography } from '@mui/material'
+import { Card, Grid, IconButton } from '@mui/material'
 import { Box, Stack, styled, useTheme } from '@mui/system'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import FormInputText from 'app/components/common/MuiRHFInputText'
-import { MuiTypography } from 'app/components/common/MuiTypography'
 import { Span } from 'app/components/Typography'
-import { toastError } from 'app/helpers/toastNofication'
 import useAuth from 'app/hooks/useAuth'
 import { messages } from 'app/utils/messages'
 import { useState } from 'react'
@@ -39,6 +37,8 @@ const StyledSpan = styled(Span)(({ mode }) => ({
 const JWTRoot = styled(JustifyBox)(() => ({
   // background: '#BD0F14', //'#1A2038',
   backgroundImage: `url('/assets/images/login/bg-login.png')`,
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
   minHeight: '100% !important',
   '& .card': {
     maxWidth: 800,

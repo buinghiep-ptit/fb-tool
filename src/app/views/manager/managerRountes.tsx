@@ -31,6 +31,9 @@ const CoachManager = Loadable(lazy(() => import('./coach/CoachManager')))
 const MemberManager = Loadable(lazy(() => import('./members/MemberManager')))
 const MemberDetail = Loadable(lazy(() => import('./members/MemberDetail')))
 const MemberSetting = Loadable(lazy(() => import('./members/MemberSetting')))
+const LogoManager = Loadable(lazy(() => import('./logos/LogoManager')))
+const EditBanner = Loadable(lazy(() => import('./banner/EditBanner')))
+const UserManager = Loadable(lazy(() => import('./users/UserManager')))
 
 const managerRoutes = [
   {
@@ -66,26 +69,22 @@ const managerRoutes = [
   { path: '/orders', element: <OrderManager /> },
 
   {
-    path: '/orders/chi-tiet-don-hang',
-    element: <OrderDetail />,
-  },
-  {
     path: '/orders/:orderID',
     element: <OrderDetail />,
   },
   { path: '/banner', element: <BannerManager /> },
+  { path: '/banner/:id', element: <EditBanner /> },
   {
-    path: '/banner/chi-tiet-banner',
+    path: '/banner/them-moi-banner',
     element: <AddBanner />,
   },
-  {
-    path: '/banner/:bannerID/*',
-    element: <AddBanner />,
-  },
+
   { path: '/matches', element: <MatchManager /> },
   { path: '/matches/:id', element: <MatchDetail /> },
   { path: '/members', element: <MemberManager /> },
   { path: '/members/:id', element: <MemberDetail /> },
   { path: '/members/setting', element: <MemberSetting /> },
+  { path: '/logos', element: <LogoManager /> },
+  { path: '/users', element: <UserManager /> },
 ]
 export default managerRoutes

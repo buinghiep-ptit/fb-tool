@@ -110,14 +110,22 @@ export default function DetailCategory(props: Props) {
     }
   }
 
-  const toggleDisplay = async (id: any) => {
+  const toggleDisplay = async (id: any, index: any) => {
     const res = await displayProduct(id)
-    if (res) fetchListProduct()
+    if (res) {
+      const newProducts = [...products]
+      newProducts[index].isDisplay = newProducts[index].isDisplay === 1 ? 0 : 1
+      setProducts(newProducts)
+    }
   }
 
-  const togglePrority = async (id: any) => {
+  const togglePrority = async (id: any, index: any) => {
     const res = await priorityProduct(id)
-    if (res) fetchListProduct()
+    if (res) {
+      const newProducts = [...products]
+      newProducts[index].priority = newProducts[index].priority === 1 ? 0 : 1
+      setProducts(newProducts)
+    }
   }
 
   const watchStatusSync = async () => {
@@ -149,7 +157,7 @@ export default function DetailCategory(props: Props) {
           <Breadcrumb
             routeSegments={[
               { name: 'Quản lý cửa hàng', path: '/shop' },
-              { name: products[0].categoryName || '' },
+              { name: products[0]?.categoryName || '' },
             ]}
           />
         )}
@@ -207,9 +215,8 @@ export default function DetailCategory(props: Props) {
                 }}
               >
                 <MenuItem value={2}>Tất cả</MenuItem>
-                <MenuItem value={0}>Không hoạt động</MenuItem>
+                <MenuItem value={0}>Ngừng kinh doanh</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={-1}>Đã xóa từ Kiotviet</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -235,7 +242,7 @@ export default function DetailCategory(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách khách hàng">
+      <SimpleCard title="Danh sách sản phẩm">
         <Box width="100%" overflow="auto">
           <StyledTable>
             <TableHead>
@@ -266,13 +273,10 @@ export default function DetailCategory(props: Props) {
                     <TableCell align="center">{product.amount}</TableCell>
                     <TableCell align="center">
                       {product.status === 0 && (
-                        <Chip label="Không hoạt động" color="success" />
+                        <Chip label="Ngừng kinh doanh" color="warning" />
                       )}
                       {product.status === 1 && (
                         <Chip label="Hoạt động" color="success" />
-                      )}
-                      {product.status === -1 && (
-                        <Chip label="Đã xóa từ kiotviet" />
                       )}
                     </TableCell>
                     <TableCell align="center">
@@ -280,7 +284,7 @@ export default function DetailCategory(props: Props) {
                         color="success"
                         checked={product.isDisplay === 0 ? false : true}
                         onChange={e => {
-                          toggleDisplay(product.id)
+                          toggleDisplay(product.id, index)
                         }}
                       />
                     </TableCell>
@@ -289,12 +293,12 @@ export default function DetailCategory(props: Props) {
                         color="success"
                         checked={product.priority === 0 ? false : true}
                         onChange={e => {
-                          togglePrority(product.id)
+                          togglePrority(product.id, index)
                         }}
                       />
                     </TableCell>
                     <TableCell align="center">
-                      {moment(product.dateUpdated).format('YYYY-MM-DD hh:mm')}
+                      {moment(product.dateUpdated).format('DD-MM-YYYY HH:mm')}
                     </TableCell>
                     <TableCell align="center">
                       <Tooltip title="Chi tiết" placement="top">

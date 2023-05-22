@@ -1,5 +1,6 @@
 import { Edit } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import LaunchIcon from '@mui/icons-material/Launch'
 import {
   Chip,
   Icon,
@@ -15,6 +16,7 @@ import { deleteMatch, getSchedule } from 'app/apis/leagues/leagues.service'
 import { ConfirmationDialog, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { isNumber } from 'lodash'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
@@ -97,10 +99,10 @@ export default function ScheduleCup(props: Props) {
                     {item.teamB.name}
                   </TableCell>
                   <TableCell align="left">
-                    {moment(item.dateStart).format('YYYY-MM-DD hh:mm')}
+                    {moment(item.dateStart).format('DD-MM-YYYY HH:mm')}
                   </TableCell>
-                  <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                    {item.stadium}
+                  <TableCell align="left">
+                    <p className="overflow-hidden">{item.stadium || ''}</p>
                   </TableCell>
                   <TableCell align="center">
                     {item.status === 1 && (
@@ -116,9 +118,13 @@ export default function ScheduleCup(props: Props) {
                       <Chip label="Hoãn" color="secondary" />
                     )}
                     {item.status === 4 && <Chip label="Hủy" />}
+                    {item.status === 5 && (
+                      <Chip label="Chờ cập nhật" color="warning" />
+                    )}
                   </TableCell>
                   <TableCell align="center">
-                    {!item.goalForTeamA || !item.goalForTeamB
+                    {!isNumber(item.goalForTeamA) ||
+                    !isNumber(item.goalForTeamB)
                       ? 'Chờ cập nhật'
                       : `${item.goalForTeamA} - ${item.goalForTeamB}`}
                   </TableCell>
@@ -142,6 +148,16 @@ export default function ScheduleCup(props: Props) {
                         }}
                       >
                         <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="thông tin trận đấu" placement="top">
+                      <IconButton
+                        color="primary"
+                        onClick={() => {
+                          navigate(`/matches/${item.id}`)
+                        }}
+                      >
+                        <LaunchIcon />
                       </IconButton>
                     </Tooltip>
                   </TableCell>

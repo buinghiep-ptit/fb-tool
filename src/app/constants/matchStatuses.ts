@@ -5,6 +5,12 @@ export const MATCH_STATUSES = {
     background: 'orange',
     color: 'white',
   },
+  WAIT_UPDATE: {
+    id: 5,
+    label: 'Chờ cập nhật',
+    background: 'purple',
+    color: 'white',
+  },
   STARTING: {
     id: 1,
     label: 'Đang diễn ra',

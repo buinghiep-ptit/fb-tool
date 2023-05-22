@@ -62,7 +62,7 @@ export default function TeamManager(props: Props) {
   const fetchListTeam = async () => {
     setIsLoading(true)
     await getTeams({
-      q: nameFilter,
+      q: nameFilter.trim(),
       status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter ? 1 : null,
       page: page,
@@ -76,6 +76,10 @@ export default function TeamManager(props: Props) {
       .finally(() => {
         setIsLoading(false)
       })
+  }
+
+  const refresh = () => {
+    setDoRerender(!doRerender)
   }
 
   const search = () => {
@@ -253,7 +257,7 @@ export default function TeamManager(props: Props) {
         <SimpleCard title="Danh sách các đội bóng">
           {teams?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={teams?.length === 0}>
@@ -359,7 +363,7 @@ export default function TeamManager(props: Props) {
         ref={dialogCreateTeamRef}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogUpdateTeam
@@ -367,7 +371,7 @@ export default function TeamManager(props: Props) {
         teamId={focusedTeam?.id}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogUpdateTeamStatus
@@ -375,7 +379,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
 
       <DialogDeleteTeam
@@ -383,7 +387,7 @@ export default function TeamManager(props: Props) {
         team={focusedTeam}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        refresh={search}
+        refresh={refresh}
       />
     </Container>
   )

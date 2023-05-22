@@ -13,13 +13,15 @@ import './style.css'
 MatchDetailTabPanel2.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  matchId: PropTypes.any.isRequired,
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
 }
 
 export default function MatchDetailTabPanel2(props: any) {
-  const { value, index, match, isLoading, setIsLoading, ...other } = props
+  const { value, index, matchId, match, isLoading, setIsLoading, ...other } =
+    props
 
   const createMatcheProcessRef = useRef<any>(null)
   const sortProcessesRef = useRef<any>(null)
@@ -28,8 +30,8 @@ export default function MatchDetailTabPanel2(props: any) {
 
   const fetchMatchProcesses = async () => {
     setIsLoading(true)
-    await getMatchProcesses(match.id)
-      .then(res => setProcesses(res.content)) // TODO update api: page -> list
+    await getMatchProcesses(matchId)
+      .then(res => setProcesses(res))
       .catch(() => {})
       .finally(() => {
         setIsLoading(false)
@@ -78,13 +80,16 @@ export default function MatchDetailTabPanel2(props: any) {
               Sắp xếp
             </Button>
           </Box>
-          <DialogSortProcesses
-            ref={sortProcessesRef}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-            list={processes}
-            refresh={fetchMatchProcesses}
-          />
+          {processes && (
+            <DialogSortProcesses
+              ref={sortProcessesRef}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              matchId={match.id}
+              list={processes}
+              refresh={fetchMatchProcesses}
+            />
+          )}
           <MatchProcessCreate
             ref={createMatcheProcessRef}
             isLoading={isLoading}
@@ -96,7 +101,7 @@ export default function MatchDetailTabPanel2(props: any) {
           <List>
             {(processes || []).map((process: any, index: any) => {
               return (
-                <ListItem key={index}>
+                <ListItem key={index} sx={{ padding: 0, marginTop: 2 }}>
                   <MatchProcess
                     match={match}
                     matchProcess={process}

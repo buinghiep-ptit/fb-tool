@@ -83,13 +83,15 @@ const TableRowForm = (props: any) => {
 MatchDetailTabPanel3.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  matchId: PropTypes.any.isRequired,
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
 }
 
 export default function MatchDetailTabPanel3(props: any) {
-  const { value, index, match, isLoading, setIsLoading, ...other } = props
+  const { value, index, matchId, match, isLoading, setIsLoading, ...other } =
+    props
 
   const navigate = useNavigate()
 
@@ -98,6 +100,7 @@ export default function MatchDetailTabPanel3(props: any) {
   const numberValidation = yup
     .number()
     .min(0, 'Số dương')
+    .max(9999, 'Tối đa 4 chữ số')
     .integer('Số nguyên')
     .nullable()
     .transform((curr, orig) => (orig === '' ? null : curr))
@@ -189,7 +192,7 @@ export default function MatchDetailTabPanel3(props: any) {
 
   const fetchMatchStats = async () => {
     setIsLoading(true)
-    await getMatchStats(match.id)
+    await getMatchStats(matchId)
       .then(res => {
         setMatchStats(res)
         initDefaultValues(res)
@@ -231,7 +234,7 @@ export default function MatchDetailTabPanel3(props: any) {
       team2Corners: data.team2.corners,
     }
 
-    await updateMatchStats(match.id, payload)
+    await updateMatchStats(matchId, payload)
       .then(() => {
         toastSuccess({
           message: 'Thành công',
@@ -252,7 +255,7 @@ export default function MatchDetailTabPanel3(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box
@@ -456,15 +459,6 @@ export default function MatchDetailTabPanel3(props: any) {
                   }}
                 >
                   <Button
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{ mx: 1 }}
-                  >
-                    Lưu
-                  </Button>
-                  <Button
                     variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
@@ -473,6 +467,15 @@ export default function MatchDetailTabPanel3(props: any) {
                     sx={{ mx: 1 }}
                   >
                     Quay lại
+                  </Button>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ mx: 1 }}
+                  >
+                    Lưu
                   </Button>
                 </Box>
               </FormProvider>

@@ -6,7 +6,6 @@ import WhatshotIcon from '@mui/icons-material/Whatshot'
 import {
   Badge,
   Box,
-  Container,
   FormControl,
   Grid,
   Icon,
@@ -29,13 +28,14 @@ import Button from '@mui/material/Button'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { getVideos } from 'app/apis/videos/video.service'
-import { Breadcrumb, SimpleCard, StyledTable } from 'app/components'
+import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { WEB_DOMAIN } from 'app/constants'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
+import { createSlugName } from 'app/utils/common'
 import dayjs from 'dayjs'
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { headTableVideos } from './const'
 
 export interface Props {}
@@ -59,7 +59,7 @@ export default function VideoManager(props: Props) {
   const fetchListVideo = async () => {
     setIsLoading(true)
     await getVideos({
-      search: searchFilter,
+      search: searchFilter.trim(),
       status: statusFilter === 99 ? null : statusFilter,
       type: typeFilter === 99 ? null : typeFilter,
       dateStart:
@@ -307,7 +307,7 @@ export default function VideoManager(props: Props) {
         <SimpleCard>
           {videos?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={videos?.length === 0}>
@@ -333,14 +333,15 @@ export default function VideoManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/cahntv/' + video.id)
+                        <Link
+                          to={`/cahntv/${video.id}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
                           {video.title}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="center">
                         {video.priority && (
@@ -353,9 +354,12 @@ export default function VideoManager(props: Props) {
                         {findVideoType(video.type)?.label}
                       </TableCell>
                       <TableCell align="left">
-                        {dayjs(video.dateCreated).format('DD/MM/YYYY HH:mm')}
+                        {dayjs(video.dateCreated).format('DD-MM-YYYY HH:mm')}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell
+                        align="center"
+                        style={{ wordBreak: 'keep-all' }}
+                      >
                         {video.status === 1 ? 'Hoạt động' : 'Không hoạt động'}
                       </TableCell>
                       <TableCell align="center">
@@ -372,7 +376,9 @@ export default function VideoManager(props: Props) {
                           <IconButton
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                WEB_DOMAIN + '/cahntv/' + video.id,
+                                WEB_DOMAIN +
+                                  '/videos/' +
+                                  createSlugName(video.title, video.id),
                               )
                             }}
                           >

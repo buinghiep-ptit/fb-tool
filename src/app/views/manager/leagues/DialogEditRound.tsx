@@ -91,6 +91,8 @@ const DialogEditRound = React.forwardRef((props: Props, ref) => {
                 variant="outlined"
                 margin="normal"
                 fullWidth
+                error={!nameRound}
+                helperText={!nameRound ? 'Giá trị bắt buộc' : ''}
                 value={nameRound}
                 onChange={e => setNameRound(e.target.value)}
               />
@@ -101,6 +103,8 @@ const DialogEditRound = React.forwardRef((props: Props, ref) => {
                 label="Thứ tự"
                 variant="outlined"
                 type="number"
+                error={!order}
+                helperText={!order ? 'Giá trị bắt buộc' : ''}
                 value={order}
                 onChange={e => setOrder(e.target.value)}
                 margin="normal"

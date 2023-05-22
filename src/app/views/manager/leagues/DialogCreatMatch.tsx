@@ -23,6 +23,7 @@ import * as React from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import * as yup from 'yup'
+import './leagues.css'
 interface Props {
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
@@ -71,11 +72,15 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       stadium: yup.string().trim(),
       goalForTeamA:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
     })
     .required()
@@ -122,6 +127,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
       props.setIsLoading(false)
     }
   }
+
   return (
     <div>
       <Dialog open={open} maxWidth="sm">
@@ -162,6 +168,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng 1*:"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -197,6 +204,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng 2*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>

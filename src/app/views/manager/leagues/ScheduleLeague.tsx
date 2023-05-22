@@ -1,5 +1,6 @@
 import { Edit } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import LaunchIcon from '@mui/icons-material/Launch'
 import {
   Chip,
   Icon,
@@ -53,7 +54,6 @@ export default function ScheduleLeague(props: Props) {
   const fetchScheduleCup = async () => {
     const res = await getSchedule(params.id)
     setSchedule(res.rounds)
-    console.log(res.rounds)
   }
 
   const closeConfirmDialog = () => {
@@ -157,19 +157,27 @@ export default function ScheduleLeague(props: Props) {
                       {(round.matches || []).map((item: any, index: any) => {
                         return (
                           <TableRow hover key={item.name + index}>
-                            <TableCell align="center">
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {item.teamA?.name || ''}
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="left"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {item.teamB?.name || ''}
                             </TableCell>
                             <TableCell align="center">
                               {moment(item.dateStart).format(
-                                'YYYY-MM-DD hh:mm',
+                                'DD-MM-YYYY HH:mm',
                               ) || ''}
                             </TableCell>
-                            <TableCell align="center">
-                              {item.stadium || ''}
+                            <TableCell align="left">
+                              <p className="overflow-hidden">
+                                {item.stadium || ''}
+                              </p>
                             </TableCell>
                             <TableCell align="center">
                               {item.status === 1 && (
@@ -185,6 +193,9 @@ export default function ScheduleLeague(props: Props) {
                                 <Chip label="Hoãn" color="secondary" />
                               )}
                               {item.status === 4 && <Chip label="Hủy" />}
+                              {item.status === 5 && (
+                                <Chip label="Chờ cập nhật" color="warning" />
+                              )}
                             </TableCell>
                             <TableCell align="center">
                               {!isNumber(item.goalForTeamA) ||
@@ -199,6 +210,7 @@ export default function ScheduleLeague(props: Props) {
                                   onClick={() => {
                                     dialogEditMatchRef.current.handleClickOpen(
                                       item,
+                                      round.name,
                                     )
                                   }}
                                 >
@@ -214,6 +226,19 @@ export default function ScheduleLeague(props: Props) {
                                   }}
                                 >
                                   <DeleteIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip
+                                title="thông tin trận đấu"
+                                placement="top"
+                              >
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => {
+                                    navigate(`/matches/${item.id}`)
+                                  }}
+                                >
+                                  <LaunchIcon />
                                 </IconButton>
                               </Tooltip>
                             </TableCell>

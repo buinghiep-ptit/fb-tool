@@ -6,12 +6,8 @@ import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Container,
-  FormControl,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TableBody,
   TableCell,
@@ -30,7 +26,6 @@ import { getTeams } from 'app/apis/teams/teams.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import { remove } from 'lodash'
 import * as React from 'react'
-import { useParams } from 'react-router-dom'
 import { headTableTeams } from '../team/const'
 
 interface Props {
@@ -43,8 +38,7 @@ interface Props {
 
 const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-  const [focusedTeam, setFocusedTeam] = React.useState<any>()
-  const params = useParams()
+
   const [page, setPage] = React.useState(0)
   const [countTable, setCountTable] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(20)
@@ -59,7 +53,7 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     await getTeams({
       q: nameFilter,
-      status: statusFilter === 99 ? null : statusFilter,
+      status: 1,
       type: typeFilter ? 1 : null,
       page: page,
       size: rowsPerPage,
@@ -117,7 +111,10 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    props.setValue('teamList', props.teamPicked)
+    props.setValue(
+      'teamList',
+      props.teamPicked.length === 0 ? null : props.teamPicked,
+    )
   }
 
   const handlePick = async (id: number) => {
@@ -127,9 +124,11 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
         return n !== newList[id].id
       })
       props.setTeamPicked(newListPicked)
+      props.setValue('teamList', newListPicked)
     } else {
       const newListPicked = [...props.teamPicked, newList[id].id]
       props.setTeamPicked(newListPicked)
+      props.setValue('teamList', newListPicked)
     }
 
     newList[id].isPicked = !teams[id].isPicked
@@ -175,30 +174,10 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">
-                        Trạng thái
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Trạng thái"
-                        value={statusFilter}
-                        onChange={e => {
-                          setStatusFilter(e.target.value as number)
-                        }}
-                      >
-                        <MenuItem value={99}>Tất cả</MenuItem>
-                        <MenuItem value={-1}>Không hoạt động</MenuItem>
-                        <MenuItem value={1}>Hoạt động</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}></Grid>
+
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -217,7 +196,7 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
                   </Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={3}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',

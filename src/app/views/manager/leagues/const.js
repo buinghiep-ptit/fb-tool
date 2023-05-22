@@ -94,7 +94,7 @@ export const headTableScheduleLeague = [
 export const headTableRank = [
   {
     name: 'Thứ hạng',
-    width: '150px',
+    width: '100px',
   },
   {
     name: 'CLB',
@@ -102,35 +102,35 @@ export const headTableRank = [
   },
   {
     name: 'Trận',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Thắng',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Hòa',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Thua',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Bàn thắng',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Bàn thua',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Hiệu số',
-    width: '200px',
+    width: '100px',
   },
   {
     name: 'Điểm',
-    width: '200px',
+    width: '100px',
   },
 ]
 

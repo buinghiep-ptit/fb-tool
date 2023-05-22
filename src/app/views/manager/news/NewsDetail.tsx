@@ -52,7 +52,7 @@ export default function NewsDetail(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(500, 'Tối đa 500 ký tự'),
+        .max(255, 'Tối đa 255 ký tự'),
       type: yup.number().required(),
       priority: yup
         .number()
@@ -66,8 +66,14 @@ export default function NewsDetail(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(1000, 'Tối đa 1000 ký tự'),
-      content: yup.string().required('Giá trị bắt buộc').trim(),
+        .max(255, 'Tối đa 255 ký tự'),
+      content: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('notEmpty', 'Giá trị bắt buộc', value => {
+          return value !== '<p></p>'
+        }),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')
@@ -105,7 +111,7 @@ export default function NewsDetail(props: Props) {
     const defaultValues: any = {}
     defaultValues.file = news.imgUrl
     defaultValues.title = news.title
-    defaultValues.type = news.newsCategory
+    defaultValues.type = news.idCategory
     defaultValues.priority = news.priority
     defaultValues.description = news.description
     defaultValues.content = news.content

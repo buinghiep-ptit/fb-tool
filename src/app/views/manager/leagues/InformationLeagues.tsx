@@ -40,7 +40,7 @@ export default function InfomationLeagues(props: Props) {
   const params = useParams()
   const dispatch = useDispatch()
   const [file, setFile] = useState()
-  const [teamPicked, setTeamPicked] = useState([])
+  const [teamPicked, setTeamPicked] = useState<any>(null)
   const [logo, setLogo] = useState('')
   const [typeLeague, setTypeLeague] = useState<any>('')
   const DialogPickTeamRef = useRef<any>(null)
@@ -68,7 +68,10 @@ export default function InfomationLeagues(props: Props) {
         .number()
         .required('Giá trị bắt buộc')
         .typeError('Giá trị bắt buộc'),
-      teamList: yup.array().required('Giá trị bắt buộc'),
+      teamList: yup
+        .array()
+        .required('Giá trị bắt buộc')
+        .min(2, 'Chọn ít nhất 2 đội'),
     })
     .required()
 
@@ -100,7 +103,7 @@ export default function InfomationLeagues(props: Props) {
     data.isDisplaySchedule = data.isDisplaySchedule ? 1 : 0
     let urlLogo: any = ''
     if (file) {
-      urlLogo = await handleUploadImage(file)
+      urlLogo = await handleUploadImage(file, 'png')
     } else {
       urlLogo = logo
     }
@@ -117,7 +120,6 @@ export default function InfomationLeagues(props: Props) {
         if (res) {
           toastSuccess({ message: 'Lưu thành công' })
           props.setIsLoading(false)
-          navigate('/leagues')
         }
       } else {
         const res = await createLeagues({
@@ -127,7 +129,6 @@ export default function InfomationLeagues(props: Props) {
         if (res) {
           props.setIsLoading(false)
           toastSuccess({ message: 'Tạo thành công' })
-          navigate('/leagues')
         }
       }
     } catch (e) {
@@ -170,7 +171,7 @@ export default function InfomationLeagues(props: Props) {
 
   return (
     <Container>
-      <SimpleCard title="Thêm thông tin giải đấu">
+      <SimpleCard title="Cập nhật thông tin giải đấu">
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <FormProvider {...methods}>
             <Grid container spacing={2}>
@@ -281,12 +282,24 @@ export default function InfomationLeagues(props: Props) {
                   id="uploadImage"
                   style={{ display: 'none' }}
                   onChange={(e: any) => {
+                    if (
+                      !(
+                        e.target.files[0].type.endsWith('png') ||
+                        e.target.files[0].type.endsWith('jpg') ||
+                        e.target.files[0].type.endsWith('jpeg')
+                      )
+                    ) {
+                      toastWarning({
+                        message: 'Định dạng cho phép: JPG, JPEG, PNG',
+                      })
+                      return
+                    }
                     if (!validateLogo(e.target.files[0])) {
                       toastWarning({
-                        message: 'Dung lượng file lớn hơn 10MB',
+                        message: 'Giới hạn dung lượng tối đa 10mb',
                       })
+                      return
                     }
-
                     setFile(e.target.files[0])
                   }}
                 />
@@ -381,7 +394,7 @@ export default function InfomationLeagues(props: Props) {
               </Grid>
               {methods.formState.errors?.teamList && (
                 <FormHelperText style={{ color: 'red', paddingLeft: '20px' }}>
-                  Chọn đội tham gia giải
+                  Chọn ít nhất 2 đội
                 </FormHelperText>
               )}
               <Grid
@@ -393,7 +406,7 @@ export default function InfomationLeagues(props: Props) {
                   Số lượng đội bóng tham gia:
                 </InputLabel>
                 <Typography style={{ marginLeft: '20px' }}>
-                  {teamPicked.length}
+                  {teamPicked?.length}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -434,7 +447,7 @@ export default function InfomationLeagues(props: Props) {
           </FormProvider>
         </form>
       </SimpleCard>
-      {teamPicked.length && (
+      {teamPicked && teamPicked?.length && (
         <DialogPickTeam
           isLoading={props.isLoading}
           setIsLoading={props.setIsLoading}

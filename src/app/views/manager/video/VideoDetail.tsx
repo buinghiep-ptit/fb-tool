@@ -69,8 +69,14 @@ export default function VideoDetail(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(1000, 'Tối đa 1000 ký tự'),
-      url: yup.string().required('Giá trị bắt buộc').trim(),
+        .max(255, 'Tối đa 255 ký tự'),
+      url: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('youtube', 'Link không hợp lệ', value => {
+          return isYouTubeUrl(value)
+        }),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')
@@ -111,7 +117,7 @@ export default function VideoDetail(props: Props) {
     const defaultValues: any = {}
     defaultValues.file = video.imgUrl
     defaultValues.title = video.title
-    defaultValues.type = video.newsCategory
+    defaultValues.type = video.type
     defaultValues.priority = video.priority
     defaultValues.description = video.description
     defaultValues.url = video.url

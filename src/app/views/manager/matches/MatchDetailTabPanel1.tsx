@@ -35,6 +35,7 @@ import './style.css'
 MatchDetailTabPanel1.propTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  matchId: PropTypes.any.isRequired,
   match: PropTypes.object.isRequired,
   isLoading: PropTypes.bool.isRequired,
   setIsLoading: PropTypes.func.isRequired,
@@ -42,16 +43,24 @@ MatchDetailTabPanel1.propTypes = {
 }
 
 export default function MatchDetailTabPanel1(props: any) {
-  const { value, index, match, isLoading, setIsLoading, refresh, ...other } =
-    props
+  const {
+    value,
+    index,
+    matchId,
+    match,
+    isLoading,
+    setIsLoading,
+    refresh,
+    ...other
+  } = props
 
   const navigate = useNavigate()
 
   const dialogRelatedNewsRef = useRef<any>(null)
   const dialogRelatedVideosRef = useRef<any>(null)
 
-  const [relatedNews, setRelatedNews] = useState([])
-  const [relatedVideos, setRelatedVideos] = useState([])
+  const [relatedNews, setRelatedNews] = useState<any>()
+  const [relatedVideos, setRelatedVideos] = useState<any>()
 
   const schema = yup.object({
     status: yup.number().required('Giá trị bắt buộc'),
@@ -69,16 +78,13 @@ export default function MatchDetailTabPanel1(props: any) {
       })
       .nullable()
       .transform((curr, orig) => (orig === '' ? null : curr)),
-    stadium: yup
-      .string()
-      .required('Giá trị bắt buộc')
-      .trim()
-      .max(255, 'Tối đa 255 ký tự'),
+    stadium: yup.string().trim().max(255, 'Tối đa 255 ký tự'),
     preMatchSummary: yup.string(),
     team1Goal: yup
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
         if (
@@ -93,6 +99,7 @@ export default function MatchDetailTabPanel1(props: any) {
       .number()
       .min(0, 'Số dương')
       .integer('Số nguyên')
+      .max(9999, 'Tối đa 4 chữ số')
       .when('status', (status, schema) => {
         // bắt buộc nếu đang diễn ra/kết thúc
         if (
@@ -131,23 +138,27 @@ export default function MatchDetailTabPanel1(props: any) {
   React.useEffect(() => {
     if (match) {
       initDefaultValues(match)
-      setRelatedNews(match.listNews.map((n: any) => n.id))
-      setRelatedVideos(match.listVideo.map((v: any) => v.id))
+      setRelatedNews(
+        match.listNews?.map((n: any) => ({ id: n.id, label: n.title })) || [],
+      )
+      setRelatedVideos(
+        match.listVideo?.map((v: any) => ({ id: v.id, label: v.title })) || [],
+      )
     }
   }, [match])
 
   const onSubmit = async (data: any) => {
     setIsLoading(true)
     const payload: any = {
-      id: match.id,
+      id: matchId,
       status: data.status,
       dateStart: data.dateStart,
       stadium: data.stadium,
       preMatchSummary: data.preMatchSummary,
       team1Goal: data.team1Goal,
       team2Goal: data.team2Goal,
-      listVideo: relatedVideos.map((v: any) => ({ id: v.id })),
-      listNews: relatedNews.map((n: any) => ({ id: n.id })),
+      listVideo: relatedVideos.map((i: any) => ({ id: Number(i.id) })),
+      listNews: relatedNews.map((i: any) => ({ id: Number(i.id) })),
     }
 
     await updateMatch(payload)
@@ -172,7 +183,7 @@ export default function MatchDetailTabPanel1(props: any) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: { xs: 0, md: 3 } }}>
           <SimpleCard>
             {props.isLoading && (
               <Box
@@ -193,10 +204,21 @@ export default function MatchDetailTabPanel1(props: any) {
                   label="Giải đấu"
                   variant="standard"
                   margin="normal"
-                  value={match.leagueName}
+                  value={match?.leagueName}
                   fullWidth
                   disabled
                 />
+
+                {match.leagueCategory === 1 && (
+                  <TextField
+                    label="Vòng đấu"
+                    variant="standard"
+                    margin="normal"
+                    fullWidth
+                    disabled
+                    value={match?.roundName}
+                  />
+                )}
 
                 <TextField
                   label="Đội bóng tham gia"
@@ -204,7 +226,9 @@ export default function MatchDetailTabPanel1(props: any) {
                   margin="normal"
                   fullWidth
                   disabled
-                  value={match.teamName}
+                  value={match?.team1Name
+                    .concat(match.leagueCategory === 1 ? ' (Chủ nhà)' : '')
+                    .concat(' - '.concat(match?.team2Name))}
                 />
 
                 <Controller
@@ -217,7 +241,7 @@ export default function MatchDetailTabPanel1(props: any) {
                       </InputLabel>
                       <Select
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                         {...field}
                         onClose={() =>
                           methods.trigger().then(() => methods.clearErrors())
@@ -227,11 +251,12 @@ export default function MatchDetailTabPanel1(props: any) {
                         label="Trạng thái*"
                       >
                         {Object.values(MATCH_STATUSES).map((type, index) => {
-                          return (
-                            <MenuItem key={index} value={type.id}>
-                              {type.label}
-                            </MenuItem>
-                          )
+                          if (type.id !== MATCH_STATUSES.WAIT_UPDATE.id)
+                            return (
+                              <MenuItem key={index} value={type.id}>
+                                {type.label}
+                              </MenuItem>
+                            )
                         })}
                       </Select>
                       {!!methods.formState.errors?.status?.message && (
@@ -253,6 +278,7 @@ export default function MatchDetailTabPanel1(props: any) {
                           methods.getValues('status') === 3 ? '' : '*'
                         }:`}
                         ampm={false}
+                        inputFormat="DD/MM/YYYY HH:mm"
                         renderInput={(params: any) => (
                           <FormControl fullWidth margin="normal">
                             <TextField
@@ -262,7 +288,7 @@ export default function MatchDetailTabPanel1(props: any) {
                                 methods.formState.errors?.dateStart?.message
                               }
                               InputLabelProps={{ shrink: true }}
-                              sx={{ width: '50%' }}
+                              sx={{ width: { xs: '100%', md: '50%' } }}
                               variant="outlined"
                               autoComplete="bday"
                             />
@@ -281,9 +307,9 @@ export default function MatchDetailTabPanel1(props: any) {
                         error={!!methods.formState.errors?.stadium}
                         helperText={methods.formState.errors?.stadium?.message}
                         {...field}
-                        label="Sân vận động*"
+                        label="Sân vận động"
                         variant="outlined"
-                        sx={{ width: '50%' }}
+                        sx={{ width: { xs: '100%', md: '50%' } }}
                       />
                     </FormControl>
                   )}
@@ -295,37 +321,45 @@ export default function MatchDetailTabPanel1(props: any) {
                   <RHFWYSIWYGEditor name="preMatchSummary"></RHFWYSIWYGEditor>
                 </FormControl>
 
-                <MultipleVideosSelect
-                  label="Video liên quan"
-                  selectedArr={relatedVideos}
-                  setSelectedArr={setRelatedVideos}
-                />
-                <Button
-                  sx={{ mt: 2 }}
-                  variant="contained"
-                  color="info"
-                  onClick={() =>
-                    dialogRelatedVideosRef?.current.handleClickOpen()
-                  }
-                >
-                  Chọn video liên quan
-                </Button>
+                {relatedVideos && (
+                  <>
+                    <MultipleVideosSelect
+                      label="Video liên quan"
+                      selectedArr={relatedVideos}
+                      setSelectedArr={setRelatedVideos}
+                    />
+                    <Button
+                      sx={{ mt: 2 }}
+                      variant="contained"
+                      color="info"
+                      onClick={() =>
+                        dialogRelatedVideosRef?.current.handleClickOpen()
+                      }
+                    >
+                      Chọn video liên quan
+                    </Button>
+                  </>
+                )}
                 <br />
-                <MultipleNewsSelect
-                  label="Tin tức liên quan"
-                  selectedArr={relatedNews}
-                  setSelectedArr={setRelatedNews}
-                />
-                <Button
-                  sx={{ mt: 2 }}
-                  variant="contained"
-                  color="info"
-                  onClick={() =>
-                    dialogRelatedNewsRef?.current.handleClickOpen()
-                  }
-                >
-                  Chọn tin tức liên quan
-                </Button>
+                {relatedNews && (
+                  <>
+                    <MultipleNewsSelect
+                      label="Tin tức liên quan"
+                      selectedArr={relatedNews}
+                      setSelectedArr={setRelatedNews}
+                    />
+                    <Button
+                      sx={{ mt: 2 }}
+                      variant="contained"
+                      color="info"
+                      onClick={() =>
+                        dialogRelatedNewsRef?.current.handleClickOpen()
+                      }
+                    >
+                      Chọn tin tức liên quan
+                    </Button>
+                  </>
+                )}
 
                 <FormControl fullWidth margin="normal">
                   <Typography color="grey">Kết quả:</Typography>
@@ -384,15 +418,6 @@ export default function MatchDetailTabPanel1(props: any) {
                   }}
                 >
                   <Button
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    disabled={isLoading}
-                    sx={{ mx: 1 }}
-                  >
-                    Lưu
-                  </Button>
-                  <Button
                     variant="outlined"
                     disabled={isLoading}
                     onClick={() => {
@@ -401,6 +426,15 @@ export default function MatchDetailTabPanel1(props: any) {
                     sx={{ mx: 1 }}
                   >
                     Quay lại
+                  </Button>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading}
+                    sx={{ mx: 1 }}
+                  >
+                    Lưu
                   </Button>
                 </Box>
               </FormProvider>

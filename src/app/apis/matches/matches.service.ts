@@ -32,6 +32,11 @@ export const getMatchProcesses = async (id: any): Promise<any> => {
   return data
 }
 
+export const createMatchProcess = async (params: any): Promise<any> => {
+  const { data } = await http.post<any>(`/api/match-process`, params)
+  return data
+}
+
 export const updateMatchProcess = async (params: any): Promise<any> => {
   const { data } = await http.put<any>(`/api/match-process`, params)
   return data
@@ -44,5 +49,16 @@ export const getMatchProcessDetail = async (id: any): Promise<any> => {
 
 export const deleteMatchProcess = async (id: any): Promise<any> => {
   const { data } = await http.delete<any>(`/api/match-process/${id}`)
+  return data
+}
+
+export const updateMatchProcessSort = async (
+  id: any,
+  params: any,
+): Promise<any> => {
+  const { data } = await http.post<any>(
+    `/api/matches/${id}/process-sort`,
+    params,
+  )
   return data
 }

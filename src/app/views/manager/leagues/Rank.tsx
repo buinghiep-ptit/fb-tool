@@ -61,8 +61,19 @@ export default function Rank(props: Props) {
               return (
                 <TableRow hover key={item.name + index}>
                   <TableCell align="center">{index + 1}</TableCell>
-                  <TableCell align="center" style={{ wordBreak: 'keep-all' }}>
-                    {item.name}
+                  <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                    <div style={{ display: 'flex' }}>
+                      <img
+                        src={item?.team?.logo}
+                        style={{
+                          marginRight: '10px',
+                          objectFit: 'contain',
+                          width: '50px',
+                          height: '50px',
+                        }}
+                      ></img>
+                      <p> {item.name}</p>
+                    </div>
                   </TableCell>
                   <TableCell align="center">{item.numOfMatch}</TableCell>
                   <TableCell align="center">{item.numOfWin}</TableCell>

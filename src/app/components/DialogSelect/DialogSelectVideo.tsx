@@ -37,7 +37,8 @@ import { SimpleCard, StyledTable } from 'app/components'
 import { VIDEO_TYPES, findVideoType } from 'app/constants/videoTypes'
 import dayjs from 'dayjs'
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { headTableVideos } from './headTableVideos'
 
 const Transition = React.forwardRef(function Transition(
@@ -64,8 +65,6 @@ interface Props {
 const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
   const { label, isLoading, setIsLoading, selectedList, setSelectedList } =
     props
-
-  const navigate = useNavigate()
 
   const [open, setOpen] = React.useState(false)
 
@@ -100,7 +99,9 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
     })
       .then(res => {
         const newList = res.content.map((item: any) => {
-          item.isPicked = (selectedList || []).includes(item.id)
+          item.isPicked = (selectedList || [])
+            .map((i: any) => i.id + '')
+            .includes(item.id + '')
           return item
         })
         setVideos(newList)
@@ -141,7 +142,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
 
   React.useEffect(() => {
     fetchListVideo()
-  }, [page, doRerender, selectedList])
+  }, [page, doRerender])
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
@@ -154,19 +155,38 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
 
   const handleClose = () => {
     setOpen(false)
-    const listPicked = (videos || []).filter(
-      (item: any) => item.isPicked === true,
-    )
-    setSelectedList(
-      listPicked.map((item: any) => {
-        id: item.id
-        label: item.title
-      }),
-    )
   }
+
+  useEffect(() => {
+    if (open) {
+      const newList = videos.map((item: any) => {
+        item.isPicked = (selectedList || [])
+          .map((i: any) => i.id + '')
+          .includes(item.id + '')
+        return item
+      })
+      setVideos(newList)
+    }
+  }, [open])
 
   const handlePick = (id: number) => {
     const newList = [...videos]
+    if (newList[id].isPicked) {
+      const newListPicked = selectedList.filter(
+        (n: any) => n.id !== newList[id].id,
+      )
+      setSelectedList(newListPicked)
+    } else {
+      const newListPicked = [
+        ...selectedList,
+        {
+          id: newList[id].id,
+          label: newList[id].title,
+        },
+      ]
+      setSelectedList(newListPicked)
+    }
+
     newList[id].isPicked = !videos[id].isPicked
     setVideos(newList)
   }
@@ -215,7 +235,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} md={3}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         Loại video
@@ -240,7 +260,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} md={3}>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">
                         Trạng thái
@@ -261,7 +281,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                     </FormControl>
                   </Grid>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} md={3}>
                       <DatePicker
                         label="Từ ngày"
                         inputFormat="DD/MM/YYYY"
@@ -283,7 +303,7 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                         )}
                       />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={12} md={3}>
                       <DatePicker
                         label="Đến ngày"
                         inputFormat="DD/MM/YYYY"
@@ -309,7 +329,8 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                   <Grid item xs={4}></Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={12}
+                    md={2}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -328,7 +349,8 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                   </Grid>
                   <Grid
                     item
-                    xs={2}
+                    xs={12}
+                    md={2}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-around',
@@ -378,14 +400,15 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                               {rowsPerPage * page + index + 1}
                             </TableCell>
                             <TableCell align="left">
-                              <Button
-                                color="info"
-                                onClick={() => {
-                                  navigate('/videos/' + video.id)
+                              <Link
+                                to={`/videos/${video.id}`}
+                                style={{
+                                  color: '#2196F3',
+                                  wordBreak: 'keep-all',
                                 }}
                               >
                                 {video.title}
-                              </Button>
+                              </Link>
                             </TableCell>
                             <TableCell align="center">
                               {video.priority && (
@@ -402,7 +425,10 @@ const DialogSelectVideo = React.forwardRef((props: Props, ref) => {
                                 'DD/MM/YYYY HH:mm',
                               )}
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell
+                              align="center"
+                              style={{ wordBreak: 'keep-all' }}
+                            >
                               {video.status === 1
                                 ? 'Hoạt động'
                                 : 'Không hoạt động'}

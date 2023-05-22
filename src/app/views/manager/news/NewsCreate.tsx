@@ -50,7 +50,7 @@ export default function NewsCreate(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(500, 'Tối đa 500 ký tự'),
+        .max(255, 'Tối đa 255 ký tự'),
       type: yup.number().required(),
       priority: yup
         .number()
@@ -64,8 +64,14 @@ export default function NewsCreate(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(1000, 'Tối đa 1000 ký tự'),
-      content: yup.string().required('Giá trị bắt buộc').trim(),
+        .max(255, 'Tối đa 255 ký tự'),
+      content: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('notEmpty', 'Giá trị bắt buộc', value => {
+          return value !== '<p></p>'
+        }),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')

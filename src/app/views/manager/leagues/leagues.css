@@ -1,0 +1,11 @@
+.overflowY {
+  height: 300px;
+}
+
+.overflow-hidden {
+  width: 200px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

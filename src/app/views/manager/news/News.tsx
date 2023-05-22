@@ -32,9 +32,10 @@ import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { WEB_DOMAIN } from 'app/constants'
 import { NEWS_TYPES, findNewsType } from 'app/constants/newsType'
+import { createSlugName } from 'app/utils/common'
 import dayjs from 'dayjs'
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { headTableNews } from './const'
 
 export interface Props {}
@@ -331,14 +332,15 @@ export default function NewsManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/news/' + news.id)
+                        <Link
+                          to={`/news/${news.id}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
                           {news.title}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="center">
                         {news.priority && (
@@ -380,7 +382,9 @@ export default function NewsManager(props: Props) {
                           <IconButton
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                WEB_DOMAIN + '/news/' + news.id,
+                                WEB_DOMAIN +
+                                  '/news/' +
+                                  createSlugName(news.title, news.id),
                               )
                             }}
                           >

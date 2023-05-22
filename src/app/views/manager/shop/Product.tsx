@@ -2,7 +2,7 @@ import { Box } from '@mui/system'
 import { Breadcrumb, Container, SimpleCard } from 'app/components'
 import * as React from 'react'
 
-import { Grid, LinearProgress } from '@mui/material'
+import { Chip, Grid, LinearProgress } from '@mui/material'
 import { getInformationProduct } from 'app/apis/shop/shop.service'
 import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -64,11 +64,11 @@ export default function Product(props: Props) {
             routeSegments={[
               { name: 'Quản lý cửa hàng', path: '/shop' },
               {
-                name: products[0].category,
-                path: `/shop/category/${products[0].idCategory}`,
+                name: products[0]?.category,
+                path: `/shop/category/${products[0]?.idCategory}`,
               },
               {
-                name: products[0].category,
+                name: products[0].name,
               },
             ]}
           />
@@ -163,12 +163,20 @@ export default function Product(props: Props) {
                   </div>
                 </section>
               </Grid>
-              <Grid item xs={6} style={{ paddingTop: '32px' }}>
+              <Grid item xs={4} style={{ paddingTop: '32px' }}>
                 <div>Mã hàng: {product.code}</div>
                 <div>Tên sản phẩm: {product.name}</div>
                 <div>Nhóm hàng: {product.category}</div>
                 <div>Thương hiệu: {product.brand}</div>
                 <div>Giá bán: {product.price}</div>
+              </Grid>
+              <Grid item xs={2} style={{ paddingTop: '32px' }}>
+                {product.status === 0 && (
+                  <Chip label="Ngừng kinh doanh" color="warning" />
+                )}
+                {product.status === 1 && (
+                  <Chip label="Hoạt động" color="success" />
+                )}
               </Grid>
             </Grid>
           )

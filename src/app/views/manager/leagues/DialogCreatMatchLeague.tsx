@@ -76,11 +76,15 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
       stadium: yup.string().trim(),
       goalForTeamA:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
-          ? yup.string().matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+          ? yup
+              .string()
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
           : yup.string().nullable(),
     })
     .required()
@@ -168,6 +172,16 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng chủ nhà*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
+                          onChange={e => {
+                            methods.setValue(
+                              'stadium',
+                              leagues.teamList.find(
+                                (team: any) => team.id === e.target.value,
+                              ).homeField || '',
+                            )
+                            methods.setValue('idTeamA', e.target.value)
+                          }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -203,6 +217,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng sân khách*"
+                          MenuProps={{ classes: { paper: 'overflowY' } }}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -219,7 +234,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={8}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <MuiRHFDateTimePicker
                       name="dateStart"

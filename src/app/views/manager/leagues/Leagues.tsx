@@ -81,7 +81,7 @@ export default function LeaguesManager(props: Props) {
   const handleClearFilter = async () => {
     setNameFilter('')
     setNameShortFilter('')
-    setStatusFilter(2)
+    setStatusFilter(99)
     setTypeFilter(99)
     setDoRerender(!doRerender)
   }
@@ -234,7 +234,7 @@ export default function LeaguesManager(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách khách hàng">
+      <SimpleCard title="Danh sách giải đấu">
         {leagues?.length === 0 && (
           <Typography color="gray" textAlign="center">
             Không có dữ liệu
@@ -264,7 +264,10 @@ export default function LeaguesManager(props: Props) {
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Link to="#" style={{ wordBreak: 'keep-all' }}>
+                        <Link
+                          to={`/leagues/${league.id}`}
+                          style={{ wordBreak: 'keep-all', color: '#1AA3FF' }}
+                        >
                           {league.name}
                         </Link>
                       </TableCell>

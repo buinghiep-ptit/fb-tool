@@ -105,7 +105,7 @@ const DialogCreateTeam = React.forwardRef((props: Props, ref) => {
     props.setIsLoading(true)
     let logo: any = ''
     if (file) {
-      logo = await handleUploadImage(file)
+      logo = await handleUploadImage(file, 'png')
     }
 
     const payload: any = {

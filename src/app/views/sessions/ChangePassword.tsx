@@ -4,7 +4,6 @@ import { IconButton, LinearProgress, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import MuiStyledModal from 'app/components/common/MuiStyledModal'
-import { MuiTypography } from 'app/components/common/MuiTypography'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import { useChangePassword } from 'app/hooks/useAuth'
 import { messages } from 'app/utils/messages'
@@ -42,7 +41,7 @@ export default function ChangePassword({ title }: Props) {
         } else return false
       })
       .matches(/^\S*$/, messages.MSG21)
-      .matches(/^(?=.*?[a-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
+      .matches(/^(?=.*?[A-Za-z])(?=.*?[0-9]).{8,32}$/g, messages.MSG20),
     passwordConfirmation: Yup.string()
       .oneOf([Yup.ref('newPassword'), null], messages.MSG11)
       .required(messages.MSG1),

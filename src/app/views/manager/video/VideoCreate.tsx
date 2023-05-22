@@ -59,8 +59,14 @@ export default function VideoCreate(props: Props) {
         .string()
         .required('Giá trị bắt buộc')
         .trim()
-        .max(1000, 'Tối đa 1000 ký tự'),
-      url: yup.string().required('Giá trị bắt buộc').trim(),
+        .max(255, 'Tối đa 255 ký tự'),
+      url: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('youtube', 'Link không hợp lệ', value => {
+          return isYouTubeUrl(value)
+        }),
       file: yup
         .mixed()
         .required('Giá trị bắt buộc')

@@ -32,7 +32,7 @@ import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import LeagueSelect from '../../../components/DynamicAutocomplete/LeagueSelect'
 import {
   MATCH_STATUSES,
@@ -45,38 +45,63 @@ export interface Props {}
 export default function MatchManager(props: Props) {
   const navigate = useNavigate()
 
-  const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
-  const [rowsPerPage, setRowsPerPage] = useState(20)
   const [doRerender, setDoRerender] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const [matches, setMatches] = useState<any>()
-  const [teamFilter, setTeamFilter] = useState('')
-  const [leagueFilter, setLeagueFilter] = useState<any>(null)
-  const [statusFilter, setStatusFilter] = useState(99)
-  const [fromFilter, setFromFilter] = useState<any>('')
-  const [toFilter, setToFilter] = useState<any>('')
-  const [cahnFilter, setCahnFilter] = useState(false)
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 0)
+  const [rowsPerPage, setRowsPerPage] = useState(
+    Number(searchParams.get('size')) || 20,
+  )
+  const [teamFilter, setTeamFilter] = useState(
+    searchParams.get('teamName') || '',
+  )
+  const [leagueFilter, setLeagueFilter] = useState<any>(
+    Number(searchParams.get('idLeague')) || null,
+  )
+  const [statusFilter, setStatusFilter] = useState(
+    Number(searchParams.get('status')) || 99,
+  )
+  const [fromFilter, setFromFilter] = useState<any>(
+    searchParams.get('from') || '',
+  )
+  const [toFilter, setToFilter] = useState<any>(searchParams.get('to') || '')
+  const [cahnFilter, setCahnFilter] = useState(
+    Number(searchParams.get('isCahnfc')) === 1 ? true : false,
+  )
 
   const fetchListMatches = async () => {
     setIsLoading(true)
-    await getMatches({
-      teamName: teamFilter,
-      idLeague: leagueFilter,
+
+    const params: any = {
+      teamName: teamFilter ? teamFilter.trim() : null,
+      idLeague: leagueFilter?.id ?? null,
       status: statusFilter === 99 ? null : statusFilter,
-      dateStart:
+      from:
         fromFilter && dayjs(fromFilter).isValid()
           ? dayjs(fromFilter).format('YYYY-MM-DD')
-          : '',
-      dateEnd:
+          : null,
+      to:
         toFilter && dayjs(toFilter).isValid()
           ? dayjs(toFilter).format('YYYY-MM-DD')
-          : '',
-      isCahn: cahnFilter ? 1 : null, // TODO pending api
+          : null,
+      isCahnfc: cahnFilter ? 1 : 0,
       page: page,
       size: rowsPerPage,
+    }
+    Object.keys(params).forEach(k => params[k] == null && delete params[k])
+
+    setSearchParams(prevParams => {
+      return new URLSearchParams({
+        ...Object.fromEntries(prevParams.entries()),
+        ...params,
+      })
     })
+
+    await getMatches(params)
       .then(res => {
         setMatches(res.content)
         setCountTable(res.totalElements)
@@ -148,7 +173,7 @@ export default function MatchManager(props: Props) {
       <Stack gap={1}>
         <SimpleCard>
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <TextField
                 id="outlined-basic"
                 label="Đội bóng tham gia"
@@ -165,14 +190,14 @@ export default function MatchManager(props: Props) {
                 }}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <LeagueSelect
                 label="Giải đấu"
-                leagueFilter={leagueFilter}
-                setLeagueFilter={setLeagueFilter}
+                selectedLeague={leagueFilter}
+                setSelectedLeague={setLeagueFilter}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">
                   Trạng thái
@@ -198,7 +223,7 @@ export default function MatchManager(props: Props) {
               </FormControl>
             </Grid>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Grid item xs={4}>
+              <Grid item xs={12} md={4}>
                 <DatePicker
                   label="Từ ngày"
                   inputFormat="DD/MM/YYYY"
@@ -221,7 +246,7 @@ export default function MatchManager(props: Props) {
                   )}
                 />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={12} md={4}>
                 <DatePicker
                   label="Đến ngày"
                   inputFormat="DD/MM/YYYY"
@@ -245,7 +270,7 @@ export default function MatchManager(props: Props) {
                 />
               </Grid>
             </LocalizationProvider>
-            <Grid item xs={4} textAlign="left">
+            <Grid item xs={12} md={4} textAlign="left">
               <Box
                 display="flex"
                 justifyContent="start"
@@ -268,7 +293,8 @@ export default function MatchManager(props: Props) {
             <Grid item xs={8}></Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              md={2}
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -287,7 +313,8 @@ export default function MatchManager(props: Props) {
             </Grid>
             <Grid
               item
-              xs={2}
+              xs={12}
+              md={2}
               style={{
                 display: 'flex',
                 justifyContent: 'space-around',
@@ -311,7 +338,7 @@ export default function MatchManager(props: Props) {
         <SimpleCard title="Danh sách thông tin trận đấu">
           {matches?.length === 0 && (
             <Typography color="gray" textAlign="center">
-              Không có dữ liệu
+              Không có kết quả thỏa mãn điều kiện tìm kiếm
             </Typography>
           )}
           <Box width="100%" overflow="auto" hidden={matches?.length === 0}>
@@ -332,32 +359,36 @@ export default function MatchManager(props: Props) {
               <TableBody>
                 {(matches || []).map((match: any, index: any) => {
                   return (
-                    <TableRow hover key={match.teamName}>
+                    <TableRow hover key={index}>
                       <TableCell align="center">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/matches/' + match.id)
+                        <Link
+                          to={`/matches/${match.id}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
+                          {' '}
                           {match.teamName}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="left">
                         {dayjs(match.dateStart).format('DD/MM/YYYY HH:mm')}
                       </TableCell>
                       <TableCell align="left">
-                        <Button
-                          color="info"
-                          onClick={() => {
-                            navigate('/leagues/' + match.idLeague)
+                        <Link
+                          to={`/leagues/${match.idLeague}`}
+                          style={{
+                            color: '#2196F3',
+                            wordBreak: 'keep-all',
                           }}
                         >
+                          {' '}
                           {match.leagueName}
-                        </Button>
+                        </Link>
                       </TableCell>
                       <TableCell align="left"> {match.stadium} </TableCell>
                       <TableCell align="center">

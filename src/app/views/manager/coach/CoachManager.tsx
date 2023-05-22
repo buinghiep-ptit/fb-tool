@@ -1,7 +1,6 @@
 import { Edit } from '@mui/icons-material'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import CachedIcon from '@mui/icons-material/Cached'
-import DeleteIcon from '@mui/icons-material/Delete'
 import SearchIcon from '@mui/icons-material/Search'
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
 import {
@@ -27,9 +26,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { getCoachs } from 'app/apis/coachs/coachs.service'
-import { deleteLeagues } from 'app/apis/leagues/leagues.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -43,7 +41,8 @@ export default function CoachManager(props: Props) {
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const [coaches, setCoaches] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
-  const [statusFilter, setStatusFilter] = useState<any>()
+  const [statusFilter, setStatusFilter] = useState<any>(2)
+  const [type, setType] = useState<any>(2)
   const [from, setFrom] = useState<any>(null)
   const [to, setTo] = useState<any>(null)
   const [position, setPosition] = useState<any>()
@@ -69,8 +68,14 @@ export default function CoachManager(props: Props) {
       name: nameFilter.trim(),
       position: position,
       status: statusFilter === 2 ? null : statusFilter,
-      dateStart: from,
-      dateEnd: to,
+      dateStart:
+        moment(from).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(from).format('YYYY-MM-DD'),
+      dateEnd:
+        moment(to).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(to).format('YYYY-MM-DD'),
       size: rowsPerPage,
       page: page,
     })
@@ -86,20 +91,10 @@ export default function CoachManager(props: Props) {
 
   const handleClearFilter = async () => {
     setNameFilter('')
-
+    setTo(null)
     setStatusFilter(2)
-
+    setFrom(null)
     setDoRerender(!doRerender)
-  }
-
-  const handleDeleteLeagues = async (id: any) => {
-    const res = await deleteLeagues(id)
-    if (res) {
-      toastSuccess({
-        message: 'Xóa thành công',
-      })
-      setDoRerender(!doRerender)
-    }
   }
 
   React.useEffect(() => {
@@ -138,7 +133,7 @@ export default function CoachManager(props: Props) {
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
           onClick={() => navigate('/leagues/create')}
         >
-          Thêm mới giải đấu
+          Thêm mới ban huấn luyện
         </Button>
       </div>
       <SimpleCard>
@@ -168,7 +163,7 @@ export default function CoachManager(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Vị trí"
-                onChange={e => {}}
+                onChange={e => setType(e.target.value)}
               >
                 <MenuItem value={99}>Tất cả</MenuItem>
                 <MenuItem value={1}>Bóng đá nam</MenuItem>
@@ -232,6 +227,7 @@ export default function CoachManager(props: Props) {
                   setStatusFilter(e.target.value)
                 }}
               >
+                <MenuItem value={2}>Tất cả</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
                 <MenuItem value={0}>Không hoạt động</MenuItem>
               </Select>
@@ -268,7 +264,7 @@ export default function CoachManager(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách khách hàng">
+      <SimpleCard title="Danh sách BHL">
         <Box width="100%" overflow="auto">
           <StyledTable>
             <TableHead>
@@ -299,6 +295,9 @@ export default function CoachManager(props: Props) {
                     <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                       {coach.birthday}
                     </TableCell>
+                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                      {coach.dateJoin}
+                    </TableCell>
                     <TableCell align="center">
                       {coach.status === 1 && (
                         <Chip label="Hoạt động" color="success" />
@@ -314,14 +313,6 @@ export default function CoachManager(props: Props) {
                           // onClick={() => navigate(`/leagues/${league.id}`)}
                         >
                           <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Xóa" placement="top">
-                        <IconButton
-                          color="primary"
-                          // onClick={() => handleDeleteLeagues(league.id)}
-                        >
-                          <DeleteIcon />
                         </IconButton>
                       </Tooltip>
                     </TableCell>

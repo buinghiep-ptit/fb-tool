@@ -5,7 +5,7 @@ export const headTableVideos = [
   },
   {
     name: 'Tiêu đề',
-    width: '300px',
+    width: '250px',
   },
   {
     name: '',
@@ -13,7 +13,7 @@ export const headTableVideos = [
   },
   {
     name: 'Loại video',
-    width: '150px',
+    width: '100px',
   },
   {
     name: 'Thời gian thêm',
@@ -21,7 +21,7 @@ export const headTableVideos = [
   },
   {
     name: 'Trạng thái',
-    width: '100px',
+    width: '150px',
   },
   {
     name: 'Hành động',

@@ -10,6 +10,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from '@mui/material'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
@@ -33,7 +34,9 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
   const leagues = useSelector((state: any) => state.leagues)
   const [idMatch, setIdMatch] = React.useState()
+  const [nameRound, setNameRound] = React.useState(null)
   const [status, setStatus] = React.useState<any>(0)
+
   const initDefaultValues = (match: any) => {
     setIdMatch(match.id)
     const defaultValues: any = {}
@@ -49,7 +52,8 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
   }
 
   React.useImperativeHandle(ref, () => ({
-    handleClickOpen: (match: any) => {
+    handleClickOpen: (match: any, nameRound: any) => {
+      setNameRound(nameRound)
       initDefaultValues(match)
       setOpen(true)
     },
@@ -88,14 +92,14 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
         status === 1 || status === 2
           ? yup
               .string()
-              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
               .typeError('Vui lòng nhập số lớn hơn bằng 0')
           : yup.string().nullable(),
       goalForTeamB:
         status === 1 || status === 2
           ? yup
               .string()
-              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn bằng 0')
+              .matches(/^[0-9]+$/, 'Vui lòng nhập số lớn hơn hoặc bằng 0')
               .typeError('Vui lòng nhập số lớn hơn bằng 0')
           : yup.string().nullable(),
     })
@@ -165,6 +169,9 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
             <FormProvider {...methods}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
+                  <Typography>Vòng đấu: {nameRound}</Typography>
+                </Grid>
+                <Grid item xs={12}>
                   <Controller
                     name="idTeamA"
                     control={methods.control}
@@ -176,14 +183,14 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                         disabled
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Đội bóng 1*
+                          Đội bóng chủ nhà*
                         </InputLabel>
                         <Select
                           autoWidth
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Đội bóng 1*:"
+                          label="Đội bóng chủ nhà*"
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -212,14 +219,14 @@ const DialogEditMatch = React.forwardRef((props: Props, ref) => {
                         disabled
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Đội bóng 2*
+                          Đội bóng sân khách*
                         </InputLabel>
                         <Select
                           autoWidth
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Đội bóng 2*"
+                          label="Đội bóng sân khách*"
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>

@@ -120,47 +120,72 @@ export default function PlayerDetail(props: Props) {
       clothersNumber: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
-        .nullable(),
-      height: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
-      weight: yup.number().min(0, 'Nhập số lớn hơn 0').typeError('Nhập số'),
+        .max(2, 'Nhập không quá 2 kí tự')
+        .nullable()
+        .max(2, 'Nhấp không quá 2 ký tự'),
+      height: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
+        .required('Giá trị bắt buộc')
+        .max(4, 'Nhập không quá 4 kí tự')
+        .typeError('Nhập số'),
+      weight: yup
+        .string()
+        .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
+        .required('Giá trị bắt buộc')
+        .max(4, 'Nhập không quá 4 kí tự')
+        .typeError('Nhập số'),
       sizeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập size giày')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       sizeSpikeShoes: yup
         .string()
-        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập số')
+        .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập size giày')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
-      sizeClothers: yup.string().nullable(),
+      sizeClothers: yup.string().nullable().max(4, 'Nhập không quá 4 kí tự'),
       viewPosition: !disabledViewPosition
         ? yup.string().nullable().required('Giá trị bắt buộc')
         : yup.string().nullable(),
       countMatch: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       cleanMatch: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       goal: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       yellowCard: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       redCard: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
+        .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
       oldClub: yup
         .string()
         .trim()
-        .max(255, 'Tên đối tác không được vượt quá 255 ký tự')
+        .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
         .nullable(),
-      editor_content: yup.string().required('Giá trị bắt buộc'),
+      editor_content: yup
+        .string()
+        .required('Giá trị bắt buộc')
+        .trim()
+        .test('notEmpty', 'Giá trị bắt buộc', value => {
+          return value !== '<p></p>'
+        }),
       status: yup.string().required('Giá trị bát buộc'),
     })
     .required()
@@ -199,7 +224,7 @@ export default function PlayerDetail(props: Props) {
     let imageUrl: any = ''
     try {
       if (file) {
-        imageUrl = await handleUploadImage(file)
+        imageUrl = await handleUploadImage(file, 'png')
       } else {
         imageUrl = previewImage
       }
@@ -504,6 +529,10 @@ export default function PlayerDetail(props: Props) {
                           {...field}
                           value={idTeam}
                           onChange={e => {
+                            if (e.target.value.toString() === '1') {
+                              setDisableViewPosition(true)
+                              methods.setValue('prioritize', false)
+                            }
                             setIdTeam(e.target.value)
                             methods.setValue('team', e.target.value.toString())
                           }}

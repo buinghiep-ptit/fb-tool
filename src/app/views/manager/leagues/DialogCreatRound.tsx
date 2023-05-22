@@ -31,6 +31,7 @@ const DialogCreateRound = React.forwardRef((props: Props, ref) => {
   }))
 
   const addRound = async () => {
+    if (!nameRound || !order) return
     props.setIsLoading(true)
     const payload = {
       name: nameRound,

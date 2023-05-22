@@ -34,6 +34,7 @@ const DialogEditRound = React.forwardRef((props: Props, ref) => {
   }))
 
   const edit = async () => {
+    if (!nameRound || !order) return
     props.setIsLoading(true)
     const payload = {
       name: nameRound,

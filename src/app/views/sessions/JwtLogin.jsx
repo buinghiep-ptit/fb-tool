@@ -123,7 +123,7 @@ const JwtLogin = () => {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
-              <img src="/assets/images/login/logo.png" width="100%" alt="" />
+              <img src="/assets/images/login/logo.png" width="60%" alt="" />
             </JustifyBox>
           </Grid>
 

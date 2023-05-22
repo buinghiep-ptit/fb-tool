@@ -291,7 +291,7 @@ export default function ScheduleLeague(props: Props) {
       <ConfirmationDialog
         open={openConfirmDeleteRoundDialog}
         onConfirmDialogClose={closeConfirmDeleteRoundDialog}
-        text="Chắc chắn muốn xóa vòng đấu"
+        text="Bạn có chắc chắn muốn xóa vòng đấu"
         onYesClick={handleDeleteRound}
         title="Xác nhận"
       />

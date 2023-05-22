@@ -462,7 +462,7 @@ export default function AddBanner(props: Props) {
                           <div>Chọn video để tải lên</div>
                           <div>Hoặc kéo và thả tập tin</div>
                           <BackupIcon fontSize="large" />
-                          <div>MP4, MOV, 3GP hoặc WebM</div>
+                          <div>MP4</div>
                           <div>Dung lượng không quá 50mb</div>
                           <div>
                             (Lưu ý: video nặng sẽ khiến trải nghiệm người dùng

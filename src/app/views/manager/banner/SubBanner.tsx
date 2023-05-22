@@ -1,15 +1,10 @@
 import { DragHandle } from '@mui/icons-material'
 import BorderColorIcon from '@mui/icons-material/BorderColor'
 import { Grid, Icon, IconButton, Stack, Tooltip } from '@mui/material'
-import {
-  deleteBannerI,
-  getListBanner,
-  sortBanner,
-} from 'app/apis/banner/banner.service'
+import { getListBanner, sortBanner } from 'app/apis/banner/banner.service'
 import { Container, SimpleCard } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import React, { useState } from 'react'
 import RLDD from 'react-list-drag-and-drop/lib/RLDD'
 import { Link, useNavigate } from 'react-router-dom'
@@ -26,8 +21,7 @@ export interface Props {
 }
 
 export default function SubBanner(props: Props) {
-  const navigation = useNavigate()
-  const navigate = useNavigateParams()
+  const navigate = useNavigate()
   const [banners, setBanner] = useState<banner[]>()
 
   const fetBanner = async () => {
@@ -54,15 +48,6 @@ export default function SubBanner(props: Props) {
         message: 'Cập nhật thành công',
       })
       props.setIsLoading(false)
-      fetBanner()
-    }
-  }
-  const deleteBanner = async (id: any) => {
-    const res = await deleteBannerI(id)
-    if (res) {
-      toastSuccess({
-        message: 'Xoá thành công',
-      })
       fetBanner()
     }
   }
@@ -127,7 +112,7 @@ export default function SubBanner(props: Props) {
             <IconButton
               color="secondary"
               sx={{ width: '33%' }}
-              onClick={() => navigate(`/banner/${banner.id}`, {})}
+              onClick={() => navigate(`/banner/${banner.id}`)}
             >
               <BorderColorIcon />
             </IconButton>

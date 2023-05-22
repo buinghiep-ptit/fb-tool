@@ -22,7 +22,6 @@ import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
 import { toastSuccess } from 'app/helpers/toastNofication'
-import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { useEffect, useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -32,8 +31,7 @@ import * as yup from 'yup'
 export interface Props {}
 
 export default function EditBanner(props: Props) {
-  const navigation = useNavigate()
-  const navigate = useNavigateParams()
+  const navigate = useNavigate()
   const [position, setPosition] = useState<any>(1)
   const [searchParams] = useSearchParams()
   const queryParams = Object.fromEntries([...searchParams])
@@ -150,7 +148,7 @@ export default function EditBanner(props: Props) {
         message: 'Cập nhật thành công',
       })
       setIsLoading(false)
-      navigate('/banner', {})
+      navigate(-1)
     })
   }
 
@@ -410,15 +408,13 @@ export default function EditBanner(props: Props) {
                       variant="contained"
                       color="primary"
                       type="submit"
-                      // onClick={() => navigation(`chi-tiet-banner`, {})}
                       sx={{ width: '100px' }}
                     />
                     <MuiButton
                       title="Quay lại"
                       variant="outlined"
                       color="primary"
-                      type="submit"
-                      onClick={() => navigation(`/banner`, {})}
+                      onClick={() => navigate(-1)}
                       startIcon={<Icon>keyboard_return</Icon>}
                     />
                   </Stack>
@@ -434,7 +430,7 @@ export default function EditBanner(props: Props) {
                     sx={{ width: '80%' }}
                   >
                     <MenuItem value={1}>Ảnh</MenuItem>
-                    <MenuItem value={2}>Video</MenuItem>
+                    {position !== 2 && <MenuItem value={2}>Video</MenuItem>}
                   </SelectDropDown>
 
                   <input
@@ -518,7 +514,7 @@ export default function EditBanner(props: Props) {
                           <div>Chọn video để tải lên</div>
                           <div>Hoặc kéo và thả tập tin</div>
                           <BackupIcon fontSize="large" />
-                          <div>MP4, MOV, 3GP hoặc WebM</div>
+                          <div>MP4</div>
                           <div>Dung lượng không quá 50mb</div>
                           <div>
                             (Lưu ý: video nặng sẽ khiến trải nghiệm người dùng

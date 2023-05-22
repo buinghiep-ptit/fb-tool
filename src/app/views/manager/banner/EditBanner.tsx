@@ -87,7 +87,7 @@ export default function EditBanner(props: Props) {
               .test('fileSize', 'Dung lượng không quá 50MB', value => {
                 console.log(currentMediaUrl)
                 if (currentMediaUrl?.length > 0) return true
-                return Math.floor(value?.size / 1000000) <= 10
+                return Math.floor(value?.size / 1000000) <= 50
               }),
     })
     .required()

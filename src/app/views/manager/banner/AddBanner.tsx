@@ -114,6 +114,7 @@ export default function AddBanner(props: Props) {
       description: data.description,
       titlePosition: data.titlePosition,
       titleColor: colorDisplay,
+      descriptionPosition: data.descriptionPosition,
       descriptionColor: colorDescription,
       buttonContent: data.buttonContent,
       buttonPosition: data.buttonPosition,

@@ -105,6 +105,7 @@ export default function EditBanner(props: Props) {
     setColorButton(banner.buttonColor)
     setColorDisplay(banner.titleColor)
     setColorText(banner.buttonTextColor)
+    setColorDescription(banner.descriptionColor)
     defaultValues.type = banner.type
     setPreviewImage(banner.mediaUrl)
     defaultValues.descriptionPosition = banner.descriptionPosition

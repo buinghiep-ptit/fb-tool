@@ -42,6 +42,7 @@ export default function EditBanner(props: Props) {
   const [colorDisplay, setColorDisplay] = useState('#FFFFFF')
   const [colorButton, setColorButton] = useState('#FFFFFF')
   const [colorText, setColorText] = useState('#FFFFFF')
+  const [colorDescription, setColorDescription] = useState('#FFFFFF')
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
@@ -50,12 +51,14 @@ export default function EditBanner(props: Props) {
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
+  const [showColorPicker4, setShowColorPicker4] = useState<any>(false)
   const inputRef = useRef<any>(null)
 
   const schema = yup
     .object({
       title: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
       titlePosition: yup.number().required('Giá trị bắt buộc'),
+      descriptionPosition: yup.number().required('Giá trị bắt buộc'),
       titleColor: yup.string().trim(),
       buttonContent: yup.string().max(255, 'Tối đa 255 ký tự').trim(),
       url: yup.string().trim().nullable(),
@@ -104,8 +107,10 @@ export default function EditBanner(props: Props) {
     setColorText(banner.buttonTextColor)
     defaultValues.type = banner.type
     setPreviewImage(banner.mediaUrl)
+    defaultValues.descriptionPosition = banner.descriptionPosition
     setType(banner.type)
     setMediaUrlResponse(banner.mediaUrl)
+    defaultValues.description = banner.description
     setPosition(banner.position)
     setCurrentMediaUrl(banner.mediaUrl)
     methods.reset({ ...defaultValues })
@@ -118,6 +123,8 @@ export default function EditBanner(props: Props) {
       titlePosition: 0,
       buttonContent: '',
       buttonPosition: 0,
+      descriptionPosition: 0,
+      description: '',
       url: '',
       file: null,
       type: 1,
@@ -133,8 +140,11 @@ export default function EditBanner(props: Props) {
     const payload: any = {
       id: params.id,
       title: data.title ? data.title : null,
+      description: data.description,
       titlePosition: data.titlePosition,
       titleColor: colorDisplay,
+      descriptionColor: colorDescription,
+      descriptionPosition: data.descriptionPosition,
       buttonContent: data.buttonContent,
       buttonPosition: data.buttonPosition,
       buttonColor: colorButton,
@@ -265,8 +275,85 @@ export default function EditBanner(props: Props) {
                     </Stack>
                   )}
                   {position !== 2 && (
+                    <FormInputText
+                      type="text"
+                      name="description"
+                      label={'Mô tả'}
+                      defaultValue=""
+                      placeholder="Nhập mô tả"
+                      fullWidth
+                      rows={3}
+                      multiline
+                    />
+                  )}
+                  {position !== 2 && (
+                    <Stack direction={'row'} gap={2}>
+                      <SelectDropDown
+                        name="descriptionPosition"
+                        label="Vị trí mô tả"
+                        sx={{ width: '75%' }}
+                      >
+                        <MenuItem value={0}>Không hiển thị</MenuItem>
+                        <MenuItem value={1}>Trái</MenuItem>
+                        <MenuItem value={2}>Giữa</MenuItem>
+                        <MenuItem value={3}>Phải</MenuItem>
+                      </SelectDropDown>
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1}
+                        alignItems={'center'}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          <div
+                            onMouseEnter={() => setShowColorPicker4(true)}
+                            id="descriptionColor"
+                            style={{
+                              backgroundColor: colorDescription,
+                              width: '50px',
+                              height: '35px',
+                              border: '1px solid #aeaaaa',
+                            }}
+                          ></div>
+                          <div
+                            style={{
+                              zIndex: 1000,
+                              position: 'absolute',
+                              top: '40px',
+                              left: '0',
+                              display: showColorPicker4 ? 'block' : 'none',
+                            }}
+                          >
+                            <SketchPicker
+                              color={colorDescription}
+                              onChangeComplete={(color: any, event: any) => {
+                                setColorDescription(color.hex)
+                                setShowColorPicker4(false)
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <FormInputText
+                          onFocus={() => {
+                            setShowColorPicker1(true)
+                          }}
+                          value={colorDisplay}
+                          onChange={e => {
+                            setColorDisplay(e.target.value)
+                          }}
+                          clearIcon={false}
+                          type="text"
+                          name="titleColor"
+                          label={'Màu hiển thị'}
+                          defaultValue=""
+                          placeholder=""
+                          fullWidth
+                        />
+                      </Stack>
+                    </Stack>
+                  )}
+                  {position !== 2 && (
                     <>
-                      {' '}
                       <FormInputText
                         type="text"
                         name="buttonContent"

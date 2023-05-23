@@ -39,6 +39,7 @@ export default function AddBanner(props: Props) {
   const [colorDisplay, setColorDisplay] = useState('#FFFFFF')
   const [colorButton, setColorButton] = useState('#FFFFFF')
   const [colorText, setColorText] = useState('#FFFFFF')
+  const [colorDescription, setColorDescription] = useState('#FFFFFF')
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
@@ -46,10 +47,12 @@ export default function AddBanner(props: Props) {
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
+  const [showColorPicker4, setShowColorPicker4] = useState<any>(false)
   const inputRef = useRef<any>(null)
 
   const schema = yup
     .object({
+      description: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
       title: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
       titlePosition: yup.number().required('Giá trị bắt buộc'),
       titleColor: yup.string().trim(),
@@ -80,7 +83,7 @@ export default function AddBanner(props: Props) {
                 else return true
               })
               .test('fileSize', 'Dung lượng không quá 50MB', value => {
-                return Math.floor(value?.size / 1000000) <= 10
+                return Math.floor(value?.size / 1000000) <= 50
               }),
     })
     .required()
@@ -92,9 +95,11 @@ export default function AddBanner(props: Props) {
       titlePosition: 0,
       buttonContent: '',
       buttonPosition: 0,
+      descriptionPosition: 0,
       url: '',
       file: null,
       type: 1,
+      description: '',
     },
   })
 
@@ -106,8 +111,10 @@ export default function AddBanner(props: Props) {
 
     const payload: any = {
       title: data.title ? data.title : null,
+      description: data.description,
       titlePosition: data.titlePosition,
       titleColor: colorDisplay,
+      descriptionColor: colorDescription,
       buttonContent: data.buttonContent,
       buttonPosition: data.buttonPosition,
       buttonColor: colorButton,
@@ -199,6 +206,76 @@ export default function AddBanner(props: Props) {
                             onChangeComplete={(color: any, event: any) => {
                               setColorDisplay(color.hex)
                               setShowColorPicker1(false)
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <FormInputText
+                        onFocus={() => {
+                          setShowColorPicker1(true)
+                        }}
+                        value={colorDisplay}
+                        onChange={e => {
+                          setColorDisplay(e.target.value)
+                        }}
+                        clearIcon={false}
+                        type="text"
+                        name="titleColor"
+                        label={'Màu hiển thị'}
+                        defaultValue=""
+                        placeholder=""
+                        fullWidth
+                      />
+                    </Stack>
+                  </Stack>
+                  <FormInputText
+                    type="text"
+                    name="description"
+                    label={'Mô tả'}
+                    defaultValue=""
+                    placeholder="Nhập mô tả"
+                    fullWidth
+                    rows={3}
+                    multiline
+                  />
+                  <Stack direction={'row'} gap={2}>
+                    <SelectDropDown
+                      name="descriptionPosition"
+                      label="Vị trí mô tả"
+                      sx={{ width: '75%' }}
+                    >
+                      <MenuItem value={0}>Không hiển thị</MenuItem>
+                      <MenuItem value={1}>Trái</MenuItem>
+                      <MenuItem value={2}>Giữa</MenuItem>
+                      <MenuItem value={3}>Phải</MenuItem>
+                    </SelectDropDown>
+                    <Stack flexDirection={'row'} gap={1} alignItems={'center'}>
+                      <div style={{ position: 'relative' }}>
+                        <div
+                          onMouseEnter={() => setShowColorPicker4(true)}
+                          id="descriptionColor"
+                          style={{
+                            backgroundColor: colorDescription,
+                            width: '50px',
+                            height: '35px',
+                            border: '1px solid #aeaaaa',
+                          }}
+                        ></div>
+                        <div
+                          style={{
+                            zIndex: 1000,
+                            position: 'absolute',
+                            top: '40px',
+                            left: '0',
+                            display: showColorPicker4 ? 'block' : 'none',
+                          }}
+                        >
+                          <SketchPicker
+                            color={colorDescription}
+                            onChangeComplete={(color: any, event: any) => {
+                              setColorDescription(color.hex)
+                              setShowColorPicker4(false)
                             }}
                           />
                         </div>

@@ -18,7 +18,7 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
 import { useNavigateParams } from 'app/hooks/useNavigateParams'
 import { useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
@@ -43,7 +43,7 @@ export default function AddBanner(props: Props) {
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [banner, setBanner] = useState<any>()
+  const [previewVideo, setPreviewVideo] = useState<string>('')
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
@@ -466,17 +466,23 @@ export default function AddBanner(props: Props) {
                     style={{ display: 'none' }}
                     onChange={(e: any) => {
                       if (e.target.files[0].size > 52428800) {
-                        toastSuccess({
+                        toastWarning({
                           message: 'Quá dung lượng cho phép',
                         })
                         return
                       }
                       methods.setValue('file', e.target.files[0])
                       setFile(e.target.files[0])
-                      console.log(window.URL.createObjectURL(e.target.files[0]))
-                      setPreviewImage(
-                        window.URL.createObjectURL(e.target.files[0]),
-                      )
+
+                      if (type === 1) {
+                        setPreviewImage(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      } else {
+                        setPreviewVideo(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      }
                     }}
                   />
                   {type !== 2 && (
@@ -494,7 +500,7 @@ export default function AddBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewImage?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -503,7 +509,7 @@ export default function AddBanner(props: Props) {
                           <BackupIcon fontSize="large" />
                           <div>PNG/JPEG hoặc JPG</div>
                           <div>Dung lượng không quá 50mb</div>
-                          <div>(Tỷ lệ ảnh phù hợp)</div>
+                          <div>(Tỷ lệ ảnh phù hợp: 16:9)</div>
                         </div>
                       )}
                       {previewImage?.length !== 0 && (
@@ -533,7 +539,7 @@ export default function AddBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewVideo?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -548,7 +554,7 @@ export default function AddBanner(props: Props) {
                           </div>
                         </div>
                       )}
-                      {previewImage?.length !== 0 && (
+                      {previewVideo?.length !== 0 && (
                         <>
                           {file && (
                             <div style={{ textAlign: 'right' }}>
@@ -558,7 +564,7 @@ export default function AddBanner(props: Props) {
                                 style={{ position: 'relative' }}
                                 onClick={event => {
                                   setFile(null)
-                                  setPreviewImage('')
+                                  setPreviewVideo('')
                                   event.stopPropagation()
                                 }}
                               >
@@ -568,7 +574,7 @@ export default function AddBanner(props: Props) {
                           )}
 
                           <video
-                            src={previewImage}
+                            src={previewVideo}
                             width="80%"
                             height="60%"
                             controls

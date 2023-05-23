@@ -21,7 +21,7 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
 import { useEffect, useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -46,8 +46,10 @@ export default function EditBanner(props: Props) {
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
+  const [previewVideo, setPreviewVideo] = useState<string>('')
   const [currentMediaUrl, setCurrentMediaUrl] = useState<any>('')
   const [MediaUrlResponse, setMediaUrlResponse] = useState<any>()
+  const [typeResponse, setTypeResponse] = useState<any>()
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
@@ -107,7 +109,12 @@ export default function EditBanner(props: Props) {
     setColorText(banner.buttonTextColor)
     setColorDescription(banner.descriptionColor)
     defaultValues.type = banner.type
-    setPreviewImage(banner.mediaUrl)
+    setTypeResponse(banner.type)
+    if (banner.type === 1) {
+      setPreviewImage(banner.mediaUrl)
+    } else {
+      setPreviewVideo(banner.mediaUrl)
+    }
     defaultValues.descriptionPosition = banner.descriptionPosition
     setType(banner.type)
     setMediaUrlResponse(banner.mediaUrl)
@@ -133,6 +140,16 @@ export default function EditBanner(props: Props) {
   })
 
   const onSubmitHandler = async (data: any) => {
+    if (type !== typeResponse) {
+      if (type === 1 && previewImage?.length === 0) {
+        toastWarning({ message: 'Vui lòng thêm ảnh' })
+        return
+      }
+      if (type === 2 && previewVideo?.length === 0) {
+        toastWarning({ message: 'Vui lòng thêm video' })
+        return
+      }
+    }
     setIsLoading(true)
     let imgUrl: any = MediaUrlResponse
     if (file && type === 1) imgUrl = await handleUploadImage(file)
@@ -528,7 +545,7 @@ export default function EditBanner(props: Props) {
                     style={{ display: 'none' }}
                     onChange={(e: any) => {
                       if (e.target.files[0].size > 52428800) {
-                        toastSuccess({
+                        toastWarning({
                           message: 'Quá dung lượng cho phép',
                         })
                         return
@@ -536,9 +553,15 @@ export default function EditBanner(props: Props) {
                       methods.setValue('file', e.target.files[0])
                       setFile(e.target.files[0])
                       setCurrentMediaUrl('')
-                      setPreviewImage(
-                        window.URL.createObjectURL(e.target.files[0]),
-                      )
+                      if (type === 1) {
+                        setPreviewImage(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      } else {
+                        setPreviewVideo(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      }
                     }}
                   />
                   {type !== 2 && (
@@ -556,7 +579,7 @@ export default function EditBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewImage?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -565,7 +588,7 @@ export default function EditBanner(props: Props) {
                           <BackupIcon fontSize="large" />
                           <div>PNG/JPEG hoặc JPG</div>
                           <div>Dung lượng không quá 50mb</div>
-                          <div>(Tỷ lệ ảnh phù hợp)</div>
+                          <div>(Tỷ lệ ảnh phù hợp: 16: 9)</div>
                         </div>
                       )}
                       {previewImage?.length !== 0 && (
@@ -595,7 +618,7 @@ export default function EditBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewVideo?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -610,7 +633,7 @@ export default function EditBanner(props: Props) {
                           </div>
                         </div>
                       )}
-                      {previewImage?.length !== 0 && (
+                      {previewVideo?.length !== 0 && (
                         <>
                           {file && (
                             <div style={{ textAlign: 'right' }}>
@@ -620,7 +643,7 @@ export default function EditBanner(props: Props) {
                                 style={{ position: 'relative' }}
                                 onClick={event => {
                                   setFile(null)
-                                  setPreviewImage('')
+                                  setPreviewVideo('')
                                   event.stopPropagation()
                                 }}
                               >
@@ -630,7 +653,7 @@ export default function EditBanner(props: Props) {
                           )}
 
                           <video
-                            src={previewImage}
+                            src={previewVideo}
                             width="80%"
                             height="60%"
                             controls

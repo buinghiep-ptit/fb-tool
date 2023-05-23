@@ -21,7 +21,7 @@ import FormInputText from 'app/components/common/MuiRHFInputText'
 import { SelectDropDown } from 'app/components/common/MuiRHFSelectDropdown'
 import handleUploadImage from 'app/helpers/handleUploadImage'
 import handleUploadVideo from 'app/helpers/handleUploadVideo'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
 import { useEffect, useRef, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -42,20 +42,25 @@ export default function EditBanner(props: Props) {
   const [colorDisplay, setColorDisplay] = useState('#FFFFFF')
   const [colorButton, setColorButton] = useState('#FFFFFF')
   const [colorText, setColorText] = useState('#FFFFFF')
+  const [colorDescription, setColorDescription] = useState('#FFFFFF')
   const [type, setType] = useState<number>(1)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
+  const [previewVideo, setPreviewVideo] = useState<string>('')
   const [currentMediaUrl, setCurrentMediaUrl] = useState<any>('')
   const [MediaUrlResponse, setMediaUrlResponse] = useState<any>()
+  const [typeResponse, setTypeResponse] = useState<any>()
   const [showColorPicker1, setShowColorPicker1] = useState<any>(false)
   const [showColorPicker2, setShowColorPicker2] = useState<any>(false)
   const [showColorPicker3, setShowColorPicker3] = useState<any>(false)
+  const [showColorPicker4, setShowColorPicker4] = useState<any>(false)
   const inputRef = useRef<any>(null)
 
   const schema = yup
     .object({
       title: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
       titlePosition: yup.number().required('Giá trị bắt buộc'),
+      descriptionPosition: yup.number().required('Giá trị bắt buộc'),
       titleColor: yup.string().trim(),
       buttonContent: yup.string().max(255, 'Tối đa 255 ký tự').trim(),
       url: yup.string().trim().nullable(),
@@ -102,10 +107,18 @@ export default function EditBanner(props: Props) {
     setColorButton(banner.buttonColor)
     setColorDisplay(banner.titleColor)
     setColorText(banner.buttonTextColor)
+    setColorDescription(banner.descriptionColor)
     defaultValues.type = banner.type
-    setPreviewImage(banner.mediaUrl)
+    setTypeResponse(banner.type)
+    if (banner.type === 1) {
+      setPreviewImage(banner.mediaUrl)
+    } else {
+      setPreviewVideo(banner.mediaUrl)
+    }
+    defaultValues.descriptionPosition = banner.descriptionPosition
     setType(banner.type)
     setMediaUrlResponse(banner.mediaUrl)
+    defaultValues.description = banner.description
     setPosition(banner.position)
     setCurrentMediaUrl(banner.mediaUrl)
     methods.reset({ ...defaultValues })
@@ -118,6 +131,8 @@ export default function EditBanner(props: Props) {
       titlePosition: 0,
       buttonContent: '',
       buttonPosition: 0,
+      descriptionPosition: 0,
+      description: '',
       url: '',
       file: null,
       type: 1,
@@ -125,6 +140,16 @@ export default function EditBanner(props: Props) {
   })
 
   const onSubmitHandler = async (data: any) => {
+    if (type !== typeResponse) {
+      if (type === 1 && previewImage?.length === 0) {
+        toastWarning({ message: 'Vui lòng thêm ảnh' })
+        return
+      }
+      if (type === 2 && previewVideo?.length === 0) {
+        toastWarning({ message: 'Vui lòng thêm video' })
+        return
+      }
+    }
     setIsLoading(true)
     let imgUrl: any = MediaUrlResponse
     if (file && type === 1) imgUrl = await handleUploadImage(file)
@@ -133,8 +158,11 @@ export default function EditBanner(props: Props) {
     const payload: any = {
       id: params.id,
       title: data.title ? data.title : null,
+      description: data.description,
       titlePosition: data.titlePosition,
       titleColor: colorDisplay,
+      descriptionColor: colorDescription,
+      descriptionPosition: data.descriptionPosition,
       buttonContent: data.buttonContent,
       buttonPosition: data.buttonPosition,
       buttonColor: colorButton,
@@ -265,8 +293,85 @@ export default function EditBanner(props: Props) {
                     </Stack>
                   )}
                   {position !== 2 && (
+                    <FormInputText
+                      type="text"
+                      name="description"
+                      label={'Mô tả'}
+                      defaultValue=""
+                      placeholder="Nhập mô tả"
+                      fullWidth
+                      rows={3}
+                      multiline
+                    />
+                  )}
+                  {position !== 2 && (
+                    <Stack direction={'row'} gap={2}>
+                      <SelectDropDown
+                        name="descriptionPosition"
+                        label="Vị trí mô tả"
+                        sx={{ width: '75%' }}
+                      >
+                        <MenuItem value={0}>Không hiển thị</MenuItem>
+                        <MenuItem value={1}>Trái</MenuItem>
+                        <MenuItem value={2}>Giữa</MenuItem>
+                        <MenuItem value={3}>Phải</MenuItem>
+                      </SelectDropDown>
+                      <Stack
+                        flexDirection={'row'}
+                        gap={1}
+                        alignItems={'center'}
+                      >
+                        <div style={{ position: 'relative' }}>
+                          <div
+                            onMouseEnter={() => setShowColorPicker4(true)}
+                            id="descriptionColor"
+                            style={{
+                              backgroundColor: colorDescription,
+                              width: '50px',
+                              height: '35px',
+                              border: '1px solid #aeaaaa',
+                            }}
+                          ></div>
+                          <div
+                            style={{
+                              zIndex: 1000,
+                              position: 'absolute',
+                              top: '40px',
+                              left: '0',
+                              display: showColorPicker4 ? 'block' : 'none',
+                            }}
+                          >
+                            <SketchPicker
+                              color={colorDescription}
+                              onChangeComplete={(color: any, event: any) => {
+                                setColorDescription(color.hex)
+                                setShowColorPicker4(false)
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <FormInputText
+                          onFocus={() => {
+                            setShowColorPicker1(true)
+                          }}
+                          value={colorDisplay}
+                          onChange={e => {
+                            setColorDisplay(e.target.value)
+                          }}
+                          clearIcon={false}
+                          type="text"
+                          name="titleColor"
+                          label={'Màu hiển thị'}
+                          defaultValue=""
+                          placeholder=""
+                          fullWidth
+                        />
+                      </Stack>
+                    </Stack>
+                  )}
+                  {position !== 2 && (
                     <>
-                      {' '}
                       <FormInputText
                         type="text"
                         name="buttonContent"
@@ -440,7 +545,7 @@ export default function EditBanner(props: Props) {
                     style={{ display: 'none' }}
                     onChange={(e: any) => {
                       if (e.target.files[0].size > 52428800) {
-                        toastSuccess({
+                        toastWarning({
                           message: 'Quá dung lượng cho phép',
                         })
                         return
@@ -448,9 +553,15 @@ export default function EditBanner(props: Props) {
                       methods.setValue('file', e.target.files[0])
                       setFile(e.target.files[0])
                       setCurrentMediaUrl('')
-                      setPreviewImage(
-                        window.URL.createObjectURL(e.target.files[0]),
-                      )
+                      if (type === 1) {
+                        setPreviewImage(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      } else {
+                        setPreviewVideo(
+                          window.URL.createObjectURL(e.target.files[0]),
+                        )
+                      }
                     }}
                   />
                   {type !== 2 && (
@@ -468,7 +579,7 @@ export default function EditBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewImage?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -477,7 +588,7 @@ export default function EditBanner(props: Props) {
                           <BackupIcon fontSize="large" />
                           <div>PNG/JPEG hoặc JPG</div>
                           <div>Dung lượng không quá 50mb</div>
-                          <div>(Tỷ lệ ảnh phù hợp)</div>
+                          <div>(Tỷ lệ ảnh phù hợp: 16: 9)</div>
                         </div>
                       )}
                       {previewImage?.length !== 0 && (
@@ -507,7 +618,7 @@ export default function EditBanner(props: Props) {
                         textAlign: 'center',
                       }}
                     >
-                      {!file && previewImage?.length === 0 && (
+                      {previewVideo?.length === 0 && (
                         <div
                           style={{ marginTop: '50px', marginBottom: '50px' }}
                         >
@@ -522,7 +633,7 @@ export default function EditBanner(props: Props) {
                           </div>
                         </div>
                       )}
-                      {previewImage?.length !== 0 && (
+                      {previewVideo?.length !== 0 && (
                         <>
                           {file && (
                             <div style={{ textAlign: 'right' }}>
@@ -532,7 +643,7 @@ export default function EditBanner(props: Props) {
                                 style={{ position: 'relative' }}
                                 onClick={event => {
                                   setFile(null)
-                                  setPreviewImage('')
+                                  setPreviewVideo('')
                                   event.stopPropagation()
                                 }}
                               >
@@ -542,7 +653,7 @@ export default function EditBanner(props: Props) {
                           )}
 
                           <video
-                            src={previewImage}
+                            src={previewVideo}
                             width="80%"
                             height="60%"
                             controls

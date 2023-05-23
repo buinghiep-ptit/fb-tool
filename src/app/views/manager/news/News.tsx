@@ -383,7 +383,7 @@ export default function NewsManager(props: Props) {
                             onClick={() => {
                               navigator.clipboard.writeText(
                                 WEB_DOMAIN +
-                                  '/news/' +
+                                  '/tin-tuc/' +
                                   createSlugName(news.title, news.id),
                               )
                             }}

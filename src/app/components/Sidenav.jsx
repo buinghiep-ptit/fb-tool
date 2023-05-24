@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux'
 const StyledScrollBar = styled(Scrollbar)(() => ({
   paddingLeft: '1rem',
   paddingRight: '1rem',
+  paddingBottom: '100px',
   position: 'relative',
 }))
 

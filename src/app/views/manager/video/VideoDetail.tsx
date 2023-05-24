@@ -412,7 +412,7 @@ export default function VideoDetail(props: Props) {
                         <BackupIcon fontSize="large" />
                         <div>PNG/JPEG hoặc JPG</div>
                         <div>Dung lượng không quá 50mb</div>
-                        <div>(Tỷ lệ ảnh phù hợp 3:2)</div>
+                        <div>(Tỷ lệ ảnh phù hợp 16:9)</div>
                       </div>
                     )}
                     {previewImage?.length !== 0 && (

@@ -262,7 +262,11 @@ export default function CustomerManager(props: Props) {
                 label="Từ ngày"
                 inputFormat="DD/MM/YYYY"
                 onChange={newValue => {
-                  setDateStart(new Date(newValue))
+                  if (new Date(newValue).toString() === 'Invalid Date') {
+                    setDateStart(null)
+                  } else {
+                    setDateStart(new Date(newValue))
+                  }
                 }}
                 renderInput={(params: any) => (
                   <TextField
@@ -284,7 +288,13 @@ export default function CustomerManager(props: Props) {
                 value={dateEnd}
                 label="Đến ngày"
                 inputFormat="DD/MM/YYYY"
-                onChange={newValue => setDateEnd(new Date(newValue))}
+                onChange={newValue => {
+                  if (new Date(newValue).toString() === 'Invalid Date') {
+                    setDateEnd(null)
+                  } else {
+                    setDateEnd(new Date(newValue))
+                  }
+                }}
                 renderInput={(params: any) => (
                   <TextField
                     {...params}

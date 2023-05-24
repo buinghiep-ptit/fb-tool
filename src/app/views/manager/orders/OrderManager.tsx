@@ -214,7 +214,7 @@ export default function OrderManager(props: Props) {
                   <FormInputText
                     type="text"
                     name="q"
-                    label={'SĐT, email người đặt, tên sản phẩm'}
+                    label={'SĐT, email người đặt, mã đơn hàng'}
                     defaultValue=""
                     placeholder="Nhập SĐT, email, mã đơn hàng"
                     fullWidth

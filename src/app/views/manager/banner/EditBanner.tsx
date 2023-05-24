@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
+import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
   FormHelperText,
@@ -9,6 +10,7 @@ import {
   LinearProgress,
   MenuItem,
   Stack,
+  Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import {
@@ -29,7 +31,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import * as yup from 'yup'
 
 export interface Props {}
-
 export default function EditBanner(props: Props) {
   const navigate = useNavigate()
   const [position, setPosition] = useState<any>(1)
@@ -244,16 +245,19 @@ export default function EditBanner(props: Props) {
                         alignItems={'center'}
                       >
                         <div style={{ position: 'relative' }}>
-                          <div
-                            onMouseEnter={() => setShowColorPicker1(true)}
-                            id="colorDisplay"
-                            style={{
-                              backgroundColor: colorDisplay,
-                              width: '50px',
-                              height: '35px',
-                              border: '1px solid #aeaaaa',
-                            }}
-                          ></div>
+                          <Tooltip title="Chọn màu" placement="top">
+                            <div
+                              onClick={() => setShowColorPicker1(true)}
+                              id="colorDisplay"
+                              style={{
+                                cursor: 'pointer',
+                                backgroundColor: colorDisplay,
+                                width: '50px',
+                                height: '35px',
+                                border: '1px solid #aeaaaa',
+                              }}
+                            ></div>
+                          </Tooltip>
                           <div
                             style={{
                               zIndex: 1000,
@@ -263,13 +267,31 @@ export default function EditBanner(props: Props) {
                               display: showColorPicker1 ? 'block' : 'none',
                             }}
                           >
-                            <SketchPicker
-                              color={colorDisplay}
-                              onChangeComplete={(color: any, event: any) => {
-                                setColorDisplay(color.hex)
-                                setShowColorPicker1(false)
+                            <div
+                              style={{
+                                background: 'white',
+                                padding: '10px',
+                                border: '1px solid gray',
                               }}
-                            />
+                            >
+                              <p style={{ textAlign: 'end' }}>
+                                <IconButton
+                                  onClick={() => {
+                                    setShowColorPicker1(false)
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                              </p>
+
+                              <SketchPicker
+                                color={colorDisplay}
+                                onChangeComplete={(color: any, event: any) => {
+                                  setColorDisplay(color.hex)
+                                  setShowColorPicker1(false)
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
 
@@ -322,16 +344,19 @@ export default function EditBanner(props: Props) {
                         alignItems={'center'}
                       >
                         <div style={{ position: 'relative' }}>
-                          <div
-                            onMouseEnter={() => setShowColorPicker4(true)}
-                            id="descriptionColor"
-                            style={{
-                              backgroundColor: colorDescription,
-                              width: '50px',
-                              height: '35px',
-                              border: '1px solid #aeaaaa',
-                            }}
-                          ></div>
+                          <Tooltip title="Chọn màu" placement="top">
+                            <div
+                              onClick={() => setShowColorPicker4(true)}
+                              id="descriptionColor"
+                              style={{
+                                cursor: 'pointer',
+                                backgroundColor: colorDescription,
+                                width: '50px',
+                                height: '35px',
+                                border: '1px solid #aeaaaa',
+                              }}
+                            ></div>
+                          </Tooltip>
                           <div
                             style={{
                               zIndex: 1000,
@@ -341,23 +366,41 @@ export default function EditBanner(props: Props) {
                               display: showColorPicker4 ? 'block' : 'none',
                             }}
                           >
-                            <SketchPicker
-                              color={colorDescription}
-                              onChangeComplete={(color: any, event: any) => {
-                                setColorDescription(color.hex)
-                                setShowColorPicker4(false)
+                            <div
+                              style={{
+                                background: 'white',
+                                padding: '10px',
+                                border: '1px solid gray',
                               }}
-                            />
+                            >
+                              <p style={{ textAlign: 'end' }}>
+                                <IconButton
+                                  onClick={() => {
+                                    setShowColorPicker4(false)
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                              </p>
+
+                              <SketchPicker
+                                color={colorDescription}
+                                onChangeComplete={(color: any, event: any) => {
+                                  setColorDescription(color.hex)
+                                  setShowColorPicker4(false)
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
 
                         <FormInputText
                           onFocus={() => {
-                            setShowColorPicker1(true)
+                            setShowColorPicker4(true)
                           }}
-                          value={colorDisplay}
+                          value={colorDescription}
                           onChange={e => {
-                            setColorDisplay(e.target.value)
+                            setColorDescription(e.target.value)
                           }}
                           clearIcon={false}
                           type="text"
@@ -397,16 +440,19 @@ export default function EditBanner(props: Props) {
                           alignItems={'center'}
                         >
                           <div style={{ position: 'relative' }}>
-                            <div
-                              onMouseEnter={() => setShowColorPicker2(true)}
-                              id="colorDisplay"
-                              style={{
-                                backgroundColor: colorButton,
-                                width: '50px',
-                                height: '35px',
-                                border: '1px solid #aeaaaa',
-                              }}
-                            ></div>
+                            <Tooltip title="Chọn màu" placement="top">
+                              <div
+                                onClick={() => setShowColorPicker2(true)}
+                                id="colorDisplay"
+                                style={{
+                                  cursor: 'pointer',
+                                  backgroundColor: colorButton,
+                                  width: '50px',
+                                  height: '35px',
+                                  border: '1px solid #aeaaaa',
+                                }}
+                              ></div>
+                            </Tooltip>
                             <div
                               style={{
                                 zIndex: 1000,
@@ -416,13 +462,34 @@ export default function EditBanner(props: Props) {
                                 display: showColorPicker2 ? 'block' : 'none',
                               }}
                             >
-                              <SketchPicker
-                                color={colorButton}
-                                onChangeComplete={(color: any, event: any) => {
-                                  setColorButton(color.hex)
-                                  setShowColorPicker2(false)
+                              <div
+                                style={{
+                                  background: 'white',
+                                  padding: '10px',
+                                  border: '1px solid gray',
                                 }}
-                              />
+                              >
+                                <p style={{ textAlign: 'end' }}>
+                                  <IconButton
+                                    onClick={() => {
+                                      setShowColorPicker2(false)
+                                    }}
+                                  >
+                                    <CloseIcon />
+                                  </IconButton>
+                                </p>
+
+                                <SketchPicker
+                                  color={colorButton}
+                                  onChangeComplete={(
+                                    color: any,
+                                    event: any,
+                                  ) => {
+                                    setColorButton(color.hex)
+                                    setShowColorPicker2(false)
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
 
@@ -449,16 +516,19 @@ export default function EditBanner(props: Props) {
                           alignItems={'center'}
                         >
                           <div style={{ position: 'relative' }}>
-                            <div
-                              onMouseEnter={() => setShowColorPicker3(true)}
-                              id="colorDisplay"
-                              style={{
-                                backgroundColor: colorText,
-                                width: '50px',
-                                height: '35px',
-                                border: '1px solid #aeaaaa',
-                              }}
-                            ></div>
+                            <Tooltip title="Chọn màu" placement="top">
+                              <div
+                                onClick={() => setShowColorPicker3(true)}
+                                id="colorDisplay"
+                                style={{
+                                  cursor: 'pointer',
+                                  backgroundColor: colorText,
+                                  width: '50px',
+                                  height: '35px',
+                                  border: '1px solid #aeaaaa',
+                                }}
+                              ></div>
+                            </Tooltip>
                             <div
                               style={{
                                 zIndex: 1000,
@@ -468,13 +538,34 @@ export default function EditBanner(props: Props) {
                                 display: showColorPicker3 ? 'block' : 'none',
                               }}
                             >
-                              <SketchPicker
-                                color={colorText}
-                                onChangeComplete={(color: any, event: any) => {
-                                  setColorText(color.hex)
-                                  setShowColorPicker3(false)
+                              <div
+                                style={{
+                                  background: 'white',
+                                  padding: '10px',
+                                  border: '1px solid gray',
                                 }}
-                              />
+                              >
+                                <p style={{ textAlign: 'end' }}>
+                                  <IconButton
+                                    onClick={() => {
+                                      setShowColorPicker3(false)
+                                    }}
+                                  >
+                                    <CloseIcon />
+                                  </IconButton>
+                                </p>
+
+                                <SketchPicker
+                                  color={colorText}
+                                  onChangeComplete={(
+                                    color: any,
+                                    event: any,
+                                  ) => {
+                                    setColorText(color.hex)
+                                    setShowColorPicker3(false)
+                                  }}
+                                />
+                              </div>
                             </div>
                           </div>
 

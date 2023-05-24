@@ -253,10 +253,15 @@ export default function PlayerManager(props: Props) {
           <Grid item xs={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
+                inputFormat="DD/MM/YYYY"
                 value={dateStart}
                 label="Từ ngày"
                 onChange={newValue => {
-                  setDateStart(new Date(newValue))
+                  if (new Date(newValue).toString() === 'Invalid Date') {
+                    setDateStart(null)
+                  } else {
+                    setDateStart(new Date(newValue))
+                  }
                 }}
                 renderInput={(params: any) => (
                   <TextField
@@ -277,7 +282,14 @@ export default function PlayerManager(props: Props) {
               <DatePicker
                 value={dateEnd}
                 label="Đến ngày"
-                onChange={newValue => setDateEnd(new Date(newValue))}
+                inputFormat="DD/MM/YYYY"
+                onChange={newValue => {
+                  if (new Date(newValue).toString() === 'Invalid Date') {
+                    setDateEnd(null)
+                  } else {
+                    setDateEnd(new Date(newValue))
+                  }
+                }}
                 renderInput={(params: any) => (
                   <TextField
                     {...params}

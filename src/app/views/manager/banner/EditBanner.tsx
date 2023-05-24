@@ -60,12 +60,16 @@ export default function EditBanner(props: Props) {
   const schema = yup
     .object({
       title: yup.string().max(255, 'Tối đa 255 ký tự').trim().nullable(),
-      titlePosition: yup.number().required('Giá trị bắt buộc'),
-      descriptionPosition: yup.number().required('Giá trị bắt buộc'),
-      titleColor: yup.string().trim(),
-      buttonContent: yup.string().max(255, 'Tối đa 255 ký tự').trim(),
+      titlePosition: yup.number().nullable(),
+      descriptionPosition: yup.number().nullable(),
+      titleColor: yup.string().trim().nullable(),
+      buttonContent: yup
+        .string()
+        .max(255, 'Tối đa 255 ký tự')
+        .trim()
+        .nullable(),
       url: yup.string().trim().nullable(),
-      buttonPosition: yup.number().required('Giá trị bắt buộc'),
+      buttonPosition: yup.number().nullable(),
       file:
         type === 1
           ? yup
@@ -105,10 +109,10 @@ export default function EditBanner(props: Props) {
     defaultValues.buttonContent = banner.buttonContent
     defaultValues.buttonPosition = banner.buttonPosition
     defaultValues.url = banner.url
-    setColorButton(banner.buttonColor)
-    setColorDisplay(banner.titleColor)
-    setColorText(banner.buttonTextColor)
-    setColorDescription(banner.descriptionColor)
+    setColorButton(banner.buttonColor || '#FFFFFF')
+    setColorDisplay(banner.titleColor || '#FFFFFF')
+    setColorText(banner.buttonTextColor || '#FFFFFF')
+    setColorDescription(banner.descriptionColor || '#FFFFFF')
     defaultValues.type = banner.type
     setTypeResponse(banner.type)
     if (banner.type === 1) {
@@ -287,7 +291,7 @@ export default function EditBanner(props: Props) {
                               <SketchPicker
                                 color={colorDisplay}
                                 onChangeComplete={(color: any, event: any) => {
-                                  setColorDisplay(color.hex)
+                                  setColorDisplay(color?.hex)
                                   setShowColorPicker1(false)
                                 }}
                               />
@@ -386,7 +390,7 @@ export default function EditBanner(props: Props) {
                               <SketchPicker
                                 color={colorDescription}
                                 onChangeComplete={(color: any, event: any) => {
-                                  setColorDescription(color.hex)
+                                  setColorDescription(color?.hex)
                                   setShowColorPicker4(false)
                                 }}
                               />
@@ -485,7 +489,7 @@ export default function EditBanner(props: Props) {
                                     color: any,
                                     event: any,
                                   ) => {
-                                    setColorButton(color.hex)
+                                    setColorButton(color?.hex)
                                     setShowColorPicker2(false)
                                   }}
                                 />
@@ -561,7 +565,7 @@ export default function EditBanner(props: Props) {
                                     color: any,
                                     event: any,
                                   ) => {
-                                    setColorText(color.hex)
+                                    setColorText(color?.hex)
                                     setShowColorPicker3(false)
                                   }}
                                 />

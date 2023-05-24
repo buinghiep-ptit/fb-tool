@@ -175,7 +175,7 @@ const Layout1Topbar = () => {
 
             <StyledItem onClick={logout}>
               <Icon> power_settings_new </Icon>
-              <Span> Đang xuất </Span>
+              <Span> Đăng xuất </Span>
             </StyledItem>
           </MatxMenu>
         </Box>

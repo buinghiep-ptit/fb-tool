@@ -84,9 +84,8 @@ const JwtRegister = () => {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <ContentBox>
-              <StyledSpan className="sidenavHoverShow pb-3">CampDi</StyledSpan>
               <img
-                src="/assets/images/login/bg-register.png"
+                src="/assets/images/login/logo.png"
                 width="100%"
                 alt="Register"
               />

@@ -109,7 +109,7 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Sắp xếp diễn biến</div>
+            <div>Sắp xếp vị trí</div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>

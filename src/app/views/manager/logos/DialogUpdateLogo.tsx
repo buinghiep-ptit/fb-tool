@@ -169,7 +169,7 @@ const DialogUpdateLogo = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Thêm mới logo</div>
+            <div>Chỉnh sửa logo</div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>

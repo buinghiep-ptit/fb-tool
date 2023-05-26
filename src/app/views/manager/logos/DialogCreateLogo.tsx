@@ -24,6 +24,7 @@ import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
 export interface Props {
+  type: number
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   refresh: () => void
@@ -97,6 +98,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
       strUrl: data.strUrl,
       logo: logo,
       status: 1,
+      type: props.type,
     }
 
     await createLogo(payload)
@@ -137,7 +139,11 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Thêm mới logo</div>
+            <div>
+              {props.type === 1
+                ? 'Thêm mới logo nhà tài trợ chính'
+                : 'Thêm mới logo nhà tài trợ thường'}
+            </div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>

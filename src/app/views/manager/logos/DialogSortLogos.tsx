@@ -139,7 +139,7 @@ const DialogSortProcesses = React.forwardRef((props: Props, ref) => {
                             <ListItemAvatar sx={{ background: 'tomato', p: 1 }}>
                               <img
                                 src={item.logo}
-                                height="100px"
+                                height="60px"
                                 style={{ objectFit: 'contain' }}
                               ></img>
                             </ListItemAvatar>

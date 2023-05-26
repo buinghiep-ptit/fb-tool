@@ -25,7 +25,6 @@ export default function BannerManager(props: Props) {
   }
 
   React.useEffect(() => {
-    console.log(params)
     setValue(searchParams?.get('type') || '1')
   }, [])
 

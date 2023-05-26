@@ -622,16 +622,18 @@ export default function EditBanner(props: Props) {
               </Grid>
               <Grid item sm={6} xs={12}>
                 <Stack gap={3}>
-                  <SelectDropDown
-                    name="type"
-                    label="Loại"
-                    value={type}
-                    onChange={(e: any) => setType(e.target.value)}
-                    sx={{ width: '80%' }}
-                  >
-                    <MenuItem value={1}>Ảnh</MenuItem>
-                    {position !== 2 && <MenuItem value={2}>Video</MenuItem>}
-                  </SelectDropDown>
+                  {position !== 2 && (
+                    <SelectDropDown
+                      name="type"
+                      label="Loại"
+                      value={type}
+                      onChange={(e: any) => setType(e.target.value)}
+                      sx={{ width: '80%' }}
+                    >
+                      <MenuItem value={1}>Ảnh</MenuItem>
+                      <MenuItem value={2}>Video</MenuItem>
+                    </SelectDropDown>
+                  )}
 
                   <input
                     ref={inputRef}

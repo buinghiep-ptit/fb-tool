@@ -108,13 +108,11 @@ export default function CoachDetail(props: Props) {
       height: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       weight: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       sizeShoes: yup
@@ -161,7 +159,7 @@ export default function CoachDetail(props: Props) {
       achiveSummy: yup
         .string()
         .trim()
-        .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
+        .max(255, 'Tóm tắc thành tích  không được vượt quá 255 ký tự')
         .nullable()
         .required('Giá trị bắt buộc'),
       editor_content: yup
@@ -420,7 +418,7 @@ export default function CoachDetail(props: Props) {
                         <BackupIcon fontSize="large" />
                         <div>PNG/JPEG hoặc JPG</div>
                         <div>Dung lượng không quá 50mb</div>
-                        <div>(Tỷ lệ ảnh phù hợp)</div>
+                        <div>(Tỷ lệ ảnh phù hợp: 3:4)</div>
                       </div>
                     )}
                     {previewImage?.length !== 0 && (
@@ -462,7 +460,7 @@ export default function CoachDetail(props: Props) {
               id="panel2bh-header"
             >
               <Typography variant="h4" gutterBottom>
-                Thông số cầu thủ
+                Thông số
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -736,7 +734,7 @@ export default function CoachDetail(props: Props) {
                         id="time"
                         multiline
                         rows={2}
-                        label="Tóm tắt thành tích"
+                        label="Tóm tắt thành tích*"
                         fullWidth
                       />
                     )}
@@ -790,7 +788,7 @@ export default function CoachDetail(props: Props) {
                     variant="contained"
                     disabled={isLoading}
                     onClick={() => {
-                      navigate('/players')
+                      navigate('/coachs')
                     }}
                   >
                     Quay lại

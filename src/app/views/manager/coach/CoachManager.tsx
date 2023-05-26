@@ -20,6 +20,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
@@ -259,7 +260,12 @@ export default function CoachManager(props: Props) {
       </SimpleCard>
       <div style={{ height: '30px' }} />
       <SimpleCard title="Danh sách BHL">
-        <Box width="100%" overflow="auto">
+        {coaches?.length === 0 && (
+          <Typography color="gray" textAlign="center">
+            Không có dữ liệu
+          </Typography>
+        )}
+        <Box width="100%" overflow="auto" hidden={coaches?.length === 0}>
           <StyledTable>
             <TableHead>
               <TableRow>
@@ -270,50 +276,52 @@ export default function CoachManager(props: Props) {
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {(coaches || []).map((coach: any, index: any) => {
-                return (
-                  <TableRow hover key={coach.name}>
-                    <TableCell align="center">
-                      {rowsPerPage * page + index + 1}
-                    </TableCell>
-                    <TableCell align="left">
-                      <Link to="#" style={{ wordBreak: 'keep-all' }}>
-                        {coach.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell align="center">{coach.position}</TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.placeOfOrigin}
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.birthday}
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.dateJoin}
-                    </TableCell>
-                    <TableCell align="center">
-                      {coach.status === 1 && (
-                        <Chip label="Hoạt động" color="success" />
-                      )}
-                      {coach.status === 0 && (
-                        <Chip label="Không hoạt động" color="warning" />
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Tooltip title="Sửa" placement="top">
-                        <IconButton
-                          color="primary"
-                          onClick={() => navigate(`/coachs/${coach.id}`)}
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
+            {coaches && (
+              <TableBody>
+                {(coaches || []).map((coach: any, index: any) => {
+                  return (
+                    <TableRow hover key={coach.id}>
+                      <TableCell align="center">
+                        {rowsPerPage * page + index + 1}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Link to="#" style={{ wordBreak: 'keep-all' }}>
+                          {coach.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell align="center">{coach.position}</TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {coach.placeOfOrigin}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {coach.birthday}
+                      </TableCell>
+                      <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
+                        {coach.dateJoin}
+                      </TableCell>
+                      <TableCell align="center">
+                        {coach.status === 1 && (
+                          <Chip label="Hoạt động" color="success" />
+                        )}
+                        {coach.status === 0 && (
+                          <Chip label="Không hoạt động" color="warning" />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title="Sửa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => navigate(`/coachs/${coach.id}`)}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            )}
           </StyledTable>
         </Box>
         <TablePagination

@@ -19,6 +19,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import {
@@ -207,8 +208,13 @@ export default function PositionManager(props: Props) {
         </Grid>
       </SimpleCard>
       <div style={{ height: '30px' }} />
-      <SimpleCard title="Danh sách BHL">
-        <Box width="100%" overflow="auto">
+      <SimpleCard title="Danh sách vị trí công tác">
+        {positions?.length === 0 && (
+          <Typography color="gray" textAlign="center">
+            Không có dữ liệu
+          </Typography>
+        )}
+        <Box width="100%" overflow="auto" hidden={positions?.length === 0}>
           <StyledTable>
             <TableHead>
               <TableRow>
@@ -219,49 +225,51 @@ export default function PositionManager(props: Props) {
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {(positions || []).map((position: any, index: any) => {
-                return (
-                  <TableRow hover key={position.name}>
-                    <TableCell align="center">
-                      {rowsPerPage * page + index + 1}
-                    </TableCell>
-                    <TableCell align="left">{position.description}</TableCell>
-                    <TableCell align="center">
-                      {position.status === 1 && (
-                        <Chip label="Hoạt động" color="success" />
-                      )}
-                      {position.status === 0 && (
-                        <Chip label="Không hoạt động" color="warning" />
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Tooltip title="Sửa" placement="top">
-                        <IconButton
-                          color="primary"
-                          onClick={() =>
-                            editRef.current.handleClickOpen(position)
-                          }
-                        >
-                          <Edit />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Xóa" placement="top">
-                        <IconButton
-                          color="primary"
-                          onClick={() => {
-                            setIdDelete(position.id)
-                            setOpenConfirmDialog(true)
-                          }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
+            {positions && (
+              <TableBody>
+                {(positions || []).map((position: any, index: any) => {
+                  return (
+                    <TableRow hover key={position.id}>
+                      <TableCell align="center">
+                        {rowsPerPage * page + index + 1}
+                      </TableCell>
+                      <TableCell align="left">{position.description}</TableCell>
+                      <TableCell align="center">
+                        {position.status === 1 && (
+                          <Chip label="Hoạt động" color="success" />
+                        )}
+                        {position.status === 0 && (
+                          <Chip label="Không hoạt động" color="warning" />
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title="Sửa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() =>
+                              editRef.current.handleClickOpen(position)
+                            }
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Xóa" placement="top">
+                          <IconButton
+                            color="primary"
+                            onClick={() => {
+                              setIdDelete(position.id)
+                              setOpenConfirmDialog(true)
+                            }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            )}
           </StyledTable>
         </Box>
         <TablePagination

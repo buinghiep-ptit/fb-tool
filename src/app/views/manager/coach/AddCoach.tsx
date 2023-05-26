@@ -71,18 +71,16 @@ export default function AddCoach(props: Props) {
         .date()
         .nullable()
         .typeError('Nhập đúng định dạng ngày hợp lệ'),
-      teams: yup.array(),
+      teams: yup.array().min(1, 'Giá trị bắt buộc'),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       height: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       weight: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       sizeShoes: yup
@@ -129,7 +127,7 @@ export default function AddCoach(props: Props) {
       achiveSummy: yup
         .string()
         .trim()
-        .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
+        .max(255, 'Tóm tắc thành tích không được vượt quá 255 ký tự')
         .nullable()
         .required('Giá trị bắt buộc'),
       editor_content: yup
@@ -211,6 +209,7 @@ export default function AddCoach(props: Props) {
         biography: data.editor_content,
         cupNo: data.countCup,
         status: data.status,
+        achiveSummy: data.achiveSummy,
         position: idPosition,
       }
       const res = await createCoach(payload)
@@ -374,7 +373,7 @@ export default function AddCoach(props: Props) {
                         <BackupIcon fontSize="large" />
                         <div>PNG/JPEG hoặc JPG</div>
                         <div>Dung lượng không quá 50mb</div>
-                        <div>(Tỷ lệ ảnh phù hợp)</div>
+                        <div>(Tỷ lệ ảnh phù hợp: 3:4)</div>
                       </div>
                     )}
                     {previewImage?.length !== 0 && (
@@ -416,7 +415,7 @@ export default function AddCoach(props: Props) {
               id="panel2bh-header"
             >
               <Typography variant="h4" gutterBottom>
-                Thông số cầu thủ
+                Thông số
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -513,7 +512,7 @@ export default function AddCoach(props: Props) {
                         error={!!methods.formState.errors?.height}
                         helperText={methods.formState.errors?.height?.message}
                         id=""
-                        label="Chiều cao(cm)*"
+                        label="Chiều cao(cm)"
                         type="number"
                       />
                     )}
@@ -529,7 +528,7 @@ export default function AddCoach(props: Props) {
                         error={!!methods.formState.errors?.weight}
                         helperText={methods.formState.errors?.weight?.message}
                         id="time"
-                        label="Cân nặng(kg)*"
+                        label="Cân nặng(kg)"
                         type="number"
                       />
                     )}
@@ -690,7 +689,7 @@ export default function AddCoach(props: Props) {
                         id="time"
                         multiline
                         rows={2}
-                        label="Tóm tắt thành tích"
+                        label="Tóm tắt thành tích*"
                         fullWidth
                       />
                     )}
@@ -744,7 +743,7 @@ export default function AddCoach(props: Props) {
                     variant="contained"
                     disabled={isLoading}
                     onClick={() => {
-                      navigate('/players')
+                      navigate('/coachs')
                     }}
                   >
                     Quay lại

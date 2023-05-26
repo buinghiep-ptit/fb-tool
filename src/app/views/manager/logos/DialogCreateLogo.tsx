@@ -197,7 +197,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
                   <div>Chọn ảnh để tải lên</div>
                   <BackupIcon fontSize="large" />
                   <div>Định dạng: SVG</div>
-                  <div>Lưu ý logo gần để màu trắng</div>
+                  <div>Lưu ý logo cần để màu trắng</div>
                 </div>
               )}
               {previewImage?.length !== 0 && (

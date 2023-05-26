@@ -32,3 +32,22 @@ export const headTableCoachs = [
     width: '150px',
   },
 ]
+
+export const headTablePosition = [
+  {
+    name: 'STT',
+    width: '60px',
+  },
+  {
+    name: 'Tên vị trí công tác',
+    width: '250px',
+  },
+  {
+    name: 'Trạng thái',
+    width: '150px',
+  },
+  {
+    name: '',
+    width: '200px',
+  },
+]

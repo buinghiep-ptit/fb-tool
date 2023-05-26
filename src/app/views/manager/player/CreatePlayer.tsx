@@ -389,7 +389,7 @@ export default function PlayerDetail(props: Props) {
                         <BackupIcon fontSize="large" />
                         <div>PNG/JPEG hoặc JPG</div>
                         <div>Dung lượng không quá 50mb</div>
-                        <div>(Tỷ lệ ảnh phù hợp)</div>
+                        <div>(Tỷ lệ ảnh phù hợp: 3:4)</div>
                       </div>
                     )}
                     {previewImage?.length !== 0 && (

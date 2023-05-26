@@ -13,15 +13,15 @@ export const headTablePlayer = [
   },
   {
     name: 'Vị trí',
-    width: '250px',
+    width: '100px',
   },
   {
     name: 'Đội thi đấu',
-    width: '250px',
+    width: '100px',
   },
   {
     name: 'Ngày sinh',
-    width: '250px',
+    width: '150px',
   },
   {
     name: 'Chiều cao(cm)',

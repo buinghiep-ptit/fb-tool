@@ -26,23 +26,22 @@ export const navigations = [
   { name: 'Quản lý thông tin trận đấu', path: '/matches', icon: 'scoreboard' },
   // { name: 'Quản lý tài khoản vận hành', path: '/users', icon: 'contacts' },
   { name: 'Logo nhà tài trợ', path: '/logos', icon: 'flag-pennant' },
-  // {
-  //   name: 'Quản lý giải đấu',
-  //   icon: 'sports_soccer',
-  //   children: [
-  //     {
-  //       name: 'BXH',
-  //       iconText: 'SI',
-  //       path: '/quan-ly-thong-bao/nguoi-dung',
-  //     },
-  //     {
-  //       name: 'Quản lý cố phiếu đội',
-  //       iconText: 'SU',
-  //       path: '/quan-ly-thong-bao/dau-trang',
-  //     },
-  //   ],
-  //   auth: [ROLES.ADMIN],
-  // },
+  {
+    name: 'Quản lý ban huấn luyện',
+    icon: 'sports_soccer',
+    children: [
+      {
+        name: 'Danh sách BHL',
+        iconText: 'SI',
+        path: '/coachs',
+      },
+      {
+        name: 'Quản lý vị trí ban huấn luyện',
+        iconText: 'SU',
+        path: '/position',
+      },
+    ],
+  },
   // {
   //   name: 'Quản lý Homepages',
   //   path: '/quan-ly-tai-khoan-admin',

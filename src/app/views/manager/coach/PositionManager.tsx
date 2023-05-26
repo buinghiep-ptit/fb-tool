@@ -1,8 +1,7 @@
-import { Edit } from '@mui/icons-material'
+import { Delete, Edit } from '@mui/icons-material'
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 import CachedIcon from '@mui/icons-material/Cached'
 import SearchIcon from '@mui/icons-material/Search'
-import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload'
 import {
   Button,
   Chip,
@@ -22,36 +21,47 @@ import {
   Tooltip,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { LocalizationProvider } from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { getCoachs } from 'app/apis/coachs/coachs.service'
-import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
-import moment from 'moment'
+import {
+  deleteCoachPosition,
+  getCoachPosition,
+} from 'app/apis/coachs/coachs.service'
+import {
+  Breadcrumb,
+  ConfirmationDialog,
+  Container,
+  SimpleCard,
+  StyledTable,
+} from 'app/components'
+import { toastSuccess } from 'app/helpers/toastNofication'
 import * as React from 'react'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { headTableCoachs } from './const'
-
+import { useNavigate } from 'react-router-dom'
+import DialogCreatePosition from './DialogCreatePosition'
+import DialogEditPosition from './DialogEditPosition'
+import { headTablePosition } from './const'
 export interface Props {}
 
-export default function CoachManager(props: Props) {
+export default function PositionManager(props: Props) {
   const [page, setPage] = useState(0)
   const [countTable, setCountTable] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(20)
-  const [coaches, setCoaches] = useState<any>()
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false)
   const [nameFilter, setNameFilter] = useState<any>('')
   const [statusFilter, setStatusFilter] = useState<any>(2)
-  const [type, setType] = useState<any>(2)
-  const [from, setFrom] = useState<any>(null)
-  const [to, setTo] = useState<any>(null)
-  const [position, setPosition] = useState<any>()
+  const createRef = React.useRef<any>(null)
+  const editRef = React.useRef<any>(null)
+  const [positions, setPositions] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const [doRerender, setDoRerender] = React.useState(false)
+  const [idDelete, setIdDelete] = useState(null)
   const navigate = useNavigate()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
+  }
+
+  const closeConfirmDialog = () => {
+    setOpenConfirmDialog(false)
   }
 
   const handleChangeRowsPerPage = (event: {
@@ -62,24 +72,15 @@ export default function CoachManager(props: Props) {
     setDoRerender(!doRerender)
   }
 
-  const fetchCoaches = async () => {
+  const fetchCoachePosition = async () => {
     setIsLoading(true)
-    const res = await getCoachs({
+    const res = await getCoachPosition({
       name: nameFilter.trim(),
-      position: position,
       status: statusFilter === 2 ? null : statusFilter,
-      dateStart:
-        moment(from).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(from).format('YYYY-MM-DD'),
-      dateEnd:
-        moment(to).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(to).format('YYYY-MM-DD'),
       size: rowsPerPage,
       page: page,
     })
-    setCoaches(res.content)
+    setPositions(res.content)
     setCountTable(res.totalElements)
     setIsLoading(false)
   }
@@ -91,14 +92,23 @@ export default function CoachManager(props: Props) {
 
   const handleClearFilter = async () => {
     setNameFilter('')
-    setTo(null)
     setStatusFilter(2)
-    setFrom(null)
     setDoRerender(!doRerender)
   }
 
+  const handleDeletePosition = async () => {
+    const res = await deleteCoachPosition(idDelete)
+    if (res) {
+      toastSuccess({
+        message: 'Xóa thành công',
+      })
+      setOpenConfirmDialog(false)
+      fetchCoachePosition()
+    }
+  }
+
   React.useEffect(() => {
-    fetchCoaches()
+    fetchCoachePosition()
   }, [page, doRerender])
 
   return (
@@ -125,23 +135,23 @@ export default function CoachManager(props: Props) {
         }}
       >
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Quản lý ban huấn luyện' }]} />
+          <Breadcrumb routeSegments={[{ name: 'Quản lý vị trí công tác ' }]} />
         </Box>
         <Button
           variant="contained"
           startIcon={<AddBoxOutlinedIcon />}
           style={{ width: '200px', margin: '15px 0', height: '52px' }}
-          onClick={() => navigate('/coachs/create')}
+          onClick={() => createRef?.current.handleClickOpen()}
         >
-          Thêm mới BHL
+          Thêm mới
         </Button>
       </div>
       <SimpleCard>
         <Grid container spacing={2}>
           <Grid item xs={3}>
             <TextField
-              id="name1"
-              label="Tên ban huấn luyện"
+              id="namePosition"
+              label="Tên vị trí công tác"
               variant="outlined"
               fullWidth
               onChange={e => {
@@ -156,59 +166,6 @@ export default function CoachManager(props: Props) {
             />
           </Grid>
 
-          <Grid item xs={3}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Vị trí</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                label="Vị trí"
-                onChange={e => setType(e.target.value)}
-              >
-                <MenuItem value={99}>Tất cả</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={3}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                value={from}
-                label="Từ ngày"
-                onChange={newValue => setFrom(newValue)}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{ shrink: true }}
-                    size="medium"
-                    variant="outlined"
-                    fullWidth
-                    color="primary"
-                    autoComplete="bday"
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={3}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                value={to}
-                label="Đến ngày"
-                onChange={newValue => setTo(newValue)}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    InputLabelProps={{ shrink: true }}
-                    size="medium"
-                    variant="outlined"
-                    fullWidth
-                    color="primary"
-                    autoComplete="bday"
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
           <Grid item xs={3}>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
@@ -227,7 +184,7 @@ export default function CoachManager(props: Props) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={9} style={{ textAlign: 'end' }}>
+          <Grid item xs={6} style={{ textAlign: 'end' }}>
             <Button
               variant="contained"
               startIcon={<SearchIcon />}
@@ -246,14 +203,6 @@ export default function CoachManager(props: Props) {
             >
               Làm mới
             </Button>
-            <Button
-              startIcon={<SimCardDownloadIcon />}
-              variant="contained"
-              disabled={isLoading}
-              style={{ marginRight: '15px', height: '50px' }}
-            >
-              Xuất Excel
-            </Button>
           </Grid>
         </Grid>
       </SimpleCard>
@@ -263,7 +212,7 @@ export default function CoachManager(props: Props) {
           <StyledTable>
             <TableHead>
               <TableRow>
-                {headTableCoachs.map(header => (
+                {headTablePosition.map(header => (
                   <TableCell align="center" style={{ minWidth: header.width }}>
                     {header.name}
                   </TableCell>
@@ -271,32 +220,18 @@ export default function CoachManager(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(coaches || []).map((coach: any, index: any) => {
+              {(positions || []).map((position: any, index: any) => {
                 return (
-                  <TableRow hover key={coach.name}>
+                  <TableRow hover key={position.name}>
                     <TableCell align="center">
                       {rowsPerPage * page + index + 1}
                     </TableCell>
-                    <TableCell align="left">
-                      <Link to="#" style={{ wordBreak: 'keep-all' }}>
-                        {coach.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell align="center">{coach.position}</TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.placeOfOrigin}
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.birthday}
-                    </TableCell>
-                    <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
-                      {coach.dateJoin}
-                    </TableCell>
+                    <TableCell align="left">{position.description}</TableCell>
                     <TableCell align="center">
-                      {coach.status === 1 && (
+                      {position.status === 1 && (
                         <Chip label="Hoạt động" color="success" />
                       )}
-                      {coach.status === 0 && (
+                      {position.status === 0 && (
                         <Chip label="Không hoạt động" color="warning" />
                       )}
                     </TableCell>
@@ -304,9 +239,22 @@ export default function CoachManager(props: Props) {
                       <Tooltip title="Sửa" placement="top">
                         <IconButton
                           color="primary"
-                          onClick={() => navigate(`/coachs/${coach.id}`)}
+                          onClick={() =>
+                            editRef.current.handleClickOpen(position)
+                          }
                         >
                           <Edit />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Xóa" placement="top">
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            setIdDelete(position.id)
+                            setOpenConfirmDialog(true)
+                          }}
+                        >
+                          <Delete />
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -328,6 +276,26 @@ export default function CoachManager(props: Props) {
           onRowsPerPageChange={handleChangeRowsPerPage}
           nextIconButtonProps={{ 'aria-label': 'Next Page' }}
           backIconButtonProps={{ 'aria-label': 'Previous Page' }}
+        />
+        <DialogCreatePosition
+          ref={createRef}
+          fetchData={fetchCoachePosition}
+          setIsLoading={setIsLoading}
+          isLoading={isLoading}
+        ></DialogCreatePosition>
+        <DialogEditPosition
+          fetchData={fetchCoachePosition}
+          ref={editRef}
+          setIsLoading={setIsLoading}
+          isLoading={isLoading}
+        />
+        <ConfirmationDialog
+          open={openConfirmDialog}
+          onConfirmDialogClose={closeConfirmDialog}
+          text="Bạn có chắc chắn muốn xóa vị trí công tác này?"
+          onYesClick={handleDeletePosition}
+          textYes="Xóa"
+          title="Xác nhận"
         />
       </SimpleCard>
     </Container>

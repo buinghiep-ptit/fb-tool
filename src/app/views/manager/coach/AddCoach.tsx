@@ -25,11 +25,7 @@ import {
 import IconButton from '@mui/material/IconButton'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import {
-  getCoachDetail,
-  getCoachPosition,
-  updateCoach,
-} from 'app/apis/coachs/coachs.service'
+import { createCoach, getCoachPosition } from 'app/apis/coachs/coachs.service'
 import { getTeams } from 'app/apis/players/players.service'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
@@ -42,49 +38,21 @@ import {
 import moment from 'moment'
 import { useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as yup from 'yup'
 export interface Props {}
 
-export default function CoachDetail(props: Props) {
+export default function AddCoach(props: Props) {
   const [teams, setTeams] = useState<any[]>([])
   const [positions, setPositions] = useState<any[]>([])
   const [isLoading, setIsloading] = useState(false)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
   const [coach, setCoach] = useState<any>()
+
   const [idPosition, setIdPosition] = React.useState<any>(false)
-  const params = useParams()
+
   const navigate = useNavigate()
-
-  const initDefaultValues = (coach: any) => {
-    const defaultValues: any = {}
-    defaultValues.nameCoach = coach?.fullName || ''
-    defaultValues.homeTown = coach?.placeOfOrigin || ''
-    defaultValues.dateOfBirth = coach?.dateOfBirth || ''
-
-    defaultValues.gatheringDay =
-      coach.dateJoined || moment(Date.now()).format('YYYY-MM-DD')
-    defaultValues.teams = coach.teams
-
-    defaultValues.position = coach.mainPosition
-    defaultValues.clothesNumber = coach.jerseyNo
-    defaultValues.height = coach.height || 0
-    defaultValues.weight = coach.weight || 0
-    defaultValues.sizeShoes = coach.shoseSize || 0
-    defaultValues.sizeSpikeShoes = coach.nailShoseSize || 0
-    defaultValues.sizeClothes = coach.shirtSize || ''
-    defaultValues.achiveSummy = coach.achiveSummy
-    defaultValues.yellowCard = coach.yellowCardNo || 0
-    defaultValues.redCard = coach.redCardNo || 0
-    defaultValues.editor_content = coach.biography
-    defaultValues.oldClub = coach.oldClub
-    defaultValues.position = coach.position
-    defaultValues.status = coach.status
-    setPreviewImage(coach.imageUrl)
-    setIdPosition(coach.position)
-    methods.reset({ ...defaultValues })
-  }
 
   const schema = yup
     .object({
@@ -103,7 +71,7 @@ export default function CoachDetail(props: Props) {
         .date()
         .nullable()
         .typeError('Nhập đúng định dạng ngày hợp lệ'),
-      teams: yup.array().min(1, 'Giá trị bắt buộc'),
+      teams: yup.array(),
       position: yup.string().nullable().required('Giá trị bắt buộc'),
       height: yup
         .string()
@@ -204,7 +172,6 @@ export default function CoachDetail(props: Props) {
   })
 
   const onSubmit = async (data: any) => {
-    console.log(data)
     setIsloading(true)
     let imageUrl: any = ''
     try {
@@ -231,10 +198,7 @@ export default function CoachDetail(props: Props) {
           moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
             ? null
             : moment(data.dateOfBirth).format('YYYY-MM-DD'),
-        dateJoined:
-          moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
-            ? null
-            : moment(data.gatheringDay).format('YYYY-MM-DD'),
+
         shirtSize: data.sizeClothes,
         shoseSize: data.sizeShoes,
         nailShoseSize: data.sizeSpikeShoes,
@@ -247,22 +211,19 @@ export default function CoachDetail(props: Props) {
         biography: data.editor_content,
         cupNo: data.countCup,
         status: data.status,
-        achiveSummy: data.achiveSummy,
-        mainPosition: data.position,
-        position: parseInt(idPosition),
-        id: params.id,
+        position: idPosition,
       }
-      const res = await updateCoach(payload)
+      const res = await createCoach(payload)
       if (res) {
         toastSuccess({
-          message: 'Cập nhật thành công',
+          message: 'Thêm thành công',
         })
         setIsloading(false)
         navigate('/coachs')
       }
     } catch (e) {
       toastError({
-        message: 'Cập nhật thất bại',
+        message: 'Thêm thất bại',
       })
       setIsloading(false)
     }
@@ -278,16 +239,9 @@ export default function CoachDetail(props: Props) {
     setTeams(res)
   }
 
-  const fetchCoachDetail = async () => {
-    const res = await getCoachDetail(params.id)
-    setCoach(res)
-    initDefaultValues(res)
-  }
-
   React.useEffect(() => {
     fetchPositions()
     fetchTeams()
-    fetchCoachDetail()
   }, [])
 
   return (
@@ -309,7 +263,7 @@ export default function CoachDetail(props: Props) {
         <Breadcrumb
           routeSegments={[
             { name: 'Quản lý ban huấn luyện', path: '/coachs' },
-            { name: 'Chi tiết ban huấn luyện' },
+            { name: 'Thêm ban huấn luyện' },
           ]}
         />
       </Box>
@@ -433,7 +387,7 @@ export default function CoachDetail(props: Props) {
                               style={{ position: 'relative' }}
                               onClick={event => {
                                 setFile(null)
-                                setPreviewImage(coach?.imageUrl)
+                                setPreviewImage(coach?.imageUrl || '')
                                 event.stopPropagation()
                               }}
                             >

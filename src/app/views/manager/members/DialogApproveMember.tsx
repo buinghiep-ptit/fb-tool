@@ -79,10 +79,11 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
           else return schema
         })
         .max(next20Years, 'Tối đa 20 năm từ năm hiện tại')
-        .when(
-          'from',
-          (from, yup) => from && yup.min(from, 'Lớn hơn [Từ mùa giải]'),
-        )
+        .when('type', (type, schema) => {
+          if (type === 2)
+            return schema.min(yup.ref('from'), 'Lớn hơn [Từ mùa giải]')
+          else return schema
+        })
         .nullable()
         .transform((curr, orig) => (orig === '' ? null : curr))
         .typeError('Không hợp lệ'),

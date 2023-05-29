@@ -92,11 +92,11 @@ export default function CoachManager(props: Props) {
       position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
-        moment(new Date(from)).format('YYYY-MM-DD') === 'Invalid date'
+        moment(from).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(new Date(from)).format('YYYY-MM-DD'),
       dateEnd:
-        moment(new Date(to)).format('YYYY-MM-DD') === 'Invalid date'
+        moment(to).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(new Date(to)).format('YYYY-MM-DD'),
       size: rowsPerPage,
@@ -114,11 +114,11 @@ export default function CoachManager(props: Props) {
       position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
-        moment(new Date(from)).format('YYYY-MM-DD') === 'Invalid date'
+        moment(from).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(new Date(from)).format('YYYY-MM-DD'),
       dateEnd:
-        moment(new Date(to)).format('YYYY-MM-DD') === 'Invalid date'
+        moment(to).format('YYYY-MM-DD') === 'Invalid date'
           ? null
           : moment(new Date(to)).format('YYYY-MM-DD'),
       page: 0,

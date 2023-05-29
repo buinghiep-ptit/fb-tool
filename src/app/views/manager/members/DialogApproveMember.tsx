@@ -7,21 +7,24 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   FormLabel,
   Grid,
   IconButton,
   LinearProgress,
+  Radio,
   TextField,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { approveMember } from 'app/apis/members/members.service'
+import { MuiRHFRadioGroup } from 'app/components/common/MuiRHFRadioGroup'
 import MuiRHFTextarea from 'app/components/common/MuiRHFTextarea'
 import MuiRHFNumericFormatInput from 'app/components/common/MuiRHFWithNumericFormat'
 import { toastSuccess } from 'app/helpers/toastNofication'
 import dayjs from 'dayjs'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
@@ -60,6 +63,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
 
   const schema = yup
     .object({
+      type: yup.number().required().min(1).max(2),
       from: yup
         .date()
         .required('Giá trị bắt buộc')
@@ -70,9 +74,15 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
         .typeError('Không hợp lệ'),
       to: yup
         .date()
-        .required('Giá trị bắt buộc')
-        .min(yup.ref('from'), 'Lớn hơn [Từ mùa giải]')
+        .when('type', (type, schema) => {
+          if (Number(type) === 2) return schema.required('Giá trị bắt buộc')
+          else return schema
+        })
         .max(next20Years, 'Tối đa 20 năm từ năm hiện tại')
+        .when(
+          'from',
+          (from, yup) => from && yup.min(from, 'Lớn hơn [Từ mùa giải]'),
+        )
         .nullable()
         .transform((curr, orig) => (orig === '' ? null : curr))
         .typeError('Không hợp lệ'),
@@ -90,18 +100,29 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      from: dayjs().toDate(),
-      to: dayjs().toDate(),
+      type: 1,
+      from: dayjs().startOf('year').toDate(),
+      to: dayjs().startOf('year').toDate(),
       amount: '',
       note: '',
     },
   })
 
+  const watchFrom = methods.watch('from')
+  const watchType = methods.watch('type')
+  useEffect(() => {
+    methods.trigger().then(() => methods.clearErrors())
+  }, [watchType])
+
   const onSubmit = async (data: any) => {
     setIsLoading(true)
 
     const yearFrom = dayjs(data.from).get('year')
-    const yearTo = dayjs(data.to).get('year')
+    const yearTo =
+      data.type === 1
+        ? dayjs(data.from).get('year')
+        : dayjs(data.to).get('year')
+
     let year = yearFrom
     let yearCount = 0
     const years = []
@@ -134,7 +155,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth>
         {isLoading && (
           <Box
             sx={{
@@ -168,6 +189,20 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
             <DialogContent>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <MuiRHFRadioGroup name="type" row>
+                      <FormControlLabel
+                        value="1"
+                        control={<Radio />}
+                        label="Một mùa giải"
+                      />
+                      <FormControlLabel
+                        value="2"
+                        control={<Radio />}
+                        label="Nhiều mùa giải"
+                      />
+                    </MuiRHFRadioGroup>
+                  </Grid>
                   <Grid item xs={6}>
                     <Controller
                       name="from"
@@ -177,6 +212,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                           label="Từ mùa giải*"
                           {...field}
                           views={['year']}
+                          openTo="year"
                           minDate={today}
                           maxDate={next1Years}
                           renderInput={(params: any) => (
@@ -190,7 +226,6 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 variant="outlined"
-                                margin="normal"
                               />
                             </FormControl>
                           )}
@@ -198,7 +233,11 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid
+                    item
+                    xs={6}
+                    display={Number(watchType) === 2 ? 'block' : 'none'}
+                  >
                     <Controller
                       name="to"
                       control={methods.control}
@@ -207,7 +246,8 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                           label="Đến mùa giải*"
                           {...field}
                           views={['year']}
-                          minDate={methods.getValues('from') ?? today}
+                          openTo="year"
+                          minDate={watchFrom}
                           maxDate={next20Years}
                           renderInput={(params: any) => (
                             <FormControl fullWidth margin="normal">
@@ -220,7 +260,6 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 variant="outlined"
-                                margin="normal"
                               />
                             </FormControl>
                           )}

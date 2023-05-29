@@ -81,7 +81,7 @@ const DialogRejectMember = React.forwardRef((props: Props, ref) => {
   }
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth>
         {isLoading && (
           <Box
             sx={{

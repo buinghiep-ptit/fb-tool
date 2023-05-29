@@ -300,7 +300,7 @@ export default function CoachManager(props: Props) {
               >
                 <MenuItem value={2}>Tất cả</MenuItem>
                 <MenuItem value={1}>Hoạt động</MenuItem>
-                <MenuItem value={0}>Không hoạt động</MenuItem>
+                <MenuItem value={-2}>Không hoạt động</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -380,7 +380,7 @@ export default function CoachManager(props: Props) {
                         {coach.status === 1 && (
                           <Chip label="Hoạt động" color="success" />
                         )}
-                        {coach.status === 0 && (
+                        {coach.status === -2 && (
                           <Chip label="Không hoạt động" color="warning" />
                         )}
                       </TableCell>

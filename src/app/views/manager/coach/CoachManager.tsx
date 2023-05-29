@@ -92,13 +92,13 @@ export default function CoachManager(props: Props) {
       position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
-        moment(from).format('YYYY-MM-DD') === 'Invalid date'
+        moment(new Date(from)).format('YYYY-MM-DD') === 'Invalid date'
           ? null
-          : moment(from).format('YYYY-MM-DD'),
+          : moment(new Date(from)).format('YYYY-MM-DD'),
       dateEnd:
-        moment(to).format('YYYY-MM-DD') === 'Invalid date'
+        moment(new Date(to)).format('YYYY-MM-DD') === 'Invalid date'
           ? null
-          : moment(to).format('YYYY-MM-DD'),
+          : moment(new Date(to)).format('YYYY-MM-DD'),
       size: rowsPerPage,
       page: page,
     })
@@ -114,13 +114,13 @@ export default function CoachManager(props: Props) {
       position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
-        moment(from).format('YYYY-MM-DD') === 'Invalid date'
+        moment(new Date(from)).format('YYYY-MM-DD') === 'Invalid date'
           ? null
-          : moment(from).format('YYYY-MM-DD'),
+          : moment(new Date(from)).format('YYYY-MM-DD'),
       dateEnd:
-        moment(to).format('YYYY-MM-DD') === 'Invalid date'
+        moment(new Date(to)).format('YYYY-MM-DD') === 'Invalid date'
           ? null
-          : moment(to).format('YYYY-MM-DD'),
+          : moment(new Date(to)).format('YYYY-MM-DD'),
       page: 0,
       size: countTable ?? 0,
     })
@@ -152,6 +152,7 @@ export default function CoachManager(props: Props) {
     setNameFilter('')
     setTo(null)
     setStatusFilter(2)
+    setType(99)
     setFrom(null)
     setDoRerender(!doRerender)
   }
@@ -238,7 +239,6 @@ export default function CoachManager(props: Props) {
               <DatePicker
                 value={from}
                 label="Từ ngày"
-                inputFormat="DD/MM/YYYY"
                 onChange={newValue => setFrom(newValue)}
                 renderInput={(params: any) => (
                   <TextField
@@ -260,11 +260,9 @@ export default function CoachManager(props: Props) {
                 value={to}
                 label="Đến ngày"
                 onChange={newValue => {
-                  console.log(moment(newValue), moment(from))
                   setIsValid(new Date(newValue) > new Date(from))
                   setTo(newValue)
                 }}
-                inputFormat="DD/MM/YYYY"
                 renderInput={(params: any) => (
                   <TextField
                     {...params}

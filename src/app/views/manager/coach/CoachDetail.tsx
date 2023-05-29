@@ -557,7 +557,7 @@ export default function CoachDetail(props: Props) {
                         error={!!methods.formState.errors?.height}
                         helperText={methods.formState.errors?.height?.message}
                         id=""
-                        label="Chiều cao(cm)*"
+                        label="Chiều cao(cm)"
                         type="number"
                       />
                     )}
@@ -573,7 +573,7 @@ export default function CoachDetail(props: Props) {
                         error={!!methods.formState.errors?.weight}
                         helperText={methods.formState.errors?.weight?.message}
                         id="time"
-                        label="Cân nặng(kg)*"
+                        label="Cân nặng(kg)"
                         type="number"
                       />
                     )}

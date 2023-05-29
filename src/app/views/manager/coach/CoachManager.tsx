@@ -7,6 +7,7 @@ import {
   Button,
   Chip,
   FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -26,7 +27,7 @@ import { Box } from '@mui/system'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { getCoachs } from 'app/apis/coachs/coachs.service'
+import { getCoachPosition, getCoachs } from 'app/apis/coachs/coachs.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { toastError } from 'app/helpers/toastNofication'
 import { ExportToExcel } from 'app/utils/exportFile'
@@ -63,12 +64,13 @@ export default function CoachManager(props: Props) {
   const [coaches, setCoaches] = useState<any>()
   const [nameFilter, setNameFilter] = useState<any>('')
   const [statusFilter, setStatusFilter] = useState<any>(2)
-  const [type, setType] = useState<any>(2)
+  const [type, setType] = useState<any>(99)
   const [from, setFrom] = useState<any>(null)
   const [to, setTo] = useState<any>(null)
-  const [position, setPosition] = useState<any>()
+  const [positions, setPositions] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
   const [doRerender, setDoRerender] = React.useState(false)
+  const [isValid, setIsValid] = useState(true)
   const navigate = useNavigate()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
@@ -87,7 +89,7 @@ export default function CoachManager(props: Props) {
     setIsLoading(true)
     const res = await getCoachs({
       name: nameFilter.trim(),
-      position: position,
+      position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
         moment(from).format('YYYY-MM-DD') === 'Invalid date'
@@ -109,7 +111,7 @@ export default function CoachManager(props: Props) {
     setIsLoading(true)
     await getCoachs({
       name: nameFilter.trim(),
-      position: position,
+      position: type === 99 ? null : type,
       status: statusFilter === 2 ? null : statusFilter,
       dateStart:
         moment(from).format('YYYY-MM-DD') === 'Invalid date'
@@ -141,6 +143,11 @@ export default function CoachManager(props: Props) {
     setDoRerender(!doRerender)
   }
 
+  const fetchPositions = async () => {
+    const res = await getCoachPosition({ size: 1000, page: 0 })
+    setPositions(res.content)
+  }
+
   const handleClearFilter = async () => {
     setNameFilter('')
     setTo(null)
@@ -151,6 +158,7 @@ export default function CoachManager(props: Props) {
 
   React.useEffect(() => {
     fetchCoaches()
+    fetchPositions()
   }, [page, doRerender])
 
   return (
@@ -215,9 +223,13 @@ export default function CoachManager(props: Props) {
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Vị trí"
+                value={type}
                 onChange={e => setType(e.target.value)}
               >
                 <MenuItem value={99}>Tất cả</MenuItem>
+                {(positions || []).map((item: any) => (
+                  <MenuItem value={item.id}>{item.description}</MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -226,6 +238,7 @@ export default function CoachManager(props: Props) {
               <DatePicker
                 value={from}
                 label="Từ ngày"
+                inputFormat="DD/MM/YYYY"
                 onChange={newValue => setFrom(newValue)}
                 renderInput={(params: any) => (
                   <TextField
@@ -246,7 +259,12 @@ export default function CoachManager(props: Props) {
               <DatePicker
                 value={to}
                 label="Đến ngày"
-                onChange={newValue => setTo(newValue)}
+                onChange={newValue => {
+                  console.log(moment(newValue), moment(from))
+                  setIsValid(new Date(newValue) > new Date(from))
+                  setTo(newValue)
+                }}
+                inputFormat="DD/MM/YYYY"
                 renderInput={(params: any) => (
                   <TextField
                     {...params}
@@ -260,6 +278,13 @@ export default function CoachManager(props: Props) {
                 )}
               />
             </LocalizationProvider>
+            {!isValid ? (
+              <FormHelperText style={{ color: 'red' }}>
+                Chọn ngày sau 'từ ngày'
+              </FormHelperText>
+            ) : (
+              ''
+            )}
           </Grid>
           <Grid item xs={3}>
             <FormControl fullWidth>

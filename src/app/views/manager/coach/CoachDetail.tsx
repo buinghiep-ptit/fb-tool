@@ -159,7 +159,7 @@ export default function CoachDetail(props: Props) {
       achiveSummy: yup
         .string()
         .trim()
-        .max(255, 'Tóm tắc thành tích  không được vượt quá 255 ký tự')
+        .max(255, 'Tóm tắc thành tích  không được vượt quá 500 ký tự')
         .nullable()
         .required('Giá trị bắt buộc'),
       editor_content: yup
@@ -267,7 +267,7 @@ export default function CoachDetail(props: Props) {
   }
 
   const fetchPositions = async () => {
-    const res = await getCoachPosition({ page: 0, size: 100 })
+    const res = await getCoachPosition({ page: 0, size: 100, status: 1 })
     setPositions(res?.content)
   }
 

@@ -28,11 +28,31 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { getCoachs } from 'app/apis/coachs/coachs.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
+import { toastError } from 'app/helpers/toastNofication'
+import { ExportToExcel } from 'app/utils/exportFile'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { headTableCoachs } from './const'
+
+const convertToXlsxData = (data: any): any[] => {
+  return data
+    .map((item: any, index: any) => ({
+      ...item,
+      index,
+      status: item.status === 1 ? 'Hoạt động' : 'Không hoạt động',
+    }))
+    .map((item: any) => ({
+      ['STT']: item.index + 1 + '',
+      ['Tên BHL']: item.name,
+      ['Vị trí']: item.position,
+      ['Quê quán']: item.placeOfOrigin,
+      ['Ngày sinh']: item.birthday,
+      ['Ngày tham gia CAHN']: item.dateJoin,
+      ['Trạng thái']: item.status,
+    })) as any
+}
 
 export interface Props {}
 
@@ -83,6 +103,37 @@ export default function CoachManager(props: Props) {
     setCoaches(res.content)
     setCountTable(res.totalElements)
     setIsLoading(false)
+  }
+
+  const handleExportExcel = async () => {
+    setIsLoading(true)
+    await getCoachs({
+      name: nameFilter.trim(),
+      position: position,
+      status: statusFilter === 2 ? null : statusFilter,
+      dateStart:
+        moment(from).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(from).format('YYYY-MM-DD'),
+      dateEnd:
+        moment(to).format('YYYY-MM-DD') === 'Invalid date'
+          ? null
+          : moment(to).format('YYYY-MM-DD'),
+      page: 0,
+      size: countTable ?? 0,
+    })
+      .then(result => {
+        ExportToExcel(
+          convertToXlsxData(result?.content ?? []),
+          'Danh_Sach_BHL_',
+        )
+      })
+      .catch(() => {
+        toastError({ message: 'Có lỗi xảy ra vui lòng thử lại!' })
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const handleSearch = async () => {
@@ -252,6 +303,7 @@ export default function CoachManager(props: Props) {
               variant="contained"
               disabled={isLoading}
               style={{ marginRight: '15px', height: '50px' }}
+              onClick={handleExportExcel}
             >
               Xuất Excel
             </Button>

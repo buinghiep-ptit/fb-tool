@@ -97,6 +97,10 @@ export const headTableRank = [
     width: '100px',
   },
   {
+    name: '',
+    width: '100px',
+  },
+  {
     name: 'CLB',
     width: '250px',
   },

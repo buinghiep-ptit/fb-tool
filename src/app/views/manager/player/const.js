@@ -9,27 +9,27 @@ export const headTablePlayer = [
   },
   {
     name: 'Tên cầu thủ',
-    width: '250px',
-  },
-  {
-    name: 'Vị trí',
-    width: '250px',
-  },
-  {
-    name: 'Đội thi đấu',
-    width: '250px',
-  },
-  {
-    name: 'Ngày sinh',
-    width: '250px',
-  },
-  {
-    name: 'Chiều cao(cm)',
     width: '150px',
   },
   {
+    name: 'Vị trí',
+    width: '100px',
+  },
+  {
+    name: 'Đội thi đấu',
+    width: '100px',
+  },
+  {
+    name: 'Ngày sinh',
+    width: '150px',
+  },
+  {
+    name: 'Chiều cao(cm)',
+    width: '120px',
+  },
+  {
     name: 'Ngày tham gia CAHN',
-    width: '250px',
+    width: '200px',
   },
   {
     name: 'Trạng thái',

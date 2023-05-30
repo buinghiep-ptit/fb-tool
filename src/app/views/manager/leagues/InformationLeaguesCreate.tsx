@@ -130,7 +130,7 @@ export default function InfomationLeaguesCreate(props: Props) {
         if (res) {
           props.setIsLoading(false)
           toastSuccess({ message: 'Tạo thành công' })
-          navigate('/leagues')
+          navigate(`/leagues/${res?.id}`)
         }
       }
     } catch (e) {

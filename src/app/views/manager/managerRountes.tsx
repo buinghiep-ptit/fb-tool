@@ -34,7 +34,9 @@ const MemberSetting = Loadable(lazy(() => import('./members/MemberSetting')))
 const LogoManager = Loadable(lazy(() => import('./logos/LogoManager')))
 const EditBanner = Loadable(lazy(() => import('./banner/EditBanner')))
 const UserManager = Loadable(lazy(() => import('./users/UserManager')))
-
+const CoachDetail = Loadable(lazy(() => import('./coach/CoachDetail')))
+const AddCoach = Loadable(lazy(() => import('./coach/AddCoach')))
+const PositionManager = Loadable(lazy(() => import('./coach/PositionManager')))
 const managerRoutes = [
   {
     path: '/customers',
@@ -45,6 +47,9 @@ const managerRoutes = [
     element: <EditCustomer />,
   },
   { path: '/coachs', element: <CoachManager /> },
+  { path: '/coachs/create', element: <AddCoach /> },
+  { path: '/position', element: <PositionManager /> },
+  { path: '/coachs/:id', element: <CoachDetail /> },
   { path: '/leagues', element: <LeaguesManager /> },
   { path: '/players', element: <PlayerManager /> },
   { path: '/news', element: <NewsManager /> },

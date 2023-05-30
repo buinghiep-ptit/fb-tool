@@ -89,3 +89,8 @@ export const removeTeam = async (id: any, teamId: any): Promise<any> => {
   )
   return data
 }
+
+export const changeRank = async (id: any, params: any): Promise<any> => {
+  const { data } = await http.put<any>(`/api/leagues/${id}/standings`, params)
+  return data
+}

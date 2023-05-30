@@ -24,6 +24,7 @@ import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
 export interface Props {
+  type: number
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   refresh: () => void
@@ -67,13 +68,11 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
         .required('Giá trị bắt buộc')
         .test('fileType', 'File không hợp lệ', value => {
           if (value && value.name)
-            return ['png', 'jpg', 'jpeg', 'svg'].includes(
-              value?.name?.split('.').pop(),
-            )
+            return ['svg', 'svgz'].includes(value?.name?.split('.').pop())
           else return true
         })
         .test('fileSize', 'Dung lượng file <= 10MB', value => {
-          return Math.floor(value?.size / 1000000) <= 10
+          return Math.floor(value?.size / 1000000) <= 50
         }),
     })
     .required()
@@ -97,6 +96,7 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
       strUrl: data.strUrl,
       logo: logo,
       status: 1,
+      type: props.type,
     }
 
     await createLogo(payload)
@@ -137,7 +137,11 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
               alignItems: 'center',
             }}
           >
-            <div>Thêm mới logo</div>
+            <div>
+              {props.type === 1
+                ? 'Thêm mới logo nhà tài trợ chính'
+                : 'Thêm mới logo nhà tài trợ thường'}
+            </div>
             <IconButton aria-label="close" size="large" onClick={handleClose}>
               <HighlightOffIcon />
             </IconButton>
@@ -146,11 +150,11 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <FormLabel error={!!methods.formState.errors?.file}>
-              Ảnh tiêu đề*:
+              Logo*:
             </FormLabel>
             <input
               type="file"
-              accept="image/png,image/jpg,image/jpeg,image/svg+xml"
+              accept="image/svg+xml"
               id="uploadImage"
               style={{ display: 'none' }}
               onChange={(event: any) => {
@@ -183,12 +187,17 @@ const DialogCreateLogo = React.forwardRef((props: Props, ref) => {
               }}
             >
               {!file && previewImage?.length === 0 && (
-                <div style={{ marginTop: '10px', cursor: 'pointer' }}>
+                <div
+                  style={{
+                    marginTop: '10px',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                  }}
+                >
                   <div>Chọn ảnh để tải lên</div>
                   <BackupIcon fontSize="large" />
-                  <div>PNG/JPEG/JPG/SVG</div>
-                  <div>Dung lượng không quá 50mb</div>
-                  <div>(Tỷ lệ ảnh phù hợp 3:2)</div>
+                  <div>Định dạng: SVG</div>
+                  <div>Lưu ý logo cần để màu trắng</div>
                 </div>
               )}
               {previewImage?.length !== 0 && (

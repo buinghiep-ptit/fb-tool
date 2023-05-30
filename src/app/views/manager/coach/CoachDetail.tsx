@@ -10,10 +10,9 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormHelperText,
   Grid,
   InputLabel,
@@ -27,10 +26,11 @@ import IconButton from '@mui/material/IconButton'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import {
-  createPlayer,
-  getPositions,
-  getTeams,
-} from 'app/apis/players/players.service'
+  getCoachDetail,
+  getCoachPosition,
+  updateCoach,
+} from 'app/apis/coachs/coachs.service'
+import { getTeams } from 'app/apis/players/players.service'
 import { MuiRHFDatePicker } from 'app/components/common/MuiRHFDatePicker'
 import RHFWYSIWYGEditor from 'app/components/common/RHFWYSIWYGEditor'
 import handleUploadImage from 'app/helpers/handleUploadImage'
@@ -46,23 +46,49 @@ import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
 export interface Props {}
 
-export default function PlayerDetail(props: Props) {
+export default function CoachDetail(props: Props) {
   const [teams, setTeams] = useState<any[]>([])
   const [positions, setPositions] = useState<any[]>([])
   const [isLoading, setIsloading] = useState(false)
   const [file, setFile] = useState<any>()
   const [previewImage, setPreviewImage] = useState<string>('')
-  const [player, setPlayer] = useState<any>()
-  const [idTeam, setIdTeam] = React.useState<any>(false)
-  const [disabledViewPosition, setDisableViewPosition] =
-    React.useState<any>(true)
+  const [coach, setCoach] = useState<any>()
   const [idPosition, setIdPosition] = React.useState<any>(false)
   const params = useParams()
   const navigate = useNavigate()
 
+  const initDefaultValues = (coach: any) => {
+    const defaultValues: any = {}
+    defaultValues.nameCoach = coach?.fullName || ''
+    defaultValues.homeTown = coach?.placeOfOrigin || ''
+    defaultValues.dateOfBirth = coach?.dateOfBirth || ''
+
+    defaultValues.gatheringDay =
+      coach.dateJoined || moment(Date.now()).format('YYYY-MM-DD')
+    defaultValues.teams = coach.teams
+
+    defaultValues.position = coach.mainPosition
+    defaultValues.clothesNumber = coach.jerseyNo
+    defaultValues.height = coach.height || 0
+    defaultValues.weight = coach.weight || 0
+    defaultValues.sizeShoes = coach.shoseSize || 0
+    defaultValues.sizeSpikeShoes = coach.nailShoseSize || 0
+    defaultValues.sizeClothes = coach.shirtSize || ''
+    defaultValues.achiveSummy = coach.achiveSummy
+    defaultValues.yellowCard = coach.yellowCardNo || 0
+    defaultValues.redCard = coach.redCardNo || 0
+    defaultValues.editor_content = coach.biography
+    defaultValues.oldClub = coach.oldClub
+    defaultValues.position = coach.position
+    defaultValues.status = coach.status
+    setPreviewImage(coach.imageUrl)
+    setIdPosition(coach.position)
+    methods.reset({ ...defaultValues })
+  }
+
   const schema = yup
     .object({
-      namePlayer: yup
+      nameCoach: yup
         .string()
         .required('Giá trị bắt buộc')
         .trim()
@@ -73,26 +99,20 @@ export default function PlayerDetail(props: Props) {
         .trim()
         .max(255, 'Tên đối tác không được vượt quá 255 ký tự'),
       dateOfBirth: yup.string().required('Gía trị bắt buộc'),
-      gatheringDay: yup.string(),
-      team: yup.string().required('Giá trị bát buộc').nullable(),
-      position: yup.string().nullable().required('Giá trị bắt buộc'),
-      dominantFoot: yup.string().nullable(),
-      clothersNumber: yup
-        .string()
-        .matches(/^[0-9\s]*$/, 'Nhập số')
-        .max(2, 'Nhập không quá 2 kí tự')
+      gatheringDay: yup
+        .date()
         .nullable()
-        .max(2, 'Nhấp không quá 2 ký tự'),
+        .typeError('Nhập đúng định dạng ngày hợp lệ'),
+      teams: yup.array().min(1, 'Giá trị bắt buộc'),
+      position: yup.string().nullable().required('Giá trị bắt buộc'),
       height: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       weight: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số lơn hơn hoặc bằng 0')
-        .required('Giá trị bắt buộc')
         .max(4, 'Nhập không quá 4 kí tự')
         .typeError('Nhập số'),
       sizeShoes: yup
@@ -105,11 +125,8 @@ export default function PlayerDetail(props: Props) {
         .matches(/^(?:\d{1,2}(?:\.\d{0,6})?)?$/, 'Nhập size giày')
         .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
-      sizeClothers: yup.string().nullable().max(4, 'Nhập không quá 4 kí tự'),
-      viewPosition: !disabledViewPosition
-        ? yup.string().nullable().required('Giá trị bắt buộc')
-        : yup.string().nullable(),
-      countMatch: yup
+      sizeClothes: yup.string().nullable().max(4, 'Nhập không quá 4 kí tự'),
+      countTeam: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
         .max(4, 'Nhập không quá 4 kí tự')
@@ -119,7 +136,7 @@ export default function PlayerDetail(props: Props) {
         .matches(/^[0-9\s]*$/, 'Nhập số')
         .max(4, 'Nhập không quá 4 kí tự')
         .nullable(),
-      goal: yup
+      countCup: yup
         .string()
         .matches(/^[0-9\s]*$/, 'Nhập số')
         .max(4, 'Nhập không quá 4 kí tự')
@@ -139,13 +156,20 @@ export default function PlayerDetail(props: Props) {
         .trim()
         .max(255, 'Câu lạc bộ cũ không được vượt quá 255 ký tự')
         .nullable(),
+      achiveSummy: yup
+        .string()
+        .trim()
+        .max(255, 'Tóm tắc thành tích  không được vượt quá 500 ký tự')
+        .nullable()
+        .required('Giá trị bắt buộc'),
       editor_content: yup
         .string()
         .required('Giá trị bắt buộc')
         .trim()
         .test('notEmpty', 'Giá trị bắt buộc', value => {
           return value !== '<p></p>'
-        }),
+        })
+        .nullable(),
       status: yup.string().required('Giá trị bát buộc'),
     })
     .required()
@@ -153,37 +177,35 @@ export default function PlayerDetail(props: Props) {
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      namePlayer: '',
+      nameCoach: '',
       homeTown: '',
       dateOfBirth: '',
       gatheringDay: moment(Date.now()).format('YYYY-MM-DD') || null,
-      team: '',
+      teams: [],
       position: '',
-      dominantFoot: '',
-      clothersNumber: null,
-      height: '',
-      weight: '',
+      height: 0,
+      weight: 0,
       sizeShoes: 0,
       sizeSpikeShoes: 0,
-      sizeClothers: null,
-      viewPosition: '',
+      sizeClothes: '',
+      countTeam: 0,
+      countCup: 0,
       countMatch: 0,
       cleanMatch: 0,
-      goal: 0,
       yellowCard: 0,
       redCard: 0,
       editor_content: '',
       oldClub: '',
-      prioritize: false,
       status: 1,
+      achiveSummy: '',
     },
   })
 
   const onSubmit = async (data: any) => {
     console.log(data)
     setIsloading(true)
+    let imageUrl: any = ''
     try {
-      let imageUrl: any = ''
       if (file) {
         imageUrl = await handleUploadImage(file, 'png')
       } else {
@@ -195,10 +217,14 @@ export default function PlayerDetail(props: Props) {
         return
       }
       const payload: any = {
-        name: data.namePlayer,
-        fullName: data.namePlayer,
+        name: data.nameCoach,
+        fullName: data.nameCoach,
+
         placeOfOrigin: data.homeTown,
-        idTeam: data.team,
+        teams: data.teams.map((team: any) => {
+          const obj = { id: team.id }
+          return obj
+        }),
         dateOfBirth:
           moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
             ? null
@@ -207,47 +233,42 @@ export default function PlayerDetail(props: Props) {
           moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
             ? null
             : moment(data.gatheringDay).format('YYYY-MM-DD'),
-        shirtSize: data.sizeClothers,
+        shirtSize: data.sizeClothes,
         shoseSize: data.sizeShoes,
         nailShoseSize: data.sizeSpikeShoes,
         height: data.height,
         weight: data.weight,
         imageUrl: imageUrl,
-        jerseyNo: data.clothersNumber,
-        dominantFoot: data.dominantFoot,
-        cleanSheetNo: data.cleanMatch,
-        matchPlayedNo: data.countMatch,
         yellowCardNo: data.yellowCard,
         redCardNo: data.redCard,
         oldClub: data.oldClub,
         biography: data.editor_content,
-        isDisplayHome: data.prioritize ? 1 : 0,
-        priority: data.prioritize ? data.viewPosition : null,
+        cupNo: data.countCup,
         status: data.status,
+        achiveSummy: data.achiveSummy,
         mainPosition: data.position,
-        position: null,
-        goalFor: data.goal,
+        position: parseInt(idPosition),
+        id: params.id,
       }
-
-      const res = await createPlayer(payload)
+      const res = await updateCoach(payload)
       if (res) {
         toastSuccess({
-          message: 'Tạo thành công',
+          message: 'Cập nhật thành công',
         })
         setIsloading(false)
-        navigate('/players')
+        navigate('/coachs')
       }
     } catch (e) {
       toastError({
-        message: 'Tạo thất bại',
+        message: 'Cập nhật thất bại',
       })
       setIsloading(false)
     }
   }
 
   const fetchPositions = async () => {
-    const res = await getPositions({ size: 100, page: 0 })
-    setPositions(res)
+    const res = await getCoachPosition({ page: 0, size: 100, status: 1 })
+    setPositions(res?.content)
   }
 
   const fetchTeams = async () => {
@@ -255,9 +276,16 @@ export default function PlayerDetail(props: Props) {
     setTeams(res)
   }
 
+  const fetchCoachDetail = async () => {
+    const res = await getCoachDetail(params.id)
+    setCoach(res)
+    initDefaultValues(res)
+  }
+
   React.useEffect(() => {
     fetchPositions()
     fetchTeams()
+    fetchCoachDetail()
   }, [])
 
   return (
@@ -278,8 +306,8 @@ export default function PlayerDetail(props: Props) {
       <Box className="breadcrumb">
         <Breadcrumb
           routeSegments={[
-            { name: 'Quản lý cầu thủ', path: '/players' },
-            { name: 'Thông tin cầu thủ' },
+            { name: 'Quản lý ban huấn luyện', path: '/coachs' },
+            { name: 'Chi tiết ban huấn luyện' },
           ]}
         />
       </Box>
@@ -304,16 +332,16 @@ export default function PlayerDetail(props: Props) {
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Controller
-                        name="namePlayer"
+                        name="nameCoach"
                         control={methods.control}
                         render={({ field }) => (
                           <TextField
-                            error={!!methods.formState.errors?.namePlayer}
+                            error={!!methods.formState.errors?.nameCoach}
                             helperText={
-                              methods.formState.errors?.namePlayer?.message
+                              methods.formState.errors?.nameCoach?.message
                             }
                             {...field}
-                            label="Tên cầu thủ*"
+                            label="Họ và tên*"
                             variant="outlined"
                             margin="normal"
                             fullWidth
@@ -338,6 +366,7 @@ export default function PlayerDetail(props: Props) {
                         )}
                       />
                     </Grid>
+
                     <Grid item xs={4}>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <MuiRHFDatePicker
@@ -402,8 +431,7 @@ export default function PlayerDetail(props: Props) {
                               style={{ position: 'relative' }}
                               onClick={event => {
                                 setFile(null)
-                                console.log(player)
-                                setPreviewImage(player.imageUrl)
+                                setPreviewImage(coach?.imageUrl)
                                 event.stopPropagation()
                               }}
                             >
@@ -432,7 +460,7 @@ export default function PlayerDetail(props: Props) {
               id="panel2bh-header"
             >
               <Typography variant="h4" gutterBottom>
-                Thông số cầu thủ
+                Thông số
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -448,48 +476,36 @@ export default function PlayerDetail(props: Props) {
                 </Grid>
                 <Grid item xs={3}>
                   <Controller
-                    name="team"
+                    name="teams"
                     control={methods.control}
                     render={({ field }) => (
-                      <FormControl
-                        fullWidth
-                        margin="dense"
-                        error={!!methods.formState.errors?.team?.message}
-                      >
-                        <InputLabel id="demo-simple-select-label">
-                          Đội thi đấu*
-                        </InputLabel>
-                        <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          label="Đội thi đấu*"
-                          {...field}
-                          value={idTeam}
-                          onChange={e => {
-                            if (e.target.value.toString() === '1') {
-                              setDisableViewPosition(true)
-                              methods.setValue('prioritize', false)
+                      <Autocomplete
+                        disablePortal
+                        {...field}
+                        multiple
+                        options={teams}
+                        getOptionLabel={option => option.shortName}
+                        onChange={(_, data) => {
+                          field.onChange(data)
+                        }}
+                        renderInput={params => (
+                          <TextField
+                            error={!!methods?.formState?.errors.teams}
+                            helperText={
+                              methods?.formState?.errors.teams
+                                ? 'Vui lòng chọn đội'
+                                : ''
                             }
-                            setIdTeam(e.target.value)
-                            methods.setValue('team', e.target.value.toString())
-                          }}
-                        >
-                          {teams.map((team, index) => (
-                            <MenuItem value={team.id} key={index}>
-                              {team.shortName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        {!!methods.formState.errors?.team?.message && (
-                          <FormHelperText>
-                            {methods.formState.errors?.team.message}
-                          </FormHelperText>
+                            {...params}
+                            label="Đội tham gia huấn luyện*"
+                            margin="dense"
+                          />
                         )}
-                      </FormControl>
+                      />
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={6}>
                   <Controller
                     name="position"
                     control={methods.control}
@@ -500,13 +516,13 @@ export default function PlayerDetail(props: Props) {
                         error={!!methods.formState.errors?.position}
                       >
                         <InputLabel id="demo-simple-select-label">
-                          Vị trí thi đấu*
+                          Vị trí*
                         </InputLabel>
                         <Select
                           {...field}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
-                          label="Vị trí thi đấu chính"
+                          label="Vị trí"
                           value={idPosition}
                           onChange={e => {
                             setIdPosition(e.target.value.toString())
@@ -533,58 +549,6 @@ export default function PlayerDetail(props: Props) {
                 </Grid>
                 <Grid item xs={2}>
                   <Controller
-                    name="dominantFoot"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <FormControl
-                        style={{ width: '100%' }}
-                        margin="dense"
-                        error={!!methods.formState.errors?.dominantFoot}
-                      >
-                        <InputLabel id="demo-simple-select-label">
-                          Chân thuận
-                        </InputLabel>
-                        <Select
-                          autoWidth
-                          {...field}
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          label="Chân thuận"
-                        >
-                          <MenuItem value={3}>Cả hai chân</MenuItem>
-                          <MenuItem value={2}>Trái</MenuItem>
-                          <MenuItem value={1}>Phải</MenuItem>
-                        </Select>
-                        {!!methods.formState.errors?.dominantFoot?.message && (
-                          <FormHelperText>
-                            {methods.formState.errors?.dominantFoot.message}
-                          </FormHelperText>
-                        )}
-                      </FormControl>
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={1}>
-                  <Controller
-                    name="clothersNumber"
-                    control={methods.control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        error={!!methods.formState.errors?.clothersNumber}
-                        helperText={
-                          methods.formState.errors?.clothersNumber?.message
-                        }
-                        id="clothersNumber"
-                        label="Số áo"
-                        type="number"
-                        margin="dense"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={2}>
-                  <Controller
                     name="height"
                     control={methods.control}
                     render={({ field }) => (
@@ -593,7 +557,7 @@ export default function PlayerDetail(props: Props) {
                         error={!!methods.formState.errors?.height}
                         helperText={methods.formState.errors?.height?.message}
                         id=""
-                        label="Chiều cao(cm)*"
+                        label="Chiều cao(cm)"
                         type="number"
                       />
                     )}
@@ -609,13 +573,13 @@ export default function PlayerDetail(props: Props) {
                         error={!!methods.formState.errors?.weight}
                         helperText={methods.formState.errors?.weight?.message}
                         id="time"
-                        label="Cân nặng(kg)*"
+                        label="Cân nặng(kg)"
                         type="number"
                       />
                     )}
                   />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={2}>
                   <Controller
                     name="sizeShoes"
                     control={methods.control}
@@ -633,7 +597,7 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item xs={2}>
                   <Controller
                     name="sizeSpikeShoes"
                     control={methods.control}
@@ -651,16 +615,16 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={3}>
                   <Controller
-                    name="sizeClothers"
+                    name="sizeClothes"
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        error={!!methods.formState.errors?.sizeClothers}
+                        error={!!methods.formState.errors?.sizeClothes}
                         helperText={
-                          methods.formState.errors?.sizeClothers?.message
+                          methods.formState.errors?.sizeClothes?.message
                         }
                         id="outlined-basic"
                         label="Size quần áo"
@@ -669,130 +633,42 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                {idTeam.toString() === '1' && (
-                  <Grid item xs={4}>
-                    <Controller
-                      name="prioritize"
-                      control={methods.control}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={methods.getValues('prioritize')}
-                              {...field}
-                              onChange={e => {
-                                setDisableViewPosition(!e.target.checked)
-                                methods.setValue('prioritize', e.target.checked)
-                                if (!e.target.checked) {
-                                  methods.setValue('viewPosition', '')
-                                }
-                              }}
-                            />
-                          }
-                          label="Ưu tiên"
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="viewPosition"
-                      control={methods.control}
-                      render={({ field }) => (
-                        <FormControl
-                          style={{ width: '200px' }}
-                          error={!!methods.formState.errors?.viewPosition}
-                        >
-                          <InputLabel id="demo-simple-select-label">
-                            Vị trí hiển thị
-                          </InputLabel>
-                          <Select
-                            autoWidth
-                            {...field}
-                            disabled={disabledViewPosition}
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            label="Vị trí hiển thị"
-                          >
-                            {Array(11)
-                              .fill('')
-                              .map((item, index) => (
-                                <MenuItem value={index + 1} key={index}>
-                                  {index + 1}
-                                </MenuItem>
-                              ))}
-                          </Select>
-                          {!!methods.formState.errors?.viewPosition
-                            ?.message && (
-                            <FormHelperText>
-                              {methods.formState.errors?.viewPosition.message}
-                            </FormHelperText>
-                          )}
-                        </FormControl>
-                      )}
-                    />
-                    <div>
-                      Lưu ý: Sau khi chọn, vị trí hiển thị của cầu thủ trên
-                      trang chủ sẽ được hiển thị đúng vị trí trong danh sách, và
-                      thay thế vào vị trí đã chọn
-                    </div>
-                  </Grid>
-                )}
 
                 <Grid item xs={2}>
                   <Controller
-                    name="countMatch"
+                    name="countTeam"
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        error={!!methods.formState.errors?.countMatch}
+                        error={!!methods.formState.errors?.countTeam}
                         helperText={
-                          methods.formState.errors?.countMatch?.message
+                          methods.formState.errors?.countTeam?.message
                         }
                         id="time"
-                        label="Số trận đã đá"
+                        label="Số đội tham gia"
                         type="number"
                       />
                     )}
                   />
                 </Grid>
-                {idPosition.toString() === '1' && (
-                  <Grid item xs={2}>
-                    <Controller
-                      name="cleanMatch"
-                      control={methods.control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          error={!!methods.formState.errors?.cleanMatch}
-                          helperText={
-                            methods.formState.errors?.cleanMatch?.message
-                          }
-                          type="number"
-                          id="outlined-basic"
-                          style={{ marginLeft: '15px', width: '150px' }}
-                          label="Số trận giữ sạch lưới"
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Grid>
-                )}
                 <Grid item xs={2}>
                   <Controller
-                    name="goal"
+                    name="countCup"
                     control={methods.control}
                     render={({ field }) => (
                       <TextField
                         {...field}
-                        error={!!methods.formState.errors?.goal}
-                        helperText={methods.formState.errors?.goal?.message}
+                        error={!!methods.formState.errors?.countCup}
+                        helperText={methods.formState.errors?.countCup?.message}
                         id="time"
-                        label="Số bàn thắng"
+                        label="Số CUP"
                         type="number"
                       />
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={2}>
                   <Controller
                     name="yellowCard"
@@ -811,7 +687,7 @@ export default function PlayerDetail(props: Props) {
                     )}
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                   <Controller
                     name="redCard"
                     control={methods.control}
@@ -839,6 +715,26 @@ export default function PlayerDetail(props: Props) {
                         helperText={methods.formState.errors?.oldClub?.message}
                         id="time"
                         label="CLB cũ"
+                        fullWidth
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Controller
+                    name="achiveSummy"
+                    control={methods.control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        error={!!methods.formState.errors?.achiveSummy}
+                        helperText={
+                          methods.formState.errors?.achiveSummy?.message
+                        }
+                        id="time"
+                        multiline
+                        rows={2}
+                        label="Tóm tắt thành tích*"
                         fullWidth
                       />
                     )}
@@ -892,7 +788,7 @@ export default function PlayerDetail(props: Props) {
                     variant="contained"
                     disabled={isLoading}
                     onClick={() => {
-                      navigate('/players')
+                      navigate('/coachs')
                     }}
                   >
                     Quay lại

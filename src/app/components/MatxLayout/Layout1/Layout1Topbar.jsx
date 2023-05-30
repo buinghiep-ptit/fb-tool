@@ -7,17 +7,14 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { Box, styled, useTheme } from '@mui/system'
-import { MatxMenu, MatxSearchBox } from 'app/components'
+import { MatxMenu } from 'app/components'
 import { themeShadows } from 'app/components/MatxTheme/themeColors'
-import { NotificationProvider } from 'app/contexts/NotificationContext'
 import useAuth from 'app/hooks/useAuth'
 import useSettings from 'app/hooks/useSettings'
 import { topBarHeight } from 'app/utils/constant'
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Span } from '../../../components/Typography'
-import NotificationBar from '../../NotificationBar/NotificationBar'
-import ShoppingCart from '../../ShoppingCart'
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -178,7 +175,7 @@ const Layout1Topbar = () => {
 
             <StyledItem onClick={logout}>
               <Icon> power_settings_new </Icon>
-              <Span> Logout </Span>
+              <Span> Đăng xuất </Span>
             </StyledItem>
           </MatxMenu>
         </Box>

@@ -67,8 +67,7 @@ export default function MemberSetting(props: Props) {
         .min(0, 'Số dương')
         .integer('Số nguyên')
         .nullable()
-        .transform((curr, orig) => (orig === '' ? null : curr))
-        .required('Giá trị bắt buộc'),
+        .transform((curr, orig) => (orig === '' ? null : curr)),
       extendPrice: yup
         .number()
         .min(0, 'Số dương')
@@ -280,7 +279,7 @@ export default function MemberSetting(props: Props) {
                   <FormControl fullWidth margin="normal">
                     <MuiRHFNumericFormatInput
                       name="discountPrice"
-                      label="Giá ưu đãi*:"
+                      label="Giá ưu đãi:"
                       fullWidth
                       iconEnd={
                         <MuiTypography variant="subtitle2">VNĐ</MuiTypography>

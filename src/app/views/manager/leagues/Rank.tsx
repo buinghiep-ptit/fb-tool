@@ -1,12 +1,16 @@
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import {
+  IconButton,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
-import { getRank } from 'app/apis/leagues/leagues.service'
+import { changeRank, getRank } from 'app/apis/leagues/leagues.service'
 import { SimpleCard, StyledTable } from 'app/components'
 import moment from 'moment'
 import * as React from 'react'
@@ -25,12 +29,40 @@ export default function Rank(props: Props) {
 
   const fetchListRank = async () => {
     const res = await getRank(params.id)
-    setRanks(res)
+    setRanks([...res])
     const newArr = res.sort(function (d1: any, d2: any) {
       return Number(new Date(d2.dateUpdated)) - Number(new Date(d1.dateUpdated))
     })
-    console.log(newArr)
+
     setTimeUpdate(moment(newArr[0].dateUpdated).format('HH:mm DD/MM/YYYY'))
+  }
+
+  const handleChangeRank = async (
+    idTeamA: any,
+    rankA: any,
+    idTeamB: any,
+    rankB: any,
+  ) => {
+    try {
+      props.setIsLoading(true)
+      const payload = [
+        {
+          idTeam: idTeamA,
+          rank: rankA,
+        },
+        {
+          idTeam: idTeamB,
+          rank: rankB,
+        },
+      ]
+      const res = await changeRank(params.id, payload)
+      if (res) {
+        props.setIsLoading(false)
+        fetchListRank()
+      }
+    } catch (e) {
+      props.setIsLoading(false)
+    }
   }
 
   React.useEffect(() => {
@@ -60,7 +92,51 @@ export default function Rank(props: Props) {
             {(ranks || []).map((item: any, index: any) => {
               return (
                 <TableRow hover key={item.name + index}>
-                  <TableCell align="center">{index + 1}</TableCell>
+                  <TableCell align="center">{item.rank}</TableCell>
+                  <TableCell align="center">
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        width: 'fit-content',
+                      }}
+                    >
+                      {item.rank !== 1 && (
+                        <Tooltip title="Tăng hạng" placement="top-start">
+                          <IconButton
+                            size="small"
+                            disabled={props.isLoading}
+                            onClick={() =>
+                              handleChangeRank(
+                                item.idTeam,
+                                item.rank - 1,
+                                ranks[index - 1].idTeam,
+                                ranks[index - 1].rank + 1,
+                              )
+                            }
+                          >
+                            <KeyboardArrowUpIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      <Tooltip title="Giảm hạng" placement="top-start">
+                        <IconButton
+                          size="small"
+                          disabled={props.isLoading}
+                          onClick={() =>
+                            handleChangeRank(
+                              item.idTeam,
+                              item.rank + 1,
+                              ranks[index + 1].idTeam,
+                              ranks[index + 1].rank - 1,
+                            )
+                          }
+                        >
+                          <KeyboardArrowDownIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
                   <TableCell align="left" style={{ wordBreak: 'keep-all' }}>
                     <div style={{ display: 'flex' }}>
                       <img

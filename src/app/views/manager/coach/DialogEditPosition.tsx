@@ -48,7 +48,6 @@ const DialogEditPosition = React.forwardRef((props: Props, ref) => {
       id: id,
       description: name,
       status: status,
-      matches: [],
     }
     try {
       const res = await editCoachPosition(payload)

@@ -43,7 +43,6 @@ const DialogCreatePosition = React.forwardRef((props: Props, ref) => {
     const payload = {
       description: name,
       status: status,
-      matches: [],
     }
     try {
       const res = await createCoachPosition(payload)

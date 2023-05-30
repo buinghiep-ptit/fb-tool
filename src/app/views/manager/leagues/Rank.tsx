@@ -43,21 +43,25 @@ export default function Rank(props: Props) {
     idTeamB: any,
     rankB: any,
   ) => {
-    props.setIsLoading(true)
-    const payload = [
-      {
-        idTeam: idTeamA,
-        rank: rankA,
-      },
-      {
-        idTeam: idTeamB,
-        rank: rankB,
-      },
-    ]
-    const res = await changeRank(params.id, payload)
-    if (res) {
+    try {
+      props.setIsLoading(true)
+      const payload = [
+        {
+          idTeam: idTeamA,
+          rank: rankA,
+        },
+        {
+          idTeam: idTeamB,
+          rank: rankB,
+        },
+      ]
+      const res = await changeRank(params.id, payload)
+      if (res) {
+        props.setIsLoading(false)
+        fetchListRank()
+      }
+    } catch (e) {
       props.setIsLoading(false)
-      fetchListRank()
     }
   }
 

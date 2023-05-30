@@ -9,7 +9,7 @@ export const headTablePlayer = [
   },
   {
     name: 'Tên cầu thủ',
-    width: '250px',
+    width: '150px',
   },
   {
     name: 'Vị trí',
@@ -25,11 +25,11 @@ export const headTablePlayer = [
   },
   {
     name: 'Chiều cao(cm)',
-    width: '150px',
+    width: '120px',
   },
   {
     name: 'Ngày tham gia CAHN',
-    width: '250px',
+    width: '200px',
   },
   {
     name: 'Trạng thái',

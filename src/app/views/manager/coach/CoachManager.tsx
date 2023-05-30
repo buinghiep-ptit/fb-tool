@@ -239,6 +239,7 @@ export default function CoachManager(props: Props) {
               <DatePicker
                 value={from}
                 label="Từ ngày"
+                inputFormat="DD/MM/YYYY"
                 onChange={newValue => setFrom(newValue)}
                 renderInput={(params: any) => (
                   <TextField
@@ -258,6 +259,7 @@ export default function CoachManager(props: Props) {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 value={to}
+                inputFormat="DD/MM/YYYY"
                 label="Đến ngày"
                 onChange={newValue => {
                   setIsValid(new Date(newValue) > new Date(from))

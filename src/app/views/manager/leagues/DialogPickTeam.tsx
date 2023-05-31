@@ -16,8 +16,10 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -236,7 +238,18 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
               </SimpleCard>
 
               <div style={{ height: '30px' }} />
-
+              <Typography>Các đội bóng tham gia</Typography>
+              <Stack direction="row" spacing={1}>
+                {(teams || []).map(
+                  (item: any, index: any) =>
+                    item?.isPicked && (
+                      <Chip
+                        label={item?.shortName || ''}
+                        onDelete={() => handlePick(index)}
+                      />
+                    ),
+                )}
+              </Stack>
               <SimpleCard title="Danh sách đội">
                 <Box width="100%" overflow="auto">
                   <StyledTable>

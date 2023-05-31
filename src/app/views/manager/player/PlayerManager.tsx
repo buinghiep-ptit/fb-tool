@@ -93,25 +93,29 @@ export default function PlayerManager(props: Props) {
 
   const fetchPlayer = async () => {
     setIsLoading(true)
-    const res = await getListPlayer({
-      name: nameFilter.trim(),
-      position: positionFilter,
-      status: statusFilter === 99 ? null : statusFilter,
-      dateStart:
-        moment(dateStart).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(dateStart).format('YYYY-MM-DD'),
-      dateEnd:
-        moment(dateEnd).format('YYYY-MM-DD') === 'Invalid date'
-          ? null
-          : moment(dateEnd).format('YYYY-MM-DD'),
-      team: teamFilter === 99 ? null : teamFilter,
-      size: rowsPerPage,
-      page: page,
-    })
-    setPlayers(res.content)
-    setCountTable(res.totalElements)
-    setIsLoading(false)
+    try {
+      const res = await getListPlayer({
+        name: nameFilter.trim(),
+        position: positionFilter,
+        status: statusFilter === 99 ? null : statusFilter,
+        dateStart:
+          moment(dateStart).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(dateStart).format('YYYY-MM-DD'),
+        dateEnd:
+          moment(dateEnd).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(dateEnd).format('YYYY-MM-DD'),
+        team: teamFilter === 99 ? null : teamFilter,
+        size: rowsPerPage,
+        page: page,
+      })
+      setPlayers(res.content)
+      setCountTable(res.totalElements)
+      setIsLoading(false)
+    } catch (e) {
+      setIsLoading(false)
+    }
   }
 
   const handleSearch = async () => {

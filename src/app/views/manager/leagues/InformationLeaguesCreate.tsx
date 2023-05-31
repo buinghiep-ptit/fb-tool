@@ -11,11 +11,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import {
-  createLeagues,
-  editLeagues,
-  getLeaguesById,
-} from 'app/apis/leagues/leagues.service'
+import { createLeagues, editLeagues } from 'app/apis/leagues/leagues.service'
 import { Container, SimpleCard } from 'app/components'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
 import handleUploadImage from 'app/helpers/handleUploadImage'
@@ -24,10 +20,8 @@ import {
   toastSuccess,
   toastWarning,
 } from 'app/helpers/toastNofication'
-import { saveLeagueCurrent } from 'app/redux/actions/leagueActions'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as yup from 'yup'
 import DialogPickTeamCreate from './DialogPickTeamCreate'
@@ -38,9 +32,9 @@ export interface Props {
 export default function InfomationLeaguesCreate(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
-  const dispatch = useDispatch()
+
   const [file, setFile] = useState()
-  const [teamPicked, setTeamPicked] = useState([])
+  const [teamPicked, setTeamPicked] = useState<any>([])
   const [logo, setLogo] = useState('')
   const [typeLeague, setTypeLeague] = useState<any>('')
   const DialogPickTeamRef = useRef<any>(null)
@@ -90,7 +84,6 @@ export default function InfomationLeaguesCreate(props: Props) {
   })
 
   const validateLogo = (file: any) => {
-    console.log(file)
     if (file.size > 10000000) return false
     return true
   }
@@ -138,38 +131,6 @@ export default function InfomationLeaguesCreate(props: Props) {
       toastError({ message: ' Tạo thất bại' })
     }
   }
-
-  const initDefaultValues = (league: any) => {
-    const defaultValues: any = {}
-    defaultValues.shortName = league.shortName
-    defaultValues.name = league.name
-    defaultValues.status = league.status
-    defaultValues.type = league.type
-    defaultValues.category = league.category
-    defaultValues.isDisplayRank = league.isDisplayRank === 0 ? false : true
-    defaultValues.isDisplaySchedule =
-      league.isDisplaySchedule === 0 ? false : true
-    defaultValues.teamList = league.teamList.map((item: any) => item.id)
-    setTeamPicked(league.teamList.map((item: any) => item.id))
-    setLogo(league.logo || '')
-    setTypeLeague(league.category)
-    methods.reset({ ...defaultValues })
-  }
-
-  const fetchDetailLeague = async () => {
-    const res = await getLeaguesById(params.id)
-    if (res) {
-      dispatch(saveLeagueCurrent(res))
-    }
-
-    initDefaultValues(res)
-  }
-
-  useEffect(() => {
-    if (params.id) {
-      fetchDetailLeague()
-    }
-  }, [])
 
   return (
     <Container>

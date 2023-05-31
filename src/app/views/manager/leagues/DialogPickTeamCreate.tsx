@@ -5,6 +5,7 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
+  Chip,
   Container,
   Grid,
   IconButton,
@@ -16,6 +17,7 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
@@ -38,15 +40,12 @@ interface Props {
 
 const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
   const [open, setOpen] = React.useState(false)
-
   const [page, setPage] = React.useState(0)
   const [countTable, setCountTable] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(20)
   const [doRerender, setDoRerender] = React.useState(false)
-
   const [teams, setTeams] = React.useState<any>()
   const [nameFilter, setNameFilter] = React.useState('')
-  const [statusFilter, setStatusFilter] = React.useState(99)
   const [typeFilter, setTypeFilter] = React.useState(false)
 
   const fetchListTeam = async () => {
@@ -76,7 +75,6 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
 
   const resetFilter = () => {
     setNameFilter('')
-    setStatusFilter(99)
     setTypeFilter(false)
     setRowsPerPage(20)
     setPage(0)
@@ -217,7 +215,18 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
               </SimpleCard>
 
               <div style={{ height: '30px' }} />
-
+              <Typography>Các đội bóng tham gia</Typography>
+              <Stack direction="row" spacing={1}>
+                {(teams || []).map(
+                  (item: any, index: any) =>
+                    item?.isPicked && (
+                      <Chip
+                        label={item?.shortName || ''}
+                        onDelete={() => handlePick(index)}
+                      />
+                    ),
+                )}
+              </Stack>
               <SimpleCard title="Danh sách đội">
                 <Box width="100%" overflow="auto">
                   <StyledTable>

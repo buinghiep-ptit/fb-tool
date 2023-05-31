@@ -2,12 +2,14 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import {
   Button,
+  Chip,
   FormControl,
   FormHelperText,
   Grid,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material'
@@ -20,6 +22,7 @@ import {
   toastSuccess,
   toastWarning,
 } from 'app/helpers/toastNofication'
+import { remove } from 'lodash'
 import { useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -32,7 +35,7 @@ export interface Props {
 export default function InfomationLeaguesCreate(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
-
+  const [tags, setTags] = useState<any>([])
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState<any>([])
   const [logo, setLogo] = useState('')
@@ -339,17 +342,36 @@ export default function InfomationLeaguesCreate(props: Props) {
                   )}
                 />
               </Grid>
-              <Grid
-                item
-                xs={12}
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
+              <Grid item xs={12}>
                 <InputLabel id="demo-simple-select-label">
                   Danh sách các đội bóng tham gia giải đấu*
                 </InputLabel>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  style={{ marginTop: '20px' }}
+                >
+                  {(tags || []).map((tag: any) => (
+                    <Chip
+                      label={tag?.shortName || ''}
+                      onDelete={() => {
+                        const newListPicked = remove(teamPicked, function (n) {
+                          return n !== tag.id
+                        })
+                        const newTags = tags.filter((item: any) => {
+                          return item.id !== tag.id
+                        })
+                        setTags(newTags)
+                        setTeamPicked(newListPicked)
+                        if (newListPicked)
+                          methods.setValue('teamList', newListPicked as any)
+                      }}
+                    />
+                  ))}
+                </Stack>
                 <Button
                   variant="contained"
-                  style={{ marginLeft: '20px' }}
+                  style={{ marginTop: '20px' }}
                   onClick={() => DialogPickTeamRef.current.handleClickOpen()}
                 >
                   Chọn đội bóng tham gia giải đấu
@@ -418,6 +440,8 @@ export default function InfomationLeaguesCreate(props: Props) {
         setTeamPicked={setTeamPicked}
         setValue={methods.setValue}
         teamPicked={teamPicked}
+        tags={tags}
+        setTags={setTags}
       />
     </Container>
   )

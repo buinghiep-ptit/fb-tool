@@ -36,6 +36,8 @@ interface Props {
   setTeamPicked: React.Dispatch<React.SetStateAction<any>>
   setValue: any
   teamPicked: any
+  tags: any
+  setTags: any
 }
 
 const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
@@ -101,6 +103,7 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
       setOpen(true)
+      setDoRerender(!doRerender)
     },
     handleClose: () => {
       setOpen(false)
@@ -121,10 +124,15 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
       const newListPicked = remove(props.teamPicked, function (n) {
         return n !== newList[id].id
       })
+      const newTags = props.tags.filter((tag: any) => {
+        return tag.id !== newList[id].id
+      })
+      props.setTags(newTags)
       props.setTeamPicked(newListPicked)
       props.setValue('teamList', newListPicked)
     } else {
       const newListPicked = [...props.teamPicked, newList[id].id]
+      props.setTags([...props.tags, newList[id]])
       props.setTeamPicked(newListPicked)
       props.setValue('teamList', newListPicked)
     }
@@ -217,15 +225,32 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
               <div style={{ height: '30px' }} />
               <Typography>Các đội bóng tham gia</Typography>
               <Stack direction="row" spacing={1}>
-                {(teams || []).map(
-                  (item: any, index: any) =>
-                    item?.isPicked && (
-                      <Chip
-                        label={item?.shortName || ''}
-                        onDelete={() => handlePick(index)}
-                      />
-                    ),
-                )}
+                {(props.tags || []).map((tag: any) => (
+                  <Chip
+                    label={tag?.shortName || ''}
+                    onDelete={() => {
+                      const newListPicked = remove(
+                        props.teamPicked,
+                        function (n) {
+                          return n !== tag.id
+                        },
+                      )
+                      const newTags = props.tags.filter((item: any) => {
+                        return item.id !== tag.id
+                      })
+                      props.setTags(newTags)
+                      props.setTeamPicked(newListPicked)
+                      props.setValue('teamList', newListPicked)
+                      const newTeams = [...teams].map((team: any) => {
+                        if (team.id === tag.id) {
+                          team.isPicked = !team.isPicked
+                        }
+                        return team
+                      })
+                      setTeams(newTeams)
+                    }}
+                  />
+                ))}
               </Stack>
               <SimpleCard title="Danh sách đội">
                 <Box width="100%" overflow="auto">

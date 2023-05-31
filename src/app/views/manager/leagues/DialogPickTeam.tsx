@@ -39,6 +39,8 @@ interface Props {
   setTeamPicked: React.Dispatch<React.SetStateAction<any>>
   setValue: any
   teamPicked: any
+  tags: any
+  setTags: any
 }
 
 const DialogPickTeam = React.forwardRef((props: Props, ref) => {
@@ -103,6 +105,7 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
   React.useImperativeHandle(ref, () => ({
     handleClickOpen: () => {
+      setDoRerender(!doRerender)
       setOpen(true)
     },
     handleClose: () => {
@@ -131,6 +134,10 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
         const newListPicked = remove(props.teamPicked, function (n) {
           return n !== newList[id].id
         })
+        const newTags = props.tags.filter((tag: any) => {
+          return tag.id !== newList[id].id
+        })
+        props.setTags(newTags)
         props.setTeamPicked(newListPicked)
         props.setValue('teamList', newListPicked)
       } else {
@@ -142,6 +149,7 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
           props.setIsLoading(false)
         }
         const newListPicked = [...props.teamPicked, newList[id].id]
+        props.setTags([...props.tags, newList[id]])
         props.setTeamPicked(newListPicked)
         props.setValue('teamList', newListPicked)
       }
@@ -240,15 +248,35 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
               <div style={{ height: '30px' }} />
               <Typography>Các đội bóng tham gia</Typography>
               <Stack direction="row" spacing={1}>
-                {(teams || []).map(
-                  (item: any, index: any) =>
-                    item?.isPicked && (
-                      <Chip
-                        label={item?.shortName || ''}
-                        onDelete={() => handlePick(index)}
-                      />
-                    ),
-                )}
+                {(props.tags || []).map((tag: any) => (
+                  <Chip
+                    label={tag?.shortName || ''}
+                    onDelete={async () => {
+                      const res = await removeTeam(params.id, tag.id)
+                      if (res) {
+                        toastSuccess({
+                          message: 'Đội đã được xóa',
+                        })
+                        props.setIsLoading(false)
+                      }
+                      const newListPicked = remove(
+                        props.teamPicked,
+                        function (n) {
+                          return n !== tag.id
+                        },
+                      )
+                      props.setTeamPicked(newListPicked)
+                      props.setValue('teamList', newListPicked)
+                      const newTeams = [...teams].map((team: any) => {
+                        if (team.id === tag.id) {
+                          team.isPicked = !team.isPicked
+                        }
+                        return team
+                      })
+                      setTeams(newTeams)
+                    }}
+                  />
+                ))}
               </Stack>
               <SimpleCard title="Danh sách đội">
                 <Box width="100%" overflow="auto">

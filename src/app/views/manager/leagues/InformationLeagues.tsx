@@ -2,12 +2,14 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import BackupIcon from '@mui/icons-material/Backup'
 import {
   Button,
+  Chip,
   FormControl,
   FormHelperText,
   Grid,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material'
@@ -15,6 +17,7 @@ import {
   createLeagues,
   editLeagues,
   getLeaguesById,
+  removeTeam,
 } from 'app/apis/leagues/leagues.service'
 import { Container, SimpleCard } from 'app/components'
 import { MuiCheckBox } from 'app/components/common/MuiRHFCheckbox'
@@ -25,6 +28,7 @@ import {
   toastWarning,
 } from 'app/helpers/toastNofication'
 import { saveLeagueCurrent } from 'app/redux/actions/leagueActions'
+import { remove } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
@@ -38,6 +42,7 @@ export interface Props {
 export default function InfomationLeagues(props: Props) {
   const navigate = useNavigate()
   const params = useParams()
+  const [tags, setTags] = useState<any>([])
   const dispatch = useDispatch()
   const [file, setFile] = useState()
   const [teamPicked, setTeamPicked] = useState<any>(null)
@@ -152,6 +157,7 @@ export default function InfomationLeagues(props: Props) {
     setLogo(league.logo || '')
     setTypeLeague(league.category)
     methods.reset({ ...defaultValues })
+    setTags(league.teamList)
   }
 
   const fetchDetailLeague = async () => {
@@ -376,17 +382,45 @@ export default function InfomationLeagues(props: Props) {
                   )}
                 />
               </Grid>
-              <Grid
-                item
-                xs={12}
-                style={{ display: 'flex', alignItems: 'center' }}
-              >
+              <Grid item xs={12}>
                 <InputLabel id="demo-simple-select-label">
                   Danh sách các đội bóng tham gia giải đấu*
                 </InputLabel>
+
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  style={{ marginTop: '20px' }}
+                >
+                  {(tags || []).map((tag: any) => (
+                    <Chip
+                      label={tag?.shortName || ''}
+                      onDelete={async () => {
+                        const res = await removeTeam(params.id, tag.id)
+                        if (res) {
+                          toastSuccess({
+                            message: 'Đội đã được xóa',
+                          })
+                          props.setIsLoading(false)
+                        }
+                        const newListPicked = remove(teamPicked, function (n) {
+                          return n !== tag.id
+                        })
+                        const newTags = tags.filter((item: any) => {
+                          return item.id !== tag.id
+                        })
+                        setTags(newTags)
+                        setTeamPicked(newListPicked)
+                        if (newListPicked)
+                          methods.setValue('teamList', newListPicked as any)
+                      }}
+                    />
+                  ))}
+                </Stack>
+
                 <Button
                   variant="contained"
-                  style={{ marginLeft: '20px' }}
+                  style={{ marginTop: '20px' }}
                   onClick={() => DialogPickTeamRef.current.handleClickOpen()}
                 >
                   Chọn đội bóng tham gia giải đấu
@@ -455,6 +489,8 @@ export default function InfomationLeagues(props: Props) {
           setTeamPicked={setTeamPicked}
           setValue={methods.setValue}
           teamPicked={teamPicked}
+          tags={tags}
+          setTags={setTags}
         />
       )}
     </Container>

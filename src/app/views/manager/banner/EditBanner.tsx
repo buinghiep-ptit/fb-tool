@@ -157,7 +157,7 @@ export default function EditBanner(props: Props) {
     }
     setIsLoading(true)
     let imgUrl: any = MediaUrlResponse
-    if (file && type === 1) imgUrl = await handleUploadImage(file)
+    if (file && type === 1) imgUrl = await handleUploadImage(file, 'jpg', false)
     if (file && type === 2) imgUrl = await handleUploadVideo(file)
 
     const payload: any = {

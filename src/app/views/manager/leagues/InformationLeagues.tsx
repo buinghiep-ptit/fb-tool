@@ -390,12 +390,19 @@ export default function InfomationLeagues(props: Props) {
                 <Stack
                   direction="row"
                   spacing={1}
-                  style={{ marginTop: '20px' }}
+                  style={{ marginTop: '20px', display: 'block' }}
                 >
                   {(tags || []).map((tag: any) => (
                     <Chip
+                      style={{ margin: '5px' }}
                       label={tag?.shortName || ''}
                       onDelete={async () => {
+                        if (tags.length <= 2) {
+                          toastWarning({
+                            message: 'Số lượng đội không được ít hơn 2',
+                          })
+                          return
+                        }
                         const res = await removeTeam(params.id, tag.id)
                         if (res) {
                           toastSuccess({

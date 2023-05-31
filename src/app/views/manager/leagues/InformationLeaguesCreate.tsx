@@ -349,10 +349,11 @@ export default function InfomationLeaguesCreate(props: Props) {
                 <Stack
                   direction="row"
                   spacing={1}
-                  style={{ marginTop: '20px' }}
+                  style={{ marginTop: '20px', display: 'block' }}
                 >
                   {(tags || []).map((tag: any) => (
                     <Chip
+                      style={{ margin: '5px' }}
                       label={tag?.shortName || ''}
                       onDelete={() => {
                         const newListPicked = remove(teamPicked, function (n) {

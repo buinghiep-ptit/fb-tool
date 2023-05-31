@@ -224,9 +224,10 @@ const DialogPickTeamCreate = React.forwardRef((props: Props, ref) => {
 
               <div style={{ height: '30px' }} />
               <Typography>Các đội bóng tham gia</Typography>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} style={{ display: 'block' }}>
                 {(props.tags || []).map((tag: any) => (
                   <Chip
+                    style={{ margin: '5px' }}
                     label={tag?.shortName || ''}
                     onDelete={() => {
                       const newListPicked = remove(

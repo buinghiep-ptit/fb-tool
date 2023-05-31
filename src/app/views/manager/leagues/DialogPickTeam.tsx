@@ -27,7 +27,7 @@ import { red } from '@mui/material/colors'
 import { addTeam, removeTeam } from 'app/apis/leagues/leagues.service'
 import { getTeams } from 'app/apis/teams/teams.service'
 import { SimpleCard, StyledTable } from 'app/components'
-import { toastSuccess } from 'app/helpers/toastNofication'
+import { toastSuccess, toastWarning } from 'app/helpers/toastNofication'
 import { remove } from 'lodash'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
@@ -247,11 +247,18 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
 
               <div style={{ height: '30px' }} />
               <Typography>Các đội bóng tham gia</Typography>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} style={{ display: 'block' }}>
                 {(props.tags || []).map((tag: any) => (
                   <Chip
+                    style={{ margin: '5px' }}
                     label={tag?.shortName || ''}
                     onDelete={async () => {
+                      if (props.tags.length <= 2) {
+                        toastWarning({
+                          message: 'Số lượng đội không được ít hơn 2',
+                        })
+                        return
+                      }
                       const res = await removeTeam(params.id, tag.id)
                       if (res) {
                         toastSuccess({
@@ -265,6 +272,10 @@ const DialogPickTeam = React.forwardRef((props: Props, ref) => {
                           return n !== tag.id
                         },
                       )
+                      const newTags = props.tags.filter((item: any) => {
+                        return item.id !== tag.id
+                      })
+                      props.setTags(newTags)
                       props.setTeamPicked(newListPicked)
                       props.setValue('teamList', newListPicked)
                       const newTeams = [...teams].map((team: any) => {

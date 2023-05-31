@@ -196,7 +196,10 @@ export default function AddCoach(props: Props) {
           moment(data.dateOfBirth).format('YYYY-MM-DD') === 'Invalid date'
             ? null
             : moment(data.dateOfBirth).format('YYYY-MM-DD'),
-
+        dateJoined:
+          moment(data.gatheringDay).format('YYYY-MM-DD') === 'Invalid date'
+            ? null
+            : moment(data.gatheringDay).format('YYYY-MM-DD'),
         shirtSize: data.sizeClothes,
         shoseSize: data.sizeShoes,
         nailShoseSize: data.sizeSpikeShoes,

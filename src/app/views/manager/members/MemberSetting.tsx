@@ -106,7 +106,7 @@ export default function MemberSetting(props: Props) {
     setIsLoading(true)
     let url: any = ''
     if (file) {
-      url = await handleUploadImage(file)
+      url = await handleUploadImage(file, 'jpg', false)
     } else {
       url = previewImage
     }

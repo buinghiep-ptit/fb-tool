@@ -10,7 +10,6 @@ import {
   getImageCategories,
   uploadImageCategories,
 } from 'app/apis/shop/shop.service'
-import { compressImageFile } from 'app/helpers/compressFile'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
@@ -42,8 +41,8 @@ const DialogSettingImage = React.forwardRef((props: Props, ref) => {
 
   const handleUploadImage = async () => {
     const formData = new FormData()
-    const newFile = await compressImageFile(file)
-    formData.append('file', newFile)
+    // const newFile = await compressImageFile(file)
+    formData.append('file', file)
     try {
       const token = window.localStorage.getItem('accessToken')
       const config: AxiosRequestConfig = {

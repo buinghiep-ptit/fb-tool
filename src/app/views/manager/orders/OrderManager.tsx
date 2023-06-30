@@ -282,8 +282,16 @@ export default function OrderManager(props: Props) {
                       {size * page + index + 1}
                     </TableCell>
                     <TableCell align="center">{item.customerPhone}</TableCell>
-                    <TableCell align="center" sx={{ color: 'red' }}>
-                      {item.orderCode}
+                    <TableCell align="center">
+                      <Link
+                        to={`${item.id}`}
+                        style={{
+                          color: 'red',
+                          textDecorationLine: 'underline',
+                        }}
+                      >
+                        {item.orderCode}
+                      </Link>
                     </TableCell>
                     <TableCell align="center">{item.quantity}</TableCell>
                     <TableCell align="center">

@@ -2,32 +2,32 @@ export const columnsOrders = [
   {
     id: 'order',
     name: 'STT',
-    width: '80px',
+    width: '60px',
   },
   {
     id: 'account',
     name: 'Tài khoản đặt',
-    width: '200px',
+    width: '120px',
   },
   {
     id: 'orderCode',
     name: 'Mã đơn hàng',
-    width: '200px',
+    width: '150px',
   },
   {
     id: 'quantity',
     name: 'Tổng số lượng sản phẩm',
-    width: '200px',
+    width: '120px',
   },
   {
     id: 'amount',
     name: 'Tổng đơn hàng',
-    width: '200px',
+    width: '150px',
   },
   {
     id: 'createdDate',
     name: 'Thời gian đặt',
-    width: '250px',
+    width: '200px',
   },
   {
     id: 'status',
@@ -37,11 +37,11 @@ export const columnsOrders = [
   {
     id: 'note',
     name: 'Ghi chú',
-    width: '300px',
+    width: '150px',
   },
   {
     id: 'action',
     name: 'Thao tác',
-    width: '200px',
+    width: '100px',
   },
 ]

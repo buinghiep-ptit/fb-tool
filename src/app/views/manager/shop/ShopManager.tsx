@@ -72,7 +72,7 @@ export default function ShopManager(props: Props) {
               setIsloading(false)
             }
             resolve()
-          }, 20000),
+          }, 10000),
         )
       }
     }

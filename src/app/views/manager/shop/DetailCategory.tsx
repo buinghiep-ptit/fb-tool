@@ -27,14 +27,14 @@ import {
   displayProduct,
   getProducts,
   priorityProduct,
-  syncProduct,
+  syncCategoryById,
   syncStatus,
 } from 'app/apis/shop/shop.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import moment from 'moment'
 import * as React from 'react'
 import { useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import DialogSettingImage from './DialogSettingImage'
 import { headTableDetailCategory } from './const'
 export interface Props {}
@@ -51,7 +51,6 @@ export default function DetailCategory(props: Props) {
   const [doRerender, setDoRerender] = React.useState(false)
   const navigate = useNavigate()
   const param = useParams()
-  const { state, pathname } = useLocation()
 
   const handleChangePage = (_: any, newPage: React.SetStateAction<number>) => {
     setPage(newPage)
@@ -89,11 +88,12 @@ export default function DetailCategory(props: Props) {
 
   const handleSyncCategory = async () => {
     setIsLoading(true)
-    const res = await syncProduct()
+    const res = await syncCategoryById(param.id)
     if (res) {
       // eslint-disable-next-line prefer-const
       let status = 0
       while (status === 0) {
+        console.log(res)
         await new Promise<void>(resolve =>
           setTimeout(async () => {
             const statusRes = await watchStatusSync()
@@ -104,7 +104,7 @@ export default function DetailCategory(props: Props) {
               setIsLoading(false)
             }
             resolve()
-          }, 20000),
+          }, 10000),
         )
       }
     }

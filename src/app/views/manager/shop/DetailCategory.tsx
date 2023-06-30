@@ -93,7 +93,6 @@ export default function DetailCategory(props: Props) {
       // eslint-disable-next-line prefer-const
       let status = 0
       while (status === 0) {
-        console.log(res)
         await new Promise<void>(resolve =>
           setTimeout(async () => {
             const statusRes = await watchStatusSync()

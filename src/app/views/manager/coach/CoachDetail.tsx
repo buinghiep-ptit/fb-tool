@@ -485,7 +485,7 @@ export default function CoachDetail(props: Props) {
                         multiple
                         options={teams}
                         getOptionLabel={option => option.shortName}
-                        onChange={(_, data) => {
+                        onChange={(_, data: any) => {
                           field.onChange(data)
                         }}
                         renderInput={params => (

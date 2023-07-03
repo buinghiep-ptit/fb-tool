@@ -759,6 +759,7 @@ export default function CoachDetail(props: Props) {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Trạng thái"
+                          onChange={() => {}}
                         >
                           <MenuItem value={-2}>Không hoạt động</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>

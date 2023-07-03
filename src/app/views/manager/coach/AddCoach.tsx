@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { Box } from '@mui/system'
 import { Breadcrumb, Container } from 'app/components'

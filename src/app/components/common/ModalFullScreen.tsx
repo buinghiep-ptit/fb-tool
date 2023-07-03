@@ -1,14 +1,22 @@
 import CloseIcon from '@mui/icons-material/Close'
 import { Stack } from '@mui/material'
-import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import IconButton from '@mui/material/IconButton'
 import Slide from '@mui/material/Slide'
 import * as React from 'react'
 import SliderShow from './SliderShow'
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide children={<></>} direction="down" ref={ref} {...props} />
+const Transition = React.forwardRef(function Transition(
+  props: any & {
+    children: React.ReactElement<any, any>
+  },
+  ref: React.Ref<unknown>,
+) {
+  return (
+    <Slide direction="up" ref={ref} {...props}>
+      {}
+    </Slide>
+  )
 })
 
 type ModalProps = {

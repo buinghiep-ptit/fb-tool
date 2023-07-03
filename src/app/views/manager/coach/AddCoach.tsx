@@ -708,16 +708,13 @@ export default function AddCoach(props: Props) {
                     control={methods.control}
                     render={({ field }) => (
                       <FormControl style={{ width: '200px' }}>
-                        <InputLabel id="demo-simple-select-label">
-                          Trạng thái
-                        </InputLabel>
+                        <InputLabel id="status">Trạng thái</InputLabel>
                         <Select
                           autoWidth
                           {...field}
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
+                          labelId="status"
+                          id="status"
                           label="Trạng thái"
-                          onChange={() => {}}
                         >
                           <MenuItem value={-2}>Không hoạt động</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>

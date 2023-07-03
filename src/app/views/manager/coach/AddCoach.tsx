@@ -1,3 +1,4 @@
+// @ts-ignore
 import { Box } from '@mui/system'
 import { Breadcrumb, Container } from 'app/components'
 import * as React from 'react'

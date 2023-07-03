@@ -715,6 +715,7 @@ export default function AddCoach(props: Props) {
                           labelId="status"
                           id="status"
                           label="Trạng thái"
+                          onChange={() => {}}
                         >
                           <MenuItem value={-2}>Không hoạt động</MenuItem>
                           <MenuItem value={1}>Hoạt động</MenuItem>

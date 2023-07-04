@@ -214,6 +214,7 @@ const DialogCreateMatchLeague = React.forwardRef((props: Props, ref) => {
                         <Select
                           autoWidth
                           {...field}
+                          onChange={field.onChange as any}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng sân khách*"

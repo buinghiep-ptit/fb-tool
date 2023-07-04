@@ -278,6 +278,7 @@ export default function NewsDetail(props: Props) {
                       <Select
                         fullWidth
                         {...field}
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Loại tin tức*"
@@ -322,6 +323,7 @@ export default function NewsDetail(props: Props) {
                           <Select
                             fullWidth
                             {...field}
+                            onChange={field.onChange as any}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             label="Chọn vị trí*"

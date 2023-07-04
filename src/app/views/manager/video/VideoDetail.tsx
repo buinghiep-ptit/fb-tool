@@ -254,6 +254,7 @@ export default function VideoDetail(props: Props) {
                       <Select
                         fullWidth
                         {...field}
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Loại video*"
@@ -298,6 +299,7 @@ export default function VideoDetail(props: Props) {
                           <Select
                             fullWidth
                             {...field}
+                            onChange={field.onChange as any}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             label="Chọn vị trí*"
@@ -458,6 +460,7 @@ export default function VideoDetail(props: Props) {
                       <Select
                         fullWidth
                         {...field}
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Trạng thái*"

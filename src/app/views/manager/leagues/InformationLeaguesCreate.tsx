@@ -186,6 +186,7 @@ export default function InfomationLeaguesCreate(props: Props) {
                       </InputLabel>
                       <Select
                         {...field}
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Loại giải*"
@@ -325,6 +326,7 @@ export default function InfomationLeaguesCreate(props: Props) {
                       </InputLabel>
                       <Select
                         {...field}
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Trạng thái*"

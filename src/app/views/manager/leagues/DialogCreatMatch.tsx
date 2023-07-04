@@ -169,7 +169,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                           id="demo-simple-select"
                           label="Đội bóng 1*:"
                           MenuProps={{ classes: { paper: 'overflowY' } }}
-                          onChange={() => {}}
+                          onChange={field.onChange as any}
                         >
                           {leagues.teamList.map((team: any) => (
                             <MenuItem key={team.id} value={team.id}>
@@ -202,6 +202,7 @@ const DialogCreateMatch = React.forwardRef((props: Props, ref) => {
                         <Select
                           autoWidth
                           {...field}
+                          onChange={field.onChange as any}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Đội bóng 2*"

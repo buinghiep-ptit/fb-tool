@@ -246,6 +246,7 @@ export default function MatchDetailTabPanel1(props: any) {
                         onClose={() =>
                           methods.trigger().then(() => methods.clearErrors())
                         }
+                        onChange={field.onChange as any}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         label="Trạng thái*"
@@ -274,6 +275,7 @@ export default function MatchDetailTabPanel1(props: any) {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DateTimePicker
                         {...field}
+                        onChange={field.onChange as any}
                         label={`Thời gian diễn ra${
                           methods.getValues('status') === 3 ? '' : '*'
                         }:`}

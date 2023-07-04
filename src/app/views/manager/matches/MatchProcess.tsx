@@ -205,6 +205,7 @@ export default function MatchProcess(props: any) {
                           onClose={() => {
                             methods.trigger().then(() => methods.clearErrors())
                           }}
+                          onChange={field.onChange as any}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Loại diễn biến*"
@@ -263,6 +264,7 @@ export default function MatchProcess(props: any) {
                           <Select
                             variant="outlined"
                             {...field}
+                            onChange={field.onChange as any}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             label="Loại diễn biến*"

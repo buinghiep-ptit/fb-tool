@@ -547,6 +547,7 @@ export default function PlayerDetail(props: Props) {
                         <Select
                           autoWidth
                           {...field}
+                          onChange={field.onChange as any}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Chân thuận"
@@ -707,6 +708,7 @@ export default function PlayerDetail(props: Props) {
                           <Select
                             autoWidth
                             {...field}
+                            onChange={field.onChange as any}
                             disabled={disabledViewPosition}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -860,6 +862,7 @@ export default function PlayerDetail(props: Props) {
                         <Select
                           autoWidth
                           {...field}
+                          onChange={field.onChange as any}
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           label="Trạng thái"

@@ -319,6 +319,7 @@ const DialogUpdateTeam = React.forwardRef((props: Props, ref) => {
                 <Select
                   fullWidth
                   {...field}
+                  onChange={field.onChange as any}
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Trạng thái*"

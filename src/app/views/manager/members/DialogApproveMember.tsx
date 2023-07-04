@@ -212,6 +212,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                         <DatePicker
                           label="Từ mùa giải*"
                           {...field}
+                          onChange={field.onChange as any}
                           views={['year']}
                           openTo="year"
                           minDate={today}
@@ -246,6 +247,7 @@ const DialogApproveMember = React.forwardRef((props: Props, ref) => {
                         <DatePicker
                           label="Đến mùa giải*"
                           {...field}
+                          onChange={field.onChange as any}
                           views={['year']}
                           openTo="year"
                           minDate={watchFrom}

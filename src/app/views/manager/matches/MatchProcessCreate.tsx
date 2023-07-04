@@ -201,6 +201,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                                 .trigger()
                                 .then(() => methods.clearErrors())
                             }}
+                            onChange={field.onChange as any}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             label="Loại diễn biến*"
@@ -257,6 +258,7 @@ const MatchProcessCreate = React.forwardRef((props: Props, ref) => {
                             <Select
                               variant="outlined"
                               {...field}
+                              onChange={field.onChange as any}
                               labelId="demo-simple-select-label"
                               id="demo-simple-select"
                               label="Loại diễn biến*"

@@ -21,7 +21,8 @@ export const userHasPermission = (pathname: string, user: any, routes: any) => {
   })
   const authenticated =
     matched && matched.auth && matched.auth.length
-      ? matched.auth.includes(user.authorities[0])
+      ? matched.auth.filter((e: any) => user.authorities.indexOf(e) !== -1)
+          .length > 0
       : true
   return authenticated
 }

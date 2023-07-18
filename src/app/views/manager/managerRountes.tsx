@@ -1,5 +1,6 @@
 import Loadable from 'app/components/Loadable'
 import { lazy } from 'react'
+import { ROLES } from '../../utils/enums/roles'
 
 const CustomerManager = Loadable(lazy(() => import('./customer/Customers')))
 const NewsManager = Loadable(lazy(() => import('./news/News')))
@@ -37,59 +38,180 @@ const UserManager = Loadable(lazy(() => import('./users/UserManager')))
 const CoachDetail = Loadable(lazy(() => import('./coach/CoachDetail')))
 const AddCoach = Loadable(lazy(() => import('./coach/AddCoach')))
 const PositionManager = Loadable(lazy(() => import('./coach/PositionManager')))
+
 const managerRoutes = [
   {
     path: '/customers',
     element: <CustomerManager />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR, ROLES.MEMBERSHIP_MANAGER],
   },
   {
     path: '/customers/:idCustomer',
     element: <EditCustomer />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR, ROLES.MEMBERSHIP_MANAGER],
   },
-  { path: '/coachs', element: <CoachManager /> },
-  { path: '/coachs/create', element: <AddCoach /> },
-  { path: '/position', element: <PositionManager /> },
-  { path: '/coachs/:id', element: <CoachDetail /> },
-  { path: '/leagues', element: <LeaguesManager /> },
-  { path: '/players', element: <PlayerManager /> },
-  { path: '/news', element: <NewsManager /> },
-  { path: '/news/:id', element: <NewsDetail /> },
-  { path: '/news/create', element: <NewsCreate /> },
+  {
+    path: '/coachs',
+    element: <CoachManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/coachs/create',
+    element: <AddCoach />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/position',
+    element: <PositionManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/coachs/:id',
+    element: <CoachDetail />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/leagues',
+    element: <LeaguesManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/players',
+    element: <PlayerManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/news',
+    element: <NewsManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/news/:id',
+    element: <NewsDetail />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/news/create',
+    element: <NewsCreate />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
   { path: '/accounts', element: <AccountManager /> },
-  { path: '/teams', element: <TeamManager /> },
-  { path: '/cahntv', element: <VideoManager /> },
-  { path: '/cahntv/:id', element: <VideoDetail /> },
-  { path: '/cahntv/create', element: <VideoCreate /> },
-  { path: '/shop/sort', element: <SortManager /> },
-  { path: '/shop/category/:id', element: <DetailCategory /> },
-  { path: '/shop/product/:id', element: <Product /> },
-  { path: '/players/:id', element: <PlayerDetail /> },
-  { path: '/players/create', element: <CreatePlayer /> },
-  { path: '/leagues/create', element: <CreateLeagues /> },
-  { path: '/leagues/:id', element: <EditLeagues /> },
+  {
+    path: '/teams',
+    element: <TeamManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/cahntv',
+    element: <VideoManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/cahntv/:id',
+    element: <VideoDetail />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/cahntv/create',
+    element: <VideoCreate />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/shop/sort',
+    element: <SortManager />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR],
+  },
+  {
+    path: '/shop/category/:id',
+    element: <DetailCategory />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR],
+  },
+  {
+    path: '/shop/product/:id',
+    element: <Product />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR],
+  },
+  {
+    path: '/players/:id',
+    element: <PlayerDetail />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/players/create',
+    element: <CreatePlayer />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/leagues/create',
+    element: <CreateLeagues />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/leagues/:id',
+    element: <EditLeagues />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
   {
     path: '/shop',
     element: <ShopManager />,
   },
-  { path: '/orders', element: <OrderManager /> },
+  {
+    path: '/orders',
+    element: <OrderManager />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR],
+  },
 
   {
     path: '/orders/:orderID',
     element: <OrderDetail />,
+    auth: [ROLES.ADMIN, ROLES.OPERATOR],
   },
-  { path: '/banner', element: <BannerManager /> },
-  { path: '/banner/:id', element: <EditBanner /> },
+  {
+    path: '/banner',
+    element: <BannerManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/banner/:id',
+    element: <EditBanner />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
   {
     path: '/banner/them-moi-banner',
     element: <AddBanner />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
   },
 
-  { path: '/matches', element: <MatchManager /> },
-  { path: '/matches/:id', element: <MatchDetail /> },
-  { path: '/members', element: <MemberManager /> },
-  { path: '/members/:id', element: <MemberDetail /> },
-  { path: '/members/setting', element: <MemberSetting /> },
-  { path: '/logos', element: <LogoManager /> },
-  { path: '/users', element: <UserManager /> },
+  {
+    path: '/matches',
+    element: <MatchManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/matches/:id',
+    element: <MatchDetail />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  {
+    path: '/members',
+    element: <MemberManager />,
+    auth: [ROLES.ADMIN, ROLES.MEMBERSHIP_MANAGER],
+  },
+  {
+    path: '/members/:id',
+    element: <MemberDetail />,
+    auth: [ROLES.ADMIN, ROLES.MEMBERSHIP_MANAGER],
+  },
+  {
+    path: '/members/setting',
+    element: <MemberSetting />,
+    auth: [ROLES.ADMIN, ROLES.MEMBERSHIP_MANAGER],
+  },
+  {
+    path: '/logos',
+    element: <LogoManager />,
+    auth: [ROLES.ADMIN, ROLES.CONTENT_MANAGER],
+  },
+  { path: '/users', element: <UserManager />, auth: [ROLES.ADMIN] },
 ]
 export default managerRoutes

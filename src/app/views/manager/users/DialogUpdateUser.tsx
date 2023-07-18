@@ -18,6 +18,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { Box } from '@mui/system'
 import { updateUser } from 'app/apis/users/users.service'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { roleOptions } from 'app/utils/enums/roles'
 import * as React from 'react'
 import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -58,7 +59,10 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
         .trim()
         .max(255, 'Tối đa 255 ký tự'),
       status: yup.number().required('Giá trị bắt buộc'),
-      role: yup.number().required('Giá trị bắt buộc'),
+      roles: yup
+        .array()
+        .min(1, 'Giá trị bắt buộc')
+        .required('Giá trị bắt buộc'),
     })
     .required()
 
@@ -67,7 +71,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
     defaultValues: {
       email: '',
       status: 1,
-      role: 1,
+      roles: [],
     },
   })
 
@@ -75,7 +79,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
     const defaultValues: any = {}
     defaultValues.email = user.email
     defaultValues.status = user.status
-    defaultValues.role = user.role
+    defaultValues.roles = user.roles.split(',').map((r: any) => Number(r))
     methods.reset({ ...defaultValues })
   }
 
@@ -89,7 +93,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
     const payload: any = {
       email: data.email,
       status: data.status,
-      role: data.role,
+      roles: data.roles,
     }
 
     await updateUser(user.userId, payload)
@@ -181,7 +185,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
             )}
           />
           <Controller
-            name="role"
+            name="roles"
             control={methods.control}
             render={({ field }) => (
               <FormControl fullWidth margin="normal">
@@ -189,6 +193,7 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
                   Nhóm quyền*
                 </InputLabel>
                 <Select
+                  multiple
                   fullWidth
                   {...field}
                   onChange={field.onChange as any}
@@ -196,11 +201,17 @@ const DialogUpdateUser = React.forwardRef((props: Props, ref) => {
                   id="demo-simple-select"
                   label="Nhóm quyền*"
                 >
-                  <MenuItem value={1}>Admin</MenuItem>
+                  {roleOptions.map((r, index) => {
+                    return (
+                      <MenuItem key={index} value={r.id}>
+                        {r.label}
+                      </MenuItem>
+                    )
+                  })}
                 </Select>
-                {!!methods.formState.errors?.role?.message && (
-                  <FormHelperText>
-                    {methods.formState.errors?.role.message}
+                {!!methods.formState.errors?.roles?.message && (
+                  <FormHelperText error>
+                    {methods.formState.errors?.roles.message}
                   </FormHelperText>
                 )}
               </FormControl>

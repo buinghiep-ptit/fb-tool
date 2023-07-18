@@ -25,6 +25,7 @@ import { Box } from '@mui/system'
 import { getUsers } from 'app/apis/users/users.service'
 import { Breadcrumb, Container, SimpleCard, StyledTable } from 'app/components'
 import { MuiButton } from 'app/components/common/MuiButton'
+import { getRoleLabel } from 'app/utils/enums/roles'
 import dayjs from 'dayjs'
 import * as React from 'react'
 import { useState } from 'react'
@@ -61,10 +62,19 @@ export default function UserManager(props: Props) {
       size: rowsPerPage,
     })
       .then(res => {
-        setUsers(res.content)
+        setUsers(
+          res.content.map((u: any) => {
+            u.roleArr = u.roles
+              .split(',')
+              .map((r: any) => getRoleLabel(Number(r)))
+            return u
+          }),
+        )
         setCountTable(res.totalElements)
       })
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const search = () => {
@@ -273,7 +283,9 @@ export default function UserManager(props: Props) {
                           {user.email}
                         </Button>
                       </TableCell>
-                      <TableCell align="center">Admin</TableCell>
+                      <TableCell align="center">
+                        {user.roleArr.join(', ')}
+                      </TableCell>
                       <TableCell align="left">
                         {dayjs(user.updateDate).format('DD/MM/YYYY HH:mm')}
                       </TableCell>

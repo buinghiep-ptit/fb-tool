@@ -5,7 +5,7 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { MuiTypography } from './MuiTypography'
 
@@ -33,7 +33,7 @@ export interface Props {
   label?: string
   defaultValue?: any
   options?: any
-  optionProperty: string // keyof options
+  optionProperty?: string // keyof options
   renderInput?: any
   getOptionLabel?: (option: any) => string
   rightIcon?: ReactElement

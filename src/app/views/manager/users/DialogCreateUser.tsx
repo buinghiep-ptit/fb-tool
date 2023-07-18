@@ -20,6 +20,7 @@ import { Box } from '@mui/system'
 import { createUser } from 'app/apis/users/users.service'
 import FormInputText from 'app/components/common/MuiRHFInputText'
 import { toastSuccess } from 'app/helpers/toastNofication'
+import { roleOptions } from 'app/utils/enums/roles'
 import { messages } from 'app/utils/messages'
 import * as React from 'react'
 import { useState } from 'react'
@@ -70,7 +71,10 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
         .trim()
         .max(255, 'Tối đa 255 ký tự'),
       status: yup.number().required('Giá trị bắt buộc'),
-      role: yup.number().required('Giá trị bắt buộc'),
+      roles: yup
+        .array()
+        .min(1, 'Tối thiểu 1 quyền')
+        .required('Giá trị bắt buộc'),
       password: yup
         .string()
         .required(messages.MSG1)
@@ -90,7 +94,7 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
     defaultValues: {
       email: '',
       status: 1,
-      role: 1,
+      roles: [],
       password: '',
     },
   })
@@ -101,7 +105,7 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
     const payload: any = {
       email: data.email,
       status: data.status,
-      role: data.role,
+      roles: data.roles,
       password: data.password,
     }
 
@@ -202,7 +206,7 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
                 )}
               />
               <Controller
-                name="role"
+                name="roles"
                 control={methods.control}
                 render={({ field }) => (
                   <FormControl fullWidth margin="normal">
@@ -210,6 +214,7 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
                       Nhóm quyền*
                     </InputLabel>
                     <Select
+                      multiple
                       fullWidth
                       {...field}
                       onChange={field.onChange as any}
@@ -217,11 +222,17 @@ const DialogCreateUser = React.forwardRef((props: Props, ref) => {
                       id="demo-simple-select"
                       label="Nhóm quyền*"
                     >
-                      <MenuItem value={1}>Admin</MenuItem>
+                      {roleOptions.map((r, index) => {
+                        return (
+                          <MenuItem key={index} value={r.id}>
+                            {r.label}
+                          </MenuItem>
+                        )
+                      })}
                     </Select>
-                    {!!methods.formState.errors?.role?.message && (
-                      <FormHelperText>
-                        {methods.formState.errors?.role.message}
+                    {!!methods.formState.errors?.roles?.message && (
+                      <FormHelperText error>
+                        {methods.formState.errors?.roles.message}
                       </FormHelperText>
                     )}
                   </FormControl>
